@@ -5,7 +5,7 @@ export default function App() {
   console.log("app exec");
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start on your app!</Text>
+      <Text>Hello World!</Text>
       <StatusBar style="auto" />
     </View>
   );
