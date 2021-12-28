@@ -1,11 +1,10 @@
-const { User } = require("../../models/User");
 const { UserType } = require("../../types");
 const getUser = {
   type: UserType,
   args: {},
   async resolve(parent, {}, context) {
     try {
-      return await User.findById(context.user.id);
+      return context.user;
     } catch (err) {
       console.log(err);
     }

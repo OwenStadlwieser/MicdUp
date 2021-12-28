@@ -92,7 +92,7 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6002;
 let server = http.createServer(app);
 server = server.listen(PORT, () =>
   console.log("Server is running on Port", PORT)
