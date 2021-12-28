@@ -1,30 +1,25 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { View } from "react-native";
 export class DefaultComponent extends Component {
-    
-    constructor() {
-        super()
-        this.state = {
-            loading: false
-        }
+  constructor() {
+    super();
+    this.state = {
+      loading: false,
+    };
 
-        this.mounted = true
-    }
+    this.mounted = true;
+  }
 
-    componentWillUnmount = () => ( this.mounted = false )
+  componentWillUnmount = () => (this.mounted = false);
 
-    componentDidMount = () => {}
+  componentDidMount = () => {};
 
-    render () {
-        return (
-            <div></div>
-        )
-    }
+  render() {
+    return <div></div>;
+  }
 }
 
-const mapStateToProps = ( state ) => ({
+const mapStateToProps = (state) => ({});
 
-})
-
-export default connect(mapStateToProps, {})(DefaultComponent)
+export default connect(mapStateToProps, {})(DefaultComponent);

@@ -19,6 +19,12 @@ const UserType = new GraphQLObjectType({
     email: { type: GraphQLString },
     phone: { type: GraphQLString },
     date: { type: GraphQLInt },
+    type: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent.__t;
+      },
+    },
   }),
 });
 

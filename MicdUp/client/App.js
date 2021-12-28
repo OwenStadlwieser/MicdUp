@@ -1,15 +1,10 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-
-export default function App() {
-  console.log("app exec");
-  return (
-    <View style={styles.container}>
-      <Text>Hello World!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import React from "react";
+import { StyleSheet } from "react-native";
+import Root from "./Root";
+import { Provider } from "react-redux";
+import store from "./redux/index";
+import { BrowserRouter } from "react-router-dom";
+import "dotenv/config";
 
 const styles = StyleSheet.create({
   container: {
@@ -19,3 +14,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default function App() {
+  console.log("app exec");
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <Root />
+      </BrowserRouter>
+    </Provider>
+  );
+}
