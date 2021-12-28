@@ -10,13 +10,13 @@ const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
-
+const { User } = require("./database/models/User");
 const app = express();
 app.use(bodyParser.json({ limit: "100kb" }));
 app.use(bodyParser.urlencoded({ limit: "100kb", extended: false }));
 app.use(cors());
 
-const verifiedUrls = ["http://localhost:3000"];
+const verifiedUrls = ["http://localhost:19006"];
 function useHttps(req, res, next) {
   if (!req.secure && process.env.NODE_ENV !== "DEVELOPMENT")
     return res.redirect("https://" + req.get("host") + req.url);
@@ -41,13 +41,13 @@ if (app.get("env") === "production") {
   app.set("trust proxy", 1); // trust first proxy
   sess.cookie.secure = true; // serve secure cookies
 }
-
+// look more into
 app.use(session(sess));
 
 app.use(function (req, res, next) {
-  if (verifiedUrls.includes(req.headers.origin))
+  if (verifiedUrls.includes(req.headers.origin)) {
     res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
-  else res.setHeader("Access-Control-Allow-Origin", "");
+  } else res.setHeader("Access-Control-Allow-Origin", "");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   res.locals.session = req.session;
   next();
@@ -88,7 +88,9 @@ mongoose
     useUnifiedTopology: true,
   })
   .then((connected) => {
-    if (connected) console.log("MongoDB connected");
+    if (connected) {
+      console.log("MongoDB connected");
+    }
   })
   .catch((err) => console.log(err));
 
