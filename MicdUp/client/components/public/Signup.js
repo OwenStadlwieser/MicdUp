@@ -90,7 +90,6 @@ export class Signup extends Component {
           <input
             type="date"
             onChange={(event) => {
-              console.log(event);
               this.mounted &&
                 this.setState({ date: event.nativeEvent.target.value });
             }}

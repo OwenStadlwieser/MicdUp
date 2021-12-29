@@ -11,7 +11,7 @@ export class DefaultComponent extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  nmount = () => (this.mounted = false);
 
   componentDidMount = () => {};
 

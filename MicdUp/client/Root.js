@@ -7,6 +7,7 @@ import { styles } from "./styles/dashboardStyles";
 import { changeLogin, changeSignup } from "./redux/actions/display";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
+import { getData } from "./reuseableFunctions/helpers";
 
 export class Root extends Component {
   constructor() {
@@ -14,18 +15,36 @@ export class Root extends Component {
     this.state = {
       loading: false,
       userId: "",
+      token: "",
+      loggedIn: false,
     };
 
     this.mounted = true;
   }
+
+  componentWillUnmount = () => {
+    this.mounted = false;
+  };
+
   componentDidMount = async () => {
     const res = await this.props.getUserQuery();
     this.mounted && this.setState({ userId: res ? res.id : "" });
+    const token = await getData("token");
+    this.mounted && this.setState({ token });
+  };
+  componentDidUpdate = async (prevProps, prevState) => {
+    const { loggedIn, token } = this.state;
+    if (loggedIn && (!token || token !== prevState.token)) {
+      const token = await getData("token");
+      this.mounted && this.setState({ token });
+    }
+  };
+  updateLoggedIn = (loggedIn) => {
+    this.mounted && this.setState({ loggedIn });
   };
   render() {
-    const { userId } = this.state;
+    const { userId, token } = this.state;
     const {
-      loggedIn,
       showLogin,
       showSignup,
       displayMessage,
@@ -33,7 +52,7 @@ export class Root extends Component {
       messageState,
     } = this.props;
     let app;
-    if (!loggedIn)
+    if (!token)
       app = (
         <View style={styles.rootContainer}>
           {displayMessage && (
@@ -46,7 +65,7 @@ export class Root extends Component {
             </View>
           )}
           {showLogin ? (
-            <Login />
+            <Login updateLoggedIn={this.updateLoggedIn.bind(this)} />
           ) : showSignup ? (
             <Signup />
           ) : (
@@ -76,6 +95,16 @@ export class Root extends Component {
               <StatusBar style="auto" />
             </View>
           )}
+        </View>
+      );
+    else
+      app = (
+        <View style={styles.rootContainer}>
+          <View style={styles.messageContainer}>
+            <Text style={messageState ? styles.goodMessage : styles.badMessage}>
+              Logged in
+            </Text>
+          </View>
         </View>
       );
     return app;

@@ -24,7 +24,8 @@ const SIGNUP_MUTATION = gql`
 const LOGIN_QUERY = gql`
   query login($authenticator: String!, $password: String!) {
     login(authenticator: $authenticator, password: $password) {
-      token
+      success
+      message
     }
   }
 `;

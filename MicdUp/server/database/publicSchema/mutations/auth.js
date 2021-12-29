@@ -18,7 +18,7 @@ const createUser = {
       message: "Sign up successful",
     };
     try {
-      await User.insertMany({
+      await User.create({
         userName: user,
         phone,
         email,

@@ -4,6 +4,7 @@ import { View, TextInput, Text, TouchableOpacity } from "react-native";
 import { changeLogin } from "../../redux/actions/display";
 import { styles } from "../../styles/dashboardStyles";
 import { AntDesign } from "@expo/vector-icons";
+import { login } from "../../redux/actions/auth";
 
 export class Login extends Component {
   constructor() {
@@ -17,9 +18,20 @@ export class Login extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.mounted = false;
+  };
 
   componentDidMount = () => {};
+
+  login = async () => {
+    const { authenticator, password } = this.state;
+    const { updateLoggedIn } = this.props;
+    const res = await this.props.login(authenticator, password);
+    if (res.success) {
+      updateLoggedIn(true);
+    }
+  };
 
   onChange = (name, text) => {
     this.mounted && this.setState({ [name]: text });
@@ -54,7 +66,11 @@ export class Login extends Component {
           />
           <Text style={styles.underline}>Forgot Password</Text>
         </View>
-        <TouchableOpacity style={styles.button} accessibilityLabel="Login">
+        <TouchableOpacity
+          onPress={async () => await this.login()}
+          style={styles.button}
+          accessibilityLabel="Login"
+        >
           <Text style={styles.text}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -64,4 +80,4 @@ export class Login extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { changeLogin })(Login);
+export default connect(mapStateToProps, { changeLogin, login })(Login);

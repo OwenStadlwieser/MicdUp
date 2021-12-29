@@ -27,7 +27,6 @@ export default function (state = { ...initialState }, action) {
         showSignup: payload,
       };
     case DISPLAY_MESSAGE:
-      console.log(payload);
       return {
         ...state,
         displayMessage: true,
@@ -35,7 +34,6 @@ export default function (state = { ...initialState }, action) {
         messageState: payload.success,
       };
     case HIDE_MESSAGE:
-      console.log("here");
       return {
         ...state,
         displayMessage: false,

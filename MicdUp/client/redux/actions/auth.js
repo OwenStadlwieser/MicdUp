@@ -1,14 +1,17 @@
 import { client } from "../../apollo/client/index";
 import { SIGNUP_MUTATION, LOGIN_QUERY } from "../../apollo/public/auth";
 import { LOG_IN } from "../types";
-
-export const login = (email, password) => async (dispatch) => {
+import { storeData } from "../../reuseableFunctions/helpers";
+export const login = (authenticator, password) => async (dispatch) => {
   try {
     const res = await client.query({
       query: LOGIN_QUERY,
-      variables: { email, password },
+      variables: { authenticator, password },
     });
-    if (res.data.login.token) dispatch({ type: LOG_IN });
+    if (res.data.login.success) {
+      await storeData("token", res.data.login.message);
+      dispatch({ type: LOG_IN });
+    }
     return res.data.login;
   } catch (err) {
     console.log(err);
@@ -17,7 +20,6 @@ export const login = (email, password) => async (dispatch) => {
 
 export const register =
   (email, phone, password, user, dob) => async (dispatch) => {
-    console.log(email, phone, password, user, dob);
     try {
       const res = await client.mutate({
         mutation: SIGNUP_MUTATION,
