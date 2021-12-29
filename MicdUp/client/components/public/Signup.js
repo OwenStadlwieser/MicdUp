@@ -11,14 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-
-let DatePicker;
-async () => {
-  console.log(Platform.OS);
-  if (Platform.OS !== "web") {
-    DatePicker = await import("react-native-datepicker");
-  }
-};
+import DatePicker from "react-native-datepicker";
 
 export class Signup extends Component {
   constructor() {
@@ -50,7 +43,7 @@ export class Signup extends Component {
     if (res.data.createUser.success)
       setTimeout(() => {
         this.props.changeSignup(false);
-      }, 5000);
+      }, 3000);
   }
   render() {
     const { email, phone, password, date, user } = this.state;
@@ -101,7 +94,7 @@ export class Signup extends Component {
               this.mounted &&
                 this.setState({ date: event.nativeEvent.target.value });
             }}
-            placeholder="select date"
+            placeholder="Date of Birth"
             format="DD/MM/YYYY"
             style={{
               width: "60%",
@@ -116,7 +109,7 @@ export class Signup extends Component {
             style={styles.datePickerStyle}
             date={date}
             mode="date"
-            placeholder="select date"
+            placeholder="Date of Birth"
             format="DD/MM/YYYY"
             confirmBtnText="Confirm"
             cancelBtnText="Cancel"
@@ -135,10 +128,11 @@ export class Signup extends Component {
               },
               placeholderText: {
                 fontSize: 17,
-                color: "gray",
+                color: "white",
               },
               dateText: {
                 fontSize: 17,
+                color: "white",
               },
             }}
             onDateChange={(date) => {
