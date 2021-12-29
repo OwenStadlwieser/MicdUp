@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     left: width * 0.2,
     borderRadius: 10,
-    padding: "15px",
+    padding: 15,
     textAlign: "center",
   },
   goodMessage: {
