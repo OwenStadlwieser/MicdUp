@@ -27,5 +27,11 @@ const UserType = new GraphQLObjectType({
     },
   }),
 });
-
-module.exports = { UserType };
+const MessageType = new GraphQLObjectType({
+  name: "Message",
+  fields: () => ({
+    success: { type: GraphQLBoolean },
+    message: { type: GraphQLString },
+  }),
+});
+module.exports = { UserType, MessageType };

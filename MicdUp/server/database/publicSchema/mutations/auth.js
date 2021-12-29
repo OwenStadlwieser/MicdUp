@@ -1,30 +1,35 @@
 const { User } = require("../../models/User");
 const { GraphQLString } = require("graphql");
-const { UserType } = require("../../types");
+const { MessageType } = require("../../types");
 
 const createUser = {
-  type: UserType,
+  type: MessageType,
   args: {
-    name: { type: GraphQLString },
     email: { type: GraphQLString },
-    password: { type: GraphQLString },
     phone: { type: GraphQLString },
+    user: { type: GraphQLString },
+    password: { type: GraphQLString },
+    dob: { type: GraphQLString },
   },
-  async resolve(parent, { name, email, password, phone }, context) {
+  async resolve(parent, { email, phone, password, user, dob }, context) {
     // FIXME: implement transaction
-    const userAlreadyExists = await User.findOne({
-      $or: [{ email: email }, { phone: phone }],
-    });
-    if (userAlreadyExists) {
-      throw new Error("duplicate user found");
+    returnObject = {
+      success: true,
+      message: "Sign up successful",
+    };
+    try {
+      await User.insertMany({
+        userName: user,
+        phone,
+        email,
+        password,
+        dob,
+      });
+    } catch (err) {
+      returnObject.success = false;
+      returnObject.message = err.message;
     }
-    let user = User.insertMany({
-      name,
-      phone,
-      email,
-      password,
-    });
-    return user;
+    return returnObject;
   },
 };
 
