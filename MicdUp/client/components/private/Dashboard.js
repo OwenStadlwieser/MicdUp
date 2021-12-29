@@ -5,12 +5,12 @@ import { Text, View } from "react-native";
 import { getUserQuery } from "../../redux/actions/user";
 import { navigate } from "../../redux/actions/display";
 // children
-import Create from "./create/Create";
-import Dms from "./dms/Dms";
-import Feed from "./feed/Feed";
-import Live from "./live/Live";
-import Profile from "./profile/Profile";
-import Search from "./search/Search";
+import Create from "./Create/Create";
+import Dms from "./Dms/Dms";
+import Feed from "./Feed/Feed";
+import Live from "./Live/Live";
+import Profile from "./Profile/Profile";
+import Search from "./Search/Search";
 // helpers
 import { removeItemValue } from "../../reuseableFunctions/helpers";
 
