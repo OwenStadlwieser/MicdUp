@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, TextInput, Text, TouchableOpacity } from "react-native";
 import { changeLogin } from "../../redux/actions/display";
-import { styles } from "../../styles/dashboardStyles";
+import { styles } from "../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import { login } from "../../redux/actions/auth";
 

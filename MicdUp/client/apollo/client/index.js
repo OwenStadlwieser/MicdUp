@@ -7,7 +7,6 @@ const httpLink = createHttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
-  // FIXME: FOR IOS
   const userToken = await getData("token");
   // return the headers to the context so httpLink can read them
   return {

@@ -90,6 +90,51 @@ const styles = StyleSheet.create({
     width: width,
     margin: 0,
   },
+  containerPrivate: {
+    flex: 1,
+    backgroundColor: "#1A3561",
+    alignItems: "center",
+    justifyContent: "center",
+    width: width,
+  },
+  contentContainer: {
+    flex: 9,
+    backgroundColor: "#1A3561",
+    alignItems: "center",
+    justifyContent: "center",
+    width: width,
+  },
+  navbarButton: {
+    width: width * 0.2,
+    height: height * 0.1,
+    display: "flex",
+    justifyContent: "center",
+    borderBottomWidth: 2,
+    borderColor: "gray",
+    borderStyle: "solid",
+  },
+  activeNavbarButton: {
+    width: width * 0.2,
+    borderBottomWidth: 4,
+    borderColor: "black",
+    borderStyle: "solid",
+    textAlign: "center",
+    height: height * 0.1,
+    display: "flex",
+    justifyContent: "center",
+  },
+  navbarText: {
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  navbar: {
+    flex: 1,
+    flexDirection: "row",
+    width: width,
+    backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export { styles };

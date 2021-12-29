@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity } from "react-native";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 // styles
-import { styles } from "./styles/dashboardStyles";
+import { styles } from "./styles/Styles";
 // redux
 import { changeLogin, changeSignup } from "./redux/actions/display";
 // children
@@ -105,10 +105,10 @@ export class Root extends Component {
             <Text style={messageState ? styles.goodMessage : styles.badMessage}>
               Logged in
             </Text>
-            <Dashboard
-              updateLoggedIn={this.updateLoggedIn.bind(this)}
-            ></Dashboard>
           </View>
+          <Dashboard
+            updateLoggedIn={this.updateLoggedIn.bind(this)}
+          ></Dashboard>
         </View>
       );
     return app;
