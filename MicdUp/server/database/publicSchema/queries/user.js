@@ -6,8 +6,7 @@ const getUser = {
   args: {},
   async resolve(parent, {}, context) {
     try {
-      const res = await User.findOne();
-      return res;
+      return context.user;
     } catch (err) {}
   },
 };

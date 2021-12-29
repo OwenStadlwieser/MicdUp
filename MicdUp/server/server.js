@@ -65,7 +65,7 @@ app.use(async (req, res, next) => {
     }
   }
   if (userId) {
-    user = await User.findOne({
+    const user = await User.findOne({
       _id: userId.user,
     });
     req.user = user;

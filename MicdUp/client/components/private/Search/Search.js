@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
-export class DefaultComponent extends Component {
+export class Search extends Component {
   constructor() {
     super();
     this.state = {
@@ -22,4 +22,4 @@ export class DefaultComponent extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(DefaultComponent);
+export default connect(mapStateToProps, {})(Search);

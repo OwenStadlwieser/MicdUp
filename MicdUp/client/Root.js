@@ -1,55 +1,129 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { client } from "./apollo/client/index";
-import { getUserQuery } from "./redux/actions/user";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { Text, View, TouchableOpacity } from "react-native";
 import React, { Component } from "react";
-import { connect, Provider } from "react-redux";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  resolvePath,
-} from "react-router-dom";
-import ReactDOM from "react-dom";
-import store from "./redux/index";
+import { connect } from "react-redux";
+// styles
+import { styles } from "./styles/dashboardStyles";
+// redux
+import { changeLogin, changeSignup } from "./redux/actions/display";
+// children
+import Dashboard from "./components/private/Dashboard";
+import Login from "./components/public/Login";
+import Signup from "./components/public/Signup";
+// helpers
+import { getData } from "./reuseableFunctions/helpers";
 
 export class Root extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
-      userId: "",
+      token: "",
+      loggedIn: false,
     };
 
     this.mounted = true;
   }
+
+  componentWillUnmount = () => {
+    this.mounted = false;
+  };
+
   componentDidMount = async () => {
-    const res = await this.props.getUserQuery();
-    console.log(resolvePath);
-    this.mounted && this.setState({ userId: res.id });
+    const token = await getData("token");
+    this.mounted && this.setState({ token });
+  };
+  componentDidUpdate = async (prevProps, prevState) => {
+    const { loggedIn, token } = this.state;
+    if (loggedIn && (!token || token !== prevState.token)) {
+      const token = await getData("token");
+      this.mounted && this.setState({ token });
+    }
+    if (!loggedIn && prevState.loggedIn) {
+      const token = await getData("token");
+      this.mounted && this.setState({ token });
+    }
+  };
+  updateLoggedIn = (loggedIn) => {
+    this.mounted && this.setState({ loggedIn });
   };
   render() {
-    const { userId } = this.state;
-    return (
-      <View style={styles.container}>
-        <Text>
-          A userId in db is {userId}. Don't forget to fix getUser to change
-          behavior
-        </Text>
-        <StatusBar style="auto" />
-      </View>
-    );
+    const { token } = this.state;
+    const {
+      showLogin,
+      showSignup,
+      displayMessage,
+      currentMessage,
+      messageState,
+    } = this.props;
+    let app;
+    if (!token)
+      app = (
+        <View style={styles.rootContainer}>
+          {displayMessage && (
+            <View style={styles.messageContainer}>
+              <Text
+                style={messageState ? styles.goodMessage : styles.badMessage}
+              >
+                {currentMessage}
+              </Text>
+            </View>
+          )}
+          {showLogin ? (
+            <Login updateLoggedIn={this.updateLoggedIn.bind(this)} />
+          ) : showSignup ? (
+            <Signup />
+          ) : (
+            <View style={styles.container}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  this.props.changeLogin(true);
+                }}
+                accessibilityLabel="Login"
+              >
+                <Text style={styles.text}>Login</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  this.props.changeSignup(true);
+                }}
+                accessibilityLabel="Sign Up"
+              >
+                <Text style={styles.text}>Sign Up</Text>
+              </TouchableOpacity>
+              <StatusBar style="auto" />
+            </View>
+          )}
+        </View>
+      );
+    else
+      app = (
+        <View style={styles.rootContainer}>
+          <View style={styles.messageContainer}>
+            <Text style={messageState ? styles.goodMessage : styles.badMessage}>
+              Logged in
+            </Text>
+            <Dashboard
+              updateLoggedIn={this.updateLoggedIn.bind(this)}
+            ></Dashboard>
+          </View>
+        </View>
+      );
+    return app;
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+const mapStateToProps = (state) => ({
+  loggedIn: state.auth.loggedIn,
+  showLogin: state.display.showLogin,
+  showSignup: state.display.showSignup,
+  displayMessage: state.display.displayMessage,
+  currentMessage: state.display.currentMessage,
+  messageState: state.display.messageState,
 });
-const mapStateToProps = (state) => ({});
-export default connect(mapStateToProps, { getUserQuery })(Root);
+export default connect(mapStateToProps, {
+  changeSignup,
+  changeLogin,
+})(Root);

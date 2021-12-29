@@ -4,6 +4,10 @@ const GET_USER_QUERY = gql`
   query getUser {
     getUser {
       id
+      userName
+      email
+      phone
+      dob
     }
   }
 `;
