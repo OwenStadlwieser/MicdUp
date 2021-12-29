@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   rootContainer: {
     height: height,
     width: width,
-    margin: "0",
+    margin: 0,
   },
 });
 

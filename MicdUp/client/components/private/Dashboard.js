@@ -32,6 +32,7 @@ export class Dashboard extends Component {
     await this.props.getUserQuery();
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
+      console.log("User not logged in.", user);
       removeItemValue("token");
       updateLoggedIn(false);
     }

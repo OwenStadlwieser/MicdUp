@@ -7,6 +7,7 @@ export const getUserQuery = () => async (dispatch) => {
     const res = await client.query({
       query: GET_USER_QUERY,
     });
+    console.log(res);
     dispatch({
       type: SET_USER,
       payload: res.data.getUser,

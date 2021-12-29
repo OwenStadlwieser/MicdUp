@@ -18,8 +18,8 @@ const UserType = new GraphQLObjectType({
     userName: { type: GraphQLString },
     email: { type: GraphQLString },
     phone: { type: GraphQLString },
-    dob: { type: GraphQLInt },
-    dateCreated: { type: GraphQLInt },
+    dob: { type: GraphQLFloat },
+    dateCreated: { type: GraphQLFloat },
     type: {
       type: GraphQLString,
       resolve(parent) {
