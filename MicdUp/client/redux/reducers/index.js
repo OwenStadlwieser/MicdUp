@@ -1,3 +1,4 @@
 import { combineReducers } from "redux";
 import auth from "./auth";
-export default combineReducers({ auth });
+import display from "./display";
+export default combineReducers({ auth, display });

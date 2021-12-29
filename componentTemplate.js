@@ -16,7 +16,7 @@ export class DefaultComponent extends Component {
   componentDidMount = () => {};
 
   render() {
-    return <div></div>;
+    return <View></View>;
   }
 }
 

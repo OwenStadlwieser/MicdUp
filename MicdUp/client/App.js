@@ -6,17 +6,7 @@ import store from "./redux/index";
 import { BrowserRouter } from "react-router-dom";
 import "dotenv/config";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-
 export default function App() {
-  console.log("app exec");
   return (
     <Provider store={store}>
       <BrowserRouter>
