@@ -15,10 +15,11 @@ const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
     id: { type: GraphQLID },
-    name: { type: GraphQLString },
+    userName: { type: GraphQLString },
     email: { type: GraphQLString },
     phone: { type: GraphQLString },
-    date: { type: GraphQLInt },
+    dob: { type: GraphQLInt },
+    dateCreated: { type: GraphQLInt },
     type: {
       type: GraphQLString,
       resolve(parent) {

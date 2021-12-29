@@ -5,3 +5,4 @@ export const CHANGE_LOGIN = "CHANGE_LOGIN";
 export const CHANGE_SIGNUP = "CHANGE_SIGNUP";
 export const DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
 export const HIDE_MESSAGE = "HIDE_MESSAGE";
+export const NAVIGATE = "NAVIGATE";

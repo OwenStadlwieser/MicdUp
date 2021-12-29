@@ -3,6 +3,7 @@ import {
   CHANGE_SIGNUP,
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
+  NAVIGATE,
 } from "../types";
 
 const initialState = {
@@ -11,11 +12,17 @@ const initialState = {
   displayMessage: false,
   currentMessage: "",
   messageState: false,
+  mountedComponent: "Feed",
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   switch (type) {
+    case NAVIGATE:
+      return {
+        ...state,
+        mountedComponent: payload,
+      };
     case CHANGE_LOGIN:
       return {
         ...state,

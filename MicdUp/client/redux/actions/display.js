@@ -3,6 +3,7 @@ import {
   CHANGE_SIGNUP,
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
+  NAVIGATE,
 } from "../types";
 
 export const changeLogin = (payload) => (dispatch) => {
@@ -27,4 +28,11 @@ export const showMessage = (payload) => (dispatch) => {
       type: HIDE_MESSAGE,
     });
   }, 3000);
+};
+
+export const navigate = (payload) => (dispatch) => {
+  dispatch({
+    type: NAVIGATE,
+    payload,
+  });
 };

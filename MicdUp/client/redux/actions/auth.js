@@ -7,6 +7,7 @@ export const login = (authenticator, password) => async (dispatch) => {
     const res = await client.query({
       query: LOGIN_QUERY,
       variables: { authenticator, password },
+      fetchPolicy: "no-cache",
     });
     if (res.data.login.success) {
       await storeData("token", res.data.login.message);
@@ -24,6 +25,7 @@ export const register =
       const res = await client.mutate({
         mutation: SIGNUP_MUTATION,
         variables: { email, phone, password, user, dob },
+        fetchPolicy: "no-cache",
       });
       return res;
     } catch (err) {

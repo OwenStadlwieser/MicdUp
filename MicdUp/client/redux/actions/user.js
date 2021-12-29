@@ -1,5 +1,5 @@
 import { client } from "../../apollo/client/index";
-import { GET_USER_QUERY } from "../../apollo/public/user";
+import { GET_USER_QUERY } from "../../apollo/private/user";
 import { SET_USER } from "../types";
 
 export const getUserQuery = () => async (dispatch) => {

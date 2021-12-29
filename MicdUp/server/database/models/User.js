@@ -22,7 +22,11 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
-  date: {
+  dob: {
+    type: Date,
+    required: true,
+  },
+  dateCreated: {
     type: Date,
     default: Date.now,
   },

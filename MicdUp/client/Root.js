@@ -1,12 +1,16 @@
 import { StatusBar } from "expo-status-bar";
 import { Text, View, TouchableOpacity } from "react-native";
-import { getUserQuery } from "./redux/actions/user";
 import React, { Component } from "react";
 import { connect } from "react-redux";
+// styles
 import { styles } from "./styles/dashboardStyles";
+// redux
 import { changeLogin, changeSignup } from "./redux/actions/display";
+// children
+import Dashboard from "./components/private/Dashboard";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
+// helpers
 import { getData } from "./reuseableFunctions/helpers";
 
 export class Root extends Component {
@@ -14,7 +18,6 @@ export class Root extends Component {
     super();
     this.state = {
       loading: false,
-      userId: "",
       token: "",
       loggedIn: false,
     };
@@ -27,8 +30,6 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
-    const res = await this.props.getUserQuery();
-    this.mounted && this.setState({ userId: res ? res.id : "" });
     const token = await getData("token");
     this.mounted && this.setState({ token });
   };
@@ -38,12 +39,16 @@ export class Root extends Component {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
+    if (!loggedIn && prevState.loggedIn) {
+      const token = await getData("token");
+      this.mounted && this.setState({ token });
+    }
   };
   updateLoggedIn = (loggedIn) => {
     this.mounted && this.setState({ loggedIn });
   };
   render() {
-    const { userId, token } = this.state;
+    const { token } = this.state;
     const {
       showLogin,
       showSignup,
@@ -88,10 +93,6 @@ export class Root extends Component {
               >
                 <Text style={styles.text}>Sign Up</Text>
               </TouchableOpacity>
-              <Text>
-                A userId in db is {userId}. Don't forget to fix getUser to
-                change behavior
-              </Text>
               <StatusBar style="auto" />
             </View>
           )}
@@ -104,6 +105,9 @@ export class Root extends Component {
             <Text style={messageState ? styles.goodMessage : styles.badMessage}>
               Logged in
             </Text>
+            <Dashboard
+              updateLoggedIn={this.updateLoggedIn.bind(this)}
+            ></Dashboard>
           </View>
         </View>
       );
@@ -120,7 +124,6 @@ const mapStateToProps = (state) => ({
   messageState: state.display.messageState,
 });
 export default connect(mapStateToProps, {
-  getUserQuery,
   changeSignup,
   changeLogin,
 })(Root);

@@ -1,16 +1,14 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-
+import { getData } from "../../reuseableFunctions/helpers";
 const httpLink = createHttpLink({
   uri: "http://localhost:6002/",
 });
 
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
   // FIXME: FOR IOS
-  // const tokenString = sessionStorage.getItem("token");
-  // const userToken = JSON.parse(tokenString);
-  const userToken = "";
+  const userToken = await getData("token");
   // return the headers to the context so httpLink can read them
   return {
     headers: {

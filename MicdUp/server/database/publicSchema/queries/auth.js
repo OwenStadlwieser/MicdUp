@@ -34,7 +34,7 @@ const login = {
       },
       "secret",
       // this token will last for a year, this should be adjusted accordingly
-      { expiresIn: "1m" }
+      { expiresIn: "1w" }
     );
     // so basically we don't do much here, we only return the token when the user successfully logs in
     return { success: true, message: token };
