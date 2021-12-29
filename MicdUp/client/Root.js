@@ -20,7 +20,7 @@ export class Root extends Component {
   }
   componentDidMount = async () => {
     const res = await this.props.getUserQuery();
-    this.mounted && this.setState({ userId: res.id });
+    this.mounted && this.setState({ userId: res ? res.id : "" });
   };
   render() {
     const { userId } = this.state;
