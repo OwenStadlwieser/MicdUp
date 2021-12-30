@@ -71,6 +71,7 @@ app.use(async (req, res, next) => {
     req.user = user;
     req.isAuthenticated = true;
   }
+  req.host = req.get("host");
   next();
 });
 

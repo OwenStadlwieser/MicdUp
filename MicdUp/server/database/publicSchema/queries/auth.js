@@ -42,6 +42,32 @@ const login = {
   },
 };
 
+const forgotPassVerify = {
+  type: MessageType,
+  args: {
+    secureCode: { type: GraphQLString },
+  },
+  async resolve(parent, { secureCode }, context) {
+    const user = await User.findOne({
+      resetPasswordToken: secureCode,
+    });
+    if (!user) {
+      return {
+        success: false,
+        message: "Token not found",
+      };
+    }
+    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
+      return {
+        success: false,
+        message: "Token has expired",
+      };
+    }
+    return { success: true, message: "Valid token" };
+  },
+};
+
 module.exports = {
   login,
+  forgotPassVerify,
 };

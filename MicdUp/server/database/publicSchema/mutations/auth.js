@@ -1,7 +1,7 @@
 const { User } = require("../../models/User");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
-
+const bcrypt = require("bcryptjs");
 const createUser = {
   type: MessageType,
   args: {
@@ -33,6 +33,44 @@ const createUser = {
   },
 };
 
+const forgotPassChange = {
+  type: MessageType,
+  args: {
+    secureCode: { type: GraphQLString },
+    newPass: { type: GraphQLString },
+  },
+  async resolve(parent, { secureCode, newPass }, context) {
+    // FIXME: implement transaction
+    let returnObject = {
+      success: true,
+      message: "Password Reset Successful",
+    };
+    const user = await User.findOne({
+      resetPasswordToken: secureCode,
+    });
+    if (!user) {
+      return {
+        success: false,
+        message: "Token not found",
+      };
+    }
+    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
+      return {
+        success: false,
+        message: "Token has expired",
+      };
+    }
+    const isValid = await bcrypt.compare(newPass, user.password);
+    if (isValid) {
+      return { success: false, message: "Please input new password" };
+    }
+    user.password = newPass;
+    await user.save();
+    return returnObject;
+  },
+};
+
 module.exports = {
   createUser,
+  forgotPassChange,
 };
