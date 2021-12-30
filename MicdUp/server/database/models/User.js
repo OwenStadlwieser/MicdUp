@@ -27,6 +27,7 @@ const UserSchema = new Schema({
   resetPasswordToken: {
     type: String,
     unique: true,
+    sparse: true,
   },
   resetPasswordCreatedAt: {
     type: Date,

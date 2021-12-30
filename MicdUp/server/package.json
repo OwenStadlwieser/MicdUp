@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node server.js",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "testserver": "nodemon test/testServer.js",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "react-native"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
