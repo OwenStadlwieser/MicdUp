@@ -1,7 +1,14 @@
 import { client } from "../../apollo/client/index";
-import { SIGNUP_MUTATION, LOGIN_QUERY } from "../../apollo/public/auth";
-import { LOG_IN, LOG_OUT } from "../types";
+import {
+  SIGNUP_MUTATION,
+  LOGIN_QUERY,
+  FORGOT_PASS_MUTATION,
+  FORGOT_PASS_CHANGE_MUTATION,
+  FORGOT_PASS_VERIFY_QUERY,
+} from "../../apollo/public/auth";
+import { LOG_IN, LOG_OUT, DISPLAY_MESSAGE } from "../types";
 import { storeData, clearAsyncStorage } from "../../reuseableFunctions/helpers";
+import { showMessage } from "./display";
 export const login = (authenticator, password) => async (dispatch) => {
   try {
     const res = await client.query({
@@ -13,6 +20,9 @@ export const login = (authenticator, password) => async (dispatch) => {
       await storeData("token", res.data.login.message);
       dispatch({ type: LOG_IN });
     }
+    if (res && res.data && !res.data.login.success) {
+      dispatch(showMessage(res.data.login));
+    }
     return res.data.login;
   } catch (err) {
     console.log(err);
@@ -22,6 +32,50 @@ export const login = (authenticator, password) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   await clearAsyncStorage();
   dispatch({ type: LOG_OUT });
+};
+
+export const forgotPass = (email) => async (dispatch) => {
+  try {
+    const res = await client.mutate({
+      mutation: FORGOT_PASS_MUTATION,
+      variables: { email },
+      fetchPolicy: "no-cache",
+    });
+    if (res && res.data) {
+      dispatch(showMessage(res.data.forgotPass));
+    }
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const forgotPassVerify = (secureCode) => async (dispatch) => {
+  try {
+    const res = await client.query({
+      query: FORGOT_PASS_VERIFY_QUERY,
+      variables: { secureCode },
+      fetchPolicy: "no-cache",
+    });
+    if (res && res.data) dispatch(showMessage(res.data.forgotPassVerify));
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const forgotPassChange = (secureCode, newPass) => async (dispatch) => {
+  try {
+    const res = await client.mutate({
+      mutation: FORGOT_PASS_CHANGE_MUTATION,
+      variables: { secureCode, newPass },
+      fetchPolicy: "no-cache",
+    });
+    if (res && res.data) dispatch(showMessage(res.data.forgotPassChange));
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const register =
