@@ -35,7 +35,8 @@ const validatePassword = (password) => {
 
 const validateAge = (date) => {
   var isOldEnough = false;
-  const dob = new Date(date);
+  let time = Date.parse(date);
+  let dob = new Date(time);
   const today = new Date();
   var age = today.getFullYear() - dob.getFullYear();
   var m = today.getMonth() - dob.getMonth();
