@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: height * 0.05,
     position: "relative",
+    paddingLeft: 5,
   },
   underline: {
     color: "#6DB5C4",
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
   settingsOptionsContainer: {
     width,
     marginTop: height * 0.1,
-    overflowY: "scroll",
     height: height * 0.8,
   },
   settingsOption: {

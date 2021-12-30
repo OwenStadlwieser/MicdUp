@@ -44,11 +44,8 @@ export class Root extends Component {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
-    console.log(this.state.token);
   };
-  updateLoggedIn = (loggedIn) => {
-    this.mounted && this.setState({ loggedIn });
-  };
+
   render() {
     const { token } = this.state;
     const {
@@ -73,7 +70,7 @@ export class Root extends Component {
             </View>
           )}
           {showLogin ? (
-            <Login updateLoggedIn={this.updateLoggedIn.bind(this)} />
+            <Login />
           ) : showSignup ? (
             <Signup />
           ) : (
@@ -113,9 +110,7 @@ export class Root extends Component {
               </Text>
             </View>
           )}
-          <Dashboard
-            updateLoggedIn={this.updateLoggedIn.bind(this)}
-          ></Dashboard>
+          <Dashboard></Dashboard>
         </View>
       );
     return app;
