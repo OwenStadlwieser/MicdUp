@@ -4,6 +4,13 @@ import { changeSignup, showMessage } from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
 import { styles } from "../../styles/Styles";
 import {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  validatePhoneNumber,
+  validateAge,
+} from "../../reuseableFunctions/regex";
+import {
   Platform,
   View,
   TextInput,
@@ -45,6 +52,7 @@ export class Signup extends Component {
         this.props.changeSignup(false);
       }, 3000);
   }
+
   render() {
     const { email, phone, password, date, user } = this.state;
     return (
@@ -60,20 +68,32 @@ export class Signup extends Component {
         />
         <TextInput
           value={user}
-          style={styles.textInput}
+          style={
+            validateUsername(user) && user
+              ? styles.textInput
+              : styles.invalidTextInput
+          }
           placeholder="Username"
           onChangeText={(text) => this.onChange("user", text)}
         />
         <TextInput
-          style={styles.textInput}
           value={email}
+          style={
+            validateEmail(email) && email
+              ? styles.textInput
+              : styles.invalidTextInput
+          }
           autoComplete="email"
           placeholder="Email"
           onChangeText={(text) => this.onChange("email", text)}
         />
         <TextInput
-          style={styles.textInput}
           value={phone}
+          style={
+            validatePhoneNumber(phone) && phone
+              ? styles.textInput
+              : styles.invalidTextInput
+          }
           autoComplete="phone"
           placeholder="Phone Number"
           onChangeText={(text) => this.onChange("phone", text)}
@@ -81,11 +101,16 @@ export class Signup extends Component {
         <TextInput
           autoComplete="password"
           value={password}
-          style={styles.textInput}
+          style={
+            validatePassword(password) && password
+              ? styles.textInput
+              : styles.invalidTextInput
+          }
           secureTextEntry={true}
           placeholder="Password"
           onChangeText={(text) => this.onChange("password", text)}
         />
+
         {Platform.OS === "web" ? (
           <input
             type="date"
@@ -136,6 +161,12 @@ export class Signup extends Component {
             }}
             onDateChange={(date) => {
               this.mounted && this.setState({ date });
+              if (!validateAge(date)) {
+                this.props.showMessage({
+                  success: false,
+                  message: "Must be 13 or older to create account.",
+                });
+              }
             }}
           />
         )}
