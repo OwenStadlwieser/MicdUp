@@ -26,11 +26,7 @@ export class Login extends Component {
 
   login = async () => {
     const { authenticator, password } = this.state;
-    const { updateLoggedIn } = this.props;
-    const res = await this.props.login(authenticator, password);
-    if (res.success) {
-      updateLoggedIn(true);
-    }
+    await this.props.login(authenticator, password);
   };
 
   onChange = (name, text) => {

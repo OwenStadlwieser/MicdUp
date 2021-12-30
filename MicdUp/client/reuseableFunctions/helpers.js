@@ -28,4 +28,7 @@ const removeItemValue = async (key) => {
   }
 };
 
-export { storeData, getData, removeItemValue };
+const clearAsyncStorage = async () => {
+  AsyncStorage.clear();
+};
+export { storeData, getData, removeItemValue, clearAsyncStorage };

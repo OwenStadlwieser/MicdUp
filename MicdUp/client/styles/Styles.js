@@ -104,6 +104,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: width,
   },
+  pane: {
+    flex: 1,
+    backgroundColor: "#1A3561",
+    width: width,
+    height: height * 0.9,
+  },
   navbarButton: {
     width: width * 0.2,
     height: height * 0.1,
@@ -134,6 +140,41 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#1A3561",
+  },
+  topRightIcon: {
+    position: "absolute",
+    right: width * 0.02,
+    top: height * 0.02,
+  },
+  topLeftIcon: {
+    position: "absolute",
+    left: width * 0.02,
+    top: height * 0.02,
+  },
+  settingsOptionsContainer: {
+    width,
+    marginTop: height * 0.1,
+    overflowY: "scroll",
+    height: height * 0.8,
+  },
+  settingsOption: {
+    width: width * 0.8,
+    marginLeft: width * 0.1,
+    height: height * 0.15,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: "#1A3561",
+    borderStyle: "solid",
+    backgroundColor: "white",
+    paddingLeft: width * 0.05,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoutIcon: {
+    paddingRight: 15,
   },
 });
 

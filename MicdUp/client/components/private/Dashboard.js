@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Text, View } from "react-native";
 // redux
 import { getUserQuery } from "../../redux/actions/user";
+import { logout } from "../../redux/actions/auth";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -29,13 +30,11 @@ export class Dashboard extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    const { updateLoggedIn } = this.props;
     this.mounted && this.setState({ loading: true });
     await this.props.getUserQuery();
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
-      removeItemValue("token");
-      updateLoggedIn(false);
+      this.props.logout();
     }
     this.mounted && this.setState({ loading: false });
   };
@@ -60,7 +59,6 @@ export class Dashboard extends Component {
           ) : (
             <Feed />
           )}
-          <Text>{user.userName}</Text>
         </View>
         <Navbar />
       </View>

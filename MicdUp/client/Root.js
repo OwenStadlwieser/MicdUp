@@ -34,15 +34,17 @@ export class Root extends Component {
     this.mounted && this.setState({ token });
   };
   componentDidUpdate = async (prevProps, prevState) => {
-    const { loggedIn, token } = this.state;
+    const { token } = this.state;
+    const { loggedIn } = this.props;
     if (loggedIn && (!token || token !== prevState.token)) {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
-    if (!loggedIn && prevState.loggedIn) {
+    if (!loggedIn && prevProps.loggedIn) {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
+    console.log(this.state.token);
   };
   updateLoggedIn = (loggedIn) => {
     this.mounted && this.setState({ loggedIn });
@@ -55,9 +57,10 @@ export class Root extends Component {
       displayMessage,
       currentMessage,
       messageState,
+      loggedIn,
     } = this.props;
     let app;
-    if (!token)
+    if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>
           {displayMessage && (
@@ -101,11 +104,15 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
-          <View style={styles.messageContainer}>
-            <Text style={messageState ? styles.goodMessage : styles.badMessage}>
-              Logged in
-            </Text>
-          </View>
+          {displayMessage && (
+            <View style={styles.messageContainer}>
+              <Text
+                style={messageState ? styles.goodMessage : styles.badMessage}
+              >
+                {currentMessage}
+              </Text>
+            </View>
+          )}
           <Dashboard
             updateLoggedIn={this.updateLoggedIn.bind(this)}
           ></Dashboard>
