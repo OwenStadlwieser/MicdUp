@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, TextInput, Text, TouchableOpacity } from "react-native";
-import { changeLogin } from "../../redux/actions/display";
 import { styles } from "../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
+// redux
+import { changeLogin } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
+// components
+import ForgotPassword from "./ForgotPassword";
 
 export class Login extends Component {
   constructor() {
@@ -13,6 +16,7 @@ export class Login extends Component {
       loading: false,
       authenticator: "",
       password: "",
+      resetPassword: false,
     };
 
     this.mounted = true;
@@ -33,44 +37,62 @@ export class Login extends Component {
     this.mounted && this.setState({ [name]: text });
   };
 
+  hideResetPassword = () => {
+    this.mounted && this.setState({ resetPassword: false });
+  };
   render() {
-    const { authenticator, password } = this.state;
-    return (
-      <View style={styles.container}>
-        <AntDesign
-          style={styles.backArrow}
-          name="leftcircle"
-          size={24}
-          color="white"
-          onPress={() => {
-            this.props.changeLogin(false);
-          }}
-        />
-        <TextInput
-          style={styles.textInput}
-          value={authenticator}
-          placeholder="Email or Phone Number"
-          onChangeText={(text) => this.onChange("authenticator", text)}
-        />
-        <View style={styles.forgotPassword}>
-          <TextInput
-            secureTextEntry={true}
-            value={password}
-            style={styles.forgotPassButton}
-            placeholder="Password"
-            onChangeText={(text) => this.onChange("password", text)}
+    const { authenticator, password, resetPassword } = this.state;
+    let login;
+    resetPassword
+      ? (login = (
+          <ForgotPassword
+            hideResetPassword={this.hideResetPassword.bind(this)}
           />
-          <Text style={styles.underline}>Forgot Password</Text>
-        </View>
-        <TouchableOpacity
-          onPress={async () => await this.login()}
-          style={styles.button}
-          accessibilityLabel="Login"
-        >
-          <Text style={styles.text}>Login</Text>
-        </TouchableOpacity>
-      </View>
-    );
+        ))
+      : (login = (
+          <View style={styles.container}>
+            <AntDesign
+              style={styles.backArrow}
+              name="leftcircle"
+              size={24}
+              color="white"
+              onPress={() => {
+                this.props.changeLogin(false);
+              }}
+            />
+            <TextInput
+              style={styles.textInput}
+              value={authenticator}
+              placeholder="Email or Phone Number"
+              onChangeText={(text) => this.onChange("authenticator", text)}
+            />
+            <View style={styles.forgotPassword}>
+              <TextInput
+                secureTextEntry={true}
+                value={password}
+                style={styles.forgotPassButton}
+                placeholder="Password"
+                onChangeText={(text) => this.onChange("password", text)}
+              />
+              <Text
+                onPress={() => {
+                  this.mounted && this.setState({ resetPassword: true });
+                }}
+                style={styles.underline}
+              >
+                Forgot Password
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={async () => await this.login()}
+              style={styles.button}
+              accessibilityLabel="Login"
+            >
+              <Text style={styles.text}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        ));
+    return login;
   }
 }
 
