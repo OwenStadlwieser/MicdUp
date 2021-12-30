@@ -1,7 +1,7 @@
 import { client } from "../../apollo/client/index";
 import { SIGNUP_MUTATION, LOGIN_QUERY } from "../../apollo/public/auth";
-import { LOG_IN } from "../types";
-import { storeData } from "../../reuseableFunctions/helpers";
+import { LOG_IN, LOG_OUT } from "../types";
+import { storeData, clearAsyncStorage } from "../../reuseableFunctions/helpers";
 export const login = (authenticator, password) => async (dispatch) => {
   try {
     const res = await client.query({
@@ -17,6 +17,11 @@ export const login = (authenticator, password) => async (dispatch) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+export const logout = () => async (dispatch) => {
+  await clearAsyncStorage();
+  dispatch({ type: LOG_OUT });
 };
 
 export const register =

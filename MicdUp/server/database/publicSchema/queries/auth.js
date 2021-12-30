@@ -28,6 +28,7 @@ const login = {
     if (!isValid) {
       return { success: false, message: "Incorrect password" };
     }
+    //FIXME: replace secret
     const token = jwt.sign(
       {
         user: user._id,

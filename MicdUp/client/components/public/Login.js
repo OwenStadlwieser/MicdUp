@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, TextInput, Text, TouchableOpacity } from "react-native";
 import { changeLogin } from "../../redux/actions/display";
-import { styles } from "../../styles/dashboardStyles";
+import { styles } from "../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import { login } from "../../redux/actions/auth";
 
@@ -26,11 +26,7 @@ export class Login extends Component {
 
   login = async () => {
     const { authenticator, password } = this.state;
-    const { updateLoggedIn } = this.props;
-    const res = await this.props.login(authenticator, password);
-    if (res.success) {
-      updateLoggedIn(true);
-    }
+    await this.props.login(authenticator, password);
   };
 
   onChange = (name, text) => {

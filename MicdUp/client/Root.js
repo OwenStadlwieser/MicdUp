@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity } from "react-native";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 // styles
-import { styles } from "./styles/dashboardStyles";
+import { styles } from "./styles/Styles";
 // redux
 import { changeLogin, changeSignup } from "./redux/actions/display";
 // children
@@ -34,19 +34,18 @@ export class Root extends Component {
     this.mounted && this.setState({ token });
   };
   componentDidUpdate = async (prevProps, prevState) => {
-    const { loggedIn, token } = this.state;
+    const { token } = this.state;
+    const { loggedIn } = this.props;
     if (loggedIn && (!token || token !== prevState.token)) {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
-    if (!loggedIn && prevState.loggedIn) {
+    if (!loggedIn && prevProps.loggedIn) {
       const token = await getData("token");
       this.mounted && this.setState({ token });
     }
   };
-  updateLoggedIn = (loggedIn) => {
-    this.mounted && this.setState({ loggedIn });
-  };
+
   render() {
     const { token } = this.state;
     const {
@@ -55,9 +54,10 @@ export class Root extends Component {
       displayMessage,
       currentMessage,
       messageState,
+      loggedIn,
     } = this.props;
     let app;
-    if (!token)
+    if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>
           {displayMessage && (
@@ -70,7 +70,7 @@ export class Root extends Component {
             </View>
           )}
           {showLogin ? (
-            <Login updateLoggedIn={this.updateLoggedIn.bind(this)} />
+            <Login />
           ) : showSignup ? (
             <Signup />
           ) : (
@@ -101,14 +101,16 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
-          <View style={styles.messageContainer}>
-            <Text style={messageState ? styles.goodMessage : styles.badMessage}>
-              Logged in
-            </Text>
-            <Dashboard
-              updateLoggedIn={this.updateLoggedIn.bind(this)}
-            ></Dashboard>
-          </View>
+          {displayMessage && (
+            <View style={styles.messageContainer}>
+              <Text
+                style={messageState ? styles.goodMessage : styles.badMessage}
+              >
+                {currentMessage}
+              </Text>
+            </View>
+          )}
+          <Dashboard></Dashboard>
         </View>
       );
     return app;

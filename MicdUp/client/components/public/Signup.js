@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { changeSignup, showMessage } from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
-import { styles } from "../../styles/dashboardStyles";
+import { styles } from "../../styles/Styles";
 import {
   Platform,
   View,
