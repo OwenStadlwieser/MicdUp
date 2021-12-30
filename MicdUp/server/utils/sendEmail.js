@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const xoauth2 = require("xoauth2");
 const sendEmail = async (options) => {
   var smtpTransport = nodemailer.createTransport({
     service: "Gmail",

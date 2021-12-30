@@ -134,7 +134,7 @@ export class Signup extends Component {
             date={date}
             mode="date"
             placeholder="Date of Birth"
-            format="DD/MM/YYYY"
+            format="ddd, MMM DD YYYY HH:mm:ss Z"
             confirmBtnText="Confirm"
             cancelBtnText="Cancel"
             customStyles={{
