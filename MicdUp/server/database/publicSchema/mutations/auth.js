@@ -2,6 +2,7 @@ const { User } = require("../../models/User");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const bcrypt = require("bcryptjs");
+
 const createUser = {
   type: MessageType,
   args: {
@@ -65,6 +66,7 @@ const forgotPassChange = {
       return { success: false, message: "Please input new password" };
     }
     user.password = newPass;
+    delete user.resetPasswordToken;
     await user.save();
     return returnObject;
   },
