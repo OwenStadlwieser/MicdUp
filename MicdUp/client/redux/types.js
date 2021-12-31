@@ -6,3 +6,4 @@ export const CHANGE_SIGNUP = "CHANGE_SIGNUP";
 export const DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
 export const HIDE_MESSAGE = "HIDE_MESSAGE";
 export const NAVIGATE = "NAVIGATE";
+export const ALTER_CLIPS = "ALTER_CLIPS";

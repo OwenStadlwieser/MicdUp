@@ -11,6 +11,10 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
 // audio
 import { Audio } from "expo-av";
+// clips
+import Clips from "./Clips";
+// redux
+import { updateClips } from "../../../redux/actions/recording";
 
 export class Create extends Component {
   constructor() {
@@ -35,13 +39,9 @@ export class Create extends Component {
         this.setState({ v: v === 1 ? 0 : v + 1 });
     }, 1000);
   };
-  onRecordingStatusUpdate = (param) => {
-    console.log(param, 1);
-  };
+
   startRecording = async () => {
-    const { recording } = this.state;
     try {
-      console.log("Requesting permissions..");
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -61,37 +61,31 @@ export class Create extends Component {
 
   stopRecording = async () => {
     const { recording } = this.state;
+    const { clips } = this.props;
     console.log("Stopping recording..");
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
+    const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
         recording: false,
-        audioBlobs: [...this.state.audioBlobs, uri],
+        audioBlobs: clips
+          ? [...clips, { uri, finalDuration }]
+          : [{ uri, finalDuration }],
         v: 0,
       });
+    this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
   };
 
-  playSound = async () => {
-    const { audioBlobs } = this.state;
-    await Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      allowsRecordingIOS: false,
-    });
-    const playbackObject = new Audio.Sound();
-    // OR
-    const res = await Audio.Sound.createAsync(
-      { uri: audioBlobs[0] },
-      { shouldPlay: true }
-    );
-  };
   render() {
     const { recording, audioBlobs, v } = this.state;
     return (
       <View style={styles.pane}>
         <View style={styles.recordingPeopleContainer}></View>
-        <View style={styles.recordingClipsContainer}></View>
+        <View style={styles.recordingClipsContainer}>
+          <Clips />
+        </View>
         <View style={styles.recordingIconsContainer}>
           <View style={styles.iconSmallContainer}>
             <SimpleLineIcons
@@ -136,14 +130,13 @@ export class Create extends Component {
             />
           </View>
         </View>
-        {audioBlobs.length > 0 && (
-          <Text onPress={this.playSound}>Play Sound</Text>
-        )}
       </View>
     );
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  clips: state.recording.clips,
+});
 
-export default connect(mapStateToProps, {})(Create);
+export default connect(mapStateToProps, { updateClips })(Create);
