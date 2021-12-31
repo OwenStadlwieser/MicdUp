@@ -206,6 +206,12 @@ const styles = StyleSheet.create({
         ? width * 0.24
         : (height * 0.21) / 1.7 - 10,
   },
+  currentRecordingIcon: {
+    fontSize:
+      width * 0.24 < (height * 0.21) / 1.7 - 10
+        ? width * 0.24
+        : (height * 0.21) / 1.7 - 10,
+  },
   recordingCircleIcon: {
     fontSize:
       width * 0.16 < (height * 0.21) / 2.5 - 10

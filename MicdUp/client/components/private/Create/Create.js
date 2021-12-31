@@ -6,6 +6,7 @@ import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // audio
@@ -18,14 +19,22 @@ export class Create extends Component {
       loading: false,
       recording: false,
       audioBlobs: [],
+      v: 0,
     };
 
     this.mounted = true;
+    this.colors = ["white", "red"];
   }
-
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = async () => {};
+  componentDidMount = async () => {
+    const interval = setInterval(() => {
+      const { v } = this.state;
+      this.mounted &&
+        this.state.recording &&
+        this.setState({ v: v === 1 ? 0 : v + 1 });
+    }, 1000);
+  };
   onRecordingStatusUpdate = (param) => {
     console.log(param, 1);
   };
@@ -59,6 +68,7 @@ export class Create extends Component {
       this.setState({
         recording: false,
         audioBlobs: [...this.state.audioBlobs, uri],
+        v: 0,
       });
     console.log("Recording stopped and stored at", uri);
   };
@@ -77,7 +87,7 @@ export class Create extends Component {
     );
   };
   render() {
-    const { recording, audioBlobs } = this.state;
+    const { recording, audioBlobs, v } = this.state;
     return (
       <View style={styles.pane}>
         <View style={styles.recordingPeopleContainer}></View>
@@ -92,13 +102,24 @@ export class Create extends Component {
             />
           </View>
           <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              onPress={recording ? this.stopRecording : this.startRecording}
-              name="microphone-plus"
-              size={75}
-              color="red"
-              style={styles.recordingMicIcon}
-            />
+            {!recording ? (
+              <MaterialCommunityIcons
+                onPress={this.startRecording}
+                name="microphone-plus"
+                size={75}
+                color="red"
+                style={styles.recordingMicIcon}
+              />
+            ) : (
+              <FontAwesome5
+                onPress={this.stopRecording}
+                style={styles.currentRecordingIcon}
+                name="record-vinyl"
+                size={24}
+                color={this.colors[v]}
+              />
+            )}
+
             <AntDesign
               style={styles.recordingCircleIcon}
               name="rightcircle"
