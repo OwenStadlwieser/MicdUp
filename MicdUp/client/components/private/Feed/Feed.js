@@ -11,7 +11,7 @@ export class Feed extends Component {
     this.mounted = true;
   }
 
-  nmount = () => (this.mounted = false);
+  componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = () => {};
 
