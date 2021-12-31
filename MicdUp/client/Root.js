@@ -10,6 +10,7 @@ import { changeLogin, changeSignup } from "./redux/actions/display";
 import Dashboard from "./components/private/Dashboard";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
+import Create from "./components/private/Create/Create";
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
 
