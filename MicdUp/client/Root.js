@@ -73,7 +73,7 @@ export class Root extends Component {
           {showLogin ? (
             <Login />
           ) : showSignup ? (
-            <Create />
+            <Signup />
           ) : (
             <View style={styles.container}>
               <TouchableOpacity
