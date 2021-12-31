@@ -2,7 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Text, View } from "react-native";
 //icons
+import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // audio
@@ -22,8 +25,10 @@ export class Create extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
-
+  componentDidMount = async () => {};
+  onRecordingStatusUpdate = (param) => {
+    console.log(param, 1);
+  };
   startRecording = async () => {
     const { recording } = this.state;
     try {
@@ -35,7 +40,8 @@ export class Create extends Component {
       });
       console.log("Starting recording..");
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
+        this.onRecordingStatusUpdate
       );
       this.mounted && this.setState({ recording });
       console.log("Recording started");
@@ -73,13 +79,42 @@ export class Create extends Component {
   render() {
     const { recording, audioBlobs } = this.state;
     return (
-      <View style={(styles.pane, styles.centeredFlexBox)}>
-        <MaterialCommunityIcons
-          onPress={recording ? this.stopRecording : this.startRecording}
-          name="microphone-plus"
-          size={24}
-          color="red"
-        />
+      <View style={styles.pane}>
+        <View style={styles.recordingPeopleContainer}></View>
+        <View style={styles.recordingClipsContainer}></View>
+        <View style={styles.recordingIconsContainer}>
+          <View style={styles.iconSmallContainer}>
+            <SimpleLineIcons
+              style={styles.recordingFireIcon}
+              name="fire"
+              size={24}
+              color="white"
+            />
+          </View>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              onPress={recording ? this.stopRecording : this.startRecording}
+              name="microphone-plus"
+              size={75}
+              color="red"
+              style={styles.recordingMicIcon}
+            />
+            <AntDesign
+              style={styles.recordingCircleIcon}
+              name="rightcircle"
+              size={48}
+              color="white"
+            />
+          </View>
+          <View style={styles.iconSmallContainer}>
+            <Fontisto
+              style={styles.recordingHashtagIcon}
+              name="hashtag"
+              size={24}
+              color="white"
+            />
+          </View>
+        </View>
         {audioBlobs.length > 0 && (
           <Text onPress={this.playSound}>Play Sound</Text>
         )}

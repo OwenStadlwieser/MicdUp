@@ -176,6 +176,50 @@ const styles = StyleSheet.create({
   logoutIcon: {
     paddingRight: 15,
   },
+  recordingPeopleContainer: {
+    paddingTop: height * 0.08,
+    height: height * 0.4,
+  },
+  recordingClipsContainer: {
+    height: height * 0.29,
+  },
+  recordingIconsContainer: {
+    height: height * 0.21,
+    width: width,
+    flexDirection: "row",
+  },
+  iconSmallContainer: {
+    width: width * 0.15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconContainer: {
+    width: width * 0.7,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  recordingMicIcon: {
+    paddingLeft: 10,
+    paddingBottom: 10,
+    fontSize:
+      width * 0.24 < (height * 0.21) / 1.7 - 10
+        ? width * 0.24
+        : (height * 0.21) / 1.7 - 10,
+  },
+  recordingCircleIcon: {
+    fontSize:
+      width * 0.16 < (height * 0.21) / 2.5 - 10
+        ? width * 0.16
+        : (height * 0.21) / 2.5 - 10,
+  },
+  recordingHashtagIcon: {
+    paddingRight: 20,
+    fontSize: width * 0.1 < 50 ? width * 0.1 : 50,
+  },
+  recordingFireIcon: {
+    paddingLeft: 20,
+    fontSize: width * 0.1 < 50 ? width * 0.1 : 50,
+  },
 });
 
 export { styles };
