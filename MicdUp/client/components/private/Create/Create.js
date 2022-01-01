@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Text, View } from "react-native";
+import { Text, View, Image, TouchableHighlight } from "react-native";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -79,10 +79,30 @@ export class Create extends Component {
   };
 
   render() {
+    const { user } = this.props;
     const { recording, audioBlobs, v } = this.state;
     return (
       <View style={styles.pane}>
-        <View style={styles.recordingPeopleContainer}></View>
+        <View style={styles.recordingPeopleContainer}>
+          <TouchableHighlight
+            style={[
+              styles.profileImgContainer,
+              { borderColor: recording ? "red" : "#30F3FF", borderWidth: 1 },
+            ]}
+          >
+            <Image
+              source={
+                user && user.profile && user.profile.image
+                  ? {
+                      uri: user.profile.image,
+                    }
+                  : require("../../../assets/no-profile-pic-icon-27.jpg")
+              }
+              style={styles.profileImg}
+            />
+          </TouchableHighlight>
+          <Text style={styles.text}>@{user ? user.userName : ""}</Text>
+        </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
         </View>
@@ -137,6 +157,7 @@ export class Create extends Component {
 
 const mapStateToProps = (state) => ({
   clips: state.recording.clips,
+  user: state.auth.user,
 });
 
 export default connect(mapStateToProps, { updateClips })(Create);

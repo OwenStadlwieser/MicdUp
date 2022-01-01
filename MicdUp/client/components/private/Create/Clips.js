@@ -20,8 +20,8 @@ import { updateClips } from "../../../redux/actions/recording";
 
 const { width } = Dimensions.get("window");
 
-const parentWidth = width;
-const childrenWidth = width;
+const parentWidth = width < 1000 ? width : width * 0.8;
+const childrenWidth = width < 1000 ? width : width * 0.8;
 const childrenHeight = 48;
 
 export class OneRowsPage extends Component {
@@ -104,7 +104,7 @@ export class OneRowsPage extends Component {
           <Text style={styles.item_text}>
             {Math.round(item.finalDuration / 1000)} Seconds
           </Text>
-          <View style={styles.iconContainer}>
+          <View style={styles.iconContainerClips}>
             {playingIndex !== index ? (
               <AntDesign
                 onPress={async () => {
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingHorizontal: 15,
   },
-  iconContainer: {
+  iconContainerClips: {
     flexDirection: "row",
   },
   item_icon: {

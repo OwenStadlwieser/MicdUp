@@ -102,7 +102,9 @@ const styles = StyleSheet.create({
   badMessage: {
     color: "red",
   },
-  text: {},
+  text: {
+    color: "white",
+  },
   rootContainer: {
     height: height,
     width: width,
@@ -127,6 +129,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A3561",
     width: width,
     height: height * 0.9,
+    justifyContent: "center",
+    alignItems: "center",
   },
   navbarButton: {
     width: width * 0.2,
@@ -196,9 +200,13 @@ const styles = StyleSheet.create({
   recordingPeopleContainer: {
     paddingTop: height * 0.08,
     height: height * 0.4,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   recordingClipsContainer: {
     height: height * 0.29,
+    width: width < 1000 ? width : width * 0.8,
   },
   recordingIconsContainer: {
     height: height * 0.21,
@@ -242,6 +250,17 @@ const styles = StyleSheet.create({
   recordingFireIcon: {
     paddingLeft: 20,
     fontSize: width * 0.1 < 50 ? width * 0.1 : 50,
+  },
+  profileImgContainer: {
+    height: height * 0.2,
+    width: height * 0.2,
+    borderRadius: height * 0.2,
+    overflow: "hidden",
+  },
+  profileImg: {
+    height: height * 0.2,
+    width: height * 0.2,
+    borderRadius: height * 0.2,
   },
 });
 
