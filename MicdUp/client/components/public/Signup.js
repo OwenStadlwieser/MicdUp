@@ -16,6 +16,7 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import DatePicker from "react-native-datepicker";
@@ -56,7 +57,7 @@ export class Signup extends Component {
   render() {
     const { email, phone, password, date, user } = this.state;
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         <AntDesign
           style={styles.backArrow}
           name="leftcircle"
@@ -180,7 +181,7 @@ export class Signup extends Component {
         >
           <Text style={styles.text}>Sign Up</Text>
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 }

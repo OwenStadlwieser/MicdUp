@@ -148,7 +148,11 @@ export class OneRowsPage extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#1A3561",
+    borderColor: "white",
+    borderRadius: 8,
+    borderStyle: "solid",
+    borderWidth: 2,
   },
   item: {
     width: childrenWidth,
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
   item_children: {
     width: childrenWidth,
     height: childrenHeight - 4,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#1A3561",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
   },
   item_text: {
     marginRight: 15,
-    color: "#1A3561",
+    color: "white",
     fontStyle: "italic",
   },
 });

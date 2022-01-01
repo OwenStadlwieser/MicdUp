@@ -1,6 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Text, View, Image, TouchableHighlight } from "react-native";
+// components
+import EditRecording from "./EditRecording";
+import SubmitRecording from "./SubmitRecording";
+import {
+  Text,
+  View,
+  Image,
+  TouchableHighlight,
+  TouchableOpacity,
+} from "react-native";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -14,6 +23,7 @@ import { Audio } from "expo-av";
 // clips
 import Clips from "./Clips";
 // redux
+import { showMessage } from "../../../redux/actions/display";
 import { updateClips } from "../../../redux/actions/recording";
 
 export class Create extends Component {
@@ -24,6 +34,8 @@ export class Create extends Component {
       recording: false,
       audioBlobs: [],
       v: 0,
+      editRecording: false,
+      submitRecording: false,
     };
 
     this.mounted = true;
@@ -38,6 +50,10 @@ export class Create extends Component {
         this.state.recording &&
         this.setState({ v: v === 1 ? 0 : v + 1 });
     }, 1000);
+  };
+
+  updateSubmitRecording = (submitRecording) => {
+    this.mounted && this.setState({ submitRecording });
   };
 
   startRecording = async () => {
@@ -78,10 +94,22 @@ export class Create extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
+  hideEditRecording = () => {
+    this.mounted && this.setState({ editRecording: false });
+  };
   render() {
     const { user } = this.props;
-    const { recording, audioBlobs, v } = this.state;
-    return (
+    const { recording, clips, v, editRecording, submitRecording } = this.state;
+    const app = submitRecording ? (
+      <SubmitRecording
+        updateSubmitRecording={this.updateSubmitRecording.bind(this)}
+      />
+    ) : editRecording ? (
+      <EditRecording
+        updateSubmitRecording={this.updateSubmitRecording.bind(this)}
+        hideEditRecording={this.hideEditRecording.bind(this)}
+      />
+    ) : (
       <View style={styles.pane}>
         <View style={styles.recordingPeopleContainer}>
           <TouchableHighlight
@@ -101,7 +129,7 @@ export class Create extends Component {
               style={styles.profileImg}
             />
           </TouchableHighlight>
-          <Text style={styles.text}>@{user ? user.userName : ""}</Text>
+          <Text style={styles.whiteText}>@{user ? user.userName : ""}</Text>
         </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
@@ -133,13 +161,29 @@ export class Create extends Component {
                 color={this.colors[v]}
               />
             )}
-
-            <AntDesign
-              style={styles.recordingCircleIcon}
-              name="rightcircle"
-              size={48}
-              color="white"
-            />
+            <TouchableOpacity
+              onPress={async () => {
+                if (recording) {
+                  await this.stopRecording();
+                }
+                const currentClips = this.props.clips;
+                if (!currentClips || currentClips.length === 0) {
+                  this.props.showMessage({
+                    success: false,
+                    message: "Record a clip before continuing",
+                  });
+                  return;
+                }
+                this.mounted && this.setState({ editRecording: true });
+              }}
+            >
+              <AntDesign
+                style={styles.recordingCircleIcon}
+                name="rightcircle"
+                size={48}
+                color="white"
+              />
+            </TouchableOpacity>
           </View>
           <View style={styles.iconSmallContainer}>
             <Fontisto
@@ -152,6 +196,7 @@ export class Create extends Component {
         </View>
       </View>
     );
+    return app;
   }
 }
 
@@ -160,4 +205,4 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
 });
 
-export default connect(mapStateToProps, { updateClips })(Create);
+export default connect(mapStateToProps, { updateClips, showMessage })(Create);

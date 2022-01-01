@@ -46,6 +46,8 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   textInput: {
+    boxShadow: "none",
+    outline: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
@@ -59,7 +61,27 @@ const styles = StyleSheet.create({
     position: "relative",
     paddingLeft: 5,
   },
+  textInputRecEdit: {
+    fontStyle: "italic",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    borderBottomColor: "white",
+    borderBottomStyle: "white",
+    borderBottomWidth: 1,
+    width: width * 0.6,
+    height: 40,
+    borderRadius: 5,
+    marginTop: height * 0.05,
+    marginBottom: height * 0.02,
+    position: "relative",
+    paddingLeft: 5,
+    boxShadow: "none",
+    outline: "none",
+  },
   invalidTextInput: {
+    boxShadow: "none",
+    outline: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     borderColor: "red",
@@ -102,7 +124,8 @@ const styles = StyleSheet.create({
   badMessage: {
     color: "red",
   },
-  text: {
+  text: {},
+  whiteText: {
     color: "white",
   },
   rootContainer: {
@@ -225,7 +248,6 @@ const styles = StyleSheet.create({
   },
   recordingMicIcon: {
     paddingLeft: 10,
-    paddingBottom: 10,
     fontSize:
       width * 0.24 < (height * 0.21) / 1.7 - 10
         ? width * 0.24
@@ -261,6 +283,33 @@ const styles = StyleSheet.create({
     height: height * 0.2,
     width: height * 0.2,
     borderRadius: height * 0.2,
+  },
+  upperEditDiv: {
+    marginTop: height * 0.05,
+    height: height * 0.15,
+  },
+  clipsEditDiv: {
+    height: height * 0.5,
+  },
+  continueEditDiv: {
+    height: height * 0.18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextButton: {
+    height: width * 0.05,
+    width: width * 0.1,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "white",
+    borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextButtonText: {
+    color: "white",
+    fontStyle: "italic",
+    fontSize: 14,
   },
 });
 

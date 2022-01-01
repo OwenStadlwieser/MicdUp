@@ -1,7 +1,8 @@
-import { ALTER_CLIPS } from "../types";
+import { ALTER_CLIPS, UPDATE_TITLE } from "../types";
 
 const initialState = {
   clips: [],
+  title: "",
 };
 
 export default function (state = { ...initialState }, action) {
@@ -11,6 +12,11 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         clips: payload,
+      };
+    case UPDATE_TITLE:
+      return {
+        ...state,
+        title: payload,
       };
     default:
       return state;
