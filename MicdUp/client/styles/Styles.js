@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
   },
   textInput: {
     boxShadow: "none",
-    outline: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
@@ -77,11 +76,9 @@ const styles = StyleSheet.create({
     position: "relative",
     paddingLeft: 5,
     boxShadow: "none",
-    outline: "none",
   },
   invalidTextInput: {
     boxShadow: "none",
-    outline: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     borderColor: "red",
@@ -229,7 +226,7 @@ const styles = StyleSheet.create({
   },
   recordingClipsContainer: {
     height: height * 0.29,
-    width: width < 1000 ? width : width * 0.8,
+    width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
     height: height * 0.21,
@@ -290,6 +287,7 @@ const styles = StyleSheet.create({
   },
   clipsEditDiv: {
     height: height * 0.5,
+    width: width * 0.95,
   },
   continueEditDiv: {
     height: height * 0.18,
@@ -297,8 +295,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nextButton: {
-    height: width * 0.05,
-    width: width * 0.1,
+    height: width * 0.075,
+    width: width * 0.3,
     borderWidth: 1,
     borderRadius: 4,
     borderColor: "white",
@@ -310,6 +308,36 @@ const styles = StyleSheet.create({
     color: "white",
     fontStyle: "italic",
     fontSize: 14,
+  },
+  recordingSettings: {
+    maxHeight: height * 0.5,
+    width: width * 0.95,
+    borderRadius: 3,
+  },
+  recordingSettingsOption: {
+    height: height * 0.125,
+    width: width * 0.95,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#1A3561",
+    borderStyle: "solid",
+    alignItems: "center",
+    borderRadius: 20,
+    paddingHorizontal: 20,
+  },
+  playButtonContainer: {
+    height: height * 0.1,
+    alignItems: "center",
+    justifyContent: "end",
+  },
+  continueButtonContainer: {
+    height: height * 0.1,
+    flexDirection: "row",
+    width: width * 0.7,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
 

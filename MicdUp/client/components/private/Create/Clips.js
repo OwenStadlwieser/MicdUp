@@ -20,8 +20,8 @@ import { updateClips } from "../../../redux/actions/recording";
 
 const { width } = Dimensions.get("window");
 
-const parentWidth = width < 1000 ? width : width * 0.8;
-const childrenWidth = width < 1000 ? width : width * 0.8;
+const parentWidth = width < 1000 ? width * 0.95 : width * 0.8;
+const childrenWidth = width < 1000 ? width * 0.95 : width * 0.8;
 const childrenHeight = 48;
 
 export class OneRowsPage extends Component {

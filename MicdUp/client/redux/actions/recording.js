@@ -1,4 +1,4 @@
-import { ALTER_CLIPS, UPDATE_TITLE } from "../types";
+import { ALTER_CLIPS, UPDATE_TITLE, UPDATE_TAGS } from "../types";
 
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
@@ -10,6 +10,13 @@ export const updateClips = (payload) => (dispatch) => {
 export const updateTitle = (payload) => (dispatch) => {
   dispatch({
     type: UPDATE_TITLE,
+    payload,
+  });
+};
+
+export const updateTags = (payload) => (dispatch) => {
+  dispatch({
+    type: UPDATE_TAGS,
     payload,
   });
 };

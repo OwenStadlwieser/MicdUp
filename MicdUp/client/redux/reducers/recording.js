@@ -1,8 +1,14 @@
-import { ALTER_CLIPS, UPDATE_TITLE } from "../types";
+import {
+  ALTER_CLIPS,
+  UPDATE_TITLE,
+  UPDATE_TAGS,
+  CLEAR_RECORDING,
+} from "../types";
 
 const initialState = {
   clips: [],
   title: "",
+  tags: "",
 };
 
 export default function (state = { ...initialState }, action) {
@@ -17,6 +23,15 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         title: payload,
+      };
+    case UPDATE_TAGS:
+      return {
+        ...state,
+        tags: payload,
+      };
+    case CLEAR_RECORDING:
+      return {
+        ...initialState,
       };
     default:
       return state;
