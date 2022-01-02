@@ -36,12 +36,13 @@ const createRecording = {
     { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost },
     context
   ) {
-    // FIXME: implement transaction
     var command = ffmpeg();
+    // check if logged in
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
     }
     const fileNames = [];
+    // prep files for combine
     try {
       for (let i = 0; i < files.length; i++) {
         var fileType = fileTypes[i].replace("audio/", "");
@@ -54,7 +55,6 @@ const createRecording = {
           `${i}.${fileType}`
         );
         const base64 = files[i].substr(files[i].indexOf(",") + 1);
-        // const byteArray = base64ToArrayBuffer(base64);
         fs.writeFileSync(jsonPath, base64, "base64", function (err) {
           if (err) throw err;
           console.log("File is created successfully.");
@@ -65,6 +65,15 @@ const createRecording = {
     } catch (err) {
       console.log(err);
     }
+    // create post record
+    const post = new Post({
+      owner: context.profile.id,
+      nsfw,
+      allowRebuttal,
+      allowStitch,
+      privatePost,
+      fileExtension: ".mp4",
+    });
     var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
     const fileName = path.join(
       __dirname,
@@ -72,44 +81,35 @@ const createRecording = {
       "..",
       "..",
       "temp",
-      "merged.mp4"
+      `${post._id}.mp4`
     );
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // combine files
     command
       .on("error", function (err) {
         console.log(err);
         console.log("An error occurred: " + err.message);
       })
       .on("end", async function () {
+        const session = await mongoose.startSession();
+        session.startTransaction();
         try {
           for (let i = 0; i < fileNames.length; i++) {
             fs.unlink(fileNames[i], function (err) {
               if (err) throw err;
             });
           }
-          const post = new Post({
-            owner: context.user.id,
-            nsfw,
-            allowRebuttal,
-            allowStitch,
-            privatePost,
-            fileExtension: ".mp4",
-          });
+          // upload file
           await post.save({ session });
           await uploadFile(fileName, `${post._id}.mp4`);
-          fs.unlink(fileName, function (err) {
-            if (err) throw err;
-          });
           await session.commitTransaction();
-          fs.unlink(fileName, function (err) {
-            if (err) throw err;
-          });
           return post;
         } catch (err) {
           console.log(err);
           await session.abortTransaction();
         } finally {
+          fs.unlink(fileName, function (err) {
+            if (err) throw err;
+          });
           session.endSession();
         }
       })
