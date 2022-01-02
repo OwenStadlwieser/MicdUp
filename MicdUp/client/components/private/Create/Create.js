@@ -9,6 +9,7 @@ import {
   Image,
   TouchableHighlight,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 //icons
 import { Fontisto } from "@expo/vector-icons";
@@ -68,6 +69,7 @@ export class Create extends Component {
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
       );
+      console.log(recording);
       this.mounted && this.setState({ recording });
       console.log("Recording started");
     } catch (err) {
@@ -86,8 +88,21 @@ export class Create extends Component {
       this.setState({
         recording: false,
         audioBlobs: clips
-          ? [...clips, { uri, finalDuration }]
-          : [{ uri, finalDuration }],
+          ? [
+              ...clips,
+              {
+                uri,
+                finalDuration,
+                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+              },
+            ]
+          : [
+              {
+                uri,
+                finalDuration,
+                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+              },
+            ],
         v: 0,
       });
     this.props.updateClips(this.state.audioBlobs);

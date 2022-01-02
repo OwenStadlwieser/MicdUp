@@ -1,4 +1,12 @@
-import { ALTER_CLIPS, UPDATE_TITLE, UPDATE_TAGS } from "../types";
+import {
+  ALTER_CLIPS,
+  UPDATE_TITLE,
+  UPDATE_TAGS,
+  CLEAR_RECORDING,
+  NAVIGATE,
+} from "../types";
+import { UPLOAD_RECORDING_MUTATION } from "../../apollo/private/recording";
+import { client } from "../../apollo/client";
 
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
@@ -20,3 +28,34 @@ export const updateTags = (payload) => (dispatch) => {
     payload,
   });
 };
+
+export const uploadRecording =
+  (files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost) =>
+  async (dispatch) => {
+    try {
+      const res = await client.mutate({
+        mutation: UPLOAD_RECORDING_MUTATION,
+        variables: {
+          files,
+          fileTypes,
+          nsfw,
+          allowRebuttal,
+          allowStitch,
+          privatePost,
+        },
+        fetchPolicy: "no-cache",
+      });
+      dispatch({
+        type: CLEAR_RECORDING,
+      });
+      dispatch({
+        type: NAVIGATE,
+        payload: "Feed",
+      });
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+export const combineAudioUrlsWeb = (payload) => async (dispatch) => {};

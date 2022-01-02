@@ -297,6 +297,8 @@ const styles = StyleSheet.create({
   nextButton: {
     height: width * 0.075,
     width: width * 0.3,
+    minHeight: 50,
+    maxHeight: 200,
     borderWidth: 1,
     borderRadius: 4,
     borderColor: "white",
@@ -310,12 +312,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   recordingSettings: {
-    maxHeight: height * 0.5,
+    maxHeight: height * 0.3,
     width: width * 0.95,
     borderRadius: 3,
   },
   recordingSettingsOption: {
-    height: height * 0.125,
+    height: height * 0.08,
     width: width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
