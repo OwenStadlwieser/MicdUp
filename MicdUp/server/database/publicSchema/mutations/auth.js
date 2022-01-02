@@ -1,4 +1,6 @@
+const mongoose = require("mongoose");
 const { User } = require("../../models/User");
+const { Profile } = require("../../models/Profile");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const bcrypt = require("bcryptjs");
@@ -18,17 +20,28 @@ const createUser = {
       success: true,
       message: "Sign up successful",
     };
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      await User.create({
+      const newUser = new User({
         userName: user,
         phone,
         email,
         password,
         dob,
       });
+      const newProfile = new Profile({});
+      newUser.profile = newProfile._id;
+      newProfile.user = newUser._id;
+      await newUser.save({ session });
+      await newProfile.save({ session });
+      await session.commitTransaction();
     } catch (err) {
       returnObject.success = false;
       returnObject.message = err.message;
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
     }
     return returnObject;
   },
