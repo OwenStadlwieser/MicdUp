@@ -11,6 +11,8 @@
     "preset": "react-native"
   },
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "aws-sdk": "^2.1048.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
     "connect-mongo": "^4.6.0",
@@ -19,9 +21,13 @@
     "express": "^4.17.2",
     "express-graphql": "^0.12.0",
     "express-session": "^1.17.2",
+    "ffmpeg-static": "^4.4.0",
+    "ffprobe-static": "^3.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.4",
+    "node-ffprobe-installer": "^1.2.3",
     "nodemailer": "^6.7.2"
   }
 }

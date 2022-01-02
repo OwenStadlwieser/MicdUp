@@ -1,5 +1,5 @@
 const graphql = require("graphql"); //use graphql package
-
+const { User } = require("../database/models/User");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -29,6 +29,30 @@ const UserType = new GraphQLObjectType({
   }),
 });
 
+const PostType = new GraphQLObjectType({
+  name: "Post",
+  fields: () => ({
+    id: { type: GraphQLID },
+    owner: {
+      type: GraphQLID,
+      async resolve(parent) {
+        return await User.findById(parent.owner);
+      },
+    },
+    nsfw: { type: GraphQLBoolean },
+    allowRebuttal: { type: GraphQLBoolean },
+    allowStitch: { type: GraphQLBoolean },
+    privatePost: { type: GraphQLBoolean },
+    filePath: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent._id + parent.fileExtension;
+      },
+    },
+    dateCreated: { type: GraphQLFloat },
+  }),
+});
+
 const MessageType = new GraphQLObjectType({
   name: "Message",
   fields: () => ({
@@ -36,4 +60,4 @@ const MessageType = new GraphQLObjectType({
     message: { type: GraphQLString },
   }),
 });
-module.exports = { UserType, MessageType };
+module.exports = { UserType, MessageType, PostType };

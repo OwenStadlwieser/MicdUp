@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Text, View } from "react-native";
 // redux
 import { getUserQuery } from "../../redux/actions/user";
+import { logout } from "../../redux/actions/auth";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -72,4 +73,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
   getUserQuery,
+  logout,
 })(Dashboard);

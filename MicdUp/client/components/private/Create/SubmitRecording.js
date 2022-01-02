@@ -14,16 +14,16 @@ import { AntDesign } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // redux
-import { updateTags } from "../../../redux/actions/recording";
+import { updateTags, uploadRecording } from "../../../redux/actions/recording";
 
 export class SubmitRecording extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
-      NSFW: false,
-      allowStitch: false,
-      allowRebuttal: false,
+      nsfw: false,
+      allowStitch: true,
+      allowRebuttal: true,
       privatePost: false,
     };
 
@@ -35,7 +35,7 @@ export class SubmitRecording extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { updateSubmitRecording, tags } = this.props;
+    const { updateSubmitRecording, tags, clips } = this.props;
     const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
     return (
       <View style={styles.pane}>
@@ -117,7 +117,61 @@ export class SubmitRecording extends Component {
           <TouchableOpacity style={styles.nextButton}>
             <Text style={styles.nextButtonText}>Discard</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.nextButton}>
+          <TouchableOpacity
+            onPress={async () => {
+              let files = [];
+              let fileTypes = [];
+              for (let i = 0; i < clips.length; i++) {
+                const blob = await new Promise((resolve, reject) => {
+                  const xhr = new XMLHttpRequest();
+                  xhr.onload = () => {
+                    try {
+                      resolve(xhr.response);
+                    } catch (error) {
+                      console.log("error:", error);
+                    }
+                  };
+                  xhr.onerror = (e) => {
+                    console.log(e);
+                    reject(new TypeError("Network request failed"));
+                  };
+                  xhr.responseType = "blob";
+                  xhr.open("GET", clips[i].uri, true);
+                  xhr.send(null);
+                });
+                const base64Url = await new Promise((resolve, reject) => {
+                  var reader = new FileReader();
+
+                  reader.onload = function () {
+                    var blobAsDataUrl = reader.result;
+                    blobAsDataUrl = blobAsDataUrl.substr(
+                      blobAsDataUrl.indexOf(", ") + 1
+                    );
+                    resolve(blobAsDataUrl);
+                  };
+
+                  reader.readAsDataURL(blob);
+                });
+                if (blob != null) {
+                  const uriParts = clips[i].uri.split(".");
+                  const fileType = clips[i].type;
+                  files.push(base64Url);
+                  fileTypes.push(fileType);
+                } else {
+                  console.log("erroor with blob");
+                }
+              }
+              await this.props.uploadRecording(
+                files,
+                fileTypes,
+                nsfw,
+                allowRebuttal,
+                allowStitch,
+                privatePost
+              );
+            }}
+            style={styles.nextButton}
+          >
             <Text style={styles.nextButtonText}>Post</Text>
           </TouchableOpacity>
         </View>
@@ -128,6 +182,9 @@ export class SubmitRecording extends Component {
 
 const mapStateToProps = (state) => ({
   tags: state.recording.tags,
+  clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, { updateTags })(SubmitRecording);
+export default connect(mapStateToProps, { updateTags, uploadRecording })(
+  SubmitRecording
+);

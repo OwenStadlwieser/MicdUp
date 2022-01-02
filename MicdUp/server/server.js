@@ -12,8 +12,8 @@ const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
 const { User } = require("./database/models/User");
 const app = express();
-app.use(bodyParser.json({ limit: "100kb" }));
-app.use(bodyParser.urlencoded({ limit: "100kb", extended: false }));
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: false }));
 app.use(cors());
 
 const verifiedUrls = ["http://localhost:19006"];
@@ -83,6 +83,7 @@ app.get("/hello", bodyParser.json(), async (req, res) => {
 });
 
 app.use("/", graphqlHTTP({ schema: publicSchema, graphiql: true }));
+
 mongoose
   .connect(db, {
     useNewUrlParser: true,
