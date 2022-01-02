@@ -3,8 +3,8 @@ const { PostType } = require("../../types");
 const fs = require("fs");
 const graphql = require("graphql");
 var path = require("path");
-const ffmpegStatic = require("ffmpeg-static");
-const ffprobeStatic = require("ffprobe-static");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffprobePath = require("node-ffprobe-installer").path;
 const { uploadFile } = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
@@ -18,8 +18,8 @@ const {
 } = graphql;
 const { Post } = require("../../models/Post");
 const mongoose = require("mongoose");
-ffmpeg.setFfmpegPath(ffmpegStatic);
-ffmpeg.setFfprobePath(ffprobeStatic.path);
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 const createRecording = {
   type: PostType,
