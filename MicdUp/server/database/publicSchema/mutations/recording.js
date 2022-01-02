@@ -17,6 +17,7 @@ const {
   GraphQLFloat,
 } = graphql;
 const { Post } = require("../../models/Post");
+const { Tag } = require("../../models/Tag");
 const mongoose = require("mongoose");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
@@ -26,6 +27,7 @@ const createRecording = {
   args: {
     files: { type: new GraphQLList(GraphQLString) },
     fileTypes: { type: new GraphQLList(GraphQLString) },
+    tags: { type: new GraphQLList(GraphQLString) },
     nsfw: { type: GraphQLBoolean },
     allowRebuttal: { type: GraphQLBoolean },
     allowStitch: { type: GraphQLBoolean },
@@ -33,7 +35,7 @@ const createRecording = {
   },
   async resolve(
     parent,
-    { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost },
+    { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost, tags },
     context
   ) {
     var command = ffmpeg();
@@ -99,8 +101,17 @@ const createRecording = {
             });
           }
           // upload file
-          await post.save({ session });
           await uploadFile(fileName, `${post._id}.mp4`);
+          // attach tags to post
+          for (let i = 0; i < tags.length; i++) {
+            let tag = await Tag.find({ title: tags[i] });
+            if (!tag) {
+              tag = new Tag({ title: tags[i], posts: [post._id] });
+            }
+            post.tags.push(tag._id);
+            await tag.save({ session });
+          }
+          await post.save({ session });
           await session.commitTransaction();
           return post;
         } catch (err) {

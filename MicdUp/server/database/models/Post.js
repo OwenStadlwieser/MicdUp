@@ -30,6 +30,9 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
+  hashTags: {
+    type: [mongoose.Types.ObjectId],
+  },
   dateCreated: {
     type: Date,
     default: Date.now,

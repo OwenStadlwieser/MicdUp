@@ -64,6 +64,12 @@ const PostType = new GraphQLObjectType({
         return parent._id + parent.fileExtension;
       },
     },
+    hashTags: {
+      type: new GraphQLList(TagsType),
+      async resolve(parent) {
+        return await Tag.find({ _id: { $in: parent.hashTags } });
+      },
+    },
     dateCreated: { type: GraphQLFloat },
   }),
 });
@@ -79,7 +85,7 @@ const MessageType = new GraphQLObjectType({
 const TagsType = new GraphQLObjectType({
   name: "Tags",
   fields: () => ({
-    title: { type: GraphQLBoolean },
+    title: { type: GraphQLString },
     count: {
       type: GraphQLInt,
       resolve(parent) {
