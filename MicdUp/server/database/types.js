@@ -1,5 +1,8 @@
 const graphql = require("graphql"); //use graphql package
 const { User } = require("../database/models/User");
+const { Profile } = require("../database/models/Profile");
+const { Tag } = require("./models/Tag");
+const { Post } = require("./models/Post");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -29,14 +32,26 @@ const UserType = new GraphQLObjectType({
   }),
 });
 
+const ProfileType = new GraphQLObjectType({
+  name: "Profile",
+  fields: () => ({
+    posts: {
+      type: new GraphQLList(PostType),
+      async resolve(parent) {
+        await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+  }),
+});
+
 const PostType = new GraphQLObjectType({
   name: "Post",
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
-      type: GraphQLID,
+      type: ProfileType,
       async resolve(parent) {
-        return await User.findById(parent.owner);
+        return await Profile.findById(parent.owner);
       },
     },
     nsfw: { type: GraphQLBoolean },
@@ -60,4 +75,24 @@ const MessageType = new GraphQLObjectType({
     message: { type: GraphQLString },
   }),
 });
-module.exports = { UserType, MessageType, PostType };
+
+const TagsType = new GraphQLObjectType({
+  name: "Tags",
+  fields: () => ({
+    title: { type: GraphQLBoolean },
+    count: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return parent.posts.length;
+      },
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      async resolve(parent) {
+        return await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+  }),
+});
+
+module.exports = { UserType, MessageType, PostType, TagsType };

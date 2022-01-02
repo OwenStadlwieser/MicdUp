@@ -11,6 +11,7 @@ const { graphqlHTTP } = require("express-graphql");
 const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
 const { User } = require("./database/models/User");
+const { Profile } = require("./database/models/Profile");
 const app = express();
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: false }));
@@ -68,6 +69,10 @@ app.use(async (req, res, next) => {
     const user = await User.findOne({
       _id: userId.user,
     });
+    const profile = await Profile.findOne({
+      _id: user.profile,
+    });
+    req.profile = profile;
     req.user = user;
     req.isAuthenticated = true;
   }
