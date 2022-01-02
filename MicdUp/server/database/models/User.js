@@ -40,6 +40,11 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  profile: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    unique: true,
+  },
 });
 
 UserSchema.methods.getPasswordResetToken = async function () {

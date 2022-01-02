@@ -7,3 +7,6 @@ export const DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
 export const HIDE_MESSAGE = "HIDE_MESSAGE";
 export const NAVIGATE = "NAVIGATE";
 export const ALTER_CLIPS = "ALTER_CLIPS";
+export const UPDATE_TITLE = "UPDATE_TITLE";
+export const UPDATE_TAGS = "UPDATE_TAGS";
+export const CLEAR_RECORDING = "CLEAR_RECORDING";

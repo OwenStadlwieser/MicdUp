@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, TextInput, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+} from "react-native";
 import { styles } from "../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 // redux
@@ -50,7 +56,7 @@ export class Login extends Component {
           />
         ))
       : (login = (
-          <View style={styles.container}>
+          <KeyboardAvoidingView style={styles.container}>
             <AntDesign
               style={styles.backArrow}
               name="leftcircle"
@@ -90,7 +96,7 @@ export class Login extends Component {
             >
               <Text style={styles.text}>Login</Text>
             </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
         ));
     return login;
   }

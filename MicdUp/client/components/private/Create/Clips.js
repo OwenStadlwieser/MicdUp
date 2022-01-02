@@ -20,8 +20,8 @@ import { updateClips } from "../../../redux/actions/recording";
 
 const { width } = Dimensions.get("window");
 
-const parentWidth = width;
-const childrenWidth = width;
+const parentWidth = width < 1000 ? width * 0.95 : width * 0.8;
+const childrenWidth = width < 1000 ? width * 0.95 : width * 0.8;
 const childrenHeight = 48;
 
 export class OneRowsPage extends Component {
@@ -104,7 +104,7 @@ export class OneRowsPage extends Component {
           <Text style={styles.item_text}>
             {Math.round(item.finalDuration / 1000)} Seconds
           </Text>
-          <View style={styles.iconContainer}>
+          <View style={styles.iconContainerClips}>
             {playingIndex !== index ? (
               <AntDesign
                 onPress={async () => {
@@ -148,7 +148,11 @@ export class OneRowsPage extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#1A3561",
+    borderColor: "white",
+    borderRadius: 8,
+    borderStyle: "solid",
+    borderWidth: 2,
   },
   item: {
     width: childrenWidth,
@@ -159,14 +163,14 @@ const styles = StyleSheet.create({
   item_children: {
     width: childrenWidth,
     height: childrenHeight - 4,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#1A3561",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 4,
     paddingHorizontal: 15,
   },
-  iconContainer: {
+  iconContainerClips: {
     flexDirection: "row",
   },
   item_icon: {
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
   },
   item_text: {
     marginRight: 15,
-    color: "#1A3561",
+    color: "white",
     fontStyle: "italic",
   },
 });

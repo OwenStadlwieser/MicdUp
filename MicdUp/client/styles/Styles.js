@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   textInput: {
+    boxShadow: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
@@ -59,7 +60,25 @@ const styles = StyleSheet.create({
     position: "relative",
     paddingLeft: 5,
   },
+  textInputRecEdit: {
+    fontStyle: "italic",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    borderBottomColor: "white",
+    borderBottomStyle: "white",
+    borderBottomWidth: 1,
+    width: width * 0.6,
+    height: 40,
+    borderRadius: 5,
+    marginTop: height * 0.05,
+    marginBottom: height * 0.02,
+    position: "relative",
+    paddingLeft: 5,
+    boxShadow: "none",
+  },
   invalidTextInput: {
+    boxShadow: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     borderColor: "red",
@@ -103,6 +122,9 @@ const styles = StyleSheet.create({
     color: "red",
   },
   text: {},
+  whiteText: {
+    color: "white",
+  },
   rootContainer: {
     height: height,
     width: width,
@@ -127,6 +149,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A3561",
     width: width,
     height: height * 0.9,
+    justifyContent: "center",
+    alignItems: "center",
   },
   navbarButton: {
     width: width * 0.2,
@@ -196,9 +220,13 @@ const styles = StyleSheet.create({
   recordingPeopleContainer: {
     paddingTop: height * 0.08,
     height: height * 0.4,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   recordingClipsContainer: {
     height: height * 0.29,
+    width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
     height: height * 0.21,
@@ -217,7 +245,6 @@ const styles = StyleSheet.create({
   },
   recordingMicIcon: {
     paddingLeft: 10,
-    paddingBottom: 10,
     fontSize:
       width * 0.24 < (height * 0.21) / 1.7 - 10
         ? width * 0.24
@@ -242,6 +269,75 @@ const styles = StyleSheet.create({
   recordingFireIcon: {
     paddingLeft: 20,
     fontSize: width * 0.1 < 50 ? width * 0.1 : 50,
+  },
+  profileImgContainer: {
+    height: height * 0.2,
+    width: height * 0.2,
+    borderRadius: height * 0.2,
+    overflow: "hidden",
+  },
+  profileImg: {
+    height: height * 0.2,
+    width: height * 0.2,
+    borderRadius: height * 0.2,
+  },
+  upperEditDiv: {
+    marginTop: height * 0.05,
+    height: height * 0.15,
+  },
+  clipsEditDiv: {
+    height: height * 0.5,
+    width: width * 0.95,
+  },
+  continueEditDiv: {
+    height: height * 0.18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextButton: {
+    height: width * 0.075,
+    width: width * 0.3,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "white",
+    borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextButtonText: {
+    color: "white",
+    fontStyle: "italic",
+    fontSize: 14,
+  },
+  recordingSettings: {
+    maxHeight: height * 0.5,
+    width: width * 0.95,
+    borderRadius: 3,
+  },
+  recordingSettingsOption: {
+    height: height * 0.125,
+    width: width * 0.95,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#1A3561",
+    borderStyle: "solid",
+    alignItems: "center",
+    borderRadius: 20,
+    paddingHorizontal: 20,
+  },
+  playButtonContainer: {
+    height: height * 0.1,
+    alignItems: "center",
+    justifyContent: "end",
+  },
+  continueButtonContainer: {
+    height: height * 0.1,
+    flexDirection: "row",
+    width: width * 0.7,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
 

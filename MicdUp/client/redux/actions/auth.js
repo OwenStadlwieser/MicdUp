@@ -1,6 +1,7 @@
 import { client } from "../../apollo/client/index";
 import {
   SIGNUP_MUTATION,
+  CREATE_PROFILE_MUTATION,
   LOGIN_QUERY,
   FORGOT_PASS_MUTATION,
   FORGOT_PASS_CHANGE_MUTATION,
