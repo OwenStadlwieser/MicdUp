@@ -4,6 +4,8 @@ import {
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
   NAVIGATE,
+  VIEW_PROFILE,
+  SET_BIO,
 } from "../types";
 
 const initialState = {
@@ -13,6 +15,7 @@ const initialState = {
   currentMessage: "",
   messageState: false,
   mountedComponent: "Feed",
+  viewingProfile: {},
 };
 
 export default function (state = { ...initialState }, action) {
@@ -46,6 +49,19 @@ export default function (state = { ...initialState }, action) {
         displayMessage: false,
         currentMessage: "",
         messageState: false,
+      };
+    case VIEW_PROFILE:
+      return {
+        ...state,
+        viewingProfile: payload,
+      };
+    case SET_BIO:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          bio: { ...payload },
+        },
       };
     default:
       return state;

@@ -19,9 +19,18 @@ const UPLOAD_RECORDING_MUTATION = gql`
       allowStitch: $allowStitch
       privatePost: $privatePost
     ) {
+      id
       filePath
     }
   }
 `;
+const UPLOAD_BIO_MUTATION = gql`
+  mutation uploadBio($files: String!, $fileTypes: String!) {
+    uploadBio(files: $files, fileTypes: $fileTypes) {
+      id
+      signedUrl
+    }
+  }
+`;
 
-export { UPLOAD_RECORDING_MUTATION };
+export { UPLOAD_RECORDING_MUTATION, UPLOAD_BIO_MUTATION };

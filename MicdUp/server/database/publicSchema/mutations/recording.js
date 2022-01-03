@@ -1,5 +1,5 @@
 var ffmpeg = require("fluent-ffmpeg");
-const { PostType } = require("../../types");
+const { PostType, BioType } = require("../../types");
 const fs = require("fs");
 const graphql = require("graphql");
 var path = require("path");
@@ -17,6 +17,8 @@ const {
   GraphQLFloat,
 } = graphql;
 const { Post } = require("../../models/Post");
+const { Profile } = require("../../models/Profile");
+const { Bio } = require("../../models/Bio");
 const { Tag } = require("../../models/Tag");
 const mongoose = require("mongoose");
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -38,26 +40,34 @@ const createRecording = {
     { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost, tags },
     context
   ) {
-    console.log(tags);
     var command = ffmpeg();
     // check if logged in
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
     }
     const fileNames = [];
+    // create post record
+    const post = new Post({
+      owner: context.profile.id,
+      nsfw,
+      allowRebuttal,
+      allowStitch,
+      privatePost,
+      fileExtension: ".mp4",
+    });
     // prep files for combine
     try {
       for (let i = 0; i < files.length; i++) {
-        var fileType = fileTypes[i].replace("audio/", "");
+        var fileType = fileTypes.replace("audio/", "");
         var jsonPath = path.join(
           __dirname,
           "..",
           "..",
           "..",
           "temp",
-          `${i}.${fileType}`
+          `${post._id}${i}.${fileType}`
         );
-        const base64 = files[i].substr(files[i].indexOf(",") + 1);
+        const base64 = files.substr(files.indexOf(",") + 1);
         fs.writeFileSync(jsonPath, base64, "base64", function (err) {
           if (err) throw err;
           console.log("File is created successfully.");
@@ -68,15 +78,6 @@ const createRecording = {
     } catch (err) {
       console.log(err);
     }
-    // create post record
-    const post = new Post({
-      owner: context.profile.id,
-      nsfw,
-      allowRebuttal,
-      allowStitch,
-      privatePost,
-      fileExtension: ".mp4",
-    });
     var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
     const fileName = path.join(
       __dirname,
@@ -87,14 +88,117 @@ const createRecording = {
       `${post._id}.mp4`
     );
     // combine files
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
+      for (let i = 0; i < tags.length; i++) {
+        if (!tags) continue;
+        let tag = await Tag.findOne({ title: tags });
+        if (!tag) {
+          tag = new Tag({ title: tags });
+        }
+        tag.count = tag.count + 1;
+        tag.posts.push(post._id);
+        post.tags.push(tag._id);
+        await tag.save({ session });
+      }
+      await post.save({ session });
+      await session.commitTransaction();
+      return post;
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+    } finally {
+      fs.unlink(fileName, function (err) {
+        if (err) throw err;
+      });
+      session.endSession();
+    }
+  },
+};
+
+const uploadBio = {
+  type: BioType,
+  args: {
+    files: { type: GraphQLString },
+    fileTypes: { type: GraphQLString },
+  },
+  async resolve(parent, { files, fileTypes }, context) {
+    var command = ffmpeg();
+    // check if logged in
+    if (!context.user.id) {
+      throw new Error("Must be signed in to post");
+    }
+    const fileNames = [];
+    // prep files for combine
+    const bio = new Bio({
+      owner: context.profile.id,
+      fileExtension: ".mp4",
+    });
+    try {
+      var fileType = fileTypes.replace("audio/", "");
+      var jsonPath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "temp",
+        `${bio._id}.${fileType}`
+      );
+      const base64 = files.substr(files.indexOf(",") + 1);
+      fs.writeFileSync(jsonPath, base64, "base64", function (err) {
+        if (err) throw err;
+        console.log("File is created successfully.");
+      });
+      fileNames.push(jsonPath);
+      command.input(jsonPath).inputFormat(fileType);
+    } catch (err) {
+      console.log(err);
+    }
+    // create post record
+    const profile = context.profile;
+    profile.bio = bio._id;
+    var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
+    const fileName = path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "temp",
+      `${bio._id}.mp4`
+    );
+    // convert file to mp4 (might as well keep them all the same)
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await ffmpegMergeAndUpload(fileName, bio._id, fileNames, command);
+      await profile.save({ session });
+      await bio.save({ session });
+      await session.commitTransaction();
+      return bio;
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+    } finally {
+      fs.unlink(fileName, function (err) {
+        if (err) throw err;
+      });
+      session.endSession();
+    }
+  },
+};
+
+const ffmpegMergeAndUpload = async (fileName, id, fileNames, command) => {
+  await new Promise((resolve, reject) => {
     command
       .on("error", function (err) {
         console.log(err);
         console.log("An error occurred: " + err.message);
+        return reject(new Error(err));
+        throw err;
       })
       .on("end", async function () {
-        const session = await mongoose.startSession();
-        session.startTransaction();
         try {
           for (let i = 0; i < fileNames.length; i++) {
             fs.unlink(fileNames[i], function (err) {
@@ -102,36 +206,17 @@ const createRecording = {
             });
           }
           // upload file
-          await uploadFile(fileName, `${post._id}.mp4`);
-          // attach tags to post
-          for (let i = 0; i < tags.length; i++) {
-            if (!tags[i]) continue;
-            let tag = await Tag.findOne({ title: tags[i] });
-            if (!tag) {
-              tag = new Tag({ title: tags[i] });
-            }
-            tag.count = tag.count + 1;
-            tag.posts.push(post._id);
-            post.tags.push(tag._id);
-            await tag.save({ session });
-          }
-          await post.save({ session });
-          await session.commitTransaction();
-          return post;
+          await uploadFile(fileName, `${id}.mp4`);
+          resolve();
         } catch (err) {
-          console.log(err);
-          await session.abortTransaction();
-        } finally {
-          fs.unlink(fileName, function (err) {
-            if (err) throw err;
-          });
-          session.endSession();
+          throw err;
+          return reject(new Error(err));
         }
       })
       .mergeToFile(fileName);
-  },
+  });
 };
-
 module.exports = {
   createRecording,
+  uploadBio,
 };

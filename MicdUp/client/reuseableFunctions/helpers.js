@@ -52,4 +52,43 @@ const playSound = async (uri, onPlayBackStatusUpdate) => {
   }
 };
 
-export { storeData, getData, removeItemValue, clearAsyncStorage, playSound };
+const soundBlobToBase64 = async (uri) => {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = () => {
+      try {
+        resolve(xhr.response);
+      } catch (error) {
+        console.log("error:", error);
+      }
+    };
+    xhr.onerror = (e) => {
+      console.log(e);
+      reject(new TypeError("Network request failed"));
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+  const base64Url = await new Promise((resolve, reject) => {
+    var reader = new FileReader();
+
+    reader.onload = function () {
+      var blobAsDataUrl = reader.result;
+      blobAsDataUrl = blobAsDataUrl.substr(blobAsDataUrl.indexOf(", ") + 1);
+      resolve(blobAsDataUrl);
+    };
+
+    reader.readAsDataURL(blob);
+  });
+  return base64Url;
+};
+
+export {
+  storeData,
+  getData,
+  removeItemValue,
+  clearAsyncStorage,
+  playSound,
+  soundBlobToBase64,
+};

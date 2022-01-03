@@ -4,10 +4,14 @@ import {
   UPDATE_TAGS,
   CLEAR_RECORDING,
   NAVIGATE,
+  SET_BIO,
 } from "../types";
-import { UPLOAD_RECORDING_MUTATION } from "../../apollo/private/recording";
+import {
+  UPLOAD_RECORDING_MUTATION,
+  UPLOAD_BIO_MUTATION,
+} from "../../apollo/private/recording";
 import { client } from "../../apollo/client";
-
+import { showMessage } from "./display";
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
     type: ALTER_CLIPS,
@@ -33,7 +37,14 @@ export const uploadRecording =
   (files, fileTypes, tags, nsfw, allowRebuttal, allowStitch, privatePost) =>
   async (dispatch) => {
     try {
-      console.log(tags);
+      console.log(
+        fileTypes,
+        tags,
+        nsfw,
+        allowRebuttal,
+        allowStitch,
+        privatePost
+      );
       const res = await client.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
@@ -47,6 +58,15 @@ export const uploadRecording =
         },
         fetchPolicy: "no-cache",
       });
+      if (!res.data || !res.data.createRecording) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return;
+      }
       dispatch({
         type: CLEAR_RECORDING,
       });
@@ -54,10 +74,36 @@ export const uploadRecording =
         type: NAVIGATE,
         payload: "Feed",
       });
-      console.log(res);
     } catch (err) {
       console.log(err);
     }
   };
 
-export const combineAudioUrlsWeb = (payload) => async (dispatch) => {};
+export const uploadBio = (files, fileTypes) => async (dispatch) => {
+  try {
+    const res = await client.mutate({
+      mutation: UPLOAD_BIO_MUTATION,
+      variables: {
+        files,
+        fileTypes,
+      },
+      fetchPolicy: "no-cache",
+    });
+    if (!res.data || !res.data.uploadBio) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch({
+      type: SET_BIO,
+      payload: { ...res.data.uploadBio },
+    });
+    return true;
+  } catch (err) {
+    console.log(err);
+  }
+};

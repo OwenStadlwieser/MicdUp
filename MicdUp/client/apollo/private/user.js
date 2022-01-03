@@ -8,6 +8,13 @@ const GET_USER_QUERY = gql`
       email
       phone
       dob
+      profile {
+        id
+        bio {
+          id
+          signedUrl
+        }
+      }
     }
   }
 `;
