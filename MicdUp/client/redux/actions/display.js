@@ -4,6 +4,7 @@ import {
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
   NAVIGATE,
+  VIEW_PROFILE,
 } from "../types";
 
 export const changeLogin = (payload) => (dispatch) => {
@@ -33,6 +34,13 @@ export const showMessage = (payload) => (dispatch) => {
 export const navigate = (payload) => (dispatch) => {
   dispatch({
     type: NAVIGATE,
+    payload,
+  });
+};
+
+export const viewProfile = (payload) => (dispatch) => {
+  dispatch({
+    type: VIEW_PROFILE,
     payload,
   });
 };

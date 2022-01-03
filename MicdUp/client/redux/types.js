@@ -10,3 +10,5 @@ export const ALTER_CLIPS = "ALTER_CLIPS";
 export const UPDATE_TITLE = "UPDATE_TITLE";
 export const UPDATE_TAGS = "UPDATE_TAGS";
 export const CLEAR_RECORDING = "CLEAR_RECORDING";
+export const VIEW_PROFILE = "VIEW_PROFILE";
+export const SET_BIO = "SET_BIO";

@@ -1,4 +1,4 @@
-import { LOG_IN, LOG_OUT, SET_USER } from "../types";
+import { LOG_IN, LOG_OUT, SET_USER, SET_BIO } from "../types";
 
 const initialState = {
   loggedIn: false,
@@ -23,6 +23,17 @@ export default function (state = { ...initialState }, action) {
         ...state,
         user: {},
         loggedIn: false,
+      };
+    case SET_BIO:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            bio: { ...payload },
+          },
+        },
       };
     default:
       return state;
