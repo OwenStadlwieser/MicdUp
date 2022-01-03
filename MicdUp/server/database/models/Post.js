@@ -8,7 +8,7 @@ const postSchema = new Schema({
     default: false,
   },
   owner: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   allowStitch: {
@@ -30,8 +30,8 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  hashTags: {
-    type: [mongoose.Types.ObjectId],
+  tags: {
+    type: [mongoose.Schema.Types.ObjectId],
   },
   dateCreated: {
     type: Date,

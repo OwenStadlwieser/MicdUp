@@ -6,12 +6,23 @@ const searchTags = {
   args: { searchTerm: { type: GraphQLString } },
   async resolve(parent, { searchTerm }, context) {
     try {
-      const res = await Tag.find({ $text: { $search: searchTerm } }).sort({
-        score: { $add: [{ $meta: "textScore" }, "$count"] },
-      });
-      console.log(res);
+      const res = await Tag.aggregate([
+        { $match: { $text: { $search: searchTerm } } },
+        {
+          $addFields: {
+            totalScore: {
+              $add: [{ $meta: "textScore" }, { $divide: ["$count", 1000] }],
+            },
+          },
+        },
+        {
+          $sort: { totalScore: -1 },
+        },
+      ]);
       return res;
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 

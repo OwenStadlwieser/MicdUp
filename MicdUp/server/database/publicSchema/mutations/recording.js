@@ -38,6 +38,7 @@ const createRecording = {
     { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost, tags },
     context
   ) {
+    console.log(tags);
     var command = ffmpeg();
     // check if logged in
     if (!context.user.id) {
@@ -104,10 +105,13 @@ const createRecording = {
           await uploadFile(fileName, `${post._id}.mp4`);
           // attach tags to post
           for (let i = 0; i < tags.length; i++) {
-            let tag = await Tag.find({ title: tags[i] });
+            if (!tags[i]) continue;
+            let tag = await Tag.findOne({ title: tags[i] });
             if (!tag) {
-              tag = new Tag({ title: tags[i], posts: [post._id] });
+              tag = new Tag({ title: tags[i] });
             }
+            tag.count = tag.count + 1;
+            tag.posts.push(post._id);
             post.tags.push(tag._id);
             await tag.save({ session });
           }

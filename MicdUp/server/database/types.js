@@ -35,6 +35,7 @@ const UserType = new GraphQLObjectType({
 const ProfileType = new GraphQLObjectType({
   name: "Profile",
   fields: () => ({
+    id: { type: GraphQLID },
     posts: {
       type: new GraphQLList(PostType),
       async resolve(parent) {
@@ -85,6 +86,7 @@ const MessageType = new GraphQLObjectType({
 const TagsType = new GraphQLObjectType({
   name: "Tags",
   fields: () => ({
+    _id: { type: GraphQLID },
     title: { type: GraphQLString },
     count: {
       type: GraphQLInt,

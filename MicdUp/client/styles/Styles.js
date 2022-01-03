@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 5,
     marginTop: height * 0.05,
-    marginBottom: height * 0.02,
     position: "relative",
     paddingLeft: 5,
     boxShadow: "none",
@@ -285,6 +284,11 @@ const styles = StyleSheet.create({
     marginTop: height * 0.05,
     height: height * 0.15,
   },
+  upperEditDivAbsolute: {
+    marginTop: height * 0.05,
+    height: height * 0.15,
+    zIndex: "3",
+  },
   clipsEditDiv: {
     height: height * 0.5,
     width: width * 0.95,
@@ -340,6 +344,22 @@ const styles = StyleSheet.create({
     width: width * 0.7,
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  resultsContainer: {
+    zIndex: "2",
+    flexDirection: "row",
+    maxHeight: height * 0.35,
+    backgroundColor: "white",
+    width: width * 0.6,
+    borderRadius: 8,
+  },
+  listItemContainer: {
+    height: height * 0.15,
+    borderColor: "#1A3561",
+    borderWidth: 2,
+    borderStyle: "solid",
+    padding: 10,
+    width: width * 0.6,
   },
 });
 
