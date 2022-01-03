@@ -6,6 +6,7 @@ const tagsSchema = new Schema({
   title: {
     type: String,
     required: true,
+    unique: true,
   },
   count: {
     type: Number,
@@ -13,7 +14,7 @@ const tagsSchema = new Schema({
     default: 0,
   },
   posts: {
-    type: [mongoose.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId],
     required: true,
   },
   dateCreated: {
@@ -23,5 +24,7 @@ const tagsSchema = new Schema({
 });
 
 const Tag = mongoose.model("tag", tagsSchema);
+
+tagsSchema.index({ title: "text", description: "text" });
 
 module.exports = { Tag };

@@ -8,7 +8,7 @@ const postSchema = new Schema({
     default: false,
   },
   owner: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   allowStitch: {
@@ -29,6 +29,9 @@ const postSchema = new Schema({
   fileExtension: {
     type: String,
     required: true,
+  },
+  tags: {
+    type: [mongoose.Schema.Types.ObjectId],
   },
   dateCreated: {
     type: Date,

@@ -9,12 +9,14 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
+import SearchComponent from "../../reuseable/SearchComponent";
 //icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // redux
 import { updateTags, uploadRecording } from "../../../redux/actions/recording";
+import { searchTags } from "../../../redux/actions/tag";
 
 export class SubmitRecording extends Component {
   constructor() {
@@ -34,9 +36,13 @@ export class SubmitRecording extends Component {
 
   componentDidMount = () => {};
 
+  setTagsState = (tags) => {
+    this.mounted && this.setState({ tags });
+  };
+
   render() {
-    const { updateSubmitRecording, tags, clips } = this.props;
-    const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
+    const { updateSubmitRecording, clips } = this.props;
+    const { nsfw, allowRebuttal, allowStitch, privatePost, tags } = this.state;
     return (
       <View style={styles.pane}>
         <AntDesign
@@ -48,16 +54,15 @@ export class SubmitRecording extends Component {
             updateSubmitRecording(false);
           }}
         />
-        <View style={styles.upperEditDiv}>
-          <TextInput
-            style={styles.textInputRecEdit}
-            placeholderTextColor={"white"}
-            value={tags}
-            placeholder="Recording Tags"
-            onChangeText={(text) => {
-              this.props.updateTags(text);
-              this.mounted && this.setState({ tags: text });
-            }}
+        <View style={styles.upperEditDivAbsolute}>
+          <SearchComponent
+            placeholder={"Tags"}
+            setStateOnChange={true}
+            setStateOnChangeFunc={this.setTagsState.bind(this)}
+            searchFunction={this.props.searchTags}
+            splitSearchTerm={true}
+            inputStyle={styles.textInputRecEdit}
+            placeHolderColor={"white"}
           />
         </View>
         <ScrollView
@@ -164,6 +169,7 @@ export class SubmitRecording extends Component {
               await this.props.uploadRecording(
                 files,
                 fileTypes,
+                tags.split(/[\s,]+/),
                 nsfw,
                 allowRebuttal,
                 allowStitch,
@@ -185,6 +191,8 @@ const mapStateToProps = (state) => ({
   clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, { updateTags, uploadRecording })(
-  SubmitRecording
-);
+export default connect(mapStateToProps, {
+  updateTags,
+  uploadRecording,
+  searchTags,
+})(SubmitRecording);

@@ -4,19 +4,19 @@ const Schema = mongoose.Schema;
 // Create Schema
 const ProfileSchema = new Schema({
   following: {
-    type: [mongoose.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId],
   },
   followers: {
-    type: [mongoose.Types.ObjectID],
+    type: [mongoose.Schema.Types.ObjectID],
   },
   blocked: {
-    type: [mongoose.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId],
   },
   posts: {
-    type: [mongoose.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId],
   },
   user: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     require: true,
     unique: true,
   },

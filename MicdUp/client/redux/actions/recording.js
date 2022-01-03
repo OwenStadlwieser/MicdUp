@@ -30,14 +30,16 @@ export const updateTags = (payload) => (dispatch) => {
 };
 
 export const uploadRecording =
-  (files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost) =>
+  (files, fileTypes, tags, nsfw, allowRebuttal, allowStitch, privatePost) =>
   async (dispatch) => {
     try {
+      console.log(tags);
       const res = await client.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
           files,
           fileTypes,
+          tags,
           nsfw,
           allowRebuttal,
           allowStitch,

@@ -35,6 +35,7 @@ const UserType = new GraphQLObjectType({
 const ProfileType = new GraphQLObjectType({
   name: "Profile",
   fields: () => ({
+    id: { type: GraphQLID },
     posts: {
       type: new GraphQLList(PostType),
       async resolve(parent) {
@@ -64,6 +65,12 @@ const PostType = new GraphQLObjectType({
         return parent._id + parent.fileExtension;
       },
     },
+    hashTags: {
+      type: new GraphQLList(TagsType),
+      async resolve(parent) {
+        return await Tag.find({ _id: { $in: parent.hashTags } });
+      },
+    },
     dateCreated: { type: GraphQLFloat },
   }),
 });
@@ -79,7 +86,8 @@ const MessageType = new GraphQLObjectType({
 const TagsType = new GraphQLObjectType({
   name: "Tags",
   fields: () => ({
-    title: { type: GraphQLBoolean },
+    _id: { type: GraphQLID },
+    title: { type: GraphQLString },
     count: {
       type: GraphQLInt,
       resolve(parent) {
