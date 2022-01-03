@@ -34,15 +34,19 @@ export class SubmitRecording extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    const { tags } = this.props;
+    this.mounted && this.setState({ tags });
+  };
 
   setTagsState = (tags) => {
+    this.props.updateTags(tags);
     this.mounted && this.setState({ tags });
   };
 
   render() {
-    const { updateSubmitRecording, clips } = this.props;
-    const { nsfw, allowRebuttal, allowStitch, privatePost, tags } = this.state;
+    const { updateSubmitRecording, clips, tags } = this.props;
+    const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
     return (
       <View style={styles.pane}>
         <AntDesign
@@ -63,6 +67,7 @@ export class SubmitRecording extends Component {
             splitSearchTerm={true}
             inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
+            initValue={tags}
           />
         </View>
         <ScrollView
