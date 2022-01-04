@@ -154,75 +154,80 @@ export class Profile extends Component {
           backgroundColor: this.state.backgroundColor,
         }}
       >
-        <View style={styles.paneUncentered}>
-          {loading && (
-            <View style={styles.refresh}>
-              <Text style={styles.nextButtonText}>Loading</Text>
-            </View>
-          )}
-          {!settingsShown && isUserProfile && (
-            <Ionicons
-              onPress={() => {
-                this.mounted && this.setState({ settingsShown: true });
-              }}
-              name="settings-outline"
-              size={24}
-              color="white"
-              style={styles.topRightIcon}
-            />
-          )}
-          {settingsShown && (
-            <Settings hideSetting={this.hideSetting.bind(this)} />
-          )}
-          <View style={styles.profileHeader}>
-            <TouchableHighlight
-              style={[
-                styles.profileImgContainerSmall,
-                { borderColor: recording ? "red" : "#30F3FF", borderWidth: 1 },
-              ]}
-            >
-              <Image
-                source={
-                  user && user.profile && user.profile.image
-                    ? {
-                        uri: user.profile.image,
-                      }
-                    : require("../../../assets/no-profile-pic-icon-27.jpg")
-                }
-                style={styles.profileImgSmall}
-              />
-            </TouchableHighlight>
-            <Text style={styles.profileText}>@{user.userName}</Text>
-            <Bio
-              startRecording={this.startRecording.bind(this)}
-              stopRecordingBio={this.stopRecordingBio.bind(this)}
-              currentSound={playingId}
-              onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
-              setPlaying={this.setPlaying.bind(this)}
-              setNewBioRecording={this.setNewBioRecording.bind(this)}
-              newBioRecording={newBioRecording}
-            />
-          </View>
-          <ScrollView
-            scrollEnabled={true}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            style={styles.postsContainer}
-          >
-            {posts &&
-              posts.map((post, index) => (
-                <Post
-                  key={post.id}
-                  post={post}
-                  currentSound={playingId}
-                  onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                    this
-                  )}
-                  setPlaying={this.setPlaying.bind(this)}
+        {!settingsShown && isUserProfile && (
+          <Ionicons
+            onPress={() => {
+              this.mounted && this.setState({ settingsShown: true });
+            }}
+            name="settings-outline"
+            size={24}
+            color="white"
+            style={styles.topRightIcon}
+          />
+        )}
+        {settingsShown && (
+          <Settings hideSetting={this.hideSetting.bind(this)} />
+        )}
+        {!settingsShown && (
+          <View style={styles.paneUncentered}>
+            {loading && (
+              <View style={styles.refresh}>
+                <Text style={styles.nextButtonText}>Loading</Text>
+              </View>
+            )}
+            <View style={styles.profileHeader}>
+              <TouchableHighlight
+                style={[
+                  styles.profileImgContainerSmall,
+                  {
+                    borderColor: recording ? "red" : "#30F3FF",
+                    borderWidth: 1,
+                  },
+                ]}
+              >
+                <Image
+                  source={
+                    user && user.profile && user.profile.image
+                      ? {
+                          uri: user.profile.image,
+                        }
+                      : require("../../../assets/no-profile-pic-icon-27.jpg")
+                  }
+                  style={styles.profileImgSmall}
                 />
-              ))}
-          </ScrollView>
-        </View>
+              </TouchableHighlight>
+              <Text style={styles.profileText}>@{user.userName}</Text>
+              <Bio
+                startRecording={this.startRecording.bind(this)}
+                stopRecordingBio={this.stopRecordingBio.bind(this)}
+                currentSound={playingId}
+                onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
+                setPlaying={this.setPlaying.bind(this)}
+                setNewBioRecording={this.setNewBioRecording.bind(this)}
+                newBioRecording={newBioRecording}
+              />
+            </View>
+            <ScrollView
+              scrollEnabled={true}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              style={styles.postsContainer}
+            >
+              {posts &&
+                posts.map((post, index) => (
+                  <Post
+                    key={post.id}
+                    post={post}
+                    currentSound={playingId}
+                    onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
+                      this
+                    )}
+                    setPlaying={this.setPlaying.bind(this)}
+                  />
+                ))}
+            </ScrollView>
+          </View>
+        )}
       </GestureRecognizer>
     );
   }

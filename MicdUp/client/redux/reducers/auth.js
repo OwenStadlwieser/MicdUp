@@ -1,4 +1,5 @@
 import {
+  DELETE_ACCOUNT,
   LOG_IN,
   LOG_OUT,
   SET_USER,
@@ -10,6 +11,7 @@ import {
 const initialState = {
   loggedIn: false,
   user: {},
+  profile: {},
   posts: [],
 };
 
@@ -31,6 +33,10 @@ export default function (state = { ...initialState }, action) {
         ...state,
         user: {},
         loggedIn: false,
+      };
+    case DELETE_ACCOUNT:
+      return {
+        ...state,
       };
     case SET_BIO:
       return {
