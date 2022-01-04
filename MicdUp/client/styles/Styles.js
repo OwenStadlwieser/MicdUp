@@ -241,6 +241,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: width * 0.08,
     top: height * 0.06,
+    zIndex: 99,
   },
   topLeftIcon: {
     position: "absolute",

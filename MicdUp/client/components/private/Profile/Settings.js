@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { ScrollView, View, TouchableOpacity, Text } from "react-native";
+import { ScrollView, View, TouchableOpacity, Text, Alert } from "react-native";
 // styles
 import { styles } from "../../../styles/Styles";
 // icons
 import { AntDesign } from "@expo/vector-icons";
 // redux
 import { logout } from "../../../redux/actions/auth";
+import { deleteAccount } from "../../../redux/actions/user";
 
 export class Settings extends Component {
   constructor() {
@@ -66,8 +67,14 @@ export class Settings extends Component {
           <TouchableOpacity style={styles.settingsOption}>
             <Text>Option 5</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingsOption}>
-            <Text>Option 6</Text>
+          <TouchableOpacity
+            style={styles.settingsOption}
+            onPress={async () => {
+              await this.props.deleteAccount();
+              await this.props.logout();
+            }}
+          >
+            <Text style={styles.logoutText}>Delete Account</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -77,4 +84,4 @@ export class Settings extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { logout })(Settings);
+export default connect(mapStateToProps, { logout, deleteAccount })(Settings);
