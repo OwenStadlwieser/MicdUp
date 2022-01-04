@@ -26,6 +26,7 @@ import Clips from "./Clips";
 // redux
 import { showMessage } from "../../../redux/actions/display";
 import { updateClips } from "../../../redux/actions/recording";
+import { Button } from "react-native-paper";
 
 export class Create extends Component {
   constructor() {
@@ -37,6 +38,7 @@ export class Create extends Component {
       v: 0,
       editRecording: false,
       submitRecording: false,
+      promptShown: false,
     };
 
     this.mounted = true;
@@ -114,7 +116,8 @@ export class Create extends Component {
   };
   render() {
     const { user } = this.props;
-    const { recording, clips, v, editRecording, submitRecording } = this.state;
+    const { recording, clips, v, editRecording, submitRecording, promptShown } =
+      this.state;
     const app = submitRecording ? (
       <SubmitRecording
         updateSubmitRecording={this.updateSubmitRecording.bind(this)}
@@ -145,6 +148,22 @@ export class Create extends Component {
             />
           </TouchableHighlight>
           <Text style={styles.whiteText}>@{user ? user.userName : ""}</Text>
+          {promptShown && (
+            <View style={styles.promptTopic}>
+              <TouchableOpacity
+                style={styles.deletePromptButton}
+                onPress={() => {
+                  this.mounted && this.setState({ promptShown: false });
+                }}
+                accessibilityLabel="Remove Prompt"
+              >
+                <AntDesign size={32} name="closecircleo" color="white" />
+              </TouchableOpacity>
+              <Text style={styles.promptText}>
+                Some Prompt, what happens if the prompt is longer?
+              </Text>
+            </View>
+          )}
         </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
@@ -202,6 +221,9 @@ export class Create extends Component {
           </View>
           <View style={styles.iconSmallContainer}>
             <Fontisto
+              onPress={() => {
+                this.mounted && this.setState({ promptShown: true });
+              }}
               style={styles.recordingHashtagIcon}
               name="hashtag"
               size={24}
