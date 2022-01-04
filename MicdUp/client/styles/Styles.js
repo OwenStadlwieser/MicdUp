@@ -1,5 +1,23 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, Platform, PixelRatio, StyleSheet } from "react-native";
 var { height, width } = Dimensions.get("window");
+// based on iphone 5s's scale
+const scale = width / 320;
+
+export function normalize(size) {
+  const newSize = size * scale;
+  if (Platform.OS === "ios") {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+}
+
+const mini = normalize(12);
+const small = normalize(15);
+const medium = normalize(17);
+const large = normalize(20);
+const xl = normalize(24);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -76,6 +94,11 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     boxShadow: "none",
   },
+  profileText: {
+    marginTop: 5,
+    fontStyle: "italic",
+    color: "#30F3FF",
+  },
   invalidTextInput: {
     boxShadow: "none",
     fontStyle: "italic",
@@ -151,6 +174,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  paneUncentered: {
+    flex: 1,
+    backgroundColor: "#1A3561",
+    width: width,
+    height: height * 0.9,
+  },
+  profileHeader: {
+    width,
+    paddingTop: height * 0.025,
+    alignItems: "center",
+  },
+  bioHeader: {
+    position: "absolute",
+    left: 0,
+    paddingLeft: width * 0.05,
+    color: "white",
+    fontStyle: "italic",
+  },
+  bioContainer: {
+    width,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: height * 0.0125,
+  },
+  subBioContainer: {
+    marginTop: height * 0.0125,
+    flexDirection: "row",
+    width: width * 0.8,
+    justifyContent: "space-evenly",
+  },
   navbarButton: {
     width: width * 0.2,
     height: height * 0.1,
@@ -223,6 +276,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  postsContainer: {
+    marginTop: height * 0.015,
+    width,
+  },
+  refresh: {
+    backgroundColor: "black",
+    position: "absolute",
+    top: 0,
+    width,
+    justifyContent: "center",
+    alignItems: "center",
+    height: "5vh",
+    zIndex: 99,
+  },
+  postContainer: {
+    height: height * 0.14,
+    width: width,
+    borderRadius: 8,
+    borderWidth: 2,
+    marginBottom: height * 0.02,
+    backgroundColor: "white",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+  },
+  postTitle: {
+    fontStyle: "italic",
+    fontSize: large,
+  },
+  textAndPlayButtonContainer: {
+    flexDirection: "row",
+  },
+  postText: {
+    flex: 9,
+  },
   recordingClipsContainer: {
     height: height * 0.29,
     width: width < 1000 ? width * 0.95 : width * 0.8,
@@ -280,6 +367,17 @@ const styles = StyleSheet.create({
     width: height * 0.2,
     borderRadius: height * 0.2,
   },
+  profileImgContainerSmall: {
+    height: height * 0.15,
+    width: height * 0.15,
+    borderRadius: height * 0.15,
+    overflow: "hidden",
+  },
+  profileImgSmall: {
+    height: height * 0.15,
+    width: height * 0.15,
+    borderRadius: height * 0.15,
+  },
   upperEditDiv: {
     marginTop: height * 0.05,
     height: height * 0.15,
@@ -307,6 +405,23 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: "white",
     borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextButtonBio: {
+    height: width * 0.075,
+    flex: 1,
+    minHeight: 50,
+    maxHeight: 200,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "white",
+    borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playButtonContainerBio: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

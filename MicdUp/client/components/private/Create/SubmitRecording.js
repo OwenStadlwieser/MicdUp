@@ -17,6 +17,8 @@ import { styles } from "../../../styles/Styles";
 // redux
 import { updateTags, uploadRecording } from "../../../redux/actions/recording";
 import { searchTags } from "../../../redux/actions/tag";
+// helpers
+import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 
 export class SubmitRecording extends Component {
   constructor() {
@@ -34,15 +36,19 @@ export class SubmitRecording extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    const { tags } = this.props;
+    this.mounted && this.setState({ tags });
+  };
 
   setTagsState = (tags) => {
+    this.props.updateTags(tags);
     this.mounted && this.setState({ tags });
   };
 
   render() {
-    const { updateSubmitRecording, clips } = this.props;
-    const { nsfw, allowRebuttal, allowStitch, privatePost, tags } = this.state;
+    const { updateSubmitRecording, clips, tags } = this.props;
+    const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
     return (
       <View style={styles.pane}>
         <AntDesign
@@ -63,6 +69,7 @@ export class SubmitRecording extends Component {
             splitSearchTerm={true}
             inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
+            initValue={tags}
           />
         </View>
         <ScrollView
@@ -127,38 +134,8 @@ export class SubmitRecording extends Component {
               let files = [];
               let fileTypes = [];
               for (let i = 0; i < clips.length; i++) {
-                const blob = await new Promise((resolve, reject) => {
-                  const xhr = new XMLHttpRequest();
-                  xhr.onload = () => {
-                    try {
-                      resolve(xhr.response);
-                    } catch (error) {
-                      console.log("error:", error);
-                    }
-                  };
-                  xhr.onerror = (e) => {
-                    console.log(e);
-                    reject(new TypeError("Network request failed"));
-                  };
-                  xhr.responseType = "blob";
-                  xhr.open("GET", clips[i].uri, true);
-                  xhr.send(null);
-                });
-                const base64Url = await new Promise((resolve, reject) => {
-                  var reader = new FileReader();
-
-                  reader.onload = function () {
-                    var blobAsDataUrl = reader.result;
-                    blobAsDataUrl = blobAsDataUrl.substr(
-                      blobAsDataUrl.indexOf(", ") + 1
-                    );
-                    resolve(blobAsDataUrl);
-                  };
-
-                  reader.readAsDataURL(blob);
-                });
-                if (blob != null) {
-                  const uriParts = clips[i].uri.split(".");
+                const base64Url = await soundBlobToBase64(clips[i].uri);
+                if (base64Url != null) {
                   const fileType = clips[i].type;
                   files.push(base64Url);
                   fileTypes.push(fileType);
@@ -169,6 +146,7 @@ export class SubmitRecording extends Component {
               await this.props.uploadRecording(
                 files,
                 fileTypes,
+                title,
                 tags.split(/[\s,]+/),
                 nsfw,
                 allowRebuttal,
@@ -188,6 +166,7 @@ export class SubmitRecording extends Component {
 
 const mapStateToProps = (state) => ({
   tags: state.recording.tags,
+  title: state.recording.title,
   clips: state.recording.clips,
 });
 

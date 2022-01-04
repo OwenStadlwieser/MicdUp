@@ -22,7 +22,9 @@ export class DropdownResults extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.mounted && this.setState({ searchTerm: this.props.initValue });
+  };
 
   search = debounce(async (searchTerm) => {
     if (searchTerm) {
@@ -76,6 +78,7 @@ export class DropdownResults extends Component {
               }
             }}
             style={this.props.inputStyle}
+            placeholderTextColor={this.props.placeHolderColor}
             placeHolderColor={this.props.placeHolderColor}
             value={searchTerm}
           ></TextInput>

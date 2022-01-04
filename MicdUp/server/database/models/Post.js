@@ -30,6 +30,12 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
+  signedUrl: {
+    type: String,
+  },
+  lastFetched: {
+    type: Date,
+  },
   tags: {
     type: [mongoose.Schema.Types.ObjectId],
   },

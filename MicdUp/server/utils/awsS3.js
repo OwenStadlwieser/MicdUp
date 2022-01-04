@@ -9,7 +9,7 @@ const uploadFile = async (fileName, key) => {
   const buff = new Buffer.from(contents, "base64");
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME, // pass your bucket name
-    Key: key, // file will be saved as testBucket/contacts.csv
+    Key: key,
     ContentEncoding: "base64",
     Body: buff,
   };
@@ -21,4 +21,29 @@ const uploadFile = async (fileName, key) => {
     .promise();
   return true;
 };
-module.exports = { uploadFile };
+
+const getFile = async (myKey) => {
+  try {
+    const url = await getSignedUrl(myKey);
+    return url;
+  } catch (err) {
+    throw err;
+  }
+};
+
+async function getSignedUrl(key) {
+  const signedUrlExpireSeconds = 60 * 30;
+  return new Promise((resolve, reject) => {
+    let params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      Expires: signedUrlExpireSeconds,
+    };
+    s3.getSignedUrl("getObject", params, (err, url) => {
+      if (err) reject(err);
+      resolve(url);
+    });
+  });
+}
+
+module.exports = { uploadFile, getFile };

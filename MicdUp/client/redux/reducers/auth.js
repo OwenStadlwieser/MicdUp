@@ -1,9 +1,17 @@
-import { DELETE_ACCOUNT, LOG_IN, LOG_OUT, SET_USER } from "../types";
+import {
+  DELETE_ACCOUNT,
+  LOG_IN,
+  LOG_OUT,
+  SET_USER,
+  SET_BIO,
+  SET_POSTS,
+} from "../types";
 
 const initialState = {
   loggedIn: false,
   user: {},
   profile: {},
+  posts: [],
 };
 
 export default function (state = { ...initialState }, action) {
@@ -28,6 +36,22 @@ export default function (state = { ...initialState }, action) {
     case DELETE_ACCOUNT:
       return {
         ...state,
+      };
+    case SET_BIO:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            bio: { ...payload },
+          },
+        },
+      };
+    case SET_POSTS:
+      return {
+        ...state,
+        posts: [...payload],
       };
     default:
       return state;

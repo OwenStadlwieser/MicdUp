@@ -22,7 +22,7 @@ export class DropDown extends Component {
   };
   render() {
     const { searchTerm, results } = this.props;
-    console.log(results);
+
     return (
       <ScrollView style={styles.resultsContainer}>
         {results &&
