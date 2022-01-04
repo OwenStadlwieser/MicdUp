@@ -200,6 +200,35 @@ const uploadBio = {
   },
 };
 
+const likePost = {
+  type: PostType,
+  args: {
+    postId: { type: GraphQLID },
+  },
+  async resolve(parent, { postId }, context) {
+    // check if already liked and unlike
+    let index = -1;
+    const post = await Post.findOne({
+      _id: postId,
+    }).then((post) => {
+      index = post.likers.findIndex(
+        (id) => id.toString() === context.profile.id
+      );
+      return post;
+    });
+    if (post && index < 0) {
+      post.likers.push(context.profile._id);
+      await post.save();
+      return post;
+    }
+    if (post && index > -1) {
+      post.likers.splice(index, 1);
+      await post.save();
+      return post;
+    }
+  },
+};
+
 const ffmpegMergeAndUpload = async (fileName, id, fileNames, command) => {
   await new Promise((resolve, reject) => {
     command
@@ -230,4 +259,5 @@ const ffmpegMergeAndUpload = async (fileName, id, fileNames, command) => {
 module.exports = {
   createRecording,
   uploadBio,
+  likePost,
 };

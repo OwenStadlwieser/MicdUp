@@ -143,7 +143,7 @@ export class Profile extends Component {
       loading,
     } = this.state;
     const { user, profile, currentProfile, posts } = this.props;
-    const isUserProfile = profile.id === currentProfile;
+    const isUserProfile = profile.id === currentProfile.id;
 
     return (
       <GestureRecognizer

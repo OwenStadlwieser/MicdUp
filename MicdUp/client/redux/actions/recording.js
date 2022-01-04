@@ -6,11 +6,13 @@ import {
   NAVIGATE,
   SET_BIO,
   SET_POSTS,
+  UPDATE_POST,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
+  LIKE_POST_MUTATION,
 } from "../../apollo/private/recording";
 import { client } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -136,6 +138,35 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       payload: res.data.getUserPosts,
     });
     return res.data.getUserPosts;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const likePost = (postId) => async (dispatch) => {
+  try {
+    let fetchPolicy = "no-cache";
+    const res = await client.mutate({
+      mutation: LIKE_POST_MUTATION,
+      variables: {
+        postId,
+      },
+      fetchPolicy,
+    });
+    if (!res.data || !res.data.likePost) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch({
+      type: UPDATE_POST,
+      payload: res.data.likePost,
+    });
+    return res.data.likePost;
   } catch (err) {
     console.log(err);
   }

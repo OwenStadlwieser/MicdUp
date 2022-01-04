@@ -308,8 +308,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     paddingHorizontal: 15,
+    flexDirection: "row",
   },
   postTitle: {
+    flex: 9,
     fontStyle: "italic",
     fontSize: width > 1000 ? medium : large,
   },
@@ -318,6 +320,13 @@ const styles = StyleSheet.create({
   },
   postText: {
     flex: 9,
+  },
+  postPlayButton: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  likesText: {
+    textAlign: "center",
   },
   recordingClipsContainer: {
     height: height * 0.29,

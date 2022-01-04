@@ -11,6 +11,12 @@ const postSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  likers: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
+  likes: {
+    type: Number,
+  },
   allowStitch: {
     type: Boolean,
     default: false,
