@@ -2,16 +2,15 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Create Schema
-const tagsSchema = new Schema({
-  title: {
+const promptsSchema = new Schema({
+  prompt: {
     type: String,
     required: true,
     unique: true,
   },
-  count: {
-    type: Number,
+  tag: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
-    default: 0,
   },
   posts: {
     type: [mongoose.Schema.Types.ObjectId],
@@ -22,8 +21,6 @@ const tagsSchema = new Schema({
   },
 });
 
-const Tag = mongoose.model("tag", tagsSchema);
+const Prompt = mongoose.model("prompt", promptsSchema);
 
-tagsSchema.index({ title: "text", description: "text" });
-
-module.exports = { Tag };
+module.exports = { Prompt };
