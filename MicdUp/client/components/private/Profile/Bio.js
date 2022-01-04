@@ -55,9 +55,9 @@ export class Bio extends Component {
     const isUserProfile = profile.id === currentProfile.id;
     return (
       <View style={styles.bioContainer}>
-        <Text style={styles.fullWidthText}>Bio</Text>
         {bio && (
           <View style={styles.bioContainer}>
+            <Text style={styles.bioHeader}>Bio</Text>
             <PlayButton
               containerStyle={{}}
               color={"white"}

@@ -7,6 +7,7 @@ import {
   Text,
   TouchableHighlight,
   Platform,
+  ScrollView,
 } from "react-native";
 // icons
 import { Ionicons } from "@expo/vector-icons";
@@ -15,10 +16,14 @@ import { styles } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
+import Post from "./Post";
 // redux
-import { uploadBio } from "../../../redux/actions/recording";
+import { uploadBio, getUserPosts } from "../../../redux/actions/recording";
 // helpers
 import { playSound } from "../../../reuseableFunctions/helpers";
+import GestureRecognizer, {
+  swipeDirections,
+} from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
 
@@ -37,6 +42,13 @@ export class Profile extends Component {
     };
 
     this.mounted = true;
+  }
+
+  async onSwipeDown(gestureState) {
+    const { getUserPosts, currentProfile } = this.props;
+    this.mounted && this.setState({ loading: true });
+    await getUserPosts(currentProfile.id, 0);
+    this.mounted && this.setState({ loading: false });
   }
 
   stopCurrentSound = async () => {
@@ -96,76 +108,131 @@ export class Profile extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = async () => {
+    const { getUserPosts, currentProfile, profile, posts } = this.props;
+    if (profile.id !== currentProfile.id || !posts || posts.length === 0) {
+      this.mounted && this.setState({ loading: true });
+      await getUserPosts(currentProfile.id, 0);
+      this.mounted && this.setState({ loading: false });
+    }
+  };
 
   hideSetting = () => {
     this.mounted && this.setState({ settingsShown: false });
   };
+
   setPlaying(id) {
     this.mounted && this.setState({ playingId: id });
   }
+
   setNewBioRecording = (newR) => {
     this.mounted && this.setState({ newBioRecording: newR });
   };
+
   render() {
-    const { settingsShown, recording, newBioRecording, playing, playingId } =
-      this.state;
-    const { user, profile, currentProfile } = this.props;
+    const config = {
+      velocityThreshold: 0.3,
+      directionalOffsetThreshold: 80,
+    };
+    const {
+      settingsShown,
+      recording,
+      newBioRecording,
+      playing,
+      playingId,
+      loading,
+    } = this.state;
+    const { user, profile, currentProfile, posts } = this.props;
     const isUserProfile = profile.id === currentProfile;
+
     return (
-      <View style={styles.paneUncentered}>
-        {!settingsShown && isUserProfile && (
-          <Ionicons
-            onPress={() => {
-              this.mounted && this.setState({ settingsShown: true });
-            }}
-            name="settings-outline"
-            size={24}
-            color="white"
-            style={styles.topRightIcon}
-          />
-        )}
-        {settingsShown && (
-          <Settings hideSetting={this.hideSetting.bind(this)} />
-        )}
-        <View style={styles.profileHeader}>
-          <TouchableHighlight
-            style={[
-              styles.profileImgContainerSmall,
-              { borderColor: recording ? "red" : "#30F3FF", borderWidth: 1 },
-            ]}
-          >
-            <Image
-              source={
-                user && user.profile && user.profile.image
-                  ? {
-                      uri: user.profile.image,
-                    }
-                  : require("../../../assets/no-profile-pic-icon-27.jpg")
-              }
-              style={styles.profileImgSmall}
+      <GestureRecognizer
+        onSwipeDown={(state) => this.onSwipeDown(state)}
+        config={config}
+        style={{
+          flex: 1,
+          backgroundColor: this.state.backgroundColor,
+        }}
+      >
+        <View style={styles.paneUncentered}>
+          {loading && (
+            <View style={styles.refresh}>
+              <Text style={styles.nextButtonText}>Loading</Text>
+            </View>
+          )}
+          {!settingsShown && isUserProfile && (
+            <Ionicons
+              onPress={() => {
+                this.mounted && this.setState({ settingsShown: true });
+              }}
+              name="settings-outline"
+              size={24}
+              color="white"
+              style={styles.topRightIcon}
             />
-          </TouchableHighlight>
-          <Text style={styles.profileText}>@{user.userName}</Text>
-          <Bio
-            startRecording={this.startRecording.bind(this)}
-            stopRecordingBio={this.stopRecordingBio.bind(this)}
-            currentSound={playingId}
-            onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
-            setPlaying={this.setPlaying.bind(this)}
-            setNewBioRecording={this.setNewBioRecording.bind(this)}
-            newBioRecording={newBioRecording}
-          />
+          )}
+          {settingsShown && (
+            <Settings hideSetting={this.hideSetting.bind(this)} />
+          )}
+          <View style={styles.profileHeader}>
+            <TouchableHighlight
+              style={[
+                styles.profileImgContainerSmall,
+                { borderColor: recording ? "red" : "#30F3FF", borderWidth: 1 },
+              ]}
+            >
+              <Image
+                source={
+                  user && user.profile && user.profile.image
+                    ? {
+                        uri: user.profile.image,
+                      }
+                    : require("../../../assets/no-profile-pic-icon-27.jpg")
+                }
+                style={styles.profileImgSmall}
+              />
+            </TouchableHighlight>
+            <Text style={styles.profileText}>@{user.userName}</Text>
+            <Bio
+              startRecording={this.startRecording.bind(this)}
+              stopRecordingBio={this.stopRecordingBio.bind(this)}
+              currentSound={playingId}
+              onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
+              setPlaying={this.setPlaying.bind(this)}
+              setNewBioRecording={this.setNewBioRecording.bind(this)}
+              newBioRecording={newBioRecording}
+            />
+          </View>
+          <ScrollView
+            scrollEnabled={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={styles.postsContainer}
+          >
+            {posts &&
+              posts.map((post, index) => (
+                <Post
+                  key={post.id}
+                  post={post}
+                  currentSound={playingId}
+                  onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
+                    this
+                  )}
+                  setPlaying={this.setPlaying.bind(this)}
+                />
+              ))}
+          </ScrollView>
         </View>
-      </View>
+      </GestureRecognizer>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
+  posts: state.auth.posts,
   user: state.auth.user,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,
 });
 
-export default connect(mapStateToProps, { uploadBio })(Profile);
+export default connect(mapStateToProps, { uploadBio, getUserPosts })(Profile);

@@ -29,6 +29,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-drag-sort": "^2.4.4",
     "react-native-paper": "^4.11.1",
+    "react-native-swipe-gestures": "^1.0.5",
     "react-native-web": "0.17.1",
     "react-onclickoutside": "^6.12.1",
     "react-redux": "^7.2.6",

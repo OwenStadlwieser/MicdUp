@@ -146,6 +146,7 @@ export class SubmitRecording extends Component {
               await this.props.uploadRecording(
                 files,
                 fileTypes,
+                title,
                 tags.split(/[\s,]+/),
                 nsfw,
                 allowRebuttal,
@@ -165,6 +166,7 @@ export class SubmitRecording extends Component {
 
 const mapStateToProps = (state) => ({
   tags: state.recording.tags,
+  title: state.recording.title,
   clips: state.recording.clips,
 });
 

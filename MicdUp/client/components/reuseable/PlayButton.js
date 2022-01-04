@@ -38,7 +38,13 @@ export class PlayButton extends Component {
       onPlaybackStatusUpdate,
     } = this.props;
     return (
-      <View style={containerStyle}>
+      <View
+        onStartShouldSetResponder={(event) => true}
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+        }}
+        style={containerStyle}
+      >
         {currentPlayingId !== post.id ? (
           <AntDesign
             onPress={async () => {
