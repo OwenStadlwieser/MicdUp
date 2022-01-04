@@ -30,6 +30,7 @@ const createRecording = {
     files: { type: new GraphQLList(GraphQLString) },
     fileTypes: { type: new GraphQLList(GraphQLString) },
     tags: { type: new GraphQLList(GraphQLString) },
+    title: { type: GraphQLString },
     nsfw: { type: GraphQLBoolean },
     allowRebuttal: { type: GraphQLBoolean },
     allowStitch: { type: GraphQLBoolean },
@@ -37,7 +38,16 @@ const createRecording = {
   },
   async resolve(
     parent,
-    { files, fileTypes, nsfw, allowRebuttal, allowStitch, privatePost, tags },
+    {
+      files,
+      fileTypes,
+      title,
+      nsfw,
+      allowRebuttal,
+      allowStitch,
+      privatePost,
+      tags,
+    },
     context
   ) {
     var command = ffmpeg();
@@ -50,6 +60,7 @@ const createRecording = {
     const post = new Post({
       owner: context.profile.id,
       nsfw,
+      title,
       allowRebuttal,
       allowStitch,
       privatePost,

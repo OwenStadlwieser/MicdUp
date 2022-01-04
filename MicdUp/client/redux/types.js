@@ -12,3 +12,4 @@ export const UPDATE_TAGS = "UPDATE_TAGS";
 export const CLEAR_RECORDING = "CLEAR_RECORDING";
 export const VIEW_PROFILE = "VIEW_PROFILE";
 export const SET_BIO = "SET_BIO";
+export const SET_POSTS = "SET_POSTS";

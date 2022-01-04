@@ -1,8 +1,9 @@
-import { LOG_IN, LOG_OUT, SET_USER, SET_BIO } from "../types";
+import { LOG_IN, LOG_OUT, SET_USER, SET_BIO, SET_POSTS } from "../types";
 
 const initialState = {
   loggedIn: false,
   user: {},
+  posts: [],
 };
 
 export default function (state = { ...initialState }, action) {
@@ -34,6 +35,11 @@ export default function (state = { ...initialState }, action) {
             bio: { ...payload },
           },
         },
+      };
+    case SET_POSTS:
+      return {
+        ...state,
+        posts: [...payload],
       };
     default:
       return state;

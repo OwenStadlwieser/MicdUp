@@ -5,10 +5,12 @@ import {
   CLEAR_RECORDING,
   NAVIGATE,
   SET_BIO,
+  SET_POSTS,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
+  GET_USER_POSTS_QUERY,
 } from "../../apollo/private/recording";
 import { client } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -34,22 +36,24 @@ export const updateTags = (payload) => (dispatch) => {
 };
 
 export const uploadRecording =
-  (files, fileTypes, tags, nsfw, allowRebuttal, allowStitch, privatePost) =>
+  (
+    files,
+    fileTypes,
+    title,
+    tags,
+    nsfw,
+    allowRebuttal,
+    allowStitch,
+    privatePost
+  ) =>
   async (dispatch) => {
     try {
-      console.log(
-        fileTypes,
-        tags,
-        nsfw,
-        allowRebuttal,
-        allowStitch,
-        privatePost
-      );
       const res = await client.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
           files,
           fileTypes,
+          title,
           tags,
           nsfw,
           allowRebuttal,
@@ -103,6 +107,35 @@ export const uploadBio = (files, fileTypes) => async (dispatch) => {
       payload: { ...res.data.uploadBio },
     });
     return true;
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const getUserPosts = (userId, skipMult) => async (dispatch) => {
+  try {
+    let fetchPolicy = "no-cache";
+    const res = await client.query({
+      query: GET_USER_POSTS_QUERY,
+      variables: {
+        userId,
+        skipMult,
+      },
+      fetchPolicy,
+    });
+    if (!res.data || !res.data.getUserPosts) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch({
+      type: SET_POSTS,
+      payload: res.data.getUserPosts,
+    });
+    return res.data.getUserPosts;
   } catch (err) {
     console.log(err);
   }

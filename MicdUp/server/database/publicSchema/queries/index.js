@@ -6,9 +6,10 @@ const { login, forgotPassVerify } = require("./auth");
 const { GraphQLObjectType, GraphQLID } = graphql;
 const { getUser } = require("./user");
 const { searchTags } = require("./tag");
+const { getUserPosts } = require("./recording");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
-  fields: { login, forgotPassVerify, getUser, searchTags }, //fields end here
+  fields: { login, forgotPassVerify, getUser, searchTags, getUserPosts }, //fields end here
 });
 
 module.exports = RootQuery;

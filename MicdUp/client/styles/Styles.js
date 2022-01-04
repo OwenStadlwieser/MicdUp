@@ -1,5 +1,23 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, Platform, PixelRatio, StyleSheet } from "react-native";
 var { height, width } = Dimensions.get("window");
+// based on iphone 5s's scale
+const scale = width / 320;
+
+export function normalize(size) {
+  const newSize = size * scale;
+  if (Platform.OS === "ios") {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+}
+
+const mini = normalize(12);
+const small = normalize(15);
+const medium = normalize(17);
+const large = normalize(20);
+const xl = normalize(24);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -164,12 +182,12 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     width,
-    height: height * 0.3,
     paddingTop: height * 0.025,
     alignItems: "center",
   },
-  fullWidthText: {
-    width,
+  bioHeader: {
+    position: "absolute",
+    left: 0,
     paddingLeft: width * 0.05,
     color: "white",
     fontStyle: "italic",
@@ -178,10 +196,10 @@ const styles = StyleSheet.create({
     width,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: height * 0.025,
+    marginTop: height * 0.0125,
   },
   subBioContainer: {
-    marginTop: height * 0.025,
+    marginTop: height * 0.0125,
     flexDirection: "row",
     width: width * 0.8,
     justifyContent: "space-evenly",
@@ -257,6 +275,40 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  postsContainer: {
+    marginTop: height * 0.015,
+    width,
+  },
+  refresh: {
+    backgroundColor: "black",
+    position: "absolute",
+    top: 0,
+    width,
+    justifyContent: "center",
+    alignItems: "center",
+    height: "5vh",
+    zIndex: 99,
+  },
+  postContainer: {
+    height: height * 0.14,
+    width: width,
+    borderRadius: 8,
+    borderWidth: 2,
+    marginBottom: height * 0.02,
+    backgroundColor: "white",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+  },
+  postTitle: {
+    fontStyle: "italic",
+    fontSize: large,
+  },
+  textAndPlayButtonContainer: {
+    flexDirection: "row",
+  },
+  postText: {
+    flex: 9,
   },
   recordingClipsContainer: {
     height: height * 0.29,

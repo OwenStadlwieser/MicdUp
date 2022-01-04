@@ -63,6 +63,7 @@ const PostType = new GraphQLObjectType({
   name: "Post",
   fields: () => ({
     id: { type: GraphQLID },
+    title: { type: GraphQLString },
     owner: {
       type: ProfileType,
       async resolve(parent) {
