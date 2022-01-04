@@ -12,4 +12,13 @@ const GET_USER_QUERY = gql`
   }
 `;
 
-export { GET_USER_QUERY };
+const DELETE_ACCOUNT_MUTATION = gql`
+  mutation deleteAccount {
+    deleteAccount {
+      success
+      message
+    }
+  }
+`;
+
+export { GET_USER_QUERY, DELETE_ACCOUNT_MUTATION };

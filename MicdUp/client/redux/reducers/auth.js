@@ -1,8 +1,9 @@
-import { LOG_IN, LOG_OUT, SET_USER } from "../types";
+import { DELETE_ACCOUNT, LOG_IN, LOG_OUT, SET_USER } from "../types";
 
 const initialState = {
   loggedIn: false,
   user: {},
+  profile: {},
 };
 
 export default function (state = { ...initialState }, action) {
@@ -23,6 +24,10 @@ export default function (state = { ...initialState }, action) {
         ...state,
         user: {},
         loggedIn: false,
+      };
+    case DELETE_ACCOUNT:
+      return {
+        ...state,
       };
     default:
       return state;

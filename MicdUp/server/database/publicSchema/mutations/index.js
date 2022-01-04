@@ -4,11 +4,17 @@ const graphql = require("graphql"); //use graphql package
 */
 const { GraphQLObjectType, GraphQLID } = graphql;
 const { createUser, forgotPassChange } = require("./auth");
-const { forgotPass } = require("./user");
+const { forgotPass, deleteAccount } = require("./user");
 const { createRecording } = require("./recording");
 const Mutation = new GraphQLObjectType({
   name: "MutationType",
-  fields: { createUser, forgotPass, forgotPassChange, createRecording }, //fields end here
+  fields: {
+    createUser,
+    forgotPass,
+    deleteAccount,
+    forgotPassChange,
+    createRecording,
+  }, //fields end here
 });
 
 module.exports = Mutation;

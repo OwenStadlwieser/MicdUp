@@ -1,4 +1,5 @@
 const { User } = require("../../models/User");
+const { Profile } = require("../../models/Profile");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const { sendEmail } = require("../../../utils/sendEmail");
@@ -39,6 +40,27 @@ const forgotPass = {
   },
 };
 
+const deleteAccount = {
+  type: MessageType,
+  args: {},
+  async resolve(parent, {}, context) {
+    // FIXME: implement transaction
+    context.profile.following.forEach(function (i) {
+      const index = following.indexOf(context.profile.following[i]);
+      if (index > -1) {
+        following.splice(index, 1);
+      }
+    });
+    context.profile.followers.forEach(function (i) {});
+    let returnObject = {
+      success: true,
+      message: "Delete account successfully",
+    };
+    return returnObject;
+  },
+};
+
 module.exports = {
   forgotPass,
+  deleteAccount,
 };
