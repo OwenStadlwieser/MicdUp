@@ -41,8 +41,27 @@ const GET_USER_POSTS_QUERY = gql`
       id
       title
       signedUrl
+      likes
+      isLikedByUser
     }
   }
 `;
 
-export { UPLOAD_RECORDING_MUTATION, UPLOAD_BIO_MUTATION, GET_USER_POSTS_QUERY };
+const LIKE_POST_MUTATION = gql`
+  mutation likePost($postId: ID!) {
+    likePost(postId: $postId) {
+      id
+      title
+      signedUrl
+      likes
+      isLikedByUser
+    }
+  }
+`;
+
+export {
+  UPLOAD_RECORDING_MUTATION,
+  UPLOAD_BIO_MUTATION,
+  GET_USER_POSTS_QUERY,
+  LIKE_POST_MUTATION,
+};

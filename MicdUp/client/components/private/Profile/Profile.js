@@ -144,6 +144,7 @@ export class Profile extends Component {
     } = this.state;
     const { user, profile, currentProfile, posts } = this.props;
     const isUserProfile = profile.id === currentProfile.id;
+
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
