@@ -14,3 +14,4 @@ export const DELETE_ACCOUNT = "DELETE_ACCOUNT";
 export const VIEW_PROFILE = "VIEW_PROFILE";
 export const SET_BIO = "SET_BIO";
 export const SET_POSTS = "SET_POSTS";
+export const UPDATE_POST = "UPDATE_POST";

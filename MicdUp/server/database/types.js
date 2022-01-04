@@ -103,6 +103,27 @@ const PostType = new GraphQLObjectType({
         return await Tag.find({ _id: { $in: parent.hashTags } });
       },
     },
+    likers: {
+      type: new GraphQLList(ProfileType),
+      async resolve(parent) {
+        return await Profile.find({ _id: { $in: parent.likers } });
+      },
+    },
+    likes: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return parent.likers.length;
+      },
+    },
+    isLikedByUser: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        const index = parent.likers.findIndex((id) => {
+          return id.toString() === context.profile.id;
+        });
+        return index > -1;
+      },
+    },
     dateCreated: { type: GraphQLFloat },
   }),
 });

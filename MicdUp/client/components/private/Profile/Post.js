@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
 import PlayButton from "../../reuseable/PlayButton";
+import Like from "../../reuseable/Like";
 import { View, Text, TouchableOpacity } from "react-native";
 // styles
 import { styles } from "../../../styles/Styles";
@@ -58,14 +59,17 @@ export class Post extends Component {
         </Text>
         <View style={styles.textAndPlayButtonContainer}>
           <Text style={styles.postText}></Text>
-          <PlayButton
-            containerStyle={styles.postPlayButton}
-            color={"#1A3561"}
-            currentPlayingId={currentSound}
-            post={post}
-            setPlaying={setPlaying}
-            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-          />
+          <View style={styles.postPlayButton}>
+            <Like post={post} />
+            <PlayButton
+              containerStyle={{}}
+              color={"#1A3561"}
+              currentPlayingId={currentSound}
+              post={post}
+              setPlaying={setPlaying}
+              onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+            />
+          </View>
         </View>
       </TouchableOpacity>
     );

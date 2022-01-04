@@ -73,8 +73,8 @@ export class SubmitRecording extends Component {
           />
         </View>
         <ScrollView
-          scrollEnabled={true}
           style={styles.recordingSettings}
+          scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         >

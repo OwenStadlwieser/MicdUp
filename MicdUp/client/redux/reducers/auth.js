@@ -5,6 +5,7 @@ import {
   SET_USER,
   SET_BIO,
   SET_POSTS,
+  UPDATE_POST,
 } from "../types";
 
 const initialState = {
@@ -52,6 +53,14 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         posts: [...payload],
+      };
+    case UPDATE_POST:
+      const posts = [...state.posts];
+      const postIndex = posts.findIndex((post) => post.id === payload.id);
+      posts[postIndex] = payload;
+      return {
+        ...state,
+        posts: [...posts],
       };
     default:
       return state;
