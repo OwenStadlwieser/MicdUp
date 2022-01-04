@@ -58,11 +58,68 @@ UserSchema.methods.getPasswordResetToken = async function () {
   this.resetPasswordCreatedAt = Date.now();
   return resetToken;
 };
+
 UserSchema.pre("save", async function (next) {
   if (this.isModified("userName") && this.userName) {
+    const regex = new RegExp("^[a-zA-z][a-zA-Z0-9]+$");
+    if (!regex.test(this.username)) {
+      throw new Error("Username is invalid");
+    }
+  }
+  if (this.isModified("email") && this.email) {
+    if (
+      !this.email.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+    ) {
+      throw new Error("Email is invalid.");
+    }
+  }
+  if (this.isModified("phone") && this.phone) {
+    // Matches the following
+    // (123) 456-7890
+    // (123)456-7890
+    // 123-456-7890
+    // 123.456.7890
+    // 1234567890
+    // +31636363634
+    // 075-63546725
+    const regex = new RegExp(
+      "^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$"
+    );
+    if (!regex.test(this.phone)) {
+      throw new Error("Phone number is invalid.");
+    }
   }
   if (this.isModified("password") && this.password) {
-    this.password = await bcrypt.hash(this.password, 12);
+    // Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character.
+    const regex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,}$"
+    );
+    if (!regex.test(this.password)) {
+      throw new Error("Password is invalid.");
+    } else {
+      this.password = await bcrypt.hash(this.password, 12);
+    }
+  }
+  if (this.isModified("age") && this.dob) {
+    var isOldEnough = false;
+    let time = Date.parse(this.dob);
+    let userDOB = new Date(time);
+    const today = new Date();
+    var age = today.getFullYear() - userDOB.getFullYear();
+    var m = today.getMonth() - userDOB.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < userDOB.getDate())) {
+      age--;
+    }
+    if (age >= 13) {
+      isOldEnough = true;
+    } else {
+      isOldEnough = false;
+    }
+    if (!isOldEnough) {
+      throw new Error("Age is invalid.");
+    }
   }
   next();
 });
