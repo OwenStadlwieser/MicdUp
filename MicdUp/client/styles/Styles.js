@@ -93,13 +93,16 @@ const styles = StyleSheet.create({
     position: "relative",
     paddingLeft: 5,
     boxShadow: "none",
+    fontSize: small,
   },
   profileText: {
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",
+    fontSize: small,
   },
   invalidTextInput: {
+    fontSize: small,
     boxShadow: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
@@ -120,10 +123,12 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontStyle: "italic",
     paddingTop: 5,
+    fontSize: small,
   },
   forgotPassword: {
     width: width * 0.6,
     fontStyle: "italic",
+    fontSize: small,
   },
   messageContainer: {
     display: "flex",
@@ -191,6 +196,7 @@ const styles = StyleSheet.create({
     paddingLeft: width * 0.05,
     color: "white",
     fontStyle: "italic",
+    fontSize: small,
   },
   bioContainer: {
     width,
@@ -226,6 +232,7 @@ const styles = StyleSheet.create({
   navbarText: {
     textAlign: "center",
     fontStyle: "italic",
+    fontSize: small,
   },
   navbar: {
     flex: 1,
@@ -278,7 +285,9 @@ const styles = StyleSheet.create({
   },
   postsContainer: {
     marginTop: height * 0.015,
-    width,
+    width: width > 1000 ? width * 0.8 : width,
+    height: width > 1000 ? height * 0.25 : "auto",
+    margin: "auto",
   },
   refresh: {
     backgroundColor: "black",
@@ -291,8 +300,8 @@ const styles = StyleSheet.create({
     zIndex: 99,
   },
   postContainer: {
-    height: height * 0.14,
-    width: width,
+    height: width > 1000 ? height * 0.25 : height * 0.14,
+    width: width > 1000 ? width * 0.8 : width,
     borderRadius: 8,
     borderWidth: 2,
     marginBottom: height * 0.02,
@@ -302,7 +311,7 @@ const styles = StyleSheet.create({
   },
   postTitle: {
     fontStyle: "italic",
-    fontSize: large,
+    fontSize: width > 1000 ? medium : large,
   },
   textAndPlayButtonContainer: {
     flexDirection: "row",
@@ -428,7 +437,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: "white",
     fontStyle: "italic",
-    fontSize: 14,
+    fontSize: small,
   },
   recordingSettings: {
     maxHeight: height * 0.3,
@@ -452,6 +461,9 @@ const styles = StyleSheet.create({
     height: height * 0.1,
     alignItems: "center",
     justifyContent: "end",
+  },
+  playButton: {
+    fontSize: large,
   },
   continueButtonContainer: {
     height: height * 0.1,
