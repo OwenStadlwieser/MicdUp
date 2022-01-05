@@ -15,6 +15,9 @@ const ProfileSchema = new Schema({
   posts: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  image: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
   bio: {
     type: mongoose.Schema.Types.ObjectId,
   },

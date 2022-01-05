@@ -136,9 +136,7 @@ export class Create extends Component {
             <Image
               source={
                 user && user.profile && user.profile.image
-                  ? {
-                      uri: user.profile.image,
-                    }
+                  ? user.profile.image.signedUrl
                   : require("../../../assets/no-profile-pic-icon-27.jpg")
               }
               style={styles.profileImg}

@@ -1,11 +1,11 @@
 var ffmpeg = require("fluent-ffmpeg");
-const { PostType, BioType } = require("../../types");
+const { PostType, FileType } = require("../../types");
 const fs = require("fs");
 const graphql = require("graphql");
 var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
-const { uploadFile } = require("../../../utils/awsS3");
+const { uploadFile, deleteFile } = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -18,7 +18,7 @@ const {
 } = graphql;
 const { Post } = require("../../models/Post");
 const { Profile } = require("../../models/Profile");
-const { Bio } = require("../../models/Bio");
+const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const mongoose = require("mongoose");
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -130,7 +130,7 @@ const createRecording = {
 };
 
 const uploadBio = {
-  type: BioType,
+  type: FileType,
   args: {
     files: { type: GraphQLString },
     fileTypes: { type: GraphQLString },
@@ -143,7 +143,7 @@ const uploadBio = {
     }
     const fileNames = [];
     // prep files for combine
-    const bio = new Bio({
+    const bio = new File({
       owner: context.profile.id,
       fileExtension: ".mp4",
     });
@@ -169,6 +169,13 @@ const uploadBio = {
     }
     // create post record
     const profile = context.profile;
+    if (profile.bio) {
+      const oldBio = await File.findByIdAndDelete(profile.bio, { session });
+      if (oldBio) {
+        await deleteFile(`${oldBio._id}${oldBio.fileExtension}`);
+      }
+      profile.bio = null;
+    }
     profile.bio = bio._id;
     var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
     const fileName = path.join(

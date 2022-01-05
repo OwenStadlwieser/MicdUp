@@ -11,14 +11,17 @@ import {
 } from "react-native";
 // icons
 import { Ionicons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
 import Post from "./Post";
+import ImagePicker from "../../reuseable/ImagePicker";
 // redux
 import { uploadBio, getUserPosts } from "../../../redux/actions/recording";
+import { updateProfilePic } from "../../../redux/actions/profile";
 // helpers
 import { playSound } from "../../../reuseableFunctions/helpers";
 import GestureRecognizer, {
@@ -39,6 +42,7 @@ export class Profile extends Component {
       currentBioRecording: "",
       playingId: "",
       newBioRecording: {},
+      selectImage: false,
     };
 
     this.mounted = true;
@@ -129,6 +133,15 @@ export class Profile extends Component {
     this.mounted && this.setState({ newBioRecording: newR });
   };
 
+  setImage = (uri, base64) => {
+    let mimeType2 = uri.match(/[^:/]\w+(?=;|,)/)[0];
+    this.props.updateProfilePic(uri, base64, "." + mimeType2);
+  };
+
+  setHidden = () => {
+    this.mounted && this.setState({ selectImage: false });
+  };
+
   render() {
     const config = {
       velocityThreshold: 0.3,
@@ -141,10 +154,10 @@ export class Profile extends Component {
       playing,
       playingId,
       loading,
+      selectImage,
     } = this.state;
     const { user, profile, currentProfile, posts } = this.props;
     const isUserProfile = profile.id === currentProfile.id;
-
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -154,6 +167,12 @@ export class Profile extends Component {
           backgroundColor: this.state.backgroundColor,
         }}
       >
+        {selectImage && (
+          <ImagePicker
+            setHidden={this.setHidden.bind(this)}
+            setImage={this.setImage.bind(this)}
+          />
+        )}
         {!settingsShown && isUserProfile && (
           <Ionicons
             onPress={() => {
@@ -176,26 +195,40 @@ export class Profile extends Component {
               </View>
             )}
             <View style={styles.profileHeader}>
-              <TouchableHighlight
-                style={[
-                  styles.profileImgContainerSmall,
-                  {
-                    borderColor: recording ? "red" : "#30F3FF",
-                    borderWidth: 1,
-                  },
-                ]}
-              >
-                <Image
-                  source={
-                    user && user.profile && user.profile.image
-                      ? {
-                          uri: user.profile.image,
-                        }
-                      : require("../../../assets/no-profile-pic-icon-27.jpg")
-                  }
-                  style={styles.profileImgSmall}
-                />
-              </TouchableHighlight>
+              <View style={styles.imageAndIcon}>
+                <TouchableHighlight
+                  style={[
+                    styles.profileImgContainerSmall,
+                    {
+                      borderColor: recording ? "red" : "#30F3FF",
+                      borderWidth: 1,
+                    },
+                  ]}
+                >
+                  <Image
+                    source={
+                      user && user.profile && user.profile.image
+                        ? user.profile.image.signedUrl
+                        : require("../../../assets/no-profile-pic-icon-27.jpg")
+                    }
+                    style={styles.profileImgSmall}
+                  />
+                </TouchableHighlight>
+                {isUserProfile && (
+                  <TouchableHighlight
+                    onPress={() => {
+                      this.mounted && this.setState({ selectImage: true });
+                    }}
+                  >
+                    <Entypo
+                      style={styles.uploadIcon}
+                      name="upload"
+                      size={24}
+                      color="#30F3FF"
+                    />
+                  </TouchableHighlight>
+                )}
+              </View>
               <Text style={styles.profileText}>@{user.userName}</Text>
               <Bio
                 startRecording={this.startRecording.bind(this)}
@@ -240,4 +273,8 @@ const mapStateToProps = (state) => ({
   profile: state.auth.user.profile,
 });
 
-export default connect(mapStateToProps, { uploadBio, getUserPosts })(Profile);
+export default connect(mapStateToProps, {
+  uploadBio,
+  getUserPosts,
+  updateProfilePic,
+})(Profile);

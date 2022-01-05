@@ -1,0 +1,55 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+// helpers
+import onClickOutside from "react-onclickoutside";
+// components
+import Modal from "react-native-modal";
+import { View, TouchableOpacity } from "react-native";
+// icons
+import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+// styles
+import { styles } from "../../styles/Styles";
+export class ImagePickerModal extends Component {
+  constructor() {
+    super();
+    this.state = {
+      loading: false,
+    };
+
+    this.mounted = true;
+  }
+
+  componentWillUnmount = () => (this.mounted = false);
+
+  componentDidMount = () => {};
+
+  handleClickOutside = (evt) => {
+    this.props.setHidden();
+  };
+
+  render() {
+    return (
+      <View style={styles.modalMainContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.setSelected("camera");
+          }}
+        >
+          <Entypo name="camera" style={styles.largeIcon} color="#1A3561" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.setSelected("picture");
+          }}
+        >
+          <AntDesign name="picture" style={styles.largeIcon} color="#1A3561" />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+const mapStateToProps = (state) => ({});
+
+export default connect(mapStateToProps, {})(onClickOutside(ImagePickerModal));
