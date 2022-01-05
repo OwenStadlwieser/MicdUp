@@ -6,6 +6,7 @@ import {
   SET_BIO,
   SET_POSTS,
   UPDATE_POST,
+  UPDATE_PROFILE_PIC,
 } from "../types";
 
 const initialState = {
@@ -46,6 +47,17 @@ export default function (state = { ...initialState }, action) {
           profile: {
             ...state.user.profile,
             bio: { ...payload },
+          },
+        },
+      };
+    case UPDATE_PROFILE_PIC:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            image: { ...payload },
           },
         },
       };

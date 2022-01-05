@@ -15,3 +15,4 @@ export const VIEW_PROFILE = "VIEW_PROFILE";
 export const SET_BIO = "SET_BIO";
 export const SET_POSTS = "SET_POSTS";
 export const UPDATE_POST = "UPDATE_POST";
+export const UPDATE_PROFILE_PIC = "UPDATE_PROFILE_PIC";

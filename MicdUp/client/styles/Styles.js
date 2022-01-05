@@ -250,10 +250,32 @@ const styles = StyleSheet.create({
     top: height * 0.06,
     zIndex: 99,
   },
+  modalContainer: {
+    zIndex: 999,
+  },
+  modalMainContainer: {
+    backgroundColor: "white",
+    width: width * 0.5,
+    height: height * 0.25,
+    margin: "auto",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flexDirection: "row",
+    borderRadius: 20,
+  },
+  uploadIcon: {
+    position: "absolute",
+    bottom: 0,
+    right: 10,
+    fontSize: medium,
+  },
   topLeftIcon: {
     position: "absolute",
     left: width * 0.08,
     top: height * 0.06,
+  },
+  largeIcon: {
+    fontSize: xl,
   },
   settingsOptionsContainer: {
     width,
