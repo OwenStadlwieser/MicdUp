@@ -21,7 +21,22 @@ const uploadFile = async (fileName, key) => {
     .promise();
   return true;
 };
-
+const uploadFileFromBase64 = async (contents, key) => {
+  const buff = new Buffer.from(contents, "base64");
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME, // pass your bucket name
+    Key: key,
+    ContentEncoding: "base64",
+    Body: buff,
+  };
+  await s3
+    .upload(params, function (s3Err, data) {
+      if (s3Err) throw s3Err;
+      console.log(`File uploaded successfully at ${data.Location}`);
+    })
+    .promise();
+  return true;
+};
 const getFile = async (myKey) => {
   try {
     const url = await getSignedUrl(myKey);
@@ -46,4 +61,18 @@ async function getSignedUrl(key) {
   });
 }
 
-module.exports = { uploadFile, getFile };
+async function deleteFile(Key) {
+  return new Promise((resolve, reject) => {
+    var params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key,
+    };
+
+    s3.deleteObject(params, function (err, data) {
+      if (err) reject(err);
+      // an error occurred
+      else resolve(data); // successful response
+    });
+  });
+}
+module.exports = { uploadFile, getFile, uploadFileFromBase64, deleteFile };

@@ -3,7 +3,7 @@ const { User } = require("../database/models/User");
 const { Profile } = require("../database/models/Profile");
 const { Tag } = require("./models/Tag");
 const { Post } = require("./models/Post");
-const { Bio } = require("./models/Bio");
+const { File } = require("./models/File");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -50,9 +50,16 @@ const ProfileType = new GraphQLObjectType({
       },
     },
     bio: {
-      type: BioType,
+      type: FileType,
       async resolve(parent) {
-        const res = await Bio.findOne({ _id: parent.bio });
+        const res = await File.findOne({ _id: parent.bio });
+        return res;
+      },
+    },
+    image: {
+      type: FileType,
+      async resolve(parent) {
+        const res = await File.findOne({ _id: parent.image });
         return res;
       },
     },
@@ -128,8 +135,8 @@ const PostType = new GraphQLObjectType({
   }),
 });
 
-const BioType = new GraphQLObjectType({
-  name: "Bio",
+const FileType = new GraphQLObjectType({
+  name: "File",
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
@@ -148,11 +155,11 @@ const BioType = new GraphQLObjectType({
         ) {
           return parent.signedUrl;
         }
-        const bio = await Bio.findById(parent._id);
-        bio.signedUrl = await getFile(parent._id + parent.fileExtension);
-        bio.lastFetched = Date.now();
-        await bio.save();
-        return bio.signedUrl;
+        const file = await File.findById(parent._id);
+        file.signedUrl = await getFile(parent._id + parent.fileExtension);
+        file.lastFetched = Date.now();
+        await file.save();
+        return file.signedUrl;
       },
     },
     filePath: {
@@ -160,6 +167,9 @@ const BioType = new GraphQLObjectType({
       resolve(parent) {
         return parent._id + parent.fileExtension;
       },
+    },
+    fileExtension: {
+      type: GraphQLString,
     },
     dateCreated: { type: GraphQLFloat },
   }),
@@ -193,4 +203,4 @@ const TagsType = new GraphQLObjectType({
   }),
 });
 
-module.exports = { UserType, MessageType, PostType, TagsType, BioType };
+module.exports = { UserType, MessageType, PostType, TagsType, FileType };

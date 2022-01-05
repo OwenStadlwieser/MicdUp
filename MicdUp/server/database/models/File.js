@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Create Schema
-const bioSchema = new Schema({
+const fileSchema = new Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -23,6 +23,6 @@ const bioSchema = new Schema({
   },
 });
 
-const Bio = mongoose.model("bio", bioSchema);
+const File = mongoose.model("file", fileSchema);
 
-module.exports = { Bio };
+module.exports = { File };

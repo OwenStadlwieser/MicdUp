@@ -14,6 +14,10 @@ const GET_USER_QUERY = gql`
           id
           signedUrl
         }
+        image {
+          id
+          signedUrl
+        }
       }
     }
   }
