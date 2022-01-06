@@ -520,6 +520,20 @@ const styles = StyleSheet.create({
     padding: 10,
     width: width * 0.6,
   },
+  promptText: {
+    marginVertical: 20,
+    fontStyle: "italic",
+    fontSize: large,
+    color: "#FFFFFF",
+    marginRight: 8,
+  },
+  promptTopic: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  deletePromptButton: {
+    marginHorizontal: 8,
+  },
 });
 
 export { styles };
