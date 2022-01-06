@@ -9,7 +9,7 @@ import {
 const initialState = {
   clips: [],
   title: "",
-  tags: "",
+  tags: [],
 };
 
 export default function (state = { ...initialState }, action) {

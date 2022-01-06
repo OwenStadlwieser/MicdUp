@@ -59,6 +59,14 @@ const LIKE_POST_MUTATION = gql`
   }
 `;
 
+const ADD_TAG_MUTATION = gql`
+  mutation addTag($tagId: ID!) {
+    addTag(tagId: $tagId) {
+      id
+    }
+  }
+`;
+
 export {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,

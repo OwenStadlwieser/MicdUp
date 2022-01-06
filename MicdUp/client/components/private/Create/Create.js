@@ -25,7 +25,8 @@ import { Audio } from "expo-av";
 import Clips from "./Clips";
 // redux
 import { showMessage } from "../../../redux/actions/display";
-import { updateClips } from "../../../redux/actions/recording";
+import { updateClips, updateTags } from "../../../redux/actions/recording";
+import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
 
 export class Create extends Component {
@@ -39,6 +40,8 @@ export class Create extends Component {
       editRecording: false,
       submitRecording: false,
       promptShown: false,
+      functionID: "",
+      prompt: {},
     };
 
     this.mounted = true;
@@ -116,8 +119,15 @@ export class Create extends Component {
   };
   render() {
     const { user } = this.props;
-    const { recording, clips, v, editRecording, submitRecording, promptShown } =
-      this.state;
+    const {
+      recording,
+      clips,
+      v,
+      editRecording,
+      submitRecording,
+      promptShown,
+      prompt,
+    } = this.state;
     const app = submitRecording ? (
       <SubmitRecording
         updateSubmitRecording={this.updateSubmitRecording.bind(this)}
@@ -139,7 +149,9 @@ export class Create extends Component {
             <Image
               source={
                 user && user.profile && user.profile.image
-                  ? user.profile.image.signedUrl
+                  ? {
+                      uri: user.profile.image,
+                    }
                   : require("../../../assets/no-profile-pic-icon-27.jpg")
               }
               style={styles.profileImg}
@@ -151,14 +163,23 @@ export class Create extends Component {
               <TouchableOpacity
                 style={styles.deletePromptButton}
                 onPress={() => {
-                  this.mounted && this.setState({ promptShown: false });
+                  const { functionID } = this.state;
+                  if (functionID) {
+                    clearTimeout(functionID);
+                  }
+                  this.mounted &&
+                    this.setState({
+                      promptShown: false,
+                      prompt: {},
+                      functionID: 0,
+                    });
                 }}
                 accessibilityLabel="Remove Prompt"
               >
                 <AntDesign size={32} name="closecircleo" color="white" />
               </TouchableOpacity>
               <Text style={styles.promptText}>
-                Some Prompt, what happens if the prompt is longer?
+                {prompt.prompt ? prompt.prompt : ""}
               </Text>
             </View>
           )}
@@ -219,8 +240,20 @@ export class Create extends Component {
           </View>
           <View style={styles.iconSmallContainer}>
             <Fontisto
-              onPress={() => {
+              onPress={async () => {
+                let currentTag = "";
+                const { functionID } = this.state;
                 this.mounted && this.setState({ promptShown: true });
+                if (functionID) {
+                  clearTimeout(functionID);
+                }
+                const newPrompt = await this.props.randomPrompt();
+                this.mounted && this.setState({ prompt: newPrompt });
+                const newFunctionID = setTimeout(() => {
+                  currentTag = this.props.tag + " " + newPrompt.tag.title + " ";
+                  this.props.updateTags(currentTag);
+                }, 10000);
+                this.mounted && this.setState({ functionID: newFunctionID });
               }}
               style={styles.recordingHashtagIcon}
               name="hashtag"
@@ -238,6 +271,12 @@ export class Create extends Component {
 const mapStateToProps = (state) => ({
   clips: state.recording.clips,
   user: state.auth.user,
+  tag: state.recording.tags,
 });
 
-export default connect(mapStateToProps, { updateClips, showMessage })(Create);
+export default connect(mapStateToProps, {
+  updateClips,
+  updateTags,
+  showMessage,
+  randomPrompt,
+})(Create);

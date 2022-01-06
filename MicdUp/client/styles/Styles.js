@@ -525,6 +525,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontSize: large,
     color: "#FFFFFF",
+    marginRight: 8,
   },
   promptTopic: {
     flexDirection: "row",

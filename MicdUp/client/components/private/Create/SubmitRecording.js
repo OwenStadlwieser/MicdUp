@@ -16,7 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
 // redux
 import { updateTags, uploadRecording } from "../../../redux/actions/recording";
-import { searchTags } from "../../../redux/actions/tag";
+import { searchTags, randomTag } from "../../../redux/actions/tag";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 
@@ -140,7 +140,7 @@ export class SubmitRecording extends Component {
                   files.push(base64Url);
                   fileTypes.push(fileType);
                 } else {
-                  console.log("erroor with blob");
+                  console.log("error with blob");
                 }
               }
               await this.props.uploadRecording(

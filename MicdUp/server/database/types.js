@@ -203,4 +203,37 @@ const TagsType = new GraphQLObjectType({
   }),
 });
 
-module.exports = { UserType, MessageType, PostType, TagsType, FileType };
+const PromptsType = new GraphQLObjectType({
+  name: "Prompts",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    prompt: { type: GraphQLString },
+    tag: {
+      type: TagsType,
+      async resolve(parent) {
+        return await Tag.findById(parent.tag);
+      },
+    },
+    count: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return parent.posts.length;
+      },
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      async resolve(parent) {
+        return await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+  }),
+});
+
+module.exports = {
+  UserType,
+  MessageType,
+  PostType,
+  TagsType,
+  FileType,
+  PromptsType,
+};
