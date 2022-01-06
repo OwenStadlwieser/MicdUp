@@ -16,7 +16,7 @@ import { Entypo } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
-// import Bio from "./Bio";
+import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 // redux
