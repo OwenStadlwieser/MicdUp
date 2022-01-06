@@ -47,7 +47,7 @@ export class SubmitRecording extends Component {
   };
 
   render() {
-    const { updateSubmitRecording, clips, tags } = this.props;
+    const { updateSubmitRecording, clips, tags, title } = this.props;
     const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
     return (
       <View style={styles.pane}>
@@ -143,11 +143,17 @@ export class SubmitRecording extends Component {
                   console.log("error with blob");
                 }
               }
+              let tagsArray = ['']
+              try {
+                tagsArray = tags.split('/[\s,]+/')
+              } catch (err) {
+
+              }
               await this.props.uploadRecording(
                 files,
                 fileTypes,
                 title,
-                tags.split(/[\s,]+/),
+                tagsArray,
                 nsfw,
                 allowRebuttal,
                 allowStitch,

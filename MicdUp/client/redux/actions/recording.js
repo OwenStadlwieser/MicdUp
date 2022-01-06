@@ -7,12 +7,16 @@ import {
   SET_BIO,
   SET_POSTS,
   UPDATE_POST,
+  UPDATE_POST_COMMENT,
+  UPDATE_POST_COMMENTS,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  COMMENT_POST_MUTATION,
+  GET_COMMENT_POST_QUERY,
 } from "../../apollo/private/recording";
 import { client } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -171,3 +175,70 @@ export const likePost = (postId) => async (dispatch) => {
     console.log(err);
   }
 };
+
+export const getComments =
+  (postId, skipMult = 0) =>
+  async (dispatch) => {
+    try {
+      let fetchPolicy = "no-cache";
+      const res = await client.query({
+        query: GET_COMMENT_POST_QUERY,
+        variables: {
+          postId,
+          skipMult,
+        },
+        fetchPolicy,
+      });
+      if (!res.data || !res.data.getComments) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      dispatch({
+        type: UPDATE_POST_COMMENTS,
+        payload: { data: res.data.getComments, id: postId },
+      });
+      return res.data.getComments;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+export const commentPost =
+  (postId, replyingTo, files, fileTypes, text) => async (dispatch) => {
+    try {
+      let fetchPolicy = "no-cache";
+      console.log("here");
+      const res = await client.mutate({
+        mutation: COMMENT_POST_MUTATION,
+        variables: {
+          postId,
+          replyingTo,
+          files,
+          fileTypes,
+          text,
+        },
+        fetchPolicy,
+      });
+      console.log(res);
+      if (!res.data || !res.data.commentToPost) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      dispatch({
+        type: UPDATE_POST_COMMENT,
+        payload: { data: res.data.commentToPost, id: postId },
+      });
+      return res.data.commentToPost;
+    } catch (err) {
+      console.log(err);
+    }
+  };

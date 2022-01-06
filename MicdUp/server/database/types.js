@@ -4,6 +4,7 @@ const { Profile } = require("../database/models/Profile");
 const { Tag } = require("./models/Tag");
 const { Post } = require("./models/Post");
 const { File } = require("./models/File");
+const { Comment } = require("./models/Comment");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -66,6 +67,145 @@ const ProfileType = new GraphQLObjectType({
   }),
 });
 
+const CommentWithoutReplyType = new GraphQLObjectType({
+  name: "CommentNoReply",
+  fields: () => ({
+    id: { type: GraphQLID },
+    owner: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.owner);
+      },
+    },
+    text: { type: GraphQLString },
+    signedUrl: {
+      type: GraphQLString,
+      async resolve(parent) {
+        if (!parent.fileExtension) {
+          return ""
+        }
+        if (
+          parent.signedUrl &&
+          parent.lastFetched &&
+          parent.lastFetched + 60 * 30 < Date.now()
+        ) {
+          return parent.signedUrl;
+        }
+        const post = await Comment.findById(parent._id);
+        post.signedUrl = await getFile(parent._id + parent.fileExtension);
+        post.lastFetched = Date.now();
+        await post.save();
+        return post.signedUrl;
+      },
+    },
+    filePath: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent._id + parent.fileExtension;
+      },
+    },
+    likers: {
+      type: new GraphQLList(ProfileType),
+      async resolve(parent) {
+        return await Profile.find({ _id: { $in: parent.likers } });
+      },
+    },
+    likes: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return parent.likers.length;
+      },
+    },
+    isLikedByUser: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        const index = parent.likers.findIndex((id) => {
+          return id.toString() === context.profile.id;
+        });
+        return index > -1;
+      },
+    },
+    dateCreated: { type: GraphQLFloat },
+  }),
+});
+
+const CommentType = new GraphQLObjectType({
+  name: "Comment",
+  fields: () => ({
+    id: { type: GraphQLID },
+    owner: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.owner);
+      },
+    },
+    replies: {
+      type: new GraphQLList(CommentWithoutReplyType),
+      async resolve(parent) {
+        const res = await Comment.find(
+          { _id: { $in: parent.replies } }
+        ).sort({ dateCreated: -1 });
+        return res
+      },
+    },
+    allReplies: {
+      type: new GraphQLList(CommentType),
+      async resolve(parent) {
+        return await Comment.find({ _id: { $in: parent.replies } });
+      },
+    },
+    text: { type: GraphQLString },
+    signedUrl: {
+      type: GraphQLString,
+      async resolve(parent) {
+        if (!parent.fileExtension) {
+          return ""
+        }
+        if (
+          parent.signedUrl &&
+          parent.lastFetched &&
+          parent.lastFetched + 60 * 30 < Date.now()
+        ) {
+          return parent.signedUrl;
+        }
+        const post = await Comment.findById(parent._id);
+        post.signedUrl = await getFile(parent._id + parent.fileExtension);
+        post.lastFetched = Date.now();
+        await post.save();
+        return post.signedUrl;
+      },
+    },
+    filePath: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent._id + parent.fileExtension;
+      },
+    },
+    likers: {
+      type: new GraphQLList(ProfileType),
+      async resolve(parent) {
+        return await Profile.find({ _id: { $in: parent.likers } });
+      },
+    },
+    likes: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return parent.likers.length;
+      },
+    },
+    isLikedByUser: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        const index = parent.likers.findIndex((id) => {
+          return id.toString() === context.profile.id;
+        });
+        return index > -1;
+      },
+    },
+    dateCreated: { type: GraphQLFloat },
+  }),
+});
+
 const PostType = new GraphQLObjectType({
   name: "Post",
   fields: () => ({
@@ -114,6 +254,12 @@ const PostType = new GraphQLObjectType({
       type: new GraphQLList(ProfileType),
       async resolve(parent) {
         return await Profile.find({ _id: { $in: parent.likers } });
+      },
+    },
+    comments: {
+      type: new GraphQLList(CommentType),
+      async resolve(parent) {
+        return await Comment.find({ _id: { $in: parent.comments } });
       },
     },
     likes: {
@@ -236,4 +382,5 @@ module.exports = {
   TagsType,
   FileType,
   PromptsType,
+  CommentType
 };

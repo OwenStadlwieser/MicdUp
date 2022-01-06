@@ -1,11 +1,11 @@
 var ffmpeg = require("fluent-ffmpeg");
-const { PostType, FileType } = require("../../types");
+const { PostType, FileType, CommentType } = require("../../types");
 const fs = require("fs");
 const graphql = require("graphql");
 var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
-const { uploadFile, deleteFile } = require("../../../utils/awsS3");
+const { uploadFile, deleteFile, uploadFileFromBase64 } = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -20,6 +20,7 @@ const { Post } = require("../../models/Post");
 const { Profile } = require("../../models/Profile");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
+const { Comment } = require("../../models/Comment");
 const mongoose = require("mongoose");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
@@ -69,7 +70,7 @@ const createRecording = {
     // prep files for combine
     try {
       for (let i = 0; i < files.length; i++) {
-        var fileType = fileTypes.replace("audio/", "");
+        var fileType = fileTypes[i].replace("audio/", "");
         var jsonPath = path.join(
           __dirname,
           "..",
@@ -78,7 +79,7 @@ const createRecording = {
           "temp",
           `${post._id}${i}.${fileType}`
         );
-        const base64 = files.substr(files.indexOf(",") + 1);
+        const base64 = files[i].substr(files[i].indexOf(",") + 1);
         fs.writeFileSync(jsonPath, base64, "base64", function (err) {
           if (err) throw err;
           console.log("File is created successfully.");
@@ -104,10 +105,10 @@ const createRecording = {
     try {
       await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
       for (let i = 0; i < tags.length; i++) {
-        if (!tags) continue;
-        let tag = await Tag.findOne({ title: tags });
+        if (!tags[i]) continue;
+        let tag = await Tag.findOne({ title: tags[i] });
         if (!tag) {
-          tag = new Tag({ title: tags });
+          tag = new Tag({ title: tags[i] });
         }
         tag.count = tag.count + 1;
         tag.posts.push(post._id);
@@ -213,7 +214,11 @@ const likePost = {
     postId: { type: GraphQLID },
   },
   async resolve(parent, { postId }, context) {
+
     // check if already liked and unlike
+    if (!context.user.id) {
+      throw new Error("Must be signed in to post");
+    }
     let index = -1;
     const post = await Post.findOne({
       _id: postId,
@@ -232,6 +237,97 @@ const likePost = {
       post.likers.splice(index, 1);
       await post.save();
       return post;
+    }
+  },
+};
+
+const commentToPost = {
+  type: CommentType,
+  args: {
+    postId: { type: GraphQLID },
+    replyingTo: { type: GraphQLID },
+    files: { type: GraphQLString },
+    fileTypes: { type: GraphQLString },
+    text: { type: GraphQLString }
+  },
+  async resolve(parent, { postId, replyingTo, files, fileTypes, text }, context) {
+    // check if already liked and unlike
+    if (!context.user.id) {
+      throw new Error("Must be signed in to post");
+    }
+    let comment
+    if (text) {
+      comment = new Comment({ owner: context.profile.id, text })
+    } else {
+      var fileType = fileTypes.replace("audio/", "");
+      comment = new Comment({ owner: context.profile.id, fileExtension: '.mp4', })
+      var fileNames = []
+      var command = ffmpeg();
+      try {
+        var jsonPath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          "temp",
+          `${comment._id}.${fileType}`
+        );
+        const base64 = files.substr(files.indexOf(",") + 1);
+        fs.writeFileSync(jsonPath, base64, "base64", function (err) {
+          if (err) throw err;
+          console.log("File is created successfully.");
+        });
+        fileNames.push(jsonPath);
+        command.input(jsonPath).inputFormat(fileType);
+      } catch (err) {
+        console.log(err);
+      }
+      var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
+      const fileName = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "temp",
+        `${comment._id}.mp4`
+      );
+      await ffmpegMergeAndUpload(fileName, comment._id, fileNames, command);
+      fs.unlink(fileName, function (err) {
+        if (err) throw err;
+      });
+    }
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await comment.save({ session });
+      if (replyingTo) {
+        const commentParent = await Comment.findOne({
+          _id: replyingTo,
+        })
+        if (!commentParent) {
+          throw new Error("post not found")
+        }
+        commentParent.replies.push(commentParent._id)
+        await commentParent.save({ session })
+        await session.commitTransaction();
+        return commentParent
+      } else {
+        const post = await Post.findOne({
+          _id: postId,
+        })
+        if (!post) {
+          throw new Error("post not found")
+        }
+        post.comments.push(comment._id)
+        await post.save({ session })
+        await session.commitTransaction();
+        return comment;
+      }
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+    } finally {
+      session.endSession();
     }
   },
 };
@@ -267,4 +363,5 @@ module.exports = {
   createRecording,
   uploadBio,
   likePost,
+  commentToPost
 };

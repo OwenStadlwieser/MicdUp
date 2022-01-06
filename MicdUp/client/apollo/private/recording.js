@@ -67,9 +67,75 @@ const ADD_TAG_MUTATION = gql`
   }
 `;
 
+const GET_COMMENT_POST_QUERY = gql`
+  query getComments($postId: ID!, $skipMult: Int!) {
+    getComments(postId: $postId, skipMult: $skipMult) {
+      id
+      signedUrl
+      text
+      likes
+      isLikedByUser
+      owner {
+        id
+        image {
+          id
+          signedUrl
+        }
+      }
+      replies {
+        id
+        text
+        signedUrl
+        likes
+        isLikedByUser
+      }
+    }
+  }
+`;
+const COMMENT_POST_MUTATION = gql`
+  mutation commentToPost(
+    $postId: ID!
+    $replyingTo: ID
+    $files: String
+    $fileTypes: String
+    $text: String
+  ) {
+    commentToPost(
+      postId: $postId
+      replyingTo: $replyingTo
+      files: $files
+      fileTypes: $fileTypes
+      text: $text
+    ) {
+      id
+      signedUrl
+      text
+      likes
+      isLikedByUser
+      owner {
+        id
+        image {
+          id
+          signedUrl
+        }
+      }
+      replies {
+        id
+        text
+        signedUrl
+        likes
+        isLikedByUser
+      }
+    }
+  }
+`;
+
 export {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  COMMENT_POST_MUTATION,
+  ADD_TAG_MUTATION,
+  GET_COMMENT_POST_QUERY,
 };

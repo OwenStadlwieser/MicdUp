@@ -1,5 +1,6 @@
 const { Post } = require("../../models/Post");
-const { PostType } = require("../../types");
+const { Comment } = require("../../models/Comment");
+const { PostType, CommentType } = require("../../types");
 const {
   GraphQLList,
   GraphQLString,
@@ -23,6 +24,25 @@ const getUserPosts = {
   },
 };
 
+const getComments = {
+  type: new GraphQLList(CommentType),
+  args: { postId: { type: GraphQLID }, skipMult: { type: GraphQLInt } },
+  async resolve(parent, { postId, skipMult }, context) {
+    try {
+      const size = 60;
+      const post = await Post.findById(postId);
+      const comments = await Comment.find({ _id: { $in: post.comments } })
+        .sort({ dateCreated: -1 })
+        .skip(size * skipMult)
+        .limit(size);
+      return comments;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
+
 module.exports = {
   getUserPosts,
+  getComments,
 };
