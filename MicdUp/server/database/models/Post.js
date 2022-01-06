@@ -14,6 +14,9 @@ const postSchema = new Schema({
   likers: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  comments: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
   likes: {
     type: Number,
   },

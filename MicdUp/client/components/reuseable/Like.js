@@ -19,12 +19,15 @@ export class Like extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => { };
 
   render() {
     const { post } = this.props;
     return (
-      <View style={styles.likesContainer}>
+      <View onStartShouldSetResponder={(event) => true}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+        }} style={styles.likesContainer}>
         <TouchableOpacity onPress={() => this.props.likePost(post.id)}>
           <AntDesign
             name={post.isLikedByUser ? "heart" : "hearto"}

@@ -6,7 +6,7 @@ const { login, forgotPassVerify } = require("./auth");
 const { GraphQLObjectType, GraphQLID } = graphql;
 const { getUser } = require("./user");
 const { searchTags, randomPrompt } = require("./tag");
-const { getUserPosts } = require("./recording");
+const { getUserPosts, getComments } = require("./recording");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -16,6 +16,7 @@ const RootQuery = new GraphQLObjectType({
     searchTags,
     randomPrompt,
     getUserPosts,
+    getComments
   }, //fields end here
 });
 

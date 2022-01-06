@@ -27,6 +27,42 @@ const styles = StyleSheet.create({
     width: width,
     paddingTop: height * 0.25,
   },
+  commentsContainer: {
+    height: height * 0.3,
+  },
+  recordingContainerComments: {
+    width,
+    height: height * 0.1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: 10,
+  },
+  textInputComments: {
+    borderWidth: 2,
+    borderColor: "#1A3561",
+    borderStyle: "solid",
+    flex: 7,
+  },
+  iconContainerComments: {
+    flex: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+  commentOpenContainer: {
+    width: width > 1000 ? width * 0.6 : width,
+    height: height * 0.4,
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderStyle: "solid",
+    borderColor: "black",
+    borderRadius: 8,
+    left: 0,
+    top: width > 1000 ? height * 0.25 : height * 0.14,
+    position: "absolute",
+    zIndex: 2,
+  },
   backArrow: {
     flex: 1,
     alignItems: "center",
@@ -311,6 +347,7 @@ const styles = StyleSheet.create({
     width: width > 1000 ? width * 0.8 : width,
     height: width > 1000 ? height * 0.25 : "auto",
     margin: "auto",
+    paddingBottom: height * 0.4,
   },
   refresh: {
     backgroundColor: "black",
@@ -332,6 +369,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 15,
     flexDirection: "row",
+    position: "relative",
+  },
+  higherPostContainer: {
+    height: width > 1000 ? height * 0.25 : height * 0.14,
+    width: width > 1000 ? width * 0.8 : width,
+    borderRadius: 8,
+    borderWidth: 2,
+    marginBottom: height * 0.02,
+    backgroundColor: "white",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    position: "relative",
+    zIndex: 1,
+  },
+  recordingMicIconComments: {
+    fontSize: large,
+  },
+  currentRecordingIconComments: {
+    fontSize: large,
   },
   postTitle: {
     flex: 9,
@@ -349,6 +406,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   likesText: {
+    fontSize: small,
+    lineHeight: small,
     textAlign: "center",
   },
   recordingClipsContainer: {
@@ -402,6 +461,26 @@ const styles = StyleSheet.create({
     width: height * 0.2,
     borderRadius: height * 0.2,
     overflow: "hidden",
+  },
+  commentContainer: {
+    height: height * 0.06,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    width: width > 1000 ? width * 0.6 : width,
+  },
+  commentImgContainer: {
+    height: height * 0.05,
+    width: height * 0.05,
+    borderRadius: height * 0.05,
+    overflow: "hidden",
+    resizeMode: "cover",
+  },
+  commentImg: {
+    height: height * 0.05,
+    width: height * 0.05,
+    borderRadius: height * 0.05,
   },
   profileImg: {
     height: height * 0.2,

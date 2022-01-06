@@ -20,6 +20,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // audio
+import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
 // clips
 import Clips from "./Clips";
@@ -94,20 +95,20 @@ export class Create extends Component {
         recording: false,
         audioBlobs: clips
           ? [
-              ...clips,
-              {
-                uri,
-                finalDuration,
-                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-              },
-            ]
+            ...clips,
+            {
+              uri,
+              finalDuration,
+              type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+            },
+          ]
           : [
-              {
-                uri,
-                finalDuration,
-                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-              },
-            ],
+            {
+              uri,
+              finalDuration,
+              type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+            },
+          ],
         v: 0,
       });
     this.props.updateClips(this.state.audioBlobs);
@@ -150,8 +151,8 @@ export class Create extends Component {
               source={
                 user && user.profile && user.profile.image
                   ? {
-                      uri: user.profile.image,
-                    }
+                    uri: user.profile.image.signedUrl,
+                  }
                   : require("../../../assets/no-profile-pic-icon-27.jpg")
               }
               style={styles.profileImg}
