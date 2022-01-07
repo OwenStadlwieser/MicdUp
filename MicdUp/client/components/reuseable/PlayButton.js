@@ -16,14 +16,14 @@ export class PlayButton extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => { };
+  componentDidMount = () => {};
 
   stopCurrentSound = async () => {
     const { playbackObject } = this.state;
     if (!playbackObject) return;
     try {
       await playbackObject.stopAsync();
-    } catch (err) { }
+    } catch (err) {}
     this.props.setPlaying({});
     this.props.stopSound && this.props.stopSound();
   };
@@ -49,7 +49,6 @@ export class PlayButton extends Component {
           <AntDesign
             onPress={async () => {
               await this.stopCurrentSound();
-              console.log(post.signedUrl)
               const playbackObject = await playSound(
                 post.signedUrl,
                 onPlaybackStatusUpdate
@@ -65,7 +64,6 @@ export class PlayButton extends Component {
         ) : (
           <AntDesign
             onPress={async () => {
-              console.log("here");
               await this.stopCurrentSound();
             }}
             style={styles.playButton}

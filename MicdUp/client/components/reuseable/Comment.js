@@ -5,11 +5,13 @@ import {
   View,
   KeyboardAvoidingView,
   TextInput,
+  Text,
   TouchableOpacity,
   Platform,
   TouchableHighlight,
   Image,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import PlayButton from "./PlayButton";
 // styles
@@ -27,7 +29,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // redux
 import { commentPost } from "../../redux/actions/recording";
+import { getReplies, updateCommentDisplay } from "../../redux/actions/comment";
 
+var { height, width } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
     super();
@@ -39,6 +43,8 @@ export class Comment extends Component {
       v: 0,
       text: "",
       replyingTo: "",
+      replyingToName: "",
+      parents: null,
     };
     this.colors = ["white", "red"];
     this.mounted = true;
@@ -77,6 +83,9 @@ export class Comment extends Component {
   stopRecording = async () => {
     const { recording } = this.state;
     console.log("Stopping recording..");
+    if (!recording) {
+      return;
+    }
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     const finalDuration = recording._finalDurationMillis;
@@ -92,7 +101,139 @@ export class Comment extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  handleClickOutside = (evt) => {
+  handleMap(comment, i, index, parentId, parent) {
+    if (comment.allReplies && comment.allReplies.length > 0) {
+      comment.replies = comment.allReplies;
+    }
+    if (parentId && parent && parent.parents) {
+      comment.parents = [...parent.parents, parentId];
+    } else if (parent && !parent.parents) {
+      comment.parents = [parentId];
+    }
+    return (
+      <View
+        key={comment.id}
+        style={{
+          paddingLeft: index > 0 && index < 12 ? 10 : 0,
+          right: index >= 12 ? 10 : 0,
+          borderLeftColor: "#1A3561",
+          borderLeftStyle: "solid",
+          borderLeftWidth: 1,
+        }}
+      >
+        <View
+          style={{
+            paddingTop: height * 0.01,
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 15,
+            flexDirection: "row",
+            borderLeftColor: "#1A3561",
+            borderLeftStyle: "solid",
+            left: index >= 12 ? -1 : 0,
+            borderLeftWidth: index >= 12 ? 0 : 1,
+            zIndex: index >= 12 ? 1 : 0,
+            backgroundColor: index >= 12 ? "white" : "transparent",
+          }}
+        >
+          <View>
+            <Text style={styles.blackText}>
+              @
+              {comment && comment.owner && comment.owner.user
+                ? comment.owner.user.userName
+                : ""}
+            </Text>
+            <TouchableHighlight
+              style={[
+                styles.commentImgContainer,
+                {
+                  borderColor: "#30F3FF",
+                  borderWidth: 1,
+                },
+              ]}
+            >
+              <Image
+                source={
+                  comment && comment.owner && comment.owner.image
+                    ? {
+                        uri: comment.owner.image.signedUrl,
+                      }
+                    : require("../../assets/no-profile-pic-icon-27.jpg")
+                }
+                style={styles.commentImg}
+              />
+            </TouchableHighlight>
+          </View>
+          {comment.signedUrl ? (
+            <View style={styles.commentPlayContainer}>
+              <PlayButton
+                containerStyle={{}}
+                color={"#1A3561"}
+                currentPlayingId={this.props.currentPlayingId}
+                size={48}
+                post={comment}
+                setPlaying={this.props.setPlaying}
+                onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
+              />
+            </View>
+          ) : (
+            <View style={styles.commentTextContainer}>
+              <Text>{comment.text}</Text>
+            </View>
+          )}
+        </View>
+        <View
+          style={{
+            zIndex: index >= 12 ? 1 : 0,
+            backgroundColor: index >= 12 ? "white" : "transparent",
+            left: index >= 12 ? -1 : 0,
+            flexDirection: "row",
+            borderLeftColor: "#1A3561",
+            borderLeftStyle: "solid",
+            borderLeftWidth: index >= 12 ? 0 : 1,
+            paddingTop: 5,
+          }}
+        >
+          <TouchableHighlight
+            onPress={async () => {
+              this.mounted &&
+                this.setState({
+                  parents: comment.parents,
+                  replyingTo: comment.id,
+                  replyingToName: `@${comment.owner.user.userName}`,
+                });
+            }}
+            style={styles.replyActionsContainer}
+          >
+            <Text style={styles.replyActionsText}>Reply</Text>
+          </TouchableHighlight>
+          {index !== 0 && comment.repliesLength > 0 && (
+            <TouchableHighlight
+              onPress={async () => {
+                const replies = await this.props.getReplies(comment.id);
+                this.props.updateCommentDisplay(
+                  replies,
+                  comment.parents,
+                  this.props.post.id
+                );
+              }}
+              style={styles.replyActionsContainer}
+            >
+              <Text style={styles.replyActionsText}>Show more replies</Text>
+            </TouchableHighlight>
+          )}
+        </View>
+        {comment.replies &&
+          comment.replies.length > 0 &&
+          comment.replies.map((child, index2) => {
+            return this.handleMap(child, i, index + 1, comment.id, comment);
+          })}
+      </View>
+    );
+  }
+
+  handleClickOutside = async (evt) => {
+    await this.stopRecording();
     this.props.removeCommentPosts();
     this.props.setCommentsShowing(false);
     this.mounted && this.setState({ isShowing: false });
@@ -100,7 +241,15 @@ export class Comment extends Component {
 
   render() {
     const { post, isShowing } = this.props;
-    const { v, text, replyingTo, recording, audioBlobs } = this.state;
+    const {
+      v,
+      text,
+      replyingTo,
+      recording,
+      audioBlobs,
+      replyingToName,
+      parents,
+    } = this.state;
     return (
       isShowing && (
         <KeyboardAvoidingView
@@ -116,67 +265,34 @@ export class Comment extends Component {
             style={styles.commentsContainer}
           >
             {post.comments &&
-              post.comments.map((comment, index) => (
-                <View style={styles.commentContainer} key={comment.id}>
-                  <TouchableHighlight
-                    style={[
-                      styles.commentImgContainer,
-                      {
-                        borderColor: "#30F3FF",
-                        borderWidth: 1,
-                      },
-                    ]}
-                  >
-                    <Image
-                      source={
-                        comment && comment.owner && comment.owner.image
-                          ? {
-                              uri: comment.owner.image.signedUrl,
-                            }
-                          : require("../../assets/no-profile-pic-icon-27.jpg")
-                      }
-                      style={styles.commentImg}
-                    />
-                  </TouchableHighlight>
-                  {comment.signedUrl ? (
-                    <View style={styles.commentPlayContainer}>
-                      <PlayButton
-                        containerStyle={{}}
-                        color={"#1A3561"}
-                        currentPlayingId={this.props.currentPlayingId}
-                        size={48}
-                        post={comment}
-                        setPlaying={this.props.setPlaying}
-                        onPlaybackStatusUpdate={
-                          this.props.onPlaybackStatusUpdate
-                        }
-                      />
-                    </View>
-                  ) : (
-                    <View style={styles.commentTextContainer}>
-                      <Text>{comment.text}</Text>
-                    </View>
-                  )}
-                </View>
-              ))}
+              post.comments.map((comment, index) => {
+                return this.handleMap(comment, index, 0, null, null);
+              })}
           </ScrollView>
           <View style={styles.recordingContainerComments}>
             <TextInput
-              value={text}
+              value={replyingToName + text}
               onChangeText={(e) => {
                 this.mounted && this.setState({ text });
               }}
               style={styles.textInputComments}
             ></TextInput>
             <View style={styles.iconContainerComments}>
-              {audioBlobs && (
+              {!(!audioBlobs && !replyingTo && !text) && (
                 <Feather
                   style={styles.recordingMicIconComments}
                   name="delete"
                   size={24}
                   color="black"
                   onPress={() => {
-                    this.mounted && this.setState({ audioBlobs: false });
+                    this.mounted &&
+                      this.setState({
+                        audioBlobs: false,
+                        replyingTo: "",
+                        text: "",
+                        replyingToName: "",
+                        parents: null,
+                      });
                   }}
                 />
               )}
@@ -205,30 +321,29 @@ export class Comment extends Component {
                   color="black"
                 />
               </TouchableOpacity>
-              {text ||
-                (audioBlobs && (
-                  <TouchableOpacity
-                    onPress={async () => {
-                      let fileType;
-                      const base64Url = await soundBlobToBase64(audioBlobs.uri);
-                      if (base64Url != null) {
-                        fileType = audioBlobs.type;
-                      } else {
-                        console.log("error with blob");
-                      }
-                      const res = await this.props.commentPost(
-                        post.id,
-                        replyingTo,
-                        base64Url,
-                        fileType,
-                        text
-                      );
-                      console.log(res);
-                    }}
-                  >
-                    <FontAwesome name="send" size={24} color="black" />
-                  </TouchableOpacity>
-                ))}
+              {(text || audioBlobs) && (
+                <TouchableOpacity
+                  onPress={async () => {
+                    let fileType;
+                    const base64Url = await soundBlobToBase64(audioBlobs.uri);
+                    if (base64Url != null) {
+                      fileType = audioBlobs.type;
+                    } else {
+                      console.log("error with blob");
+                    }
+                    const res = await this.props.commentPost(
+                      post.id,
+                      replyingTo,
+                      base64Url,
+                      fileType,
+                      text,
+                      parents
+                    );
+                  }}
+                >
+                  <FontAwesome name="send" size={24} color="black" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -239,6 +354,8 @@ export class Comment extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { commentPost })(
-  onClickOutside(Comment)
-);
+export default connect(mapStateToProps, {
+  commentPost,
+  getReplies,
+  updateCommentDisplay,
+})(onClickOutside(Comment));

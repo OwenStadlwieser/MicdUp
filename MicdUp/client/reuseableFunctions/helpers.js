@@ -52,6 +52,45 @@ const playSound = async (uri, onPlayBackStatusUpdate) => {
   }
 };
 
+const duplicateCommentsString = (n) => {
+  let string = "";
+  for (let i = 0; i < n; i++) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = 0; j < i; j++) {
+      tabString = tabString + tabStringC;
+    }
+    let startString = `${tabString}allReplies {
+      ${tabString}id
+      ${tabString}text
+      ${tabString}repliesLength
+      ${tabString}signedUrl
+      ${tabString}likes
+      ${tabString}isLikedByUser
+      ${tabString}owner {
+        ${tabString}id
+        ${tabString}user {
+          ${tabString}id
+          ${tabString}userName
+          ${tabString}}
+          ${tabString}image {
+            ${tabString}id
+            ${tabString}signedUrl
+            ${tabString}}
+          ${tabString}}
+    `;
+    string = string + startString;
+  }
+  for (let i = n; i > 0; i--) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = i; j > 0; j--) {
+      tabString = tabString + tabStringC;
+    }
+    string = string + `${tabString}}\n`;
+  }
+  return string;
+};
 const soundBlobToBase64 = async (uri) => {
   const blob = await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -91,4 +130,5 @@ export {
   clearAsyncStorage,
   playSound,
   soundBlobToBase64,
+  duplicateCommentsString,
 };

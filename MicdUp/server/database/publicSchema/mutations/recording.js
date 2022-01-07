@@ -5,7 +5,11 @@ const graphql = require("graphql");
 var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
-const { uploadFile, deleteFile, uploadFileFromBase64 } = require("../../../utils/awsS3");
+const {
+  uploadFile,
+  deleteFile,
+  uploadFileFromBase64,
+} = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -214,7 +218,6 @@ const likePost = {
     postId: { type: GraphQLID },
   },
   async resolve(parent, { postId }, context) {
-
     // check if already liked and unlike
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
@@ -248,20 +251,27 @@ const commentToPost = {
     replyingTo: { type: GraphQLID },
     files: { type: GraphQLString },
     fileTypes: { type: GraphQLString },
-    text: { type: GraphQLString }
+    text: { type: GraphQLString },
   },
-  async resolve(parent, { postId, replyingTo, files, fileTypes, text }, context) {
+  async resolve(
+    parent,
+    { postId, replyingTo, files, fileTypes, text },
+    context
+  ) {
     // check if already liked and unlike
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
     }
-    let comment
+    let comment;
     if (text) {
-      comment = new Comment({ owner: context.profile.id, text })
+      comment = new Comment({ owner: context.profile.id, text });
     } else {
       var fileType = fileTypes.replace("audio/", "");
-      comment = new Comment({ owner: context.profile.id, fileExtension: '.mp4', })
-      var fileNames = []
+      comment = new Comment({
+        owner: context.profile.id,
+        fileExtension: ".mp4",
+      });
+      var fileNames = [];
       var command = ffmpeg();
       try {
         var jsonPath = path.join(
@@ -299,27 +309,36 @@ const commentToPost = {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      await comment.save({ session });
       if (replyingTo) {
+        let ultimateParent;
         const commentParent = await Comment.findOne({
           _id: replyingTo,
-        })
+        });
         if (!commentParent) {
-          throw new Error("post not found")
+          throw new Error("post not found");
         }
-        commentParent.replies.push(commentParent._id)
-        await commentParent.save({ session })
+        commentParent.replies.push(comment._id);
+        if (commentParent.isTop) {
+          comment.ultimateParent = commentParent._id;
+        } else {
+          comment.ultimateParent = commentParent.ultimateParent;
+        }
+        comment.parent = commentParent._id;
+        await comment.save({ session });
+        await commentParent.save({ session });
         await session.commitTransaction();
-        return commentParent
+        return commentParent;
       } else {
         const post = await Post.findOne({
           _id: postId,
-        })
+        });
         if (!post) {
-          throw new Error("post not found")
+          throw new Error("post not found");
         }
-        post.comments.push(comment._id)
-        await post.save({ session })
+        post.comments.push(comment._id);
+        comment.isTop = true;
+        await comment.save({ session });
+        await post.save({ session });
         await session.commitTransaction();
         return comment;
       }
@@ -363,5 +382,5 @@ module.exports = {
   createRecording,
   uploadBio,
   likePost,
-  commentToPost
+  commentToPost,
 };
