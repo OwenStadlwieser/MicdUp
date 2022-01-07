@@ -8,9 +8,10 @@ import { styles } from "./styles/Styles";
 import { changeLogin, changeSignup } from "./redux/actions/display";
 // children
 import Dashboard from "./components/private/Dashboard";
+import Navbar from "./components/private/Navbar";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
-import Create from "./components/private/Create/Create";
+import Feed from "./components/private/Feed/Feed";
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
 
@@ -56,6 +57,7 @@ export class Root extends Component {
       currentMessage,
       messageState,
       loggedIn,
+      mountedComponent,
     } = this.props;
     let app;
     if (!loggedIn && !token)
@@ -70,31 +72,41 @@ export class Root extends Component {
               </Text>
             </View>
           )}
-          {showLogin ? (
+          {mountedComponent === "Feed" ? (
+            <View style={styles.containerPrivate}>
+              <View style={styles.contentContainer}>
+                <Feed />
+              </View>
+              <Navbar />
+            </View>
+          ) : showLogin ? (
             <Login />
           ) : showSignup ? (
             <Signup />
           ) : (
-            <View style={styles.container}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  this.props.changeLogin(true);
-                }}
-                accessibilityLabel="Login"
-              >
-                <Text style={styles.text}>Login</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  this.props.changeSignup(true);
-                }}
-                accessibilityLabel="Sign Up"
-              >
-                <Text style={styles.text}>Sign Up</Text>
-              </TouchableOpacity>
-              <StatusBar style="auto" />
+            <View style={styles.containerPrivate}>
+              <View style={styles.contentContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    this.props.changeLogin(true);
+                  }}
+                  accessibilityLabel="Login"
+                >
+                  <Text style={styles.text}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    this.props.changeSignup(true);
+                  }}
+                  accessibilityLabel="Sign Up"
+                >
+                  <Text style={styles.text}>Sign Up</Text>
+                </TouchableOpacity>
+                <StatusBar style="auto" />
+              </View>
+              <Navbar />
             </View>
           )}
         </View>
@@ -125,6 +137,7 @@ const mapStateToProps = (state) => ({
   displayMessage: state.display.displayMessage,
   currentMessage: state.display.currentMessage,
   messageState: state.display.messageState,
+  mountedComponent: state.display.mountedComponent,
 });
 export default connect(mapStateToProps, {
   changeSignup,
