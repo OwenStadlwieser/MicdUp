@@ -7,7 +7,7 @@ import {
   SET_BIO,
   SET_POSTS,
   UPDATE_POST,
-  UPDATE_POST_COMMENT,
+  UPDATE_POST_COMMENT2,
   UPDATE_POST_COMMENTS,
 } from "../types";
 import {
@@ -208,12 +208,11 @@ export const getComments =
     }
   };
 export const commentPost =
-  (postId, replyingTo, files, fileTypes, text) => async (dispatch) => {
+  (postId, replyingTo, files, fileTypes, text, parents) => async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
-      console.log("here");
       const res = await client.mutate({
-        mutation: COMMENT_POST_MUTATION,
+        mutation: COMMENT_POST_MUTATION(3),
         variables: {
           postId,
           replyingTo,
@@ -234,8 +233,8 @@ export const commentPost =
         return false;
       }
       dispatch({
-        type: UPDATE_POST_COMMENT,
-        payload: { data: res.data.commentToPost, id: postId },
+        type: UPDATE_POST_COMMENT2,
+        payload: { comment: res.data.commentToPost, parents, postId },
       });
       return res.data.commentToPost;
     } catch (err) {

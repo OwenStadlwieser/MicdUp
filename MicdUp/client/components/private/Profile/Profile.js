@@ -8,7 +8,7 @@ import {
   TouchableHighlight,
   Platform,
   ScrollView,
-  Dimensions
+  Dimensions,
 } from "react-native";
 // icons
 import { Ionicons } from "@expo/vector-icons";
@@ -21,10 +21,17 @@ import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 // redux
-import { uploadBio, getUserPosts, getComments } from "../../../redux/actions/recording";
+import {
+  uploadBio,
+  getUserPosts,
+  getComments,
+} from "../../../redux/actions/recording";
 import { updateProfilePic } from "../../../redux/actions/profile";
 // helpers
-import { playSound } from "../../../reuseableFunctions/helpers";
+import {
+  playSound,
+  duplicateCommentsString,
+} from "../../../reuseableFunctions/helpers";
 import GestureRecognizer, {
   swipeDirections,
 } from "react-native-swipe-gestures";
@@ -45,7 +52,7 @@ export class Profile extends Component {
       newBioRecording: {},
       selectImage: false,
     };
-    this.scrollView = null
+    this.scrollView = null;
     this.mounted = true;
   }
 
@@ -58,23 +65,26 @@ export class Profile extends Component {
 
   setCommentPosts = async (post, index) => {
     var { height, width } = Dimensions.get("window");
-    await this.props.getComments(post.id)
-    this.scrollView.scrollTo({ y: (width > 1000 ? height * 0.25 : height * 0.14) * index + (height * 0.02) * index })
-  }
+    await this.props.getComments(post.id);
+    this.scrollView.scrollTo({
+      y:
+        (width > 1000 ? height * 0.25 : height * 0.14) * index +
+        height * 0.02 * index,
+    });
+  };
 
   removeCommentPosts = (post) => {
-    this.mounted && this.setState({ commentPosts: [] })
-  }
+    this.mounted && this.setState({ commentPosts: [] });
+  };
 
   stopCurrentSound = async () => {
     const { playbackObject } = this.state;
     if (!playbackObject) return;
     try {
       await playbackObject.stopAsync();
-    } catch (err) { }
+    } catch (err) {}
     this.mounted && this.setState({ playing: "", playingId: "" });
   };
-
 
   startRecording = async () => {
     try {
@@ -102,7 +112,7 @@ export class Profile extends Component {
     console.log("Stopping recording..");
     try {
       await recording.stopAndUnloadAsync();
-    } catch (err) { }
+    } catch (err) {}
     const uri = recording.getURI();
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
@@ -153,7 +163,6 @@ export class Profile extends Component {
   setHidden = () => {
     this.mounted && this.setState({ selectImage: false });
   };
-
 
   render() {
     const config = {
@@ -260,10 +269,9 @@ export class Profile extends Component {
               showsVerticalScrollIndicator={false}
               style={styles.postsContainer}
               scrollEventThrottle={16}
-              ref={view => this.scrollView = view}
+              ref={(view) => (this.scrollView = view)}
             >
-              {
-                posts &&
+              {posts &&
                 posts.map((post, index) => (
                   <Post
                     setCommentPosts={this.setCommentPosts.bind(this)}
@@ -298,5 +306,5 @@ export default connect(mapStateToProps, {
   uploadBio,
   getUserPosts,
   updateProfilePic,
-  getComments
+  getComments,
 })(Profile);

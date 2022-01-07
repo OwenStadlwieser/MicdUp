@@ -64,6 +64,12 @@ const ProfileType = new GraphQLObjectType({
         return res;
       },
     },
+    user: {
+      type: UserType,
+      async resolve(parent) {
+        return await User.findById(parent.user);
+      },
+    },
   }),
 });
 
@@ -82,7 +88,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
       type: GraphQLString,
       async resolve(parent) {
         if (!parent.fileExtension) {
-          return ""
+          return "";
         }
         if (
           parent.signedUrl &&
@@ -142,24 +148,33 @@ const CommentType = new GraphQLObjectType({
     replies: {
       type: new GraphQLList(CommentWithoutReplyType),
       async resolve(parent) {
-        const res = await Comment.find(
-          { _id: { $in: parent.replies } }
-        ).sort({ dateCreated: -1 });
-        return res
+        const res = await Comment.find({ _id: { $in: parent.replies } }).sort({
+          dateCreated: -1,
+        });
+        return res;
       },
     },
     allReplies: {
       type: new GraphQLList(CommentType),
       async resolve(parent) {
-        return await Comment.find({ _id: { $in: parent.replies } });
+        return await Comment.find({ _id: { $in: parent.replies } }).sort({
+          dateCreated: -1,
+        });
       },
     },
+    repliesLength: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return parent.replies.length;
+      },
+    },
+    ultimateParent: { type: GraphQLID },
     text: { type: GraphQLString },
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {
         if (!parent.fileExtension) {
-          return ""
+          return "";
         }
         if (
           parent.signedUrl &&
@@ -382,5 +397,5 @@ module.exports = {
   TagsType,
   FileType,
   PromptsType,
-  CommentType
+  CommentType,
 };

@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     height: height * 0.3,
+    marginLeft: 10,
   },
   recordingContainerComments: {
     width,
@@ -37,6 +38,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: 10,
+    borderTopColor: "black",
+    borderTopStyle: "solid",
+    borderTopWidth: 1,
+    marginTop: 10,
   },
   textInputComments: {
     borderWidth: 2,
@@ -187,6 +192,10 @@ const styles = StyleSheet.create({
   text: {},
   whiteText: {
     color: "white",
+  },
+  blackText: {
+    color: "black",
+    fontStyle: "italic",
   },
   rootContainer: {
     height: height,
@@ -456,6 +465,16 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     fontSize: width * 0.1 < 50 ? width * 0.1 : 50,
   },
+  commentActionsDiv: {
+    flexDirection: "row",
+    borderLeftColor: "#1A3561",
+    borderLeftStyle: "solid",
+    borderLeftWidth: 1,
+  },
+  replyActionsText: {
+    fontStyle: "italic",
+    paddingLeft: 15,
+  },
   profileImgContainer: {
     height: height * 0.2,
     width: height * 0.2,
@@ -463,12 +482,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   commentContainer: {
+    marginTop: height * 0.02,
     height: height * 0.06,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 15,
     flexDirection: "row",
-    width: width > 1000 ? width * 0.6 : width,
+    borderLeftColor: "#1A3561",
+    borderLeftStyle: "solid",
+    borderLeftWidth: 1,
   },
   commentImgContainer: {
     height: height * 0.05,
