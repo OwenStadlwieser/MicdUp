@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-
+import { duplicateCommentsString } from "../../reuseableFunctions/helpers";
 const UPLOAD_RECORDING_MUTATION = gql`
   mutation createRecording(
     $files: [String!]
@@ -74,61 +74,79 @@ const GET_COMMENT_POST_QUERY = gql`
       signedUrl
       text
       likes
+      repliesLength
       isLikedByUser
       owner {
         id
+        user {
+          id
+          userName
+        }
         image {
           id
           signedUrl
         }
       }
-      replies {
+      allReplies {
         id
         text
+        repliesLength
         signedUrl
         likes
         isLikedByUser
+        owner {
+          id
+          user {
+            id
+            userName
+          }
+          image {
+            id
+            signedUrl
+          }
+        }
       }
     }
   }
 `;
-const COMMENT_POST_MUTATION = gql`
-  mutation commentToPost(
-    $postId: ID!
-    $replyingTo: ID
-    $files: String
-    $fileTypes: String
-    $text: String
-  ) {
-    commentToPost(
-      postId: $postId
-      replyingTo: $replyingTo
-      files: $files
-      fileTypes: $fileTypes
-      text: $text
+const COMMENT_POST_MUTATION = (duplication) => {
+  return gql`
+    mutation commentToPost(
+      $postId: ID!
+      $replyingTo: ID
+      $files: String
+      $fileTypes: String
+      $text: String
     ) {
-      id
-      signedUrl
-      text
-      likes
-      isLikedByUser
-      owner {
+      commentToPost(
+        postId: $postId
+        replyingTo: $replyingTo
+        files: $files
+        fileTypes: $fileTypes
+        text: $text
+      ) {
         id
-        image {
-          id
-          signedUrl
-        }
-      }
-      replies {
-        id
-        text
         signedUrl
+        text
         likes
         isLikedByUser
+        repliesLength
+        owner {
+          id
+          user {
+            id
+            userName
+          }
+          image {
+            id
+            signedUrl
+          }
+        }
+        ${duplicateCommentsString(duplication)}
       }
     }
-  }
-`;
+  `;
+};
 
 export {
   UPLOAD_RECORDING_MUTATION,

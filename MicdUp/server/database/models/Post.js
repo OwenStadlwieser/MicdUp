@@ -20,6 +20,10 @@ const postSchema = new Schema({
   likes: {
     type: Number,
   },
+  title: {
+    type: String,
+    required: true,
+  },
   allowStitch: {
     type: Boolean,
     default: false,

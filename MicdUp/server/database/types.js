@@ -64,6 +64,12 @@ const ProfileType = new GraphQLObjectType({
         return res;
       },
     },
+    user: {
+      type: UserType,
+      async resolve(parent) {
+        return await User.findById(parent.user);
+      },
+    },
   }),
 });
 
@@ -151,9 +157,18 @@ const CommentType = new GraphQLObjectType({
     allReplies: {
       type: new GraphQLList(CommentType),
       async resolve(parent) {
-        return await Comment.find({ _id: { $in: parent.replies } });
+        return await Comment.find({ _id: { $in: parent.replies } }).sort({
+          dateCreated: -1,
+        });
       },
     },
+    repliesLength: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return parent.replies.length;
+      },
+    },
+    ultimateParent: { type: GraphQLID },
     text: { type: GraphQLString },
     signedUrl: {
       type: GraphQLString,

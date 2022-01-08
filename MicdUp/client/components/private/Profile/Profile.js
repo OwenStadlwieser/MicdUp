@@ -28,7 +28,10 @@ import {
 } from "../../../redux/actions/recording";
 import { updateProfilePic } from "../../../redux/actions/profile";
 // helpers
-import { playSound } from "../../../reuseableFunctions/helpers";
+import {
+  playSound,
+  duplicateCommentsString,
+} from "../../../reuseableFunctions/helpers";
 import GestureRecognizer, {
   swipeDirections,
 } from "react-native-swipe-gestures";
