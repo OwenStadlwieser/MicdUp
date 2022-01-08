@@ -82,7 +82,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
       type: GraphQLString,
       async resolve(parent) {
         if (!parent.fileExtension) {
-          return ""
+          return "";
         }
         if (
           parent.signedUrl &&
@@ -142,10 +142,10 @@ const CommentType = new GraphQLObjectType({
     replies: {
       type: new GraphQLList(CommentWithoutReplyType),
       async resolve(parent) {
-        const res = await Comment.find(
-          { _id: { $in: parent.replies } }
-        ).sort({ dateCreated: -1 });
-        return res
+        const res = await Comment.find({ _id: { $in: parent.replies } }).sort({
+          dateCreated: -1,
+        });
+        return res;
       },
     },
     allReplies: {
@@ -159,7 +159,7 @@ const CommentType = new GraphQLObjectType({
       type: GraphQLString,
       async resolve(parent) {
         if (!parent.fileExtension) {
-          return ""
+          return "";
         }
         if (
           parent.signedUrl &&
@@ -382,5 +382,5 @@ module.exports = {
   TagsType,
   FileType,
   PromptsType,
-  CommentType
+  CommentType,
 };

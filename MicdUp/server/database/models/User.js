@@ -32,6 +32,14 @@ const UserSchema = new Schema({
   resetPasswordCreatedAt: {
     type: Date,
   },
+  verifyEmailToken: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  verifyEmailCreatedAt: {
+    type: Date,
+  },
   dob: {
     type: Date,
     required: true,
@@ -45,6 +53,9 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
+  emailVerified: {
+    type: Boolean,
+  },
 });
 
 UserSchema.methods.getPasswordResetToken = async function () {
@@ -57,6 +68,18 @@ UserSchema.methods.getPasswordResetToken = async function () {
   this.resetPasswordToken = resetToken;
   this.resetPasswordCreatedAt = Date.now();
   return resetToken;
+};
+
+UserSchema.methods.getVerifiedEmailToken = async function () {
+  let emailToken = crypto.randomBytes(5).toString("hex");
+  let user = await User.find({ verifyEmailToken: emailToken });
+  while (user && Object.keys(user).length !== 0) {
+    emailToken = crypto.randomBytes(5).toString("hex");
+    user = await User.find({ verifyEmailToken: emailToken });
+  }
+  this.verifyEmailToken = emailToken;
+  this.verifyEmailCreatedAt = Date.now();
+  return emailToken;
 };
 
 UserSchema.pre("save", async function (next) {
