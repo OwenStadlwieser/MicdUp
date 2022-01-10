@@ -6,18 +6,22 @@ import Like from "../../reuseable/Like";
 import Comment from "../../reuseable/Comment";
 import { View, Text, TouchableOpacity } from "react-native";
 // styles
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
 import { playSound } from "../../../reuseableFunctions/helpers";
+//icons
+import { Feather } from "@expo/vector-icons";
+//redux
+import { deletePost } from "../../../redux/actions/recording";
+
 export class Post extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
       playbackObject: {},
-      commentsShowing: false
+      commentsShowing: false,
     };
-
     this.mounted = true;
   }
 
@@ -26,22 +30,31 @@ export class Post extends Component {
     if (!playbackObject) return;
     try {
       await playbackObject.stopAsync();
-    } catch (err) { }
+    } catch (err) {}
     this.mounted && this.setState({ playing: "", playingId: "" });
     this.props.setPlaying({});
   };
 
   setCommentsShowing = (commentsShowing) => {
-    this.mounted && this.setState({ commentsShowing })
-  }
+    this.mounted && this.setState({ commentsShowing });
+  };
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => { };
+  componentDidMount = () => {};
 
   render() {
-    const { post, setPlaying, onPlaybackStatusUpdate, currentSound, setCommentPosts, removeCommentPosts, higherUp, index } =
-      this.props;
-    const { commentsShowing } = this.state
+    const {
+      post,
+      postArray,
+      setPlaying,
+      onPlaybackStatusUpdate,
+      currentSound,
+      setCommentPosts,
+      removeCommentPosts,
+      higherUp,
+      index,
+    } = this.props;
+    const { commentsShowing } = this.state;
     return (
       <TouchableOpacity
         onPress={async () => {
@@ -58,13 +71,16 @@ export class Post extends Component {
             setPlaying(post.id);
           }
         }}
-        style={commentsShowing ? styles.higherPostContainer : styles.postContainer}
+        style={
+          commentsShowing ? styles.higherPostContainer : styles.postContainer
+        }
         key={post.id}
       >
         <Text style={styles.postTitle}>
           {post.title ? post.title : "Untitled"}
         </Text>
-        <Comment containerStyle={{}}
+        <Comment
+          containerStyle={{}}
           setCommentPosts={setCommentPosts}
           removeCommentPosts={removeCommentPosts}
           color={"#1A3561"}
@@ -74,15 +90,18 @@ export class Post extends Component {
           setCommentsShowing={this.setCommentsShowing.bind(this)}
           setPlaying={setPlaying}
           index={index}
-          onPlaybackStatusUpdate={onPlaybackStatusUpdate} />
+          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+        />
         <View style={styles.textAndPlayButtonContainer}>
           <Text style={styles.postText}></Text>
           <View style={styles.postPlayButton}>
             <Like post={post} />
-            <TouchableOpacity onPress={() => {
-              setCommentPosts(post, index)
-              this.mounted && this.setState({ commentsShowing: true })
-            }}>
+            <TouchableOpacity
+              onPress={() => {
+                setCommentPosts(post, index);
+                this.mounted && this.setState({ commentsShowing: true });
+              }}
+            >
               <FontAwesome name="comment" size={24} color="black" />
             </TouchableOpacity>
             <PlayButton
@@ -93,6 +112,16 @@ export class Post extends Component {
               setPlaying={setPlaying}
               onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
+            {this.props.isUserProfile && (
+              <Feather
+                onPress={async () => {
+                  await this.props.deletePost(post.id);
+                }}
+                name="scissors"
+                size={24}
+                color="red"
+              />
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -100,6 +129,8 @@ export class Post extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  posts: state.recording.posts,
+});
 
-export default connect(mapStateToProps, {})(Post);
+export default connect(mapStateToProps, { deletePost })(Post);

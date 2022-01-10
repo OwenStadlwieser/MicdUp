@@ -9,12 +9,14 @@ import {
   UPDATE_POST,
   UPDATE_POST_COMMENT2,
   UPDATE_POST_COMMENTS,
+  DELETE_POST,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   GET_COMMENT_POST_QUERY,
 } from "../../apollo/private/recording";
@@ -171,6 +173,37 @@ export const likePost = (postId) => async (dispatch) => {
       payload: res.data.likePost,
     });
     return res.data.likePost;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deletePost = (postId) => async (dispatch) => {
+  try {
+    let fetchPolicy = "no-cache";
+    const res = await client.mutate({
+      mutation: DELETE_POST_MUTATION,
+      variables: {
+        postId,
+      },
+      fetchPolicy,
+    });
+    if (!res.data || !res.data.deletePost) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    if (res && res.data && res.data.deletePost && res.data.deletePost.success) {
+      dispatch({
+        type: DELETE_POST,
+        payload: { id: postId },
+      });
+    }
+    return res.data.deletePost;
   } catch (err) {
     console.log(err);
   }
