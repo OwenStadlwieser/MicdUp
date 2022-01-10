@@ -25,12 +25,12 @@ const forgotPass = {
     }
     const resetToken = await user.getPasswordResetToken();
     await user.save();
-    const message = `You are recieving this message because you have requested to
+    const message = `You are receiving this message because you have requested to
     reset your password. The code to reset your password is ${resetToken}.`;
     try {
       await sendEmail({
         email: user.email,
-        subject: "Password Reset Requested",
+        subject: "MicdUp Password Reset Requested",
         message,
       });
     } catch (err) {
@@ -38,6 +38,75 @@ const forgotPass = {
       returnObject.success = false;
       returnObject.message = err.message;
     }
+    return returnObject;
+  },
+};
+
+const verifyEmail = {
+  type: MessageType,
+  args: {
+    email: { type: GraphQLString },
+  },
+  async resolve(parent, { email }, context) {
+    // FIXME: implement transaction
+    let returnObject = {
+      success: true,
+      message: "Email sent successfully",
+    };
+    const user = await User.findOne({ email });
+    if (!user) {
+      returnObject.success = false;
+      returnObject.message = "No user found";
+      return returnObject;
+    }
+    const emailToken = await user.getVerifiedEmailToken();
+    await user.save();
+    const message = `You are receiving this message because you are trying to verify your email. 
+    Your email verification code is ${emailToken}.`;
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "MicdUp Email Verification",
+        message,
+      });
+    } catch (err) {
+      console.log(err);
+      returnObject.success = false;
+      returnObject.message = err.message;
+    }
+    return returnObject;
+  },
+};
+
+const setEmailVerified = {
+  type: MessageType,
+  args: {
+    verificationCode: { type: GraphQLString },
+  },
+  async resolve(parent, { verificationCode }, context) {
+    // FIXME: implement transaction
+    let returnObject = {
+      success: true,
+      message: "Email Verification Successful",
+    };
+    const user = await User.findOne({
+      verifyEmailToken: verificationCode,
+    });
+    if (!user) {
+      return {
+        success: false,
+        message: "Email Verification Token not found",
+      };
+    }
+    if (user.verifyEmailCreatedAt + 1000 * 60 * 10 > Date.now()) {
+      return {
+        success: false,
+        message: "Email Verification Token has expired",
+      };
+    }
+    user.emailVerified = true;
+    delete user.verifyEmailToken;
+    await user.save();
     return returnObject;
   },
 };
@@ -96,5 +165,7 @@ const deleteAccount = {
 
 module.exports = {
   forgotPass,
+  verifyEmail,
+  setEmailVerified,
   deleteAccount,
 };

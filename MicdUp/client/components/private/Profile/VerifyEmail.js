@@ -1,25 +1,24 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
-import { styles } from "../../styles/Styles";
+import { styles } from "../../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import {
-  forgotPass,
-  forgotPassVerify,
-  forgotPassChange,
-} from "../../redux/actions/auth";
-import { showMessage } from "../../redux/actions/display";
-export class ForgotPassword extends Component {
+  verifyEmail,
+  verifyEmailCode,
+  setEmailVerified,
+} from "../../../redux/actions/user";
+import { showMessage } from "../../../redux/actions/display";
+
+export class VerifyEmail extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
       email: "",
       stage: 1,
-      secureCode: "",
-      newPass: "",
+      verificationCode: "",
     };
-
     this.mounted = true;
   }
 
@@ -31,33 +30,26 @@ export class ForgotPassword extends Component {
 
   componentDidMount = () => {};
 
-  changePassword = async () => {
-    const { newPass, secureCode } = this.state;
-    if (!newPass) {
-      this.props.showMessage({
-        success: false,
-        message: "Please enter new password",
-      });
-      return;
-    }
-    const res = await this.props.forgotPassChange(secureCode, newPass);
+  makeEmailVerified = async () => {
+    const { verificationCode } = this.state;
+    const res = await this.props.setEmailVerified(verificationCode);
     if (
       res.data &&
-      res.data.forgotPassChange &&
-      res.data.forgotPassChange.success
+      res.data.setEmailVerified &&
+      res.data.setEmailVerified.success
     ) {
       this.props.showMessage({
         success: true,
-        message: "Password updated",
+        message: "Email Verified.",
       });
       setTimeout(() => {
-        this.props.hideResetPassword();
+        this.props.hideVerifyEmail();
       }, 3000);
     }
   };
 
   render() {
-    const { email, stage, secureCode, newPass } = this.state;
+    const { email, stage, verificationCode } = this.state;
     return (
       <View style={styles.container}>
         <AntDesign
@@ -66,7 +58,7 @@ export class ForgotPassword extends Component {
           size={24}
           color="white"
           onPress={() => {
-            this.props.hideResetPassword();
+            this.props.hideVerifyEmail();
           }}
         />
         {stage === 1 ? (
@@ -79,77 +71,59 @@ export class ForgotPassword extends Component {
             />
             <TouchableOpacity
               style={styles.button}
-              accessibilityLabel="Reset Password"
+              accessibilityLabel="Verify Email"
               onPress={async () => {
                 const { email } = this.state;
                 if (!email) {
                   this.props.showMessage({
                     success: false,
-                    message: "Please enter email",
+                    message: "Please enter email.",
                   });
                   return;
                 }
-                const res = await this.props.forgotPass(email);
+                const res = await this.props.verifyEmail(email);
                 if (
                   res.data &&
-                  res.data.forgotPass &&
-                  res.data.forgotPass.success
+                  res.data.verifyEmail &&
+                  res.data.verifyEmail.success
                 )
                   this.mounted && this.setState({ stage: 2 });
               }}
             >
-              <Text style={styles.text}>Request Link</Text>
-            </TouchableOpacity>
-          </View>
-        ) : stage === 2 ? (
-          <View>
-            <TextInput
-              style={styles.textInput}
-              value={secureCode}
-              placeholder="Secure Code"
-              onChangeText={(text) => this.onChange("secureCode", text)}
-            />
-            <TouchableOpacity
-              style={styles.button}
-              accessibilityLabel="Secure Code"
-              onPress={async () => {
-                const { secureCode } = this.state;
-                if (!secureCode) {
-                  this.props.showMessage({
-                    success: false,
-                    message: "Please enter secure code",
-                  });
-                  return;
-                }
-                const res = await this.props.forgotPassVerify(secureCode);
-                if (
-                  res.data &&
-                  res.data.forgotPassVerify &&
-                  res.data.forgotPassVerify.success
-                )
-                  this.mounted && this.setState({ stage: 3 });
-              }}
-            >
-              <Text style={styles.text}>Verify Code</Text>
+              <Text style={styles.text}>Verify Email</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View>
             <TextInput
               style={styles.textInput}
-              value={newPass}
-              placeholder="New Password"
-              secureTextEntry={true}
-              onChangeText={(text) => this.onChange("newPass", text)}
+              value={verificationCode}
+              placeholder="Verification Code"
+              onChangeText={(text) => this.onChange("verificationCode", text)}
             />
             <TouchableOpacity
               style={styles.button}
-              accessibilityLabel="New Password"
+              accessibilityLabel="Verification Code"
               onPress={async () => {
-                await this.changePassword();
+                const { verificationCode } = this.state;
+                if (!verificationCode) {
+                  this.props.showMessage({
+                    success: false,
+                    message: "Please enter verification code",
+                  });
+                  return;
+                }
+                const res = await this.props.verifyEmailCode(verificationCode);
+                if (
+                  res.data &&
+                  res.data.forgotPassVerify &&
+                  res.data.forgotPassVerify.success
+                )
+                  this.mounted && this.setState({ stage: 1 });
+                await this.makeEmailVerified();
               }}
             >
-              <Text style={styles.text}>Change Password</Text>
+              <Text style={styles.text}>Verify Code</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -161,8 +135,8 @@ export class ForgotPassword extends Component {
 const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, {
-  forgotPass,
+  verifyEmail,
   showMessage,
-  forgotPassChange,
-  forgotPassVerify,
-})(ForgotPassword);
+  verifyEmailCode,
+  setEmailVerified,
+})(VerifyEmail);
