@@ -8,7 +8,7 @@ import {
   SET_BIO,
   SET_POSTS,
   UPDATE_POST,
-  UPDATE_POST_COMMENT2,
+  UPDATE_COMMENT_TO_POST,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
   UPDATE_COMMENT,
@@ -242,12 +242,12 @@ export const deletePost = (postId) => async (dispatch) => {
         payload: res.data.deletePost,
       });
     }
-    console.log("actions/recording deletePost end")
+    console.log("actions/recording deletePost end");
     return res.data.deletePost;
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 export const getComments =
   (postId, skipMult = 0) =>
@@ -306,7 +306,7 @@ export const commentPost =
         return false;
       }
       dispatch({
-        type: UPDATE_POST_COMMENT2,
+        type: UPDATE_COMMENT_TO_POST,
         payload: { comment: res.data.commentToPost, parents, postId },
       });
       return res.data.commentToPost;
