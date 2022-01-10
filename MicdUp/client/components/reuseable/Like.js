@@ -19,41 +19,34 @@ export class Like extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => { };
+  componentDidMount = () => {};
 
   render() {
-    const { post, comment } = this.props;
+    const { post, type } = this.props;
     return (
-      <View onStartShouldSetResponder={(event) => true}
+      <View
+        onStartShouldSetResponder={(event) => true}
         onTouchStart={(e) => {
           e.stopPropagation();
-        }} style={styles.likesContainer}>
-        { post && post.id && (
-          <View>
-            <TouchableOpacity onPress={() => this.props.likePost(post.id)}>
-              <AntDesign
-                name={post.isLikedByUser ? "heart" : "hearto"}
-                size={24}
-                color="red"
-                style={styles.likes}
-              />
-            </TouchableOpacity>
-            <Text style={styles.likesText}>{post.likes}</Text>
-          </View>
-        )}
-        { comment && comment.id && (
-          <View>
-            <TouchableOpacity onPress={() => this.props.likeComment(comment.id)}>
-              <AntDesign
-                name={comment.isLikedByUser ? "heart" : "hearto"}
-                size={24}
-                color="red"
-                style={styles.likes}
-              />
-            </TouchableOpacity>
-            <Text style={styles.likesText}>{comment.likes}</Text>
-          </View>
-        )}
+        }}
+        style={styles.likesContainer}
+      >
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              if (type === "Comment") this.props.likeComment(post.id);
+              else if (type === "Post") this.props.likePost(post.id);
+            }}
+          >
+            <AntDesign
+              name={post.isLikedByUser ? "heart" : "hearto"}
+              size={24}
+              color="red"
+              style={styles.likes}
+            />
+          </TouchableOpacity>
+          <Text style={styles.likesText}>{post.likes}</Text>
+        </View>
       </View>
     );
   }

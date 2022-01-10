@@ -30,7 +30,12 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // redux
 import { commentPost } from "../../redux/actions/recording";
-import { getReplies, updateCommentDisplay, updateComments, deleteComment } from "../../redux/actions/comment";
+import {
+  getReplies,
+  updateCommentDisplay,
+  updateComments,
+  deleteComment,
+} from "../../redux/actions/comment";
 
 var { height, width } = Dimensions.get("window");
 export class Comment extends Component {
@@ -167,7 +172,7 @@ export class Comment extends Component {
           </View>
           {comment.signedUrl ? (
             <View style={styles.commentPlayContainer}>
-              <Like comment={comment} />
+              <Like post={comment} type={"Comment"} />
               <PlayButton
                 containerStyle={{}}
                 color={"#1A3561"}
@@ -178,9 +183,9 @@ export class Comment extends Component {
                 onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
               />
               <Feather
-                onPress={async ()=> { 
+                onPress={async () => {
                   this.deleteItem(this.props.post.comments, this.props.index);
-                  await this.props.deleteComment(comment.id)
+                  await this.props.deleteComment(comment.id);
                 }}
                 name="scissors"
                 size={24}
@@ -250,7 +255,7 @@ export class Comment extends Component {
     this.mounted && this.setState({ isShowing: false });
   };
 
-  deleteItem = (commentArray, index) => { 
+  deleteItem = (commentArray, index) => {
     console.log("Props comment: ", commentArray);
     commentArray.splice(index, 1);
     this.props.updateComments(commentArray);
