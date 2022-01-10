@@ -11,12 +11,14 @@ import {
   UPDATE_POST_COMMENT2,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
+  UPDATE_COMMENT,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  LIKE_COMMENT_MUTATION,
   DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   GET_COMMENT_POST_QUERY,
@@ -181,6 +183,35 @@ export const likePost = (postId) => async (dispatch) => {
       payload: res.data.likePost,
     });
     return res.data.likePost;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const likeComment = (commentId) => async (dispatch) => {
+  try {
+    let fetchPolicy = "no-cache";
+    const res = await client.mutate({
+      mutation: LIKE_COMMENT_MUTATION,
+      variables: {
+        commentId,
+      },
+      fetchPolicy,
+    });
+    if (!res.data || !res.data.likeComment) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch({
+      type: UPDATE_COMMENT,
+      payload: res.data.likeComment,
+    });
+    return res.data.likeComment;
   } catch (err) {
     console.log(err);
   }

@@ -244,6 +244,38 @@ const likePost = {
   },
 };
 
+const likeComment = {
+  type: CommentType,
+  args: {
+    commentId: { type: GraphQLID },
+  },
+  async resolve(parent, { commentId }, context) {
+    // check if already liked and unlike
+    if (!context.user.id) {
+      throw new Error("Must be signed in to like comment");
+    }
+    let index = -1;
+    const comment = await Comment.findOne({
+      _id: commentId,
+    }).then((comment) => {
+      index = comment.likers.findIndex(
+        (id) => id.toString() === context.profile.id
+      );
+      return comment;
+    });
+    if (comment && index < 0) {
+      comment.likers.push(context.profile._id);
+      await comment.save();
+      return comment;
+    }
+    if (comment && index > -1) {
+      comment.likers.splice(index, 1);
+      await comment.save();
+      return comment;
+    }
+  },
+};
+
 const deletePost = {
   type: MessageType,
   args: {
@@ -277,7 +309,44 @@ const deletePost = {
     } finally {
       session.endSession();
     }
-    console.log("Delete post successful.")
+    return returnObject;
+  }
+}
+
+const deleteComment = {
+  type: MessageType,
+  args: {
+    commentId: {type: GraphQLID},
+  },
+  async resolve(parent, {commentId}, context) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    returnObject = {
+      success: true,
+      message: "Delete post successful.",
+    };
+    try {
+      // Delete every comment to this post
+      const comment = await Comment.findOne({
+        _id: commentId,
+      });
+      if (!comment) {
+        throw new Error("post not found");
+      }
+      for (let i = 0; i < comment.replies.length; i++) {
+        await Comment.findByIdAndDelete({ _id: comment.replies[i]})
+      }
+      await comment.save({ session });
+      await Comment.findByIdAndDelete(commentId);
+      await session.commitTransaction();
+    } catch (err) {
+      returnObject.success = false;
+      returnObject.message = err.message;
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+    console.log("Deleted comment with commentId: ", commentId);
     return returnObject;
   }
 }
@@ -420,6 +489,8 @@ module.exports = {
   createRecording,
   uploadBio,
   likePost,
+  likeComment,
   deletePost,
+  deleteComment,
   commentToPost,
 };

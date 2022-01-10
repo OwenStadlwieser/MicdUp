@@ -14,6 +14,7 @@ import {
   Dimensions,
 } from "react-native";
 import PlayButton from "./PlayButton";
+import Like from "./Like";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -29,7 +30,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // redux
 import { commentPost } from "../../redux/actions/recording";
-import { getReplies, updateCommentDisplay } from "../../redux/actions/comment";
+import { getReplies, updateCommentDisplay, updateComments, deleteComment } from "../../redux/actions/comment";
 
 var { height, width } = Dimensions.get("window");
 export class Comment extends Component {
@@ -166,6 +167,7 @@ export class Comment extends Component {
           </View>
           {comment.signedUrl ? (
             <View style={styles.commentPlayContainer}>
+              <Like comment={comment} />
               <PlayButton
                 containerStyle={{}}
                 color={"#1A3561"}
@@ -174,6 +176,15 @@ export class Comment extends Component {
                 post={comment}
                 setPlaying={this.props.setPlaying}
                 onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
+              />
+              <Feather
+                onPress={async ()=> { 
+                  this.deleteItem(this.props.post.comments, this.props.index);
+                  await this.props.deleteComment(comment.id)
+                }}
+                name="scissors"
+                size={24}
+                color="red"
               />
             </View>
           ) : (
@@ -237,6 +248,12 @@ export class Comment extends Component {
     this.props.removeCommentPosts();
     this.props.setCommentsShowing(false);
     this.mounted && this.setState({ isShowing: false });
+  };
+
+  deleteItem = (commentArray, index) => { 
+    console.log("Props comment: ", commentArray);
+    commentArray.splice(index, 1);
+    this.props.updateComments(commentArray);
   };
 
   render() {
@@ -358,4 +375,6 @@ export default connect(mapStateToProps, {
   commentPost,
   getReplies,
   updateCommentDisplay,
+  updateComments,
+  deleteComment,
 })(onClickOutside(Comment));

@@ -33,4 +33,13 @@ const SHOW_MORE_REPLIES = (duplication) => {
     `;
 };
 
-export { SHOW_MORE_REPLIES };
+const DELETE_COMMENT_MUTATION = gql`
+  mutation deleteComment($commentId: ID!) {
+    deleteComment(commentId: $commentId) {
+      success
+      message
+    }
+  }
+`;
+
+export { SHOW_MORE_REPLIES, DELETE_COMMENT_MUTATION };

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Text, TouchableOpacity } from "react-native";
 // redux
-import { likePost } from "../../redux/actions/recording";
+import { likePost, likeComment } from "../../redux/actions/recording";
 // icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
@@ -22,21 +22,38 @@ export class Like extends Component {
   componentDidMount = () => { };
 
   render() {
-    const { post } = this.props;
+    const { post, comment } = this.props;
     return (
       <View onStartShouldSetResponder={(event) => true}
         onTouchStart={(e) => {
           e.stopPropagation();
         }} style={styles.likesContainer}>
-        <TouchableOpacity onPress={() => this.props.likePost(post.id)}>
-          <AntDesign
-            name={post.isLikedByUser ? "heart" : "hearto"}
-            size={24}
-            color="red"
-            style={styles.likes}
-          />
-        </TouchableOpacity>
-        <Text style={styles.likesText}>{post.likes}</Text>
+        { post && post.id && (
+          <View>
+            <TouchableOpacity onPress={() => this.props.likePost(post.id)}>
+              <AntDesign
+                name={post.isLikedByUser ? "heart" : "hearto"}
+                size={24}
+                color="red"
+                style={styles.likes}
+              />
+            </TouchableOpacity>
+            <Text style={styles.likesText}>{post.likes}</Text>
+          </View>
+        )}
+        { comment && comment.id && (
+          <View>
+            <TouchableOpacity onPress={() => this.props.likeComment(comment.id)}>
+              <AntDesign
+                name={comment.isLikedByUser ? "heart" : "hearto"}
+                size={24}
+                color="red"
+                style={styles.likes}
+              />
+            </TouchableOpacity>
+            <Text style={styles.likesText}>{comment.likes}</Text>
+          </View>
+        )}
       </View>
     );
   }
@@ -44,4 +61,4 @@ export class Like extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { likePost })(Like);
+export default connect(mapStateToProps, { likePost, likeComment })(Like);
