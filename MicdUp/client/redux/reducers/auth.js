@@ -10,6 +10,7 @@ import {
   UPDATE_POST_COMMENT,
   UPDATE_POST_COMMENTS,
   UPDATE_POST_COMMENT2,
+  DELETE_POST,
 } from "../types";
 
 const initialState = {
@@ -68,6 +69,16 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         posts: [...payload],
+      };
+    case DELETE_POST:
+      let postsToDelete = [...state.posts];
+      const postDelIndex = postsToDelete.findIndex(
+        (post) => post.id === payload.id
+      );
+      postsToDelete.splice(postDelIndex, 1);
+      return {
+        ...state,
+        posts: [...postsToDelete],
       };
     case UPDATE_POST:
       const posts = [...state.posts];
