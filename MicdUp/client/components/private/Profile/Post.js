@@ -9,6 +9,11 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
 import { styles } from "../../../styles/Styles";
 import { playSound } from "../../../reuseableFunctions/helpers";
+//icons
+import { Feather } from "@expo/vector-icons";
+//redux
+import { deletePost, updatePosts } from "../../../redux/actions/recording";
+
 export class Post extends Component {
   constructor() {
     super();
@@ -17,7 +22,6 @@ export class Post extends Component {
       playbackObject: {},
       commentsShowing: false
     };
-
     this.mounted = true;
   }
 
@@ -38,8 +42,14 @@ export class Post extends Component {
 
   componentDidMount = () => { };
 
+  deleteItem = (postArray, index) => { 
+    console.log("Props posts: ", postArray);
+    postArray.splice(index, 1);
+    this.props.updatePosts(postArray);
+  };
+
   render() {
-    const { post, setPlaying, onPlaybackStatusUpdate, currentSound, setCommentPosts, removeCommentPosts, higherUp, index } =
+    const { post, postArray, setPlaying, onPlaybackStatusUpdate, currentSound, setCommentPosts, removeCommentPosts, higherUp, index } =
       this.props;
     const { commentsShowing } = this.state
     return (
@@ -93,6 +103,15 @@ export class Post extends Component {
               setPlaying={setPlaying}
               onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
+            <Feather
+              onPress={async ()=> { 
+                this.deleteItem(this.props.postArray, this.props.index);
+                await this.props.deletePost(post.id)
+              }}
+              name="scissors"
+              size={24}
+              color="red"
+            />
           </View>
         </View>
       </TouchableOpacity>
@@ -100,6 +119,8 @@ export class Post extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  posts: state.recording.posts,
+});
 
-export default connect(mapStateToProps, {})(Post);
+export default connect(mapStateToProps, { deletePost, updatePosts })(Post);

@@ -59,6 +59,15 @@ const LIKE_POST_MUTATION = gql`
   }
 `;
 
+const DELETE_POST_MUTATION = gql`
+  mutation deletePost($postId: ID!) {
+    deletePost(postId: $postId) {
+      success
+      message
+    }
+  }
+`;
+
 const ADD_TAG_MUTATION = gql`
   mutation addTag($tagId: ID!) {
     addTag(tagId: $tagId) {
@@ -153,6 +162,7 @@ export {
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   ADD_TAG_MUTATION,
   GET_COMMENT_POST_QUERY,

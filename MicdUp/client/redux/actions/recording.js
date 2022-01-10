@@ -2,6 +2,7 @@ import {
   ALTER_CLIPS,
   UPDATE_TITLE,
   UPDATE_TAGS,
+  ALTER_POSTS,
   CLEAR_RECORDING,
   NAVIGATE,
   SET_BIO,
@@ -9,12 +10,14 @@ import {
   UPDATE_POST,
   UPDATE_POST_COMMENT2,
   UPDATE_POST_COMMENTS,
+  DELETE_POST,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
+  DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   GET_COMMENT_POST_QUERY,
 } from "../../apollo/private/recording";
@@ -37,6 +40,13 @@ export const updateTitle = (payload) => (dispatch) => {
 export const updateTags = (payload) => (dispatch) => {
   dispatch({
     type: UPDATE_TAGS,
+    payload,
+  });
+};
+
+export const updatePosts = (payload) => (dispatch) => {
+  dispatch({
+    type: ALTER_POSTS,
     payload,
   });
 };
@@ -175,6 +185,38 @@ export const likePost = (postId) => async (dispatch) => {
     console.log(err);
   }
 };
+
+export const deletePost = (postId) => async (dispatch) => {
+  try {
+    let fetchPolicy = "no-cache";
+    const res = await client.mutate({
+      mutation: DELETE_POST_MUTATION,
+      variables: {
+        postId,
+      },
+      fetchPolicy,
+    });
+    if (!res.data || !res.data.deletePost) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    if (res && res.data) {
+      dispatch({
+        type: DELETE_POST,
+        payload: res.data.deletePost,
+      });
+    }
+    console.log("actions/recording deletePost end")
+    return res.data.deletePost;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export const getComments =
   (postId, skipMult = 0) =>

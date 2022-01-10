@@ -1,5 +1,5 @@
 var ffmpeg = require("fluent-ffmpeg");
-const { PostType, FileType, CommentType } = require("../../types");
+const { PostType, FileType, CommentType, MessageType } = require("../../types");
 const fs = require("fs");
 const graphql = require("graphql");
 var path = require("path");
@@ -244,6 +244,44 @@ const likePost = {
   },
 };
 
+const deletePost = {
+  type: MessageType,
+  args: {
+    postId: {type: GraphQLID},
+  },
+  async resolve(parent, {postId}, context) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    returnObject = {
+      success: true,
+      message: "Delete post successful.",
+    };
+    try {
+      // Delete every comment to this post
+      const post = await Post.findOne({
+        _id: postId,
+      });
+      if (!post) {
+        throw new Error("post not found");
+      }
+      for (let i = 0; i < post.comments.length; i++) {
+        await Comment.findByIdAndDelete({ _id: post.comments[i]})
+      }
+      await post.save({ session });
+      await Post.findByIdAndDelete(postId);
+      await session.commitTransaction();
+    } catch (err) {
+      returnObject.success = false;
+      returnObject.message = err.message;
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+    console.log("Delete post successful.")
+    return returnObject;
+  }
+}
+
 const commentToPost = {
   type: CommentType,
   args: {
@@ -382,5 +420,6 @@ module.exports = {
   createRecording,
   uploadBio,
   likePost,
+  deletePost,
   commentToPost,
 };
