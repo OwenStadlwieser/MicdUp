@@ -14,6 +14,7 @@ import {
   Dimensions,
 } from "react-native";
 import PlayButton from "./PlayButton";
+import Like from "./Like";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -29,7 +30,12 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // redux
 import { commentPost } from "../../redux/actions/recording";
-import { getReplies, updateCommentDisplay } from "../../redux/actions/comment";
+import {
+  getReplies,
+  updateCommentDisplay,
+  updateComments,
+  deleteComment,
+} from "../../redux/actions/comment";
 
 var { height, width } = Dimensions.get("window");
 export class Comment extends Component {
@@ -102,6 +108,7 @@ export class Comment extends Component {
   };
 
   handleMap(comment, i, index, parentId, parent) {
+    const { profile, post } = this.props;
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -164,21 +171,50 @@ export class Comment extends Component {
               />
             </TouchableHighlight>
           </View>
-          {comment.signedUrl ? (
+          {comment.signedUrl || comment.text ? (
             <View style={styles.commentPlayContainer}>
-              <PlayButton
-                containerStyle={{}}
-                color={"#1A3561"}
-                currentPlayingId={this.props.currentPlayingId}
-                size={48}
-                post={comment}
-                setPlaying={this.props.setPlaying}
-                onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
-              />
+              {comment.signedUrl && (
+                <Like
+                  post={comment}
+                  type={"Comment"}
+                  parents={comment.parents}
+                  postId={this.props.post.id}
+                />
+              )}
+              {comment.signedUrl && (
+                <PlayButton
+                  containerStyle={{}}
+                  color={"#1A3561"}
+                  currentPlayingId={this.props.currentPlayingId}
+                  size={48}
+                  post={comment}
+                  setPlaying={this.props.setPlaying}
+                  onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
+                />
+              )}
+              {!comment.isDeleted &&
+                (profile.id === post.owner.id ||
+                  comment.owner.id === profile.id) && (
+                  <Feather
+                    onPress={async () => {
+                      const newComment = await this.props.deleteComment(
+                        comment.id
+                      );
+                      this.props.updateCommentDisplay(
+                        newComment,
+                        comment.parents,
+                        this.props.post.id
+                      );
+                    }}
+                    name="scissors"
+                    size={24}
+                    color="red"
+                  />
+                )}
             </View>
           ) : (
             <View style={styles.commentTextContainer}>
-              <Text>{comment.text}</Text>
+              <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
         </View>
@@ -352,10 +388,14 @@ export class Comment extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  profile: state.auth.user.profile,
+});
 
 export default connect(mapStateToProps, {
   commentPost,
   getReplies,
   updateCommentDisplay,
+  updateComments,
+  deleteComment,
 })(onClickOutside(Comment));

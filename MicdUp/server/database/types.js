@@ -145,6 +145,7 @@ const CommentType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    isDeleted: { type: GraphQLBoolean },
     replies: {
       type: new GraphQLList(CommentWithoutReplyType),
       async resolve(parent) {

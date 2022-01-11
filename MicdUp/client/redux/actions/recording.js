@@ -7,9 +7,10 @@ import {
   SET_BIO,
   SET_POSTS,
   UPDATE_POST,
-  UPDATE_POST_COMMENT2,
+  UPDATE_COMMENT_TO_POST,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
+  UPDATE_COMMENT,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
@@ -266,7 +267,7 @@ export const commentPost =
         return false;
       }
       dispatch({
-        type: UPDATE_POST_COMMENT2,
+        type: UPDATE_COMMENT_TO_POST,
         payload: { comment: res.data.commentToPost, parents, postId },
       });
       return res.data.commentToPost;

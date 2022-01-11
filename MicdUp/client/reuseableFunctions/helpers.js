@@ -65,6 +65,7 @@ const duplicateCommentsString = (n) => {
       ${tabString}text
       ${tabString}repliesLength
       ${tabString}signedUrl
+      ${tabString}isDeleted
       ${tabString}likes
       ${tabString}isLikedByUser
       ${tabString}owner {

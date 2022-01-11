@@ -3,7 +3,6 @@ import {
   UPDATE_TITLE,
   UPDATE_TAGS,
   CLEAR_RECORDING,
-  UPDATE_POST,
 } from "../types";
 
 const initialState = {

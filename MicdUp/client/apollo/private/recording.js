@@ -43,6 +43,9 @@ const GET_USER_POSTS_QUERY = gql`
       signedUrl
       likes
       isLikedByUser
+      owner {
+        id
+      }
     }
   }
 `;
@@ -55,6 +58,9 @@ const LIKE_POST_MUTATION = gql`
       signedUrl
       likes
       isLikedByUser
+      owner {
+        id
+      }
     }
   }
 `;
@@ -84,6 +90,7 @@ const GET_COMMENT_POST_QUERY = gql`
       text
       likes
       repliesLength
+      isDeleted
       isLikedByUser
       owner {
         id
@@ -101,6 +108,7 @@ const GET_COMMENT_POST_QUERY = gql`
         text
         repliesLength
         signedUrl
+        isDeleted
         likes
         isLikedByUser
         owner {

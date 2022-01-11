@@ -7,9 +7,8 @@ import {
   SET_POSTS,
   UPDATE_POST,
   UPDATE_PROFILE_PIC,
-  UPDATE_POST_COMMENT,
   UPDATE_POST_COMMENTS,
-  UPDATE_POST_COMMENT2,
+  UPDATE_COMMENT_TO_POST,
   DELETE_POST,
 } from "../types";
 
@@ -88,23 +87,6 @@ export default function (state = { ...initialState }, action) {
         ...state,
         posts: [...posts],
       };
-    case UPDATE_POST_COMMENT:
-      const posts2 = [...state.posts];
-      const post2Index = posts2.findIndex((post) => post.id === payload.id);
-      const comments = posts2[post2Index].comments;
-      const commentIndex = comments.findIndex(
-        (comment) => comment.id === payload.data.id
-      );
-      if (commentIndex > -1) {
-        comments[commentIndex] = payload.data;
-        posts2[post2Index].comments = [...comments];
-      } else {
-        posts2[post2Index].comments.push(payload.data);
-      }
-      return {
-        ...state,
-        posts: [...posts2],
-      };
     case UPDATE_POST_COMMENTS:
       const posts3 = [...state.posts];
       const post3Index = posts3.findIndex((post) => post.id === payload.id);
@@ -113,7 +95,7 @@ export default function (state = { ...initialState }, action) {
         ...state,
         posts: [...posts3],
       };
-    case UPDATE_POST_COMMENT2:
+    case UPDATE_COMMENT_TO_POST:
       const posts4 = [...state.posts];
       let postIndex2 = posts4.findIndex((post) => post.id === payload.postId);
       let postTarget = posts4[postIndex2];
@@ -121,6 +103,7 @@ export default function (state = { ...initialState }, action) {
       let comments2 = postTarget.comments;
       // comment to first layer or layer 0
       if (!payload.parents || payload.parents.length === 0) {
+        if (!posts4[postIndex2].comments) posts4[postIndex2].comments = [];
         let indexC = posts4[postIndex2].comments.findIndex(
           (comment) => comment.id === payload.comment.id
         );
@@ -149,6 +132,7 @@ export default function (state = { ...initialState }, action) {
       let finalIndex = comments2.allReplies.findIndex(
         (post) => post.id === payload.comment.id
       );
+      // comments2.allReplies[finalIndex] is the found comment from payload.comment.id
       comments2.allReplies[finalIndex] = payload.comment;
       posts4[postIndex2].comments = postTarget.comments;
       return {

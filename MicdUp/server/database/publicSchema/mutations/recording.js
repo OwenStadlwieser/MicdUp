@@ -21,7 +21,6 @@ const {
   GraphQLFloat,
 } = graphql;
 const { Post } = require("../../models/Post");
-const { Profile } = require("../../models/Profile");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const { Comment } = require("../../models/Comment");
@@ -365,6 +364,7 @@ const commentToPost = {
           comment.ultimateParent = commentParent.ultimateParent;
         }
         comment.parent = commentParent._id;
+        comment.post = postId;
         await comment.save({ session });
         await commentParent.save({ session });
         await session.commitTransaction();
@@ -378,6 +378,7 @@ const commentToPost = {
         }
         post.comments.push(comment._id);
         comment.isTop = true;
+        comment.post = post._id;
         await comment.save({ session });
         await post.save({ session });
         await session.commitTransaction();
