@@ -119,6 +119,9 @@ export class Comment extends Component {
     }
     return (
       <View
+        /*
+        onHoldDown remove id from dictionary  
+      */
         key={comment.id}
         style={{
           paddingLeft: index > 0 && index < 12 ? 10 : 0,
@@ -247,6 +250,11 @@ export class Comment extends Component {
             <TouchableHighlight
               onPress={async () => {
                 const replies = await this.props.getReplies(comment.id);
+                /*
+                  replies: Comment
+                  replies.allReplies: [Comment]
+                  add replies id and all its children to showing dictionary
+                */
                 this.props.updateCommentDisplay(
                   replies,
                   comment.parents,
@@ -259,11 +267,17 @@ export class Comment extends Component {
             </TouchableHighlight>
           )}
         </View>
-        {comment.replies &&
-          comment.replies.length > 0 &&
-          comment.replies.map((child, index2) => {
-            return this.handleMap(child, i, index + 1, comment.id, comment);
-          })}
+        {
+          /*
+            check comment id is in showing dictionary
+            parent.id isnt in dictionary parent.replies never get mapped
+          */
+          comment.replies &&
+            comment.replies.length > 0 &&
+            comment.replies.map((child, index2) => {
+              return this.handleMap(child, i, index + 1, comment.id, comment);
+            })
+        }
       </View>
     );
   }
