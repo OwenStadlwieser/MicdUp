@@ -3,11 +3,7 @@ import { connect } from "react-redux";
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
 import { styles } from "../../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
-import {
-  verifyEmail,
-  verifyEmailCode,
-  setEmailVerified,
-} from "../../../redux/actions/user";
+import { verifyEmail, setEmailVerified } from "../../../redux/actions/user";
 import { showMessage } from "../../../redux/actions/display";
 
 export class VerifyEmail extends Component {
@@ -31,8 +27,8 @@ export class VerifyEmail extends Component {
   componentDidMount = () => {};
 
   makeEmailVerified = async () => {
-    const { verificationCode } = this.state;
-    const res = await this.props.setEmailVerified(verificationCode);
+    const { verificationCode, email } = this.state;
+    const res = await this.props.setEmailVerified(verificationCode, email);
     if (
       res.data &&
       res.data.setEmailVerified &&
@@ -113,13 +109,6 @@ export class VerifyEmail extends Component {
                   });
                   return;
                 }
-                const res = await this.props.verifyEmailCode(verificationCode);
-                if (
-                  res.data &&
-                  res.data.forgotPassVerify &&
-                  res.data.forgotPassVerify.success
-                )
-                  this.mounted && this.setState({ stage: 1 });
                 await this.makeEmailVerified();
               }}
             >
@@ -137,6 +126,5 @@ const mapStateToProps = (state) => ({});
 export default connect(mapStateToProps, {
   verifyEmail,
   showMessage,
-  verifyEmailCode,
   setEmailVerified,
 })(VerifyEmail);

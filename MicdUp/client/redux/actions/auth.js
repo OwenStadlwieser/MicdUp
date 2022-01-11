@@ -50,11 +50,12 @@ export const forgotPass = (email) => async (dispatch) => {
   }
 };
 
-export const forgotPassVerify = (secureCode) => async (dispatch) => {
+export const forgotPassVerify = (secureCode, email) => async (dispatch) => {
   try {
+    console.log(email);
     const res = await client.query({
       query: FORGOT_PASS_VERIFY_QUERY,
-      variables: { secureCode },
+      variables: { secureCode, email },
       fetchPolicy: "no-cache",
     });
     if (res && res.data) dispatch(showMessage(res.data.forgotPassVerify));
@@ -64,19 +65,20 @@ export const forgotPassVerify = (secureCode) => async (dispatch) => {
   }
 };
 
-export const forgotPassChange = (secureCode, newPass) => async (dispatch) => {
-  try {
-    const res = await client.mutate({
-      mutation: FORGOT_PASS_CHANGE_MUTATION,
-      variables: { secureCode, newPass },
-      fetchPolicy: "no-cache",
-    });
-    if (res && res.data) dispatch(showMessage(res.data.forgotPassChange));
-    return res;
-  } catch (err) {
-    console.log(err);
-  }
-};
+export const forgotPassChange =
+  (secureCode, newPass, email) => async (dispatch) => {
+    try {
+      const res = await client.mutate({
+        mutation: FORGOT_PASS_CHANGE_MUTATION,
+        variables: { secureCode, newPass, email },
+        fetchPolicy: "no-cache",
+      });
+      if (res && res.data) dispatch(showMessage(res.data.forgotPassChange));
+      return res;
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 export const register =
   (email, phone, password, user, dob) => async (dispatch) => {

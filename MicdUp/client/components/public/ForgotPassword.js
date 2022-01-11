@@ -32,7 +32,7 @@ export class ForgotPassword extends Component {
   componentDidMount = () => {};
 
   changePassword = async () => {
-    const { newPass, secureCode } = this.state;
+    const { newPass, secureCode, email } = this.state;
     if (!newPass) {
       this.props.showMessage({
         success: false,
@@ -40,7 +40,7 @@ export class ForgotPassword extends Component {
       });
       return;
     }
-    const res = await this.props.forgotPassChange(secureCode, newPass);
+    const res = await this.props.forgotPassChange(secureCode, newPass, email);
     if (
       res.data &&
       res.data.forgotPassChange &&
@@ -121,7 +121,10 @@ export class ForgotPassword extends Component {
                   });
                   return;
                 }
-                const res = await this.props.forgotPassVerify(secureCode);
+                const res = await this.props.forgotPassVerify(
+                  secureCode,
+                  email
+                );
                 if (
                   res.data &&
                   res.data.forgotPassVerify &&

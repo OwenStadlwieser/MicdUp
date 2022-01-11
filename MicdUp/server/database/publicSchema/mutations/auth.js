@@ -52,20 +52,32 @@ const forgotPassChange = {
   args: {
     secureCode: { type: GraphQLString },
     newPass: { type: GraphQLString },
+    email: { type: GraphQLString },
   },
-  async resolve(parent, { secureCode, newPass }, context) {
+  async resolve(parent, { secureCode, newPass, email }, context) {
     // FIXME: implement transaction
     let returnObject = {
       success: true,
       message: "Password Reset Successful",
     };
     const user = await User.findOne({
-      resetPasswordToken: secureCode,
+      email,
+      emailVerified: true,
     });
-    if (!user) {
+    if (!user || !user.resetPasswordToken) {
       return {
         success: false,
-        message: "Token not found",
+        message: "User not found",
+      };
+    }
+    const isValidToken = await bcrypt.compare(
+      secureCode,
+      user.resetPasswordToken
+    );
+    if (!isValidToken) {
+      return {
+        success: false,
+        message: "Invalid code",
       };
     }
     if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
@@ -79,7 +91,7 @@ const forgotPassChange = {
       return { success: false, message: "Please input new password" };
     }
     user.password = newPass;
-    delete user.resetPasswordToken;
+    user.resetPasswordToken = null;
     await user.save();
     return returnObject;
   },
