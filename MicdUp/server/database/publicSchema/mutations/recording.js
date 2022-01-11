@@ -279,9 +279,9 @@ const likeComment = {
 const deletePost = {
   type: MessageType,
   args: {
-    postId: {type: GraphQLID},
+    postId: { type: GraphQLID },
   },
-  async resolve(parent, {postId}, context) {
+  async resolve(parent, { postId }, context) {
     const session = await mongoose.startSession();
     session.startTransaction();
     returnObject = {
@@ -293,11 +293,14 @@ const deletePost = {
       const post = await Post.findOne({
         _id: postId,
       });
+      if (!context.profile || post.owner.toString() !== context.profile.id) {
+        throw new Error("You are not authorized to delete this post");
+      }
       if (!post) {
         throw new Error("post not found");
       }
       for (let i = 0; i < post.comments.length; i++) {
-        await Comment.findByIdAndDelete({ _id: post.comments[i]})
+        await Comment.findByIdAndDelete({ _id: post.comments[i] });
       }
       await post.save({ session });
       await Post.findByIdAndDelete(postId);
@@ -309,47 +312,10 @@ const deletePost = {
     } finally {
       session.endSession();
     }
+    console.log("Delete post successful.");
     return returnObject;
-  }
-}
-
-const deleteComment = {
-  type: MessageType,
-  args: {
-    commentId: {type: GraphQLID},
   },
-  async resolve(parent, {commentId}, context) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    returnObject = {
-      success: true,
-      message: "Delete post successful.",
-    };
-    try {
-      // Delete every comment to this post
-      const comment = await Comment.findOne({
-        _id: commentId,
-      });
-      if (!comment) {
-        throw new Error("post not found");
-      }
-      for (let i = 0; i < comment.replies.length; i++) {
-        await Comment.findByIdAndDelete({ _id: comment.replies[i]})
-      }
-      await comment.save({ session });
-      await Comment.findByIdAndDelete(commentId);
-      await session.commitTransaction();
-    } catch (err) {
-      returnObject.success = false;
-      returnObject.message = err.message;
-      await session.abortTransaction();
-    } finally {
-      session.endSession();
-    }
-    console.log("Deleted comment with commentId: ", commentId);
-    return returnObject;
-  }
-}
+};
 
 const commentToPost = {
   type: CommentType,

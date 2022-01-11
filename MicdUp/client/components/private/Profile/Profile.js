@@ -274,6 +274,7 @@ export class Profile extends Component {
               {posts &&
                 posts.map((post, index) => (
                   <Post
+                    isUserProfile={isUserProfile}
                     setCommentPosts={this.setCommentPosts.bind(this)}
                     removeCommentPosts={this.removeCommentPosts.bind(this)}
                     key={post.id}

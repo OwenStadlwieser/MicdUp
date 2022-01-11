@@ -2,7 +2,6 @@ import {
   ALTER_CLIPS,
   UPDATE_TITLE,
   UPDATE_TAGS,
-  ALTER_POSTS,
   CLEAR_RECORDING,
   NAVIGATE,
   SET_BIO,
@@ -42,13 +41,6 @@ export const updateTitle = (payload) => (dispatch) => {
 export const updateTags = (payload) => (dispatch) => {
   dispatch({
     type: UPDATE_TAGS,
-    payload,
-  });
-};
-
-export const updatePosts = (payload) => (dispatch) => {
-  dispatch({
-    type: ALTER_POSTS,
     payload,
   });
 };
@@ -188,35 +180,6 @@ export const likePost = (postId) => async (dispatch) => {
   }
 };
 
-export const likeComment = (commentId) => async (dispatch) => {
-  try {
-    let fetchPolicy = "no-cache";
-    const res = await client.mutate({
-      mutation: LIKE_COMMENT_MUTATION,
-      variables: {
-        commentId,
-      },
-      fetchPolicy,
-    });
-    if (!res.data || !res.data.likeComment) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
-    }
-    dispatch({
-      type: UPDATE_COMMENT,
-      payload: res.data.likeComment,
-    });
-    return res.data.likeComment;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 export const deletePost = (postId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
@@ -236,13 +199,12 @@ export const deletePost = (postId) => async (dispatch) => {
       );
       return false;
     }
-    if (res && res.data) {
+    if (res && res.data && res.data.deletePost && res.data.deletePost.success) {
       dispatch({
         type: DELETE_POST,
-        payload: res.data.deletePost,
+        payload: { id: postId },
       });
     }
-    console.log("actions/recording deletePost end");
     return res.data.deletePost;
   } catch (err) {
     console.log(err);

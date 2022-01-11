@@ -12,7 +12,7 @@ import { playSound } from "../../../reuseableFunctions/helpers";
 //icons
 import { Feather } from "@expo/vector-icons";
 //redux
-import { deletePost, updatePosts } from "../../../redux/actions/recording";
+import { deletePost } from "../../../redux/actions/recording";
 
 export class Post extends Component {
   constructor() {
@@ -41,12 +41,6 @@ export class Post extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = () => {};
-
-  deleteItem = (postArray, index) => {
-    console.log("Props posts: ", postArray);
-    postArray.splice(index, 1);
-    this.props.updatePosts(postArray);
-  };
 
   render() {
     const {
@@ -118,15 +112,16 @@ export class Post extends Component {
               setPlaying={setPlaying}
               onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
-            <Feather
-              onPress={async () => {
-                this.deleteItem(this.props.postArray, this.props.index);
-                await this.props.deletePost(post.id);
-              }}
-              name="scissors"
-              size={24}
-              color="red"
-            />
+            {this.props.isUserProfile && (
+              <Feather
+                onPress={async () => {
+                  await this.props.deletePost(post.id);
+                }}
+                name="scissors"
+                size={24}
+                color="red"
+              />
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -138,4 +133,4 @@ const mapStateToProps = (state) => ({
   posts: state.recording.posts,
 });
 
-export default connect(mapStateToProps, { deletePost, updatePosts })(Post);
+export default connect(mapStateToProps, { deletePost })(Post);
