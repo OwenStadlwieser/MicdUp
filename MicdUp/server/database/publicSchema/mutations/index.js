@@ -15,11 +15,10 @@ const {
   createRecording,
   uploadBio,
   likePost,
-  likeComment,
   deletePost,
-  deleteComment,
   commentToPost,
 } = require("./recording");
+const { likeComment, deleteComment } = require("./comment");
 const { updateProfilePic } = require("./profile");
 
 const Mutation = new GraphQLObjectType({

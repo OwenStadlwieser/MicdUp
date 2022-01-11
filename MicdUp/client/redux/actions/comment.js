@@ -1,6 +1,7 @@
 import {
   SHOW_MORE_REPLIES,
   DELETE_COMMENT_MUTATION,
+  LIKE_COMMENT_MUTATION,
 } from "../../apollo/private/comment";
 import {
   UPDATE_POST_COMMENTS,
@@ -8,6 +9,7 @@ import {
   DELETE_COMMENT,
   ALTER_COMMENTS,
 } from "../types";
+import { showMessage } from "./display";
 import { client } from "../../apollo/client";
 export const getReplies = (commentId) => async (dispatch) => {
   try {
@@ -19,7 +21,6 @@ export const getReplies = (commentId) => async (dispatch) => {
       },
       fetchPolicy,
     });
-    console.log(res);
     if (!res.data || !res.data.getReplies) {
       dispatch(
         showMessage({
@@ -51,7 +52,7 @@ export const likeComment = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
     const res = await client.mutate({
-      mutation: LIKE_COMMENT_MUTATION,
+      mutation: LIKE_COMMENT_MUTATION(3),
       variables: {
         commentId,
       },
@@ -66,10 +67,6 @@ export const likeComment = (commentId) => async (dispatch) => {
       );
       return false;
     }
-    dispatch({
-      type: UPDATE_COMMENT,
-      payload: res.data.likeComment,
-    });
     return res.data.likeComment;
   } catch (err) {
     console.log(err);
@@ -80,7 +77,7 @@ export const deleteComment = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
     const res = await client.mutate({
-      mutation: DELETE_COMMENT_MUTATION,
+      mutation: DELETE_COMMENT_MUTATION(3),
       variables: {
         commentId,
       },
@@ -95,13 +92,6 @@ export const deleteComment = (commentId) => async (dispatch) => {
       );
       return false;
     }
-    if (res && res.data) {
-      dispatch({
-        type: DELETE_COMMENT,
-        payload: res.data.deletePost,
-      });
-    }
-    console.log("Deleted comment");
     return res.data.deleteComment;
   } catch (err) {
     console.log(err);

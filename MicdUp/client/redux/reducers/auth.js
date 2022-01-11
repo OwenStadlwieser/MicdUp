@@ -103,6 +103,7 @@ export default function (state = { ...initialState }, action) {
       let comments2 = postTarget.comments;
       // comment to first layer or layer 0
       if (!payload.parents || payload.parents.length === 0) {
+        if (!posts4[postIndex2].comments) posts4[postIndex2].comments = [];
         let indexC = posts4[postIndex2].comments.findIndex(
           (comment) => comment.id === payload.comment.id
         );
@@ -131,6 +132,7 @@ export default function (state = { ...initialState }, action) {
       let finalIndex = comments2.allReplies.findIndex(
         (post) => post.id === payload.comment.id
       );
+      // comments2.allReplies[finalIndex] is the found comment from payload.comment.id
       comments2.allReplies[finalIndex] = payload.comment;
       posts4[postIndex2].comments = postTarget.comments;
       return {

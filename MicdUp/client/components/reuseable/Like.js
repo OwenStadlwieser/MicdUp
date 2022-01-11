@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Text, TouchableOpacity } from "react-native";
 // redux
-import { likePost, likeComment } from "../../redux/actions/recording";
+import { likePost } from "../../redux/actions/recording";
+import { updateCommentDisplay, likeComment } from "../../redux/actions/comment";
 // icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
@@ -33,9 +34,15 @@ export class Like extends Component {
       >
         <View>
           <TouchableOpacity
-            onPress={() => {
-              if (type === "Comment") this.props.likeComment(post.id);
-              else if (type === "Post") this.props.likePost(post.id);
+            onPress={async () => {
+              if (type === "Comment") {
+                const newComment = await this.props.likeComment(post.id);
+                this.props.updateCommentDisplay(
+                  newComment,
+                  this.props.parents,
+                  this.props.postId
+                );
+              } else if (type === "Post") this.props.likePost(post.id);
             }}
           >
             <AntDesign
@@ -54,4 +61,8 @@ export class Like extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { likePost, likeComment })(Like);
+export default connect(mapStateToProps, {
+  likePost,
+  likeComment,
+  updateCommentDisplay,
+})(Like);

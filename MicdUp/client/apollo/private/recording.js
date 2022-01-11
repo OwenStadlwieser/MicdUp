@@ -59,17 +59,6 @@ const LIKE_POST_MUTATION = gql`
   }
 `;
 
-const LIKE_COMMENT_MUTATION = gql`
-  mutation likeComment($commentId: ID!) {
-    likeComment(commentId: $commentId) {
-      id
-      signedUrl
-      likes
-      isLikedByUser
-    }
-  }
-`;
-
 const DELETE_POST_MUTATION = gql`
   mutation deletePost($postId: ID!) {
     deletePost(postId: $postId) {
@@ -95,6 +84,7 @@ const GET_COMMENT_POST_QUERY = gql`
       text
       likes
       repliesLength
+      isDeleted
       isLikedByUser
       owner {
         id
@@ -112,6 +102,7 @@ const GET_COMMENT_POST_QUERY = gql`
         text
         repliesLength
         signedUrl
+        isDeleted
         likes
         isLikedByUser
         owner {
@@ -173,7 +164,6 @@ export {
   UPLOAD_BIO_MUTATION,
   GET_USER_POSTS_QUERY,
   LIKE_POST_MUTATION,
-  LIKE_COMMENT_MUTATION,
   DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   ADD_TAG_MUTATION,

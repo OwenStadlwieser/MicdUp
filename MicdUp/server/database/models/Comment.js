@@ -7,6 +7,10 @@ const commentSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  post: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   likers: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
@@ -44,6 +48,19 @@ const commentSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+commentSchema.pre("save", async function (next) {
+  if (this.isModified("isDeleted") && this.isDeleted) {
+    this.fileExtension = "";
+    this.text = "";
+    this.signedUrl = "";
+  }
+  next();
 });
 
 const Comment = mongoose.model("comments", commentSchema);

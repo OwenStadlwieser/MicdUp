@@ -172,7 +172,12 @@ export class Comment extends Component {
           </View>
           {comment.signedUrl ? (
             <View style={styles.commentPlayContainer}>
-              <Like post={comment} type={"Comment"} />
+              <Like
+                post={comment}
+                type={"Comment"}
+                parents={comment.parents}
+                postId={this.props.post.id}
+              />
               <PlayButton
                 containerStyle={{}}
                 color={"#1A3561"}
@@ -184,8 +189,12 @@ export class Comment extends Component {
               />
               <Feather
                 onPress={async () => {
-                  this.deleteItem(this.props.post.comments, this.props.index);
-                  await this.props.deleteComment(comment.id);
+                  const newComment = await this.props.deleteComment(comment.id);
+                  this.props.updateCommentDisplay(
+                    newComment,
+                    comment.parents,
+                    this.props.post.id
+                  );
                 }}
                 name="scissors"
                 size={24}
@@ -194,7 +203,7 @@ export class Comment extends Component {
             </View>
           ) : (
             <View style={styles.commentTextContainer}>
-              <Text>{comment.text}</Text>
+              <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
         </View>
@@ -253,12 +262,6 @@ export class Comment extends Component {
     this.props.removeCommentPosts();
     this.props.setCommentsShowing(false);
     this.mounted && this.setState({ isShowing: false });
-  };
-
-  deleteItem = (commentArray, index) => {
-    console.log("Props comment: ", commentArray);
-    commentArray.splice(index, 1);
-    this.props.updateComments(commentArray);
   };
 
   render() {

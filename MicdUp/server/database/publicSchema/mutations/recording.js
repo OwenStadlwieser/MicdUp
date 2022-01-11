@@ -21,7 +21,6 @@ const {
   GraphQLFloat,
 } = graphql;
 const { Post } = require("../../models/Post");
-const { Profile } = require("../../models/Profile");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const { Comment } = require("../../models/Comment");
@@ -244,38 +243,6 @@ const likePost = {
   },
 };
 
-const likeComment = {
-  type: CommentType,
-  args: {
-    commentId: { type: GraphQLID },
-  },
-  async resolve(parent, { commentId }, context) {
-    // check if already liked and unlike
-    if (!context.user.id) {
-      throw new Error("Must be signed in to like comment");
-    }
-    let index = -1;
-    const comment = await Comment.findOne({
-      _id: commentId,
-    }).then((comment) => {
-      index = comment.likers.findIndex(
-        (id) => id.toString() === context.profile.id
-      );
-      return comment;
-    });
-    if (comment && index < 0) {
-      comment.likers.push(context.profile._id);
-      await comment.save();
-      return comment;
-    }
-    if (comment && index > -1) {
-      comment.likers.splice(index, 1);
-      await comment.save();
-      return comment;
-    }
-  },
-};
-
 const deletePost = {
   type: MessageType,
   args: {
@@ -397,6 +364,7 @@ const commentToPost = {
           comment.ultimateParent = commentParent.ultimateParent;
         }
         comment.parent = commentParent._id;
+        comment.post = postId;
         await comment.save({ session });
         await commentParent.save({ session });
         await session.commitTransaction();
@@ -410,6 +378,7 @@ const commentToPost = {
         }
         post.comments.push(comment._id);
         comment.isTop = true;
+        comment.post = post._id;
         await comment.save({ session });
         await post.save({ session });
         await session.commitTransaction();
@@ -455,8 +424,6 @@ module.exports = {
   createRecording,
   uploadBio,
   likePost,
-  likeComment,
   deletePost,
-  deleteComment,
   commentToPost,
 };
