@@ -41,18 +41,9 @@ const VERIFY_EMAIL_MUTATION = gql`
   }
 `;
 
-const VERIFY_EMAIL_CODE_QUERY = gql`
-  query verifyEmailCode($verificationCode: String!) {
-    verifyEmailCode(verificationCode: $verificationCode) {
-      success
-      message
-    }
-  }
-`;
-
 const SET_EMAIL_VERIFIED_MUTATION = gql`
-  mutation setEmailVerified($verificationCode: String!) {
-    setEmailVerified(verificationCode: $verificationCode) {
+  mutation setEmailVerified($verificationCode: String!, $email: String) {
+    setEmailVerified(verificationCode: $verificationCode, email: $email) {
       success
       message
     }
@@ -63,6 +54,5 @@ export {
   GET_USER_QUERY,
   DELETE_ACCOUNT_MUTATION,
   VERIFY_EMAIL_MUTATION,
-  VERIFY_EMAIL_CODE_QUERY,
   SET_EMAIL_VERIFIED_MUTATION,
 };

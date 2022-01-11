@@ -46,15 +46,27 @@ const forgotPassVerify = {
   type: MessageType,
   args: {
     secureCode: { type: GraphQLString },
+    email: { type: GraphQLString },
   },
-  async resolve(parent, { secureCode }, context) {
+  async resolve(parent, { secureCode, email }, context) {
     const user = await User.findOne({
-      resetPasswordToken: secureCode,
+      email,
+      emailVerified: true,
     });
-    if (!user) {
+    if (!user || !user.resetPasswordToken) {
       return {
         success: false,
-        message: "Token not found",
+        message: "User not found",
+      };
+    }
+    const isValidToken = await bcrypt.compare(
+      secureCode,
+      user.resetPasswordToken
+    );
+    if (!isValidToken) {
+      return {
+        success: false,
+        message: "Invalid code",
       };
     }
     if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {

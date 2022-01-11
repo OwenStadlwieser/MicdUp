@@ -5,7 +5,7 @@ const { Post } = require("../../models/Post");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const { sendEmail } = require("../../../utils/sendEmail");
-
+const bcrypt = require("bcryptjs");
 const forgotPass = {
   type: MessageType,
   args: {
@@ -23,10 +23,16 @@ const forgotPass = {
       returnObject.message = "No user found";
       return returnObject;
     }
+    if (!user.emailVerified) {
+      returnObject.success = false;
+      returnObject.message = "Email has not been verified";
+      return returnObject;
+    }
     const resetToken = await user.getPasswordResetToken();
-    await user.save();
     const message = `You are receiving this message because you have requested to
     reset your password. The code to reset your password is ${resetToken}.`;
+    user.resetPasswordToken = await bcrypt.hash(resetToken, 12);
+    await user.save();
     try {
       await sendEmail({
         email: user.email,
@@ -60,9 +66,10 @@ const verifyEmail = {
       return returnObject;
     }
     const emailToken = await user.getVerifiedEmailToken();
-    await user.save();
     const message = `You are receiving this message because you are trying to verify your email. 
     Your email verification code is ${emailToken}.`;
+    user.verifyEmailToken = await bcrypt.hash(emailToken, 12);
+    await user.save();
     try {
       await sendEmail({
         email: user.email,
@@ -82,20 +89,31 @@ const setEmailVerified = {
   type: MessageType,
   args: {
     verificationCode: { type: GraphQLString },
+    email: { type: GraphQLString },
   },
-  async resolve(parent, { verificationCode }, context) {
+  async resolve(parent, { verificationCode, email }, context) {
     // FIXME: implement transaction
     let returnObject = {
       success: true,
       message: "Email Verification Successful",
     };
     const user = await User.findOne({
-      verifyEmailToken: verificationCode,
+      email,
     });
-    if (!user) {
+    if (!user || !user.verifyEmailToken) {
       return {
         success: false,
-        message: "Email Verification Token not found",
+        message: "User not found",
+      };
+    }
+    const isValidToken = await bcrypt.compare(
+      verificationCode,
+      user.verifyEmailToken
+    );
+    if (!isValidToken) {
+      return {
+        success: false,
+        message: "Invalid code",
       };
     }
     if (user.verifyEmailCreatedAt + 1000 * 60 * 10 > Date.now()) {
@@ -105,7 +123,7 @@ const setEmailVerified = {
       };
     }
     user.emailVerified = true;
-    delete user.verifyEmailToken;
+    user.verifyEmailToken = null;
     await user.save();
     return returnObject;
   },

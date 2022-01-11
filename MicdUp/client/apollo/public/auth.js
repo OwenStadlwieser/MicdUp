@@ -40,8 +40,16 @@ const FORGOT_PASS_MUTATION = gql`
 `;
 
 const FORGOT_PASS_CHANGE_MUTATION = gql`
-  mutation forgotPassChange($secureCode: String!, $newPass: String!) {
-    forgotPassChange(secureCode: $secureCode, newPass: $newPass) {
+  mutation forgotPassChange(
+    $secureCode: String!
+    $newPass: String!
+    $email: String!
+  ) {
+    forgotPassChange(
+      secureCode: $secureCode
+      newPass: $newPass
+      email: $email
+    ) {
       success
       message
     }
@@ -49,8 +57,8 @@ const FORGOT_PASS_CHANGE_MUTATION = gql`
 `;
 
 const FORGOT_PASS_VERIFY_QUERY = gql`
-  query forgotPassVerify($secureCode: String!) {
-    forgotPassVerify(secureCode: $secureCode) {
+  query forgotPassVerify($secureCode: String!, $email: String!) {
+    forgotPassVerify(secureCode: $secureCode, email: $email) {
       success
       message
     }
