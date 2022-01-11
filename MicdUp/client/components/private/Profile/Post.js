@@ -45,14 +45,13 @@ export class Post extends Component {
   render() {
     const {
       post,
-      postArray,
       setPlaying,
       onPlaybackStatusUpdate,
       currentSound,
       setCommentPosts,
       removeCommentPosts,
-      higherUp,
       index,
+      isUserProfile,
     } = this.props;
     const { commentsShowing } = this.state;
     return (
@@ -80,6 +79,7 @@ export class Post extends Component {
           {post.title ? post.title : "Untitled"}
         </Text>
         <Comment
+          isUserProfile={isUserProfile}
           containerStyle={{}}
           setCommentPosts={setCommentPosts}
           removeCommentPosts={removeCommentPosts}
@@ -112,7 +112,7 @@ export class Post extends Component {
               setPlaying={setPlaying}
               onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
-            {this.props.isUserProfile && (
+            {isUserProfile && (
               <Feather
                 onPress={async () => {
                   await this.props.deletePost(post.id);

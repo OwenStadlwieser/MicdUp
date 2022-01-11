@@ -43,6 +43,9 @@ const GET_USER_POSTS_QUERY = gql`
       signedUrl
       likes
       isLikedByUser
+      owner {
+        id
+      }
     }
   }
 `;
@@ -55,6 +58,9 @@ const LIKE_POST_MUTATION = gql`
       signedUrl
       likes
       isLikedByUser
+      owner {
+        id
+      }
     }
   }
 `;
