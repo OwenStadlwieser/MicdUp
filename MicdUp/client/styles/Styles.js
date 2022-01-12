@@ -520,6 +520,15 @@ const styles = StyleSheet.create({
     width: height * 0.15,
     borderRadius: height * 0.15,
   },
+  parentViewStyleUsers: {
+    top: 16,
+    position: "absolute",
+  },
+  listItemProfileImg: {
+    height: height * 0.05,
+    width: height * 0.05,
+    borderRadius: height * 0.05,
+  },
   upperEditDiv: {
     marginTop: height * 0.05,
     height: height * 0.15,
@@ -613,6 +622,15 @@ const styles = StyleSheet.create({
     width: width * 0.6,
     borderRadius: 8,
   },
+  searchResultsContainer: {
+    height: height * 0.8,
+  },
+  tagResultsContainer: {
+    flex: 1,
+  },
+  userResultsContainer: {
+    flex: 6,
+  },
   listItemContainer: {
     height: height * 0.15,
     borderColor: "#1A3561",
@@ -620,6 +638,22 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     padding: 10,
     width: width * 0.6,
+  },
+  listItemContainerUser: {
+    height: height * 0.08,
+    borderColor: "#1A3561",
+    borderWidth: 2,
+    borderStyle: "solid",
+    padding: 10,
+    backgroundColor: "white",
+    flexDirection: "row",
+    width,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  listItemTextUser: {
+    fontSize: medium,
+    paddingLeft: 10,
   },
   promptText: {
     marginVertical: 20,

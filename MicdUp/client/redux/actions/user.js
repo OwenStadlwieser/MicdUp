@@ -4,6 +4,7 @@ import {
   DELETE_ACCOUNT_MUTATION,
   VERIFY_EMAIL_MUTATION,
   SET_EMAIL_VERIFIED_MUTATION,
+  SEARCH_USERS_QUERY,
 } from "../../apollo/private/user";
 import { SET_USER, LOG_IN, DELETE_ACCOUNT } from "../types";
 import { showMessage } from "./display";
@@ -79,3 +80,18 @@ export const setEmailVerified =
       console.log(err);
     }
   };
+
+export const searchUsers = (searchTerm, skipMult) => async (dispatch) => {
+  try {
+    const res = await client.query({
+      query: SEARCH_USERS_QUERY,
+      variables: { searchTerm, skipMult },
+      fetchPolicy: "no-cache",
+    });
+    if (!res || !res.data)
+      dispatch(showMessage({ success: false, message: "Connection failed" }));
+    return res.data.searchUsers;
+  } catch (err) {
+    console.log(err);
+  }
+};

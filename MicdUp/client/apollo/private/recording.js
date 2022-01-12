@@ -95,7 +95,7 @@ const GET_COMMENT_POST_QUERY = gql`
       owner {
         id
         user {
-          id
+          _id
           userName
         }
         image {
@@ -114,7 +114,7 @@ const GET_COMMENT_POST_QUERY = gql`
         owner {
           id
           user {
-            id
+            _id
             userName
           }
           image {
@@ -151,7 +151,7 @@ const COMMENT_POST_MUTATION = (duplication) => {
         owner {
           id
           user {
-            id
+            _id
             userName
           }
           image {

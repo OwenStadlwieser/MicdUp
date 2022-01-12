@@ -173,13 +173,12 @@ export class Profile extends Component {
       settingsShown,
       recording,
       newBioRecording,
-      playing,
       playingId,
       loading,
       selectImage,
-      commentPosts,
     } = this.state;
     const { user, profile, currentProfile, posts } = this.props;
+
     const isUserProfile = profile.id === currentProfile.id;
     return (
       <GestureRecognizer

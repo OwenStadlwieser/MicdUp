@@ -5,6 +5,7 @@ import {
   HIDE_MESSAGE,
   NAVIGATE,
   VIEW_PROFILE,
+  VIEW_PROFILE_SEARCH,
 } from "../types";
 
 export const changeLogin = (payload) => (dispatch) => {
@@ -41,6 +42,13 @@ export const navigate = (payload) => (dispatch) => {
 export const viewProfile = (payload) => (dispatch) => {
   dispatch({
     type: VIEW_PROFILE,
+    payload,
+  });
+};
+
+export const searchViewProfile = (payload) => (dispatch) => {
+  dispatch({
+    type: VIEW_PROFILE_SEARCH,
     payload,
   });
 };

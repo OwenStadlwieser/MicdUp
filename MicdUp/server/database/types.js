@@ -19,7 +19,7 @@ const { getFile } = require("../utils/awsS3");
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
-    id: { type: GraphQLID },
+    _id: { type: GraphQLID },
     userName: { type: GraphQLString },
     email: { type: GraphQLString },
     phone: { type: GraphQLString },

@@ -62,6 +62,9 @@ export class SubmitRecording extends Component {
         />
         <View style={styles.upperEditDivAbsolute}>
           <SearchComponent
+            parentViewStyle={styles.parentViewStyle}
+            searchInputContainerStyle={styles.searchInputContainer}
+            inputStyle={styles.inputStyle}
             placeholder={"Tags"}
             setStateOnChange={true}
             setStateOnChangeFunc={this.setTagsState.bind(this)}
@@ -70,6 +73,7 @@ export class SubmitRecording extends Component {
             inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
             initValue={tags}
+            displayResults={true}
           />
         </View>
         <ScrollView
@@ -143,12 +147,10 @@ export class SubmitRecording extends Component {
                   console.log("error with blob");
                 }
               }
-              let tagsArray = ['']
+              let tagsArray = [""];
               try {
-                tagsArray = tags.split('/[\s,]+/')
-              } catch (err) {
-
-              }
+                tagsArray = tags.split("/[s,]+/");
+              } catch (err) {}
               await this.props.uploadRecording(
                 files,
                 fileTypes,

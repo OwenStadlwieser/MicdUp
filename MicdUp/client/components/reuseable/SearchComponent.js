@@ -15,6 +15,7 @@ export class DropdownResults extends Component {
       results: [],
       searchTerm: "",
       showDropDown: true,
+      skipMult: 0,
     };
     this.nameInput = {};
     this.mounted = true;
@@ -27,8 +28,13 @@ export class DropdownResults extends Component {
   };
 
   search = debounce(async (searchTerm) => {
+    const { scrollable, setResOnChangeFunc, setResOnChange } = this.props;
+    const { skipMult } = this.state;
     if (searchTerm) {
-      const res = await this.props.searchFunction(searchTerm);
+      const res = scrollable
+        ? await this.props.searchFunction(searchTerm, skipMult)
+        : await this.props.searchFunction(searchTerm);
+      if (setResOnChange) setResOnChangeFunc(res);
       this.mounted && this.setState({ results: res });
     }
   }, 300);
@@ -55,9 +61,16 @@ export class DropdownResults extends Component {
 
   render() {
     const { results, searchTerm, showDropDown } = this.state;
+    const {
+      isForUser,
+      parentViewStyle,
+      searchInputContainerStyle,
+      inputStyle,
+      displayResults,
+    } = this.props;
     return (
-      <View style={styles.parentViewStyle}>
-        <View style={styles.searchInputContainer}>
+      <View style={parentViewStyle}>
+        <View style={searchInputContainerStyle}>
           <TextInput
             ref={(input) => {
               this.nameInput = input;
@@ -77,12 +90,12 @@ export class DropdownResults extends Component {
                 this.search(last);
               }
             }}
-            style={this.props.inputStyle}
+            style={inputStyle}
             placeholderTextColor={this.props.placeHolderColor}
             placeHolderColor={this.props.placeHolderColor}
             value={searchTerm}
           ></TextInput>
-          {showDropDown && (
+          {showDropDown && displayResults && (
             <DropDown
               onPressFunc={this.onPressFunc.bind(this)}
               results={results}
