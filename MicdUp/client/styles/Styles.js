@@ -520,6 +520,15 @@ const styles = StyleSheet.create({
     width: height * 0.15,
     borderRadius: height * 0.15,
   },
+  parentViewStyleUsers: {
+    top: 16,
+    position: "absolute",
+  },
+  listItemProfileImg: {
+    height: height * 0.05,
+    width: height * 0.05,
+    borderRadius: height * 0.05,
+  },
   upperEditDiv: {
     marginTop: height * 0.05,
     height: height * 0.15,
@@ -549,6 +558,21 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
+  },
+  smallNextButton: {
+    marginLeft: 30,
+    height: width * 0.05,
+    width: width * 0.25,
+    minHeight: 50,
+    maxHeight: 200,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "white",
+    borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
   },
   nextButtonBio: {
     height: width * 0.075,
@@ -561,6 +585,16 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
+  },
+  imageAndFollowing: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  followersText: {
+    paddingLeft: 20,
+    fontSize: 20,
+    color: "white",
   },
   playButtonContainerBio: {
     flex: 1,
@@ -568,9 +602,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nextButtonText: {
-    color: "white",
+    color: "black",
     fontStyle: "italic",
     fontSize: small,
+    fontWeight: 600,
   },
   recordingSettings: {
     maxHeight: height * 0.3,
@@ -613,6 +648,21 @@ const styles = StyleSheet.create({
     width: width * 0.6,
     borderRadius: 8,
   },
+  searchResultsContainer: {
+    height: height * 0.8,
+  },
+  tagResultsContainer: {
+    flex: 1,
+  },
+  userResultsContainer: {
+    flex: 6,
+  },
+  foreignProfileButtons: {
+    marginTop: height * 0.02,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    width: width,
+  },
   listItemContainer: {
     height: height * 0.15,
     borderColor: "#1A3561",
@@ -620,6 +670,22 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     padding: 10,
     width: width * 0.6,
+  },
+  listItemContainerUser: {
+    height: height * 0.08,
+    borderColor: "#1A3561",
+    borderWidth: 2,
+    borderStyle: "solid",
+    padding: 10,
+    backgroundColor: "white",
+    flexDirection: "row",
+    width,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  listItemTextUser: {
+    fontSize: medium,
+    paddingLeft: 10,
   },
   promptText: {
     marginVertical: 20,

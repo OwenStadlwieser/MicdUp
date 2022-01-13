@@ -26,15 +26,12 @@ import {
   getUserPosts,
   getComments,
 } from "../../../redux/actions/recording";
-import { updateProfilePic } from "../../../redux/actions/profile";
-// helpers
 import {
-  playSound,
-  duplicateCommentsString,
-} from "../../../reuseableFunctions/helpers";
-import GestureRecognizer, {
-  swipeDirections,
-} from "react-native-swipe-gestures";
+  updateProfilePic,
+  followProfile,
+} from "../../../redux/actions/profile";
+
+import GestureRecognizer from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
 
@@ -173,14 +170,15 @@ export class Profile extends Component {
       settingsShown,
       recording,
       newBioRecording,
-      playing,
       playingId,
       loading,
       selectImage,
-      commentPosts,
     } = this.state;
-    const { user, profile, currentProfile, posts } = this.props;
-    const isUserProfile = profile.id === currentProfile.id;
+    const { userName, profile, currentProfile, posts } = this.props;
+
+    const isUserProfile =
+      profile && currentProfile ? profile.id === currentProfile.id : false;
+
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -218,41 +216,46 @@ export class Profile extends Component {
               </View>
             )}
             <View style={styles.profileHeader}>
-              <View style={styles.imageAndIcon}>
-                <TouchableHighlight
-                  style={[
-                    styles.profileImgContainerSmall,
-                    {
-                      borderColor: recording ? "red" : "#30F3FF",
-                      borderWidth: 1,
-                    },
-                  ]}
-                >
-                  <Image
-                    source={
-                      user && user.profile && user.profile.image
-                        ? user.profile.image.signedUrl
-                        : require("../../../assets/no-profile-pic-icon-27.jpg")
-                    }
-                    style={styles.profileImgSmall}
-                  />
-                </TouchableHighlight>
-                {isUserProfile && (
+              <View style={styles.imageAndFollowing}>
+                <View style={styles.imageAndIcon}>
                   <TouchableHighlight
-                    onPress={() => {
-                      this.mounted && this.setState({ selectImage: true });
-                    }}
+                    style={[
+                      styles.profileImgContainerSmall,
+                      {
+                        borderColor: recording ? "red" : "#30F3FF",
+                        borderWidth: 1,
+                      },
+                    ]}
                   >
-                    <Entypo
-                      style={styles.uploadIcon}
-                      name="upload"
-                      size={24}
-                      color="#30F3FF"
+                    <Image
+                      source={
+                        currentProfile && currentProfile.image
+                          ? currentProfile.image.signedUrl
+                          : require("../../../assets/no-profile-pic-icon-27.jpg")
+                      }
+                      style={styles.profileImgSmall}
                     />
                   </TouchableHighlight>
-                )}
+                  {isUserProfile && (
+                    <TouchableHighlight
+                      onPress={() => {
+                        this.mounted && this.setState({ selectImage: true });
+                      }}
+                    >
+                      <Entypo
+                        style={styles.uploadIcon}
+                        name="upload"
+                        size={24}
+                        color="#30F3FF"
+                      />
+                    </TouchableHighlight>
+                  )}
+                </View>
+                <Text style={styles.followersText}>
+                  {currentProfile.followersCount} Followers
+                </Text>
               </View>
-              <Text style={styles.profileText}>@{user.userName}</Text>
+              <Text style={styles.profileText}>@{userName}</Text>
               <Bio
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}
@@ -262,6 +265,23 @@ export class Profile extends Component {
                 setNewBioRecording={this.setNewBioRecording.bind(this)}
                 newBioRecording={newBioRecording}
               />
+              {!isUserProfile && (
+                <View style={styles.foreignProfileButtons}>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await this.props.followProfile(currentProfile.id);
+                    }}
+                    style={styles.smallNextButton}
+                  >
+                    <Text style={styles.nextButtonText}>
+                      {currentProfile.isFollowedByUser ? "unfollow" : "follow"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.smallNextButton}>
+                    <Text style={styles.nextButtonText}>Message</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
             <ScrollView
               scrollEnabled={true}
@@ -309,4 +329,5 @@ export default connect(mapStateToProps, {
   getUserPosts,
   updateProfilePic,
   getComments,
+  followProfile,
 })(Profile);

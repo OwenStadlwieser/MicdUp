@@ -3,13 +3,15 @@ import { gql } from "@apollo/client";
 const GET_USER_QUERY = gql`
   query getUser {
     getUser {
-      id
+      _id
       userName
       email
       phone
       dob
       profile {
         id
+        followingCount
+        followersCount
         bio {
           id
           signedUrl
@@ -50,9 +52,33 @@ const SET_EMAIL_VERIFIED_MUTATION = gql`
   }
 `;
 
+const SEARCH_USERS_QUERY = gql`
+  query searchUsers($searchTerm: String!, $skipMult: Int!) {
+    searchUsers(searchTerm: $searchTerm, skipMult: $skipMult) {
+      _id
+      userName
+      profile {
+        id
+        followingCount
+        followersCount
+        isFollowedByUser
+        bio {
+          id
+          signedUrl
+        }
+        image {
+          id
+          signedUrl
+        }
+      }
+    }
+  }
+`;
+
 export {
   GET_USER_QUERY,
   DELETE_ACCOUNT_MUTATION,
   VERIFY_EMAIL_MUTATION,
   SET_EMAIL_VERIFIED_MUTATION,
+  SEARCH_USERS_QUERY,
 };

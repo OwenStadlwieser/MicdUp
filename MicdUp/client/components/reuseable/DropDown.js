@@ -17,12 +17,11 @@ export class DropDown extends Component {
 
   componentDidMount = () => {};
 
-  handleClickOutside = (evt) => {
+  handleClickOutside = () => {
     this.props.onBlur();
   };
   render() {
-    const { searchTerm, results } = this.props;
-
+    const { results } = this.props;
     return (
       <ScrollView style={styles.resultsContainer}>
         {results &&

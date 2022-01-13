@@ -7,7 +7,7 @@ import { navigate } from "../../redux/actions/display";
 // styles
 import { styles } from "../../styles/Styles";
 
-export class DefaultComponent extends Component {
+export class NavBar extends Component {
   constructor() {
     super();
     this.state = {
@@ -96,6 +96,4 @@ const mapStateToProps = (state) => ({
   profile: state.auth.user.profile,
 });
 
-export default connect(mapStateToProps, { navigate, viewProfile })(
-  DefaultComponent
-);
+export default connect(mapStateToProps, { navigate, viewProfile })(NavBar);

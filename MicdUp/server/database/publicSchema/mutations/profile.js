@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const { Profile } = require("../../models/Profile");
 const { File } = require("../../models/File");
-const { GraphQLString } = require("graphql");
-const { FileType } = require("../../types");
+const { GraphQLString, GraphQLID } = require("graphql");
+const { FileType, ProfileType, MessageType } = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
 
 const updateProfilePic = {
@@ -48,6 +48,50 @@ const updateProfilePic = {
   },
 };
 
+const followProfile = {
+  type: ProfileType,
+  args: {
+    profileId: { type: GraphQLID },
+  },
+  async resolve(parent, { profileId }, context) {
+    // FIXME: implement transaction
+    if (!context.user.id) {
+      throw new Error("Must be signed in to follow");
+    }
+    if (profileId.toString() === context.profile.id) {
+      throw new Error("Cannot follow yourself");
+    }
+    let returnObject = {};
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    console.log("here");
+    try {
+      const profile = context.profile;
+      const foreignProfile = await Profile.findById(profileId);
+      if (foreignProfile.followers.get(`${profile._id}`)) {
+        foreignProfile.followers.delete(`${profile._id}`);
+        profile.following.delete(`${foreignProfile._id}`);
+        returnObject = { message: "unfollowed", success: true };
+      } else {
+        foreignProfile.followers.set(`${profile._id}`, "1");
+        profile.following.set(`${foreignProfile._id}`, "1");
+        returnObject = { message: "followed", success: true };
+      }
+      await profile.save({ session });
+      await foreignProfile.save({ session });
+      await session.commitTransaction();
+      return foreignProfile;
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+      return { message: "Not Followed", success: false };
+    } finally {
+      session.endSession();
+    }
+  },
+};
+
 module.exports = {
   updateProfilePic,
+  followProfile,
 };

@@ -19,11 +19,12 @@ const {
   commentToPost,
 } = require("./recording");
 const { likeComment, deleteComment } = require("./comment");
-const { updateProfilePic } = require("./profile");
+const { updateProfilePic, followProfile } = require("./profile");
 
 const Mutation = new GraphQLObjectType({
   name: "MutationType",
   fields: {
+    followProfile,
     createUser,
     forgotPass,
     deleteAccount,

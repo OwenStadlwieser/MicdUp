@@ -6,6 +6,8 @@ import {
   NAVIGATE,
   VIEW_PROFILE,
   SET_BIO,
+  VIEW_PROFILE_SEARCH,
+  UPDATE_FOLLOWER_COUNT,
 } from "../types";
 
 const initialState = {
@@ -16,6 +18,8 @@ const initialState = {
   messageState: false,
   mountedComponent: "Feed",
   viewingProfile: {},
+  keyForSearch: Math.random(),
+  searchViewingProfile: false,
 };
 
 export default function (state = { ...initialState }, action) {
@@ -25,6 +29,8 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         mountedComponent: payload,
+        keyForSearch: Math.random(),
+        searchViewingProfile: false,
       };
     case CHANGE_LOGIN:
       return {
@@ -62,6 +68,20 @@ export default function (state = { ...initialState }, action) {
           ...state.viewingProfile,
           bio: { ...payload },
         },
+      };
+    case UPDATE_FOLLOWER_COUNT:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          followersCount: payload.followersCount,
+          isFollowedByUser: payload.isFollowedByUser,
+        },
+      };
+    case VIEW_PROFILE_SEARCH:
+      return {
+        ...state,
+        searchViewingProfile: payload,
       };
     default:
       return state;

@@ -136,7 +136,7 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,
-  bio: state.display.viewingProfile.bio,
+  bio: state.display.viewingProfile ? state.display.viewingProfile.bio : null,
 });
 
 export default connect(mapStateToProps, { uploadBio, showMessage })(Bio);

@@ -16,10 +16,11 @@ const {
   GraphQLFloat,
 } = graphql;
 const { getFile } = require("../utils/awsS3");
+
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
-    id: { type: GraphQLID },
+    _id: { type: GraphQLID },
     userName: { type: GraphQLString },
     email: { type: GraphQLString },
     phone: { type: GraphQLString },
@@ -68,6 +69,25 @@ const ProfileType = new GraphQLObjectType({
       type: UserType,
       async resolve(parent) {
         return await User.findById(parent.user);
+      },
+    },
+    followingCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.following.keys()).length;
+      },
+    },
+    followersCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.followers.keys()).length;
+      },
+    },
+    isFollowedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        const index = parent.followers.get(context.profile.id);
+        return index === "1";
       },
     },
   }),
@@ -399,4 +419,5 @@ module.exports = {
   FileType,
   PromptsType,
   CommentType,
+  ProfileType,
 };

@@ -20,7 +20,7 @@ const SHOW_MORE_REPLIES = (duplication) => {
           owner {
             id
             user {
-              id
+              _id
               userName
             }
             image {
@@ -53,7 +53,7 @@ const DELETE_COMMENT_MUTATION = (duplication) => {
           owner {
             id
             user {
-              id
+              _id
               userName
             }
             image {
@@ -86,7 +86,7 @@ const LIKE_COMMENT_MUTATION = (duplication) => {
           owner {
             id
             user {
-              id
+              _id
               userName
             }
             image {
