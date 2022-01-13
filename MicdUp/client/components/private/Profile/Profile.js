@@ -177,9 +177,11 @@ export class Profile extends Component {
       loading,
       selectImage,
     } = this.state;
-    const { user, profile, currentProfile, posts } = this.props;
+    const { userName, profile, currentProfile, posts } = this.props;
 
-    const isUserProfile = profile.id === currentProfile.id;
+    const isUserProfile =
+      profile && currentProfile ? profile.id === currentProfile.id : false;
+
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -229,8 +231,8 @@ export class Profile extends Component {
                 >
                   <Image
                     source={
-                      user && user.profile && user.profile.image
-                        ? user.profile.image.signedUrl
+                      currentProfile && currentProfile.image
+                        ? currentProfile.image.signedUrl
                         : require("../../../assets/no-profile-pic-icon-27.jpg")
                     }
                     style={styles.profileImgSmall}
@@ -251,7 +253,7 @@ export class Profile extends Component {
                   </TouchableHighlight>
                 )}
               </View>
-              <Text style={styles.profileText}>@{user.userName}</Text>
+              <Text style={styles.profileText}>@{userName}</Text>
               <Bio
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}

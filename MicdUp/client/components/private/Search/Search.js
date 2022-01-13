@@ -3,8 +3,10 @@ import { connect } from "react-redux";
 import { View, TouchableOpacity, Image, Text, ScrollView } from "react-native";
 // users
 import { searchUsers } from "../../../redux/actions/user";
+import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
 // components
 import SearchComponent from "../../reuseable/SearchComponent";
+import Profile from "../Profile/Profile";
 // styles
 import { styles } from "../../../styles/Styles";
 
@@ -15,6 +17,7 @@ export class Search extends Component {
       loading: false,
       users: [],
       term: "",
+      userName: "",
     };
 
     this.mounted = true;
@@ -32,7 +35,8 @@ export class Search extends Component {
     this.mounted && this.setState({ term });
   };
   render() {
-    const { users, term } = this.state;
+    const { users, term, userName } = this.state;
+    const { searchViewingProfile } = this.props;
     return (
       <View style={styles.pane}>
         <SearchComponent
@@ -53,7 +57,7 @@ export class Search extends Component {
           displayResults={false}
           initValue={users}
         />
-        {term.length > 0 && (
+        {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
             <View style={styles.tagResultsContainer}></View>
             <ScrollView style={styles.userResultsContainer}>
@@ -63,7 +67,9 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      this.props.onPressFunc(res);
+                      this.mounted && this.setState({ userName: res.userName });
+                      this.props.viewProfile(res.profile);
+                      this.props.searchViewProfile(true);
                     }}
                     style={styles.listItemContainerUser}
                   >
@@ -82,12 +88,20 @@ export class Search extends Component {
                 ))}
             </ScrollView>
           </View>
+        ) : (
+          searchViewingProfile && <Profile userName={userName} />
         )}
       </View>
     );
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  searchViewingProfile: state.display.searchViewingProfile,
+});
 
-export default connect(mapStateToProps, { searchUsers })(Search);
+export default connect(mapStateToProps, {
+  searchUsers,
+  viewProfile,
+  searchViewProfile,
+})(Search);

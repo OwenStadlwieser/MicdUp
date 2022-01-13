@@ -29,6 +29,7 @@ export default function (state = { ...initialState }, action) {
         ...state,
         mountedComponent: payload,
         keyForSearch: Math.random(),
+        searchViewingProfile: false,
       };
     case CHANGE_LOGIN:
       return {

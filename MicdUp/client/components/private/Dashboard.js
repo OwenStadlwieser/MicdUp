@@ -53,7 +53,7 @@ export class Dashboard extends Component {
           ) : mountedComponent === "Live" ? (
             <Live />
           ) : mountedComponent === "Profile" ? (
-            <Profile />
+            <Profile userName={user && user.userName ? user.userName : ""} />
           ) : mountedComponent === "Search" ? (
             <Search key={keyForSearch} />
           ) : (
