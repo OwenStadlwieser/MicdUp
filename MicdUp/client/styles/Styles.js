@@ -558,6 +558,21 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
+  },
+  smallNextButton: {
+    marginLeft: 30,
+    height: width * 0.05,
+    width: width * 0.25,
+    minHeight: 50,
+    maxHeight: 200,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: "white",
+    borderStyle: "solid",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
   },
   nextButtonBio: {
     height: width * 0.075,
@@ -570,6 +585,16 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
+  },
+  imageAndFollowing: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  followersText: {
+    paddingLeft: 20,
+    fontSize: 20,
+    color: "white",
   },
   playButtonContainerBio: {
     flex: 1,
@@ -577,9 +602,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nextButtonText: {
-    color: "white",
+    color: "black",
     fontStyle: "italic",
     fontSize: small,
+    fontWeight: 600,
   },
   recordingSettings: {
     maxHeight: height * 0.3,
@@ -630,6 +656,12 @@ const styles = StyleSheet.create({
   },
   userResultsContainer: {
     flex: 6,
+  },
+  foreignProfileButtons: {
+    marginTop: height * 0.02,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    width: width,
   },
   listItemContainer: {
     height: height * 0.15,

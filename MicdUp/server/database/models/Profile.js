@@ -4,10 +4,14 @@ const Schema = mongoose.Schema;
 // Create Schema
 const ProfileSchema = new Schema({
   following: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
   },
   followers: {
-    type: [mongoose.Schema.Types.ObjectID],
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
   },
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],

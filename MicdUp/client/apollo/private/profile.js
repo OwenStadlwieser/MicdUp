@@ -9,4 +9,14 @@ const UPDATE_PROFILE_PIC_MUTATION = gql`
   }
 `;
 
-export { UPDATE_PROFILE_PIC_MUTATION };
+const FOLLOW_PROFILE_MUTATION = gql`
+  mutation followProfile($profileId: ID!) {
+    followProfile(profileId: $profileId) {
+      id
+      followersCount
+      isFollowedByUser
+    }
+  }
+`;
+
+export { UPDATE_PROFILE_PIC_MUTATION, FOLLOW_PROFILE_MUTATION };

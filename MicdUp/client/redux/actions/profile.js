@@ -1,7 +1,37 @@
-import { UPDATE_PROFILE_PIC } from "../types";
+import { UPDATE_PROFILE_PIC, UPDATE_FOLLOWER_COUNT } from "../types";
 import { client } from "../../apollo/client";
 import { showMessage } from "./display";
-import { UPDATE_PROFILE_PIC_MUTATION } from "../../apollo/private/profile";
+import {
+  UPDATE_PROFILE_PIC_MUTATION,
+  FOLLOW_PROFILE_MUTATION,
+} from "../../apollo/private/profile";
+
+export const followProfile = (profileId) => async (dispatch) => {
+  try {
+    const res = await client.mutate({
+      mutation: FOLLOW_PROFILE_MUTATION,
+      variables: {
+        profileId,
+      },
+      fetchPolicy: "no-cache",
+    });
+    if (!res.data || !res.data.followProfile) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch({
+      type: UPDATE_FOLLOWER_COUNT,
+      payload: { ...res.data.followProfile },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const updateProfilePic =
   (file, base64, fileType) => async (dispatch) => {
     try {

@@ -10,6 +10,8 @@ const GET_USER_QUERY = gql`
       dob
       profile {
         id
+        followingCount
+        followersCount
         bio {
           id
           signedUrl
@@ -57,6 +59,9 @@ const SEARCH_USERS_QUERY = gql`
       userName
       profile {
         id
+        followingCount
+        followersCount
+        isFollowedByUser
         bio {
           id
           signedUrl

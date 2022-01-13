@@ -7,6 +7,7 @@ import {
   VIEW_PROFILE,
   SET_BIO,
   VIEW_PROFILE_SEARCH,
+  UPDATE_FOLLOWER_COUNT,
 } from "../types";
 
 const initialState = {
@@ -66,6 +67,15 @@ export default function (state = { ...initialState }, action) {
         viewingProfile: {
           ...state.viewingProfile,
           bio: { ...payload },
+        },
+      };
+    case UPDATE_FOLLOWER_COUNT:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          followersCount: payload.followersCount,
+          isFollowedByUser: payload.isFollowedByUser,
         },
       };
     case VIEW_PROFILE_SEARCH:
