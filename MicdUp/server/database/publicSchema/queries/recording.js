@@ -34,8 +34,7 @@ const getRecordingsFromTag = {
     try {
       const size = 20;
       const tag = await Tag.findByIdAndUpdate(searchTag, {
-        $inc: { searches: 1 },
-        $inc: { hr24searches: 1 },
+        $inc: { searches: 1, hr24searches: 1 },
       });
       await Profile.findByIdAndUpdate(context.profile.id, {
         $push: { searchedTags: tag._id },
