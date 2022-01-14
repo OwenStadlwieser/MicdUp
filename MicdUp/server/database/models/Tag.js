@@ -24,6 +24,10 @@ const tagsSchema = new Schema({
     type: Number,
     default: 0,
   },
+  hr24searches: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Tag = mongoose.model("tag", tagsSchema);

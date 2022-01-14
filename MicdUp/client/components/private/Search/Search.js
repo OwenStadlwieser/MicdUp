@@ -9,6 +9,7 @@ import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
 // components
 import SearchComponent from "../../reuseable/SearchComponent";
 import Profile from "../Profile/Profile";
+import Feed from "../Feed/Feed";
 // styles
 import { styles } from "../../../styles/Styles";
 
@@ -21,6 +22,7 @@ export class Search extends Component {
       tags: [],
       term: "",
       userName: "",
+      searchExecuted: false,
     };
 
     this.mounted = true;
@@ -42,7 +44,7 @@ export class Search extends Component {
     this.mounted && this.setState({ term });
   };
   render() {
-    const { users, term, userName, tags } = this.state;
+    const { users, term, userName, tags, searchExecuted } = this.state;
     const { searchViewingProfile } = this.props;
     return (
       <View style={styles.pane}>
@@ -67,6 +69,7 @@ export class Search extends Component {
           displayResults={false}
           initValue={users}
         />
+        {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
             <ScrollView style={styles.tagResultsContainer}>
@@ -77,6 +80,7 @@ export class Search extends Component {
                     key={index}
                     onPress={async () => {
                       await this.props.getRecordingsFromTag(res._id, 0);
+                      this.mounted && this.setState({ searchExecuted: true });
                     }}
                     style={styles.listItemContainerUser}
                   >
