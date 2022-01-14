@@ -11,6 +11,7 @@ import {
   UPDATE_POST_COMMENTS,
   DELETE_POST,
   UPDATE_COMMENT,
+  UPDATE_CURRENT_RECORDINGS,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
@@ -20,6 +21,7 @@ import {
   DELETE_POST_MUTATION,
   COMMENT_POST_MUTATION,
   GET_COMMENT_POST_QUERY,
+  GET_RECORDINGS_FROM_TAG_QUERY,
 } from "../../apollo/private/recording";
 import { client } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -256,7 +258,6 @@ export const commentPost =
         },
         fetchPolicy,
       });
-      console.log(res);
       if (!res.data || !res.data.commentToPost) {
         dispatch(
           showMessage({
@@ -271,6 +272,38 @@ export const commentPost =
         payload: { comment: res.data.commentToPost, parents, postId },
       });
       return res.data.commentToPost;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+export const getRecordingsFromTag =
+  (searchTag, skipMult = 0) =>
+  async (dispatch) => {
+    try {
+      let fetchPolicy = "no-cache";
+      const res = await client.query({
+        query: GET_RECORDINGS_FROM_TAG_QUERY,
+        variables: {
+          searchTag,
+          skipMult,
+        },
+        fetchPolicy,
+      });
+      if (!res.data || !res.data.getRecordingsFromTag) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      dispatch({
+        type: UPDATE_CURRENT_RECORDINGS,
+        payload: res.data.getRecordingsFromTag,
+      });
+      return res.data.getRecordingsFromTag;
     } catch (err) {
       console.log(err);
     }

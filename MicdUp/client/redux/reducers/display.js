@@ -8,6 +8,7 @@ import {
   SET_BIO,
   VIEW_PROFILE_SEARCH,
   UPDATE_FOLLOWER_COUNT,
+  UPDATE_CURRENT_RECORDINGS,
 } from "../types";
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   viewingProfile: {},
   keyForSearch: Math.random(),
   searchViewingProfile: false,
+  viewingPostsSearch: [],
 };
 
 export default function (state = { ...initialState }, action) {
@@ -31,6 +33,11 @@ export default function (state = { ...initialState }, action) {
         mountedComponent: payload,
         keyForSearch: Math.random(),
         searchViewingProfile: false,
+      };
+    case UPDATE_CURRENT_RECORDINGS:
+      return {
+        ...state,
+        viewingPostsSearch: payload,
       };
     case CHANGE_LOGIN:
       return {

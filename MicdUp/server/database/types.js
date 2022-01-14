@@ -44,7 +44,12 @@ const UserType = new GraphQLObjectType({
 const ProfileType = new GraphQLObjectType({
   name: "Profile",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent.id;
+      },
+    },
     posts: {
       type: new GraphQLList(PostType),
       async resolve(parent) {
@@ -245,7 +250,12 @@ const CommentType = new GraphQLObjectType({
 const PostType = new GraphQLObjectType({
   name: "Post",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent._id;
+      },
+    },
     title: { type: GraphQLString },
     owner: {
       type: ProfileType,

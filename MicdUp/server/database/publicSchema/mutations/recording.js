@@ -109,6 +109,8 @@ const createRecording = {
       await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
       for (let i = 0; i < tags.length; i++) {
         if (!tags[i]) continue;
+        tags[i] = tags[i].replace(/ /g, "");
+        if (!tags[i]) continue;
         let tag = await Tag.findOne({ title: tags[i] });
         if (!tag) {
           tag = new Tag({ title: tags[i] });

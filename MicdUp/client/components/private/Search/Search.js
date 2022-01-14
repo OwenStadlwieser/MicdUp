@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { View, TouchableOpacity, Image, Text, ScrollView } from "react-native";
 // users
 import { searchUsers } from "../../../redux/actions/user";
+import { searchTags } from "../../../redux/actions/tag";
+import { getRecordingsFromTag } from "../../../redux/actions/recording";
 import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
 // components
 import SearchComponent from "../../reuseable/SearchComponent";
@@ -16,6 +18,7 @@ export class Search extends Component {
     this.state = {
       loading: false,
       users: [],
+      tags: [],
       term: "",
       userName: "",
     };
@@ -31,11 +34,15 @@ export class Search extends Component {
     this.mounted && this.setState({ users });
   };
 
+  setTagsState = (tags) => {
+    this.mounted && this.setState({ tags });
+  };
+
   setSearchTerm = (term) => {
     this.mounted && this.setState({ term });
   };
   render() {
-    const { users, term, userName } = this.state;
+    const { users, term, userName, tags } = this.state;
     const { searchViewingProfile } = this.props;
     return (
       <View style={styles.pane}>
@@ -50,6 +57,9 @@ export class Search extends Component {
           setResOnChange={true}
           setResOnChangeFunc={this.setUsersState.bind(this)}
           searchFunction={this.props.searchUsers}
+          secondSearchFunction={this.props.searchTags}
+          secondSearch={true}
+          setSecondRes={this.setTagsState.bind(this)}
           splitSearchTerm={true}
           inputStyle={styles.textInputRecEdit}
           placeHolderColor={"white"}
@@ -59,7 +69,21 @@ export class Search extends Component {
         />
         {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
-            <View style={styles.tagResultsContainer}></View>
+            <ScrollView style={styles.tagResultsContainer}>
+              {tags &&
+                tags.length > 0 &&
+                tags.map((res, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={async () => {
+                      await this.props.getRecordingsFromTag(res._id, 0);
+                    }}
+                    style={styles.listItemContainerUser}
+                  >
+                    <Text style={styles.listItemTextUser}>{res.title}</Text>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
             <ScrollView style={styles.userResultsContainer}>
               {users &&
                 users.length > 0 &&
@@ -104,4 +128,6 @@ export default connect(mapStateToProps, {
   searchUsers,
   viewProfile,
   searchViewProfile,
+  searchTags,
+  getRecordingsFromTag,
 })(Search);

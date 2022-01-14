@@ -653,6 +653,8 @@ const styles = StyleSheet.create({
   },
   tagResultsContainer: {
     flex: 1,
+    marginTop: height * 0.1,
+    marginBottom: 20,
   },
   userResultsContainer: {
     flex: 6,
@@ -664,11 +666,15 @@ const styles = StyleSheet.create({
     width: width,
   },
   listItemContainer: {
-    height: height * 0.15,
+    height: height * 0.08,
     borderColor: "#1A3561",
     borderWidth: 2,
     borderStyle: "solid",
     padding: 10,
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
     width: width * 0.6,
   },
   listItemContainerUser: {

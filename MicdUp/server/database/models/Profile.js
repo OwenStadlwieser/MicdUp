@@ -19,6 +19,9 @@ const ProfileSchema = new Schema({
   posts: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  searchedTags: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
   image: {
     type: mongoose.Schema.Types.ObjectId,
   },

@@ -28,13 +28,25 @@ export class DropdownResults extends Component {
   };
 
   search = debounce(async (searchTerm) => {
-    const { scrollable, setResOnChangeFunc, setResOnChange } = this.props;
+    const {
+      scrollable,
+      setResOnChangeFunc,
+      setResOnChange,
+      secondSearch,
+      secondSearchFunction,
+      setSecondRes,
+    } = this.props;
     const { skipMult } = this.state;
     if (searchTerm) {
       const res = scrollable
         ? await this.props.searchFunction(searchTerm, skipMult)
         : await this.props.searchFunction(searchTerm);
       if (setResOnChange) setResOnChangeFunc(res);
+      if (secondSearch) {
+        const res = await secondSearchFunction(searchTerm);
+        if (setResOnChange) setSecondRes(res);
+      }
+
       this.mounted && this.setState({ results: res });
     }
   }, 300);

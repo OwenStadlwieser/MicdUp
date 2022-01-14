@@ -20,6 +20,10 @@ const tagsSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  searches: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Tag = mongoose.model("tag", tagsSchema);
