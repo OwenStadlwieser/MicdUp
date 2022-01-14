@@ -64,7 +64,6 @@ const followProfile = {
     let returnObject = {};
     const session = await mongoose.startSession();
     session.startTransaction();
-    console.log("here");
     try {
       const profile = context.profile;
       const foreignProfile = await Profile.findById(profileId);
