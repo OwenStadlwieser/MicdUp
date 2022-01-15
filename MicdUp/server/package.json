@@ -33,7 +33,8 @@
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-swipeout": "^2.3.6"
+    "react-native-swipeout": "^2.3.6",
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "puppeteer-extra": "^3.2.3",

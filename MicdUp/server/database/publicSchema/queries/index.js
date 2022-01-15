@@ -12,6 +12,7 @@ const {
   getRecordingsFromTag,
 } = require("./recording");
 const { getReplies } = require("./comment");
+const { fetchChats } = require("./chat");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -25,6 +26,7 @@ const RootQuery = new GraphQLObjectType({
     getReplies,
     searchUsers,
     getRecordingsFromTag,
+    fetchChats,
   }, //fields end here
 });
 

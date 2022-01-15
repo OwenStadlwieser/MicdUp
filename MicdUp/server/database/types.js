@@ -4,6 +4,7 @@ const { Profile } = require("../database/models/Profile");
 const { Tag } = require("./models/Tag");
 const { Post } = require("./models/Post");
 const { File } = require("./models/File");
+const { Chat } = require("./models/Chat");
 const { Comment } = require("./models/Comment");
 const {
   GraphQLObjectType,
@@ -327,6 +328,76 @@ const PostType = new GraphQLObjectType({
   }),
 });
 
+const ChatType = new GraphQLObjectType({
+  name: "Chat",
+  fields: () => ({
+    id: { type: GraphQLID },
+    creator: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.creator);
+      },
+    },
+    members: {
+      type: new GraphQLList(ProfileType),
+      async resolve(parent) {
+        return await Profile.find({ _id: { $in: parent.members } });
+      },
+    },
+    chatMessages: {
+      type: new GraphQLList(ChatMessageType),
+      async resolve(parent) {
+        return await Chat.findById(
+          parent.chatMessages[parent.chatMessages.length - 1]
+        );
+      },
+    },
+  }),
+});
+
+const ChatMessageType = new GraphQLObjectType({
+  name: "ChatMessage",
+  fields: () => ({
+    id: { type: GraphQLID },
+    owner: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.owner);
+      },
+    },
+    seenBy: {
+      type: new GraphQLList(GraphQLID),
+    },
+    signedUrl: {
+      type: GraphQLString,
+      async resolve(parent) {
+        if (
+          parent.signedUrl &&
+          parent.lastFetched &&
+          parent.lastFetched + 60 * 30 < Date.now()
+        ) {
+          return parent.signedUrl;
+        }
+        const file = await File.findById(parent._id);
+        file.signedUrl = await getFile(parent._id + parent.fileExtension);
+        file.lastFetched = Date.now();
+        await file.save();
+        return file.signedUrl;
+      },
+    },
+    filePath: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent._id + parent.fileExtension;
+      },
+    },
+    fileExtension: {
+      type: GraphQLString,
+    },
+    dateCreated: { type: GraphQLFloat },
+  }),
+});
+
 const FileType = new GraphQLObjectType({
   name: "File",
   fields: () => ({
@@ -430,4 +501,6 @@ module.exports = {
   PromptsType,
   CommentType,
   ProfileType,
+  ChatType,
+  ChatMessageType,
 };
