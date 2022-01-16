@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { ScrollView, View, TextInput } from "react-native";
+import {
+  ScrollView,
+  View,
+  Platform,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { Appbar } from "react-native-paper";
 import { styles } from "../../../styles/Styles";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -9,7 +16,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
+import { Audio } from "expo-av";
+// redux
+import { hideChats } from "../../../redux/actions/chat";
 
+const { width, height } = Dimensions.get("window");
 export class Chat extends Component {
   constructor() {
     super();
@@ -18,8 +29,9 @@ export class Chat extends Component {
       currentPlayingId: "",
       recording: false,
       audioBlobs: false,
+      v: 0,
     };
-
+    this.colors = ["white", "red"];
     this.mounted = true;
   }
 
@@ -65,7 +77,14 @@ export class Chat extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    const interval = setInterval(() => {
+      const { v } = this.state;
+      this.mounted &&
+        this.state.recording &&
+        this.setState({ v: v === 1 ? 0 : v + 1 });
+    }, 1000);
+  };
 
   setPlaying(id) {
     this.mounted && this.setState({ playingId: id });
@@ -76,11 +95,43 @@ export class Chat extends Component {
       this.mounted && this.setState({ playing: "", playingId: "" });
   }
 
+  goBack = () => console.log("Went back");
+
+  handleMore = () => console.log("Shown more");
+
   render() {
-    const { activeChats, activeChatId, profile } = this.props;
-    const { currentPlayingId, recording, audioBlobs } = this.state;
+    const { activeChats, activeChatId, profile, activeChatMembers, userName } =
+      this.props;
+    const { currentPlayingId, recording, audioBlobs, v } = this.state;
+    console.log(activeChats);
     return (
       <View>
+        <Appbar.Header
+          style={{
+            position: "absolute",
+            top: 0,
+            backgroundColor: "white",
+            width,
+            height: height * 0.1,
+            zIndex: 2,
+          }}
+        >
+          <Appbar.BackAction
+            onPress={() => {
+              console.log("here");
+              this.props.hideChats();
+            }}
+          />
+          <Appbar.Content
+            title={activeChatMembers.map((member, res) => {
+              return userName !== member.user.userName
+                ? member.user.userName + " "
+                : "";
+            })}
+            subtitle="Members"
+          />
+          <Appbar.Action icon="dots-vertical" onPress={this.handleMore} />
+        </Appbar.Header>
         <ScrollView style={styles.messagesContainer}>
           {activeChats &&
             activeChats.length > 0 &&
@@ -116,7 +167,7 @@ export class Chat extends Component {
                             ? {
                                 uri: chat.owner.image.signedUrl,
                               }
-                            : require("../../assets/no-profile-pic-icon-27.jpg")
+                            : require("../../../assets/no-profile-pic-icon-27.jpg")
                         }
                         style={styles.commentImg}
                       />
@@ -218,6 +269,8 @@ const mapStateToProps = (state) => ({
   activeChats: state.chat.activeChats,
   activeChatId: state.chat.activeChatId,
   profile: state.auth.profile,
+  activeChatMembers: state.chat.activeChatMembers,
+  userName: state.auth.user.userName,
 });
 
-export default connect(mapStateToProps, {})(Chat);
+export default connect(mapStateToProps, { hideChats })(Chat);

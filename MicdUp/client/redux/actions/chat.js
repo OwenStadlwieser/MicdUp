@@ -1,4 +1,10 @@
-import { SET_CHATS, ADD_CHAT, SET_ACTIVE_CHATS, ADD_CHATS } from "../types";
+import {
+  SET_CHATS,
+  ADD_CHAT,
+  SET_ACTIVE_CHATS,
+  ADD_CHATS,
+  HIDE_CHATS,
+} from "../types";
 import {
   FETCH_CHAT_MUTATION,
   FETCH_CHATS_QUERY,
@@ -8,6 +14,15 @@ import { showMessage } from "./display";
 import { navigate } from "./display";
 import { client } from "../../apollo/client/index";
 
+export const hideChats = () => async (dispatch) => {
+  try {
+    dispatch({
+      type: HIDE_CHATS,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const createOrOpenChat = (members, creator) => async (dispatch) => {
   try {
     const res = await client.mutate({
@@ -26,6 +41,7 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
       payload: {
         activeChats: res.data.fetchChat.chatMessages,
         activeChatId: res.data.fetchChat.id,
+        activeChatMembers: res.data.fetchChat.members,
       },
     });
     return res.data.fetchChat;
@@ -56,11 +72,11 @@ export const viewChats = (skipMult) => async (dispatch) => {
   }
 };
 
-export const viewMoreChats = (skipMult, chatId) => async (dispatch) => {
+export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
   try {
     const res = await client.query({
       query: FETCH_CHAT_MESSAGES_QUERY,
-      variables: { skipMult, chatId },
+      variables: { skipMult, chatId: chat.id },
       fetchPolicy: "no-cache",
     });
     if (!res || !res.data || !res.data.fetchChatMessages) {
@@ -70,7 +86,11 @@ export const viewMoreChats = (skipMult, chatId) => async (dispatch) => {
     }
     dispatch({
       type: ADD_CHATS,
-      payload: res.data.fetchChatMessages,
+      payload: {
+        activeChats: res.data.fetchChatMessages,
+        activeChatId: chat.id,
+        activeChatMembers: chat.members,
+      },
     });
     return res.data.fetchChatMessages;
   } catch (err) {

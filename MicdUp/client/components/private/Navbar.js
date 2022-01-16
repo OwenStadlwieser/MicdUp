@@ -63,12 +63,12 @@ export class NavBar extends Component {
         </TouchableOpacity>
         <TouchableOpacity
           style={
-            mountedComponent === "Chat"
+            mountedComponent === "Dms"
               ? styles.activeNavbarButton
               : styles.navbarButton
           }
           onPress={() => {
-            this.props.navigate("Chat");
+            this.props.navigate("Dms");
           }}
         >
           <Text style={styles.navbarText}>Chat</Text>

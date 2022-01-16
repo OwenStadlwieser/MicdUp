@@ -8,7 +8,7 @@ const {
   GraphQLList,
   GraphQLInt,
 } = require("graphql");
-const { ChatMessageType } = require("../../types");
+const { ChatMessageType, ChatType } = require("../../types");
 
 const fetchChatMessages = {
   type: new GraphQLList(ChatMessageType),
@@ -42,7 +42,7 @@ const fetchChatMessages = {
 };
 
 const fetchChats = {
-  type: new GraphQLList(ChatMessageType),
+  type: new GraphQLList(ChatType),
   args: { skipMult: { type: GraphQLInt } },
   async resolve(parent, { skipMult }, context) {
     // FIXME: implement transaction

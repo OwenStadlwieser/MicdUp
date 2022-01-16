@@ -9,19 +9,20 @@ const fetchChat = {
   type: ChatType,
   args: {
     members: { type: new GraphQLList(GraphQLID) },
-    owner: { type: GraphQLID },
+    creator: { type: GraphQLID },
   },
-  async resolve(parent, { members, owner }, context) {
+  async resolve(parent, { members, creator }, context) {
     // FIXME: implement transaction
     const session = await mongoose.startSession();
     session.startTransaction();
+    members.sort();
     try {
       if (!context.user.id) {
         throw new Error("Must be signed in to message");
       }
       let chat = await Chat.findOne({ members });
       if (chat) return chat;
-      chat = new Chat({ members, owner });
+      chat = new Chat({ members, creator });
       for (let i = 0; i < members.length; i++) {
         await Profile.findByIdAndUpdate(
           members[i],

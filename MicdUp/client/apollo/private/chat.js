@@ -1,18 +1,15 @@
 import { gql } from "@apollo/client";
 
 const FETCH_CHAT_MESSAGES_QUERY = gql`
-  query fetchChats($skipMult: Int!, $chatId: ID!) {
-    fetchChats(skipMult: $skipMult, chatId: $chatId) {
+  query fetchChatMessages($skipMult: Int!, $chatId: ID!) {
+    fetchChatMessages(skipMult: $skipMult, chatId: $chatId) {
       id
-      creator {
+      owner {
         id
-        user {
-          _id
-          userName
+        image {
+          id
+          signedUrl
         }
-      }
-      members {
-        id
         user {
           _id
           userName
@@ -29,20 +26,22 @@ const FETCH_CHATS_QUERY = gql`
     fetchChats(skipMult: $skipMult) {
       id
       creator {
+        id
         user {
+          _id
+          userName
+        }
+      }
+      members {
+        id
+        user {
+          _id
           userName
         }
       }
       chatMessages {
         id
-        creator {
-          id
-          user {
-            _id
-            userName
-          }
-        }
-        members {
+        owner {
           id
           image {
             id
@@ -62,30 +61,25 @@ const FETCH_CHATS_QUERY = gql`
 `;
 
 const FETCH_CHAT_MUTATION = gql`
-  mutation fetchChat($members: [ID!], $owner: ID!) {
-    fetchChat(members: $members, owner: $owner) {
+  mutation fetchChat($members: [ID!], $creator: ID!) {
+    fetchChat(members: $members, creator: $creator) {
       id
-      owner {
+      creator {
+        id
         user {
+          _id
+          userName
+        }
+      }
+      members {
+        id
+        user {
+          _id
           userName
         }
       }
       chatMessages {
         id
-        creator {
-          id
-          user {
-            _id
-            userName
-          }
-        }
-        members {
-          id
-          user {
-            _id
-            userName
-          }
-        }
         seenBy
         signedUrl
         dateCreated
