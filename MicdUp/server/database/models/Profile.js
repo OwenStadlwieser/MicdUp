@@ -15,6 +15,7 @@ const ProfileSchema = new Schema({
   },
   chats: {
     type: [mongoose.Schema.Types.ObjectId],
+    default: [],
   },
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],

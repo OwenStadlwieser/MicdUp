@@ -13,7 +13,7 @@ const publicSchema = require("./database/publicSchema/index");
 const { User } = require("./database/models/User");
 const { Profile } = require("./database/models/Profile");
 const { resetSearches } = require("./cron/searches");
-const ioServer = require("socket.io");
+const chatSocket = require("./sockets/chat");
 const app = express();
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: false }));
@@ -106,14 +106,12 @@ mongoose
 
 const PORT = process.env.PORT || 6002;
 let server = http.createServer(app);
-const io = ioServer(server);
-io.on("connection", (socket) => {
-  console.log("a user connected :D");
-  socket.on("chat message", (msg) => {
-    console.log(msg);
-    io.emit("chat message", msg);
-  });
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
 });
+chatSocket(io);
 server = server.listen(PORT, () =>
   console.log("Server is running on Port", PORT)
 );

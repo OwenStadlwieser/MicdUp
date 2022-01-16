@@ -6,9 +6,20 @@ import {
   FORGOT_PASS_CHANGE_MUTATION,
   FORGOT_PASS_VERIFY_QUERY,
 } from "../../apollo/public/auth";
-import { LOG_IN, LOG_OUT, DISPLAY_MESSAGE } from "../types";
+import { LOG_IN, LOG_OUT, DISPLAY_MESSAGE, SET_SOCKET } from "../types";
 import { storeData, clearAsyncStorage } from "../../reuseableFunctions/helpers";
 import { showMessage } from "./display";
+
+export const setSocket = (socket) => async (dispatch) => {
+  try {
+    dispatch({
+      type: SET_SOCKET,
+      payload: socket,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const login = (authenticator, password) => async (dispatch) => {
   try {
     const res = await client.query({

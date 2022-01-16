@@ -75,4 +75,10 @@ async function deleteFile(Key) {
     });
   });
 }
-module.exports = { uploadFile, getFile, uploadFileFromBase64, deleteFile };
+module.exports = {
+  uploadFile,
+  getFile,
+  uploadFileFromBase64,
+  deleteFile,
+  getSignedUrl,
+};
