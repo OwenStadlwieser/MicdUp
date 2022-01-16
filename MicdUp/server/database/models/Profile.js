@@ -13,6 +13,9 @@ const ProfileSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  chats: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],
   },

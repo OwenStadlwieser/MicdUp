@@ -347,9 +347,12 @@ const ChatType = new GraphQLObjectType({
     chatMessages: {
       type: new GraphQLList(ChatMessageType),
       async resolve(parent) {
-        return await Chat.findById(
-          parent.chatMessages[parent.chatMessages.length - 1]
-        );
+        const size = 20;
+        const skipMult = 0;
+        return await Chat.find({ _id: { $in: parent.messages } })
+          .sort({ dateCreated: -1 })
+          .skip(size * skipMult)
+          .limit(size);
       },
     },
   }),

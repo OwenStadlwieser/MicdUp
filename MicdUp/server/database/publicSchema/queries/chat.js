@@ -8,10 +8,10 @@ const {
   GraphQLList,
   GraphQLInt,
 } = require("graphql");
-const { ChatType } = require("../../types");
+const { ChatMessageType } = require("../../types");
 
-const fetchChats = {
-  type: new GraphQLList(ChatType),
+const fetchChatMessages = {
+  type: new GraphQLList(ChatMessageType),
   args: {
     skipMult: { type: GraphQLInt },
     chatId: { type: GraphQLID },
@@ -30,7 +30,28 @@ const fetchChats = {
       if (index === -1) {
         throw new Error("Must be in chat to view messages");
       }
-      const chats = await Chat.find({ _id: { $in: chat.messages } })
+      const chats = await Message.find({ _id: { $in: chat.messages } })
+        .sort({ dateCreated: -1 })
+        .skip(size * skipMult)
+        .limit(size);
+      return chats;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
+
+const fetchChats = {
+  type: new GraphQLList(ChatMessageType),
+  args: { skipMult: { type: GraphQLInt } },
+  async resolve(parent, { skipMult }, context) {
+    // FIXME: implement transaction
+    const size = 20;
+    try {
+      if (!context.user.id) {
+        throw new Error("Must be signed in to message");
+      }
+      const chats = await Chat.find({ _id: { $in: context.profile.chats } })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
@@ -43,4 +64,5 @@ const fetchChats = {
 
 module.exports = {
   fetchChats,
+  fetchChatMessages,
 };

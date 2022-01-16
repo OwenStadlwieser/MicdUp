@@ -12,12 +12,13 @@ const {
   getRecordingsFromTag,
 } = require("./recording");
 const { getReplies } = require("./comment");
-const { fetchChats } = require("./chat");
+const { fetchChats, fetchChatMessages } = require("./chat");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     login,
     forgotPassVerify,
+    fetchChatMessages,
     getUser,
     searchTags,
     randomPrompt,

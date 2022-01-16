@@ -13,6 +13,8 @@ const fetchChat = {
   },
   async resolve(parent, { members, owner }, context) {
     // FIXME: implement transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
       if (!context.user.id) {
         throw new Error("Must be signed in to message");
@@ -20,10 +22,23 @@ const fetchChat = {
       let chat = await Chat.findOne({ members });
       if (chat) return chat;
       chat = new Chat({ members, owner });
-      await chat.save();
+      for (let i = 0; i < members.length; i++) {
+        await Profile.findByIdAndUpdate(
+          members[i],
+          {
+            $push: { chats: chat._id },
+          },
+          { session }
+        );
+      }
+      await chat.save({ session });
+      await session.commitTransaction();
       return chat;
     } catch (err) {
+      await session.abortTransaction();
       console.log(err);
+    } finally {
+      session.endSession();
     }
   },
 };

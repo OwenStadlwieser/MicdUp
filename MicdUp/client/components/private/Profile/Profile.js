@@ -30,7 +30,7 @@ import {
   updateProfilePic,
   followProfile,
 } from "../../../redux/actions/profile";
-
+import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
@@ -278,7 +278,17 @@ export class Profile extends Component {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.smallNextButton}>
-                    <Text style={styles.nextButtonText}>Message</Text>
+                    <Text
+                      onPress={async () => {
+                        await this.props.createOrOpenChat(
+                          [currentProfile.id, profile.id],
+                          profile.id
+                        );
+                      }}
+                      style={styles.nextButtonText}
+                    >
+                      Message
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -330,4 +340,5 @@ export default connect(mapStateToProps, {
   updateProfilePic,
   getComments,
   followProfile,
+  createOrOpenChat,
 })(Profile);
