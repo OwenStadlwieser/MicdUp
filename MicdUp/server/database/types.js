@@ -371,6 +371,21 @@ const ChatMessageType = new GraphQLObjectType({
     seenBy: {
       type: new GraphQLList(GraphQLID),
     },
+    isLikedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        // FIXME: unneeded logic
+        parent.likers = parent.likers ? parent.likers : new Map();
+        const index = parent.likers.get(context.profile.id);
+        return index === "1";
+      },
+    },
+    likersCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.likers.keys()).length;
+      },
+    },
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {

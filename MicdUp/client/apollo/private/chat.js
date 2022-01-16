@@ -15,6 +15,8 @@ const FETCH_CHAT_MESSAGES_QUERY = gql`
           userName
         }
       }
+      isLikedByUser
+      likersCount
       seenBy
       signedUrl
       dateCreated
@@ -52,6 +54,8 @@ const FETCH_CHATS_QUERY = gql`
             userName
           }
         }
+        isLikedByUser
+        likersCount
         seenBy
         signedUrl
         dateCreated
@@ -80,6 +84,8 @@ const FETCH_CHAT_MUTATION = gql`
       }
       chatMessages {
         id
+        isLikedByUser
+        likersCount
         seenBy
         signedUrl
         dateCreated

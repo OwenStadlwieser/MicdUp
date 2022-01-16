@@ -31,9 +31,22 @@ export default function (state = { ...initialState }, action) {
         chats: payload,
       };
     case ADD_CHAT:
+      const chats = [...state.chats];
+      const chatIndex = chats.findIndex((chat) => chat.id === payload.chatId);
+      if (chatIndex < 0) {
+        return {
+          ...state,
+        };
+      }
+      chats[chatIndex].chatMessages.push(payload.message);
+      const activeChats = [...state.activeChats];
+      if (state.activeChatId === payload.chatId) {
+        activeChats.push(payload.message);
+      }
       return {
         ...state,
-        activeChats: [payload, ...activeChats],
+        activeChats: [...activeChats],
+        chats: [...chats],
       };
     case ADD_CHATS:
       return {

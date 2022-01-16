@@ -13,6 +13,12 @@ const chatSchema = new Schema({
   },
   messages: {
     type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
+  likers: {
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
   },
 });
 

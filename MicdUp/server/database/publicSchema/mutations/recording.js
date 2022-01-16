@@ -5,11 +5,7 @@ const graphql = require("graphql");
 var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
-const {
-  uploadFile,
-  deleteFile,
-  uploadFileFromBase64,
-} = require("../../../utils/awsS3");
+const { uploadFile, deleteFile } = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -428,4 +424,5 @@ module.exports = {
   likePost,
   deletePost,
   commentToPost,
+  ffmpegMergeAndUpload,
 };

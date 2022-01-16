@@ -23,6 +23,13 @@ export const hideChats = () => async (dispatch) => {
     console.log(err);
   }
 };
+
+export const chatRecieved = (message, chatId) => (dispatch) => {
+  dispatch({
+    type: ADD_CHAT,
+    payload: { message, chatId },
+  });
+};
 export const createOrOpenChat = (members, creator) => async (dispatch) => {
   try {
     const res = await client.mutate({

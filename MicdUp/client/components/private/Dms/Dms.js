@@ -18,14 +18,13 @@ export class Dms extends Component {
       chatMessage: "",
       chatMessages: [],
     };
-    this.socket = {};
     this.mounted = true;
   }
 
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    const { activeChatId } = this.props;
+    const { activeChatId, socket } = this.props;
     if (!activeChatId) await this.props.viewChats(0);
   };
 
@@ -82,6 +81,7 @@ const mapStateToProps = (state) => ({
   showingChat: state.chat.showingChat,
   activeChats: state.chat.activeChats,
   activeChatId: state.chat.activeChatId,
+  socket: state.auth.socket,
 });
 
 export default connect(mapStateToProps, { viewChats, viewMoreChats })(Dms);

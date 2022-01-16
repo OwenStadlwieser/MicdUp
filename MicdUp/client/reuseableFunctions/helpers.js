@@ -34,6 +34,7 @@ const clearAsyncStorage = async () => {
 };
 
 const playSound = async (uri, onPlayBackStatusUpdate) => {
+  console.log(uri);
   try {
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,

@@ -1,13 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+// components
+import Like from "../../reuseable/Like";
+import PlayButton from "../../reuseable/PlayButton";
 import {
   ScrollView,
   View,
   Platform,
   TouchableOpacity,
   Dimensions,
+  TouchableHighlight,
+  Text,
+  Image,
 } from "react-native";
 import { Appbar } from "react-native-paper";
+//styles
 import { styles } from "../../../styles/Styles";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -103,9 +110,8 @@ export class Chat extends Component {
     const { activeChats, activeChatId, profile, activeChatMembers, userName } =
       this.props;
     const { currentPlayingId, recording, audioBlobs, v } = this.state;
-    console.log(activeChats);
     return (
-      <View>
+      <View style={styles.chatPane}>
         <Appbar.Header
           style={{
             position: "absolute",
@@ -144,64 +150,62 @@ export class Chat extends Component {
                     : styles.foreignChat
                 }
               >
-                <View style={styles.chatContainerOne}>
-                  <View>
-                    <Text style={styles.blackText}>
-                      @
-                      {chat && chat.owner && chat.owner.user
-                        ? chat.owner.user.userName
-                        : ""}
-                    </Text>
-                    <TouchableHighlight
-                      style={[
-                        styles.commentImgContainer,
-                        {
-                          borderColor: "#30F3FF",
-                          borderWidth: 1,
-                        },
-                      ]}
-                    >
-                      <Image
-                        source={
-                          chat && chat.owner && chat.owner.image
-                            ? {
-                                uri: chat.owner.image.signedUrl,
-                              }
-                            : require("../../../assets/no-profile-pic-icon-27.jpg")
-                        }
-                        style={styles.commentImg}
-                      />
-                    </TouchableHighlight>
-                  </View>
-                  {chat.signedUrl && (
-                    <View style={styles.commentPlayContainer}>
-                      {chat.signedUrl && (
-                        <Like type={"Chat"} postId={this.props.chat.id} />
-                      )}
-                      {chat.signedUrl && (
-                        <PlayButton
-                          containerStyle={{}}
-                          color={"#1A3561"}
-                          currentPlayingId={currentPlayingId}
-                          size={48}
-                          post={chat}
-                          setPlaying={this.setPlaying.bind(this)}
-                          onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                            this
-                          )}
-                        />
-                      )}
-                      {chat.owner.id === profile.id && (
-                        <Feather
-                          onPress={async () => {}}
-                          name="scissors"
-                          size={24}
-                          color="red"
-                        />
-                      )}
-                    </View>
-                  )}
+                <View>
+                  <Text style={styles.blackText}>
+                    @
+                    {chat && chat.owner && chat.owner.user
+                      ? chat.owner.user.userName
+                      : ""}
+                  </Text>
+                  <TouchableHighlight
+                    style={[
+                      styles.commentImgContainer,
+                      {
+                        borderColor: "#30F3FF",
+                        borderWidth: 1,
+                      },
+                    ]}
+                  >
+                    <Image
+                      source={
+                        chat && chat.owner && chat.owner.image
+                          ? {
+                              uri: chat.owner.image.signedUrl,
+                            }
+                          : require("../../../assets/no-profile-pic-icon-27.jpg")
+                      }
+                      style={styles.commentImg}
+                    />
+                  </TouchableHighlight>
                 </View>
+                {chat.signedUrl && (
+                  <View style={styles.commentPlayContainer}>
+                    {chat.signedUrl && (
+                      <Like type={"Chat"} postId={chat.id} post={chat} />
+                    )}
+                    {chat.signedUrl && (
+                      <PlayButton
+                        containerStyle={{}}
+                        color={"#1A3561"}
+                        currentPlayingId={currentPlayingId}
+                        size={48}
+                        post={chat}
+                        setPlaying={this.setPlaying.bind(this)}
+                        onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
+                          this
+                        )}
+                      />
+                    )}
+                    {chat.owner.id === profile.id && (
+                      <Feather
+                        onPress={async () => {}}
+                        name="scissors"
+                        size={24}
+                        color="red"
+                      />
+                    )}
+                  </View>
+                )}
               </View>
             ))}
         </ScrollView>
@@ -246,9 +250,15 @@ export class Chat extends Component {
               <TouchableOpacity
                 onPress={async () => {
                   let fileType;
+                  const { socket, activeChatId } = this.props;
                   const base64Url = await soundBlobToBase64(audioBlobs.uri);
                   if (base64Url != null) {
                     fileType = audioBlobs.type;
+                    socket.emit("new message", {
+                      messageData: base64Url,
+                      chatId: activeChatId,
+                      fileType,
+                    });
                   } else {
                     console.log("error with blob");
                   }
@@ -268,9 +278,10 @@ export class Chat extends Component {
 const mapStateToProps = (state) => ({
   activeChats: state.chat.activeChats,
   activeChatId: state.chat.activeChatId,
-  profile: state.auth.profile,
+  profile: state.auth.user.profile,
   activeChatMembers: state.chat.activeChatMembers,
   userName: state.auth.user.userName,
+  socket: state.auth.socket,
 });
 
 export default connect(mapStateToProps, { hideChats })(Chat);

@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 // redux
 import { getUserQuery } from "../../redux/actions/user";
 import { logout, setSocket } from "../../redux/actions/auth";
+import { chatRecieved } from "../../redux/actions/chat";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -32,6 +33,7 @@ export class Dashboard extends Component {
 
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
+    const { chatRecieved } = this.props;
     await this.props.getUserQuery();
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
@@ -40,6 +42,10 @@ export class Dashboard extends Component {
       const token = await getData("token");
       const socket = io.connect("http://localhost:6002/");
       socket.emit("new user", token);
+      socket.on("new message", async function (message, chatId) {
+        console.log("recieved", message);
+        chatRecieved(message, chatId);
+      });
       this.props.setSocket(socket);
     }
     this.mounted && this.setState({ loading: false });
@@ -82,4 +88,5 @@ export default connect(mapStateToProps, {
   getUserQuery,
   logout,
   setSocket,
+  chatRecieved,
 })(Dashboard);
