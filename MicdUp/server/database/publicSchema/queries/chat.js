@@ -31,10 +31,11 @@ const fetchChatMessages = {
         throw new Error("Must be in chat to view messages");
       }
       const chats = await Message.find({ _id: { $in: chat.messages } })
-        .sort({ dateCreated: 1 })
+        .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
-      return chats;
+      const reverse = chats.reverse();
+      return reverse;
     } catch (err) {
       console.log(err);
     }

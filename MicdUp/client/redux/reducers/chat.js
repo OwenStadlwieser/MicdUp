@@ -51,7 +51,7 @@ export default function (state = { ...initialState }, action) {
     case ADD_CHATS:
       return {
         ...state,
-        activeChats: [...state.activeChats, ...payload.activeChats],
+        activeChats: [...payload.activeChats, ...state.activeChats],
         activeChatId: payload.activeChatId,
         activeChatMembers: [...payload.activeChatMembers],
         showingChat: true,

@@ -28,7 +28,6 @@ exports = module.exports = function (io) {
         const profile = await Profile.findOne({ user: userId.user });
         socket.profileId = profile._id;
         for (let i = 0; i < profile.chats.length; i++) {
-          console.log("Joining", profile.chats[i].toString());
           socket.join(profile.chats[i].toString());
         }
         userIds[socket.id] = profile._id;

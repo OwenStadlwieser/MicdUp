@@ -25,7 +25,7 @@ import { Feather } from "@expo/vector-icons";
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
 // redux
-import { hideChats } from "../../../redux/actions/chat";
+import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
 
 const { width, height } = Dimensions.get("window");
 export class Chat extends Component {
@@ -37,7 +37,10 @@ export class Chat extends Component {
       recording: false,
       audioBlobs: false,
       v: 0,
+      fetching: false,
+      lastFetched: 0,
     };
+    this.scrollView = null;
     this.colors = ["white", "red"];
     this.mounted = true;
   }
@@ -91,8 +94,21 @@ export class Chat extends Component {
         this.state.recording &&
         this.setState({ v: v === 1 ? 0 : v + 1 });
     }, 1000);
+    this.scrollView && this.scrollView.scrollToEnd({ animated: true });
   };
 
+  componentDidUpdate = (prevProps, prevState) => {
+    const { activeChats } = this.props;
+    const { fetching } = this.state;
+    if (
+      activeChats &&
+      prevProps.activeChats &&
+      activeChats.length > prevProps.activeChats.length &&
+      !fetching
+    ) {
+      this.scrollView.scrollToEnd({ animated: true });
+    }
+  };
   setPlaying(id) {
     this.mounted && this.setState({ playingId: id });
   }
@@ -109,7 +125,7 @@ export class Chat extends Component {
   render() {
     const { activeChats, activeChatId, profile, activeChatMembers, userName } =
       this.props;
-    const { currentPlayingId, recording, audioBlobs, v } = this.state;
+    const { currentPlayingId, recording, audioBlobs, v, loading } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -138,7 +154,41 @@ export class Chat extends Component {
           />
           <Appbar.Action icon="dots-vertical" onPress={this.handleMore} />
         </Appbar.Header>
-        <ScrollView style={styles.messagesContainer}>
+        {loading && (
+          <View style={styles.refresh}>
+            <Text style={styles.nextButtonText}>Loading</Text>
+          </View>
+        )}
+        <ScrollView
+          ref={(view) => {
+            this.scrollView = view;
+          }}
+          style={styles.messagesContainer}
+          scrollEventThrottle={16}
+          onScroll={async (event) => {
+            const { activeChatId, activeChatMembers } = this.props;
+            const { lastFetched } = this.state;
+            if (
+              event.nativeEvent.contentOffset.y === 0 &&
+              Math.floor(activeChats.length / 20) > lastFetched
+            ) {
+              this.mounted &&
+                this.setState({
+                  loading: true,
+                  fetching: true,
+                  lastFetched: Math.floor(activeChats.length / 20),
+                });
+              await this.props.viewMoreChats(
+                { id: activeChatId, members: activeChatMembers },
+                activeChats && activeChats.length > 0
+                  ? Math.floor(activeChats.length / 20)
+                  : 0
+              );
+              this.mounted &&
+                this.setState({ loading: false, fetching: false });
+            }
+          }}
+        >
           {activeChats &&
             activeChats.length > 0 &&
             activeChats.map((chat, index) => (
@@ -284,4 +334,4 @@ const mapStateToProps = (state) => ({
   socket: state.auth.socket,
 });
 
-export default connect(mapStateToProps, { hideChats })(Chat);
+export default connect(mapStateToProps, { hideChats, viewMoreChats })(Chat);

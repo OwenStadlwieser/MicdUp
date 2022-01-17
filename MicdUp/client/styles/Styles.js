@@ -552,9 +552,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "center",
     marginTop: 20,
+    marginLeft: width * 0.05,
   },
   foreignChat: {
-    right: 0,
+    marginLeft: width * 0.35,
     backgroundColor: "gray",
     width: width * 0.6,
     flexDirection: "row",
