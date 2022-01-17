@@ -30,7 +30,7 @@ export class Dms extends Component {
 
   render() {
     const { chats, showingChat, activeChatId } = this.props;
-    console.log(activeChatId);
+
     const app = activeChatId ? (
       <View style={styles.pane}>
         <Chat />
