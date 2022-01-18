@@ -10,7 +10,9 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Platform,
+  NativeModules,
 } from "react-native";
+const { NativeOfflineAudioEngine } = NativeModules;
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -51,6 +53,10 @@ export class Create extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
+    NativeOfflineAudioEngine.createCalendarEvent("test", "test", 1, 2, (e) => {
+      console.log("here");
+      console.log(e);
+    });
     const interval = setInterval(() => {
       const { v } = this.state;
       this.mounted &&
@@ -95,20 +101,20 @@ export class Create extends Component {
         recording: false,
         audioBlobs: clips
           ? [
-            ...clips,
-            {
-              uri,
-              finalDuration,
-              type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-            },
-          ]
+              ...clips,
+              {
+                uri,
+                finalDuration,
+                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+              },
+            ]
           : [
-            {
-              uri,
-              finalDuration,
-              type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-            },
-          ],
+              {
+                uri,
+                finalDuration,
+                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+              },
+            ],
         v: 0,
       });
     this.props.updateClips(this.state.audioBlobs);
@@ -151,8 +157,8 @@ export class Create extends Component {
               source={
                 user && user.profile && user.profile.image
                   ? {
-                    uri: user.profile.image.signedUrl,
-                  }
+                      uri: user.profile.image.signedUrl,
+                    }
                   : require("../../../assets/no-profile-pic-icon-27.jpg")
               }
               style={styles.profileImg}
