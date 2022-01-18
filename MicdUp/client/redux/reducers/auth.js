@@ -10,6 +10,7 @@ import {
   UPDATE_POST_COMMENTS,
   UPDATE_COMMENT_TO_POST,
   DELETE_POST,
+  SET_SOCKET,
 } from "../types";
 
 const initialState = {
@@ -17,6 +18,7 @@ const initialState = {
   user: {},
   profile: {},
   posts: [],
+  socket: {},
 };
 
 export default function (state = { ...initialState }, action) {
@@ -32,11 +34,17 @@ export default function (state = { ...initialState }, action) {
         ...state,
         user: { ...payload },
       };
+    case SET_SOCKET:
+      return {
+        ...state,
+        socket: payload,
+      };
     case LOG_OUT:
       return {
         ...state,
         user: {},
         loggedIn: false,
+        socket: {},
       };
     case DELETE_ACCOUNT:
       return {

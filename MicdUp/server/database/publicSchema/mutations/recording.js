@@ -5,11 +5,7 @@ const graphql = require("graphql");
 var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
-const {
-  uploadFile,
-  deleteFile,
-  uploadFileFromBase64,
-} = require("../../../utils/awsS3");
+const { uploadFile, deleteFile } = require("../../../utils/awsS3");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -108,6 +104,8 @@ const createRecording = {
     try {
       await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
       for (let i = 0; i < tags.length; i++) {
+        if (!tags[i]) continue;
+        tags[i] = tags[i].replace(/ /g, "");
         if (!tags[i]) continue;
         let tag = await Tag.findOne({ title: tags[i] });
         if (!tag) {
@@ -426,4 +424,5 @@ module.exports = {
   likePost,
   deletePost,
   commentToPost,
+  ffmpegMergeAndUpload,
 };

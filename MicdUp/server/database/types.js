@@ -4,6 +4,7 @@ const { Profile } = require("../database/models/Profile");
 const { Tag } = require("./models/Tag");
 const { Post } = require("./models/Post");
 const { File } = require("./models/File");
+const { Chat } = require("./models/Chat");
 const { Comment } = require("./models/Comment");
 const {
   GraphQLObjectType,
@@ -44,7 +45,12 @@ const UserType = new GraphQLObjectType({
 const ProfileType = new GraphQLObjectType({
   name: "Profile",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent.id;
+      },
+    },
     posts: {
       type: new GraphQLList(PostType),
       async resolve(parent) {
@@ -245,7 +251,12 @@ const CommentType = new GraphQLObjectType({
 const PostType = new GraphQLObjectType({
   name: "Post",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent._id;
+      },
+    },
     title: { type: GraphQLString },
     owner: {
       type: ProfileType,
@@ -312,6 +323,94 @@ const PostType = new GraphQLObjectType({
         });
         return index > -1;
       },
+    },
+    dateCreated: { type: GraphQLFloat },
+  }),
+});
+
+const ChatType = new GraphQLObjectType({
+  name: "Chat",
+  fields: () => ({
+    id: { type: GraphQLID },
+    creator: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.creator);
+      },
+    },
+    members: {
+      type: new GraphQLList(ProfileType),
+      async resolve(parent) {
+        return await Profile.find({ _id: { $in: parent.members } });
+      },
+    },
+    chatMessages: {
+      type: new GraphQLList(ChatMessageType),
+      async resolve(parent) {
+        const size = 20;
+        const skipMult = 0;
+        return await Chat.find({ _id: { $in: parent.messages } })
+          .sort({ dateCreated: -1 })
+          .skip(size * skipMult)
+          .limit(size);
+      },
+    },
+  }),
+});
+
+const ChatMessageType = new GraphQLObjectType({
+  name: "ChatMessage",
+  fields: () => ({
+    id: { type: GraphQLID },
+    owner: {
+      type: ProfileType,
+      async resolve(parent) {
+        return await Profile.findById(parent.owner);
+      },
+    },
+    seenBy: {
+      type: new GraphQLList(GraphQLID),
+    },
+    isLikedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        // FIXME: unneeded logic
+        parent.likers = parent.likers ? parent.likers : new Map();
+        const index = parent.likers.get(context.profile.id);
+        return index === "1";
+      },
+    },
+    likersCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.likers.keys()).length;
+      },
+    },
+    signedUrl: {
+      type: GraphQLString,
+      async resolve(parent) {
+        if (
+          parent.signedUrl &&
+          parent.lastFetched &&
+          parent.lastFetched + 60 * 30 < Date.now()
+        ) {
+          return parent.signedUrl;
+        }
+        const file = await File.findById(parent._id);
+        file.signedUrl = await getFile(parent._id + parent.fileExtension);
+        file.lastFetched = Date.now();
+        await file.save();
+        return file.signedUrl;
+      },
+    },
+    filePath: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent._id + parent.fileExtension;
+      },
+    },
+    fileExtension: {
+      type: GraphQLString,
     },
     dateCreated: { type: GraphQLFloat },
   }),
@@ -420,4 +519,6 @@ module.exports = {
   PromptsType,
   CommentType,
   ProfileType,
+  ChatType,
+  ChatMessageType,
 };

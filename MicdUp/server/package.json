@@ -28,11 +28,13 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.4",
+    "node-cron": "^3.0.0",
     "node-ffprobe-installer": "^1.2.3",
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-swipeout": "^2.3.6"
+    "react-native-swipeout": "^2.3.6",
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "puppeteer-extra": "^3.2.3",

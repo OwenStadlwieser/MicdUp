@@ -82,6 +82,25 @@ const ADD_TAG_MUTATION = gql`
   }
 `;
 
+const GET_RECORDINGS_FROM_TAG_QUERY = gql`
+  query getRecordingsFromTag($searchTag: ID!, $skipMult: Int!) {
+    getRecordingsFromTag(searchTag: $searchTag, skipMult: $skipMult) {
+      id
+      title
+      signedUrl
+      likes
+      isLikedByUser
+      owner {
+        id
+        image {
+          id
+          signedUrl
+        }
+      }
+    }
+  }
+`;
+
 const GET_COMMENT_POST_QUERY = gql`
   query getComments($postId: ID!, $skipMult: Int!) {
     getComments(postId: $postId, skipMult: $skipMult) {
@@ -174,4 +193,5 @@ export {
   COMMENT_POST_MUTATION,
   ADD_TAG_MUTATION,
   GET_COMMENT_POST_QUERY,
+  GET_RECORDINGS_FROM_TAG_QUERY,
 };

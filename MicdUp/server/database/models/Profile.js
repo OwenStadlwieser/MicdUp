@@ -13,10 +13,17 @@ const ProfileSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  chats: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],
   },
   posts: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
+  searchedTags: {
     type: [mongoose.Schema.Types.ObjectId],
   },
   image: {

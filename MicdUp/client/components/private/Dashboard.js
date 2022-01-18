@@ -3,7 +3,8 @@ import { connect } from "react-redux";
 import { Text, View } from "react-native";
 // redux
 import { getUserQuery } from "../../redux/actions/user";
-import { logout } from "../../redux/actions/auth";
+import { logout, setSocket } from "../../redux/actions/auth";
+import { chatRecieved } from "../../redux/actions/chat";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -13,7 +14,8 @@ import Profile from "./Profile/Profile";
 import Search from "./Search/Search";
 import Navbar from "./Navbar";
 // helpers
-import { removeItemValue } from "../../reuseableFunctions/helpers";
+import { removeItemValue, getData } from "../../reuseableFunctions/helpers";
+import { io } from "socket.io-client";
 //styles
 import { styles } from "../../styles/Styles";
 
@@ -31,10 +33,20 @@ export class Dashboard extends Component {
 
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
+    const { chatRecieved } = this.props;
     await this.props.getUserQuery();
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
       this.props.logout();
+    } else {
+      const token = await getData("token");
+      const socket = io.connect("http://localhost:6002/");
+      socket.emit("new user", token);
+      socket.on("new message", async function (message, chatId) {
+        console.log("recieved", message);
+        chatRecieved(message, chatId);
+      });
+      this.props.setSocket(socket);
     }
     this.mounted && this.setState({ loading: false });
   };
@@ -75,4 +87,6 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   getUserQuery,
   logout,
+  setSocket,
+  chatRecieved,
 })(Dashboard);

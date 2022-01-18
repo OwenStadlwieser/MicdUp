@@ -12,6 +12,8 @@ const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
 const { User } = require("./database/models/User");
 const { Profile } = require("./database/models/Profile");
+const { resetSearches } = require("./cron/searches");
+const chatSocket = require("./sockets/chat");
 const app = express();
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: false }));
@@ -97,12 +99,19 @@ mongoose
   .then((connected) => {
     if (connected) {
       console.log("MongoDB connected");
+      resetSearches.start();
     }
   })
   .catch((err) => console.log(err));
 
 const PORT = process.env.PORT || 6002;
 let server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+chatSocket(io);
 server = server.listen(PORT, () =>
   console.log("Server is running on Port", PORT)
 );

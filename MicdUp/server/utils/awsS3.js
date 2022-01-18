@@ -6,6 +6,7 @@ const s3 = new AWS.S3({
 });
 const uploadFile = async (fileName, key) => {
   const contents = await fs.readFile(fileName, { encoding: "base64" });
+  console.log(key);
   const buff = new Buffer.from(contents, "base64");
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME, // pass your bucket name
@@ -75,4 +76,10 @@ async function deleteFile(Key) {
     });
   });
 }
-module.exports = { uploadFile, getFile, uploadFileFromBase64, deleteFile };
+module.exports = {
+  uploadFile,
+  getFile,
+  uploadFileFromBase64,
+  deleteFile,
+  getSignedUrl,
+};

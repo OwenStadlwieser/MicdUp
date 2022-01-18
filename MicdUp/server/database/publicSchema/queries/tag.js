@@ -9,11 +9,15 @@ const searchTags = {
   async resolve(parent, { searchTerm }, context) {
     try {
       const res = await Tag.aggregate([
-        { $match: { $text: { $search: searchTerm } } },
+        {
+          $match: {
+            title: { $regex: new RegExp(searchTerm), $options: "i" },
+          },
+        },
         {
           $addFields: {
             totalScore: {
-              $add: [{ $meta: "textScore" }, { $divide: ["$count", 1000] }],
+              $add: [0, { $divide: ["$count", 1000] }],
             },
           },
         },
