@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 10,
     borderTopColor: "black",
-    borderTopStyle: "solid",
+    borderStyle: "solid",
     borderTopWidth: 1,
     marginTop: 10,
   },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 10,
     borderTopColor: "black",
-    borderTopStyle: "solid",
+    borderStyle: "solid",
     borderTopWidth: 1,
     marginTop: 10,
     backgroundColor: "white",
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   textInput: {
-    boxShadow: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: "white",
     borderBottomColor: "white",
-    borderBottomStyle: "white",
+    borderStyle: "solid",
     borderBottomWidth: 1,
     width: width * 0.6,
     height: 40,
@@ -149,7 +148,6 @@ const styles = StyleSheet.create({
     marginTop: height * 0.05,
     position: "relative",
     paddingLeft: 5,
-    boxShadow: "none",
     fontSize: small,
   },
   profileText: {
@@ -160,7 +158,6 @@ const styles = StyleSheet.create({
   },
   invalidTextInput: {
     fontSize: small,
-    boxShadow: "none",
     fontStyle: "italic",
     backgroundColor: "#FFFFFF",
     borderColor: "red",
@@ -484,7 +481,7 @@ const styles = StyleSheet.create({
   commentActionsDiv: {
     flexDirection: "row",
     borderLeftColor: "#1A3561",
-    borderLeftStyle: "solid",
+    borderStyle: "solid",
     borderLeftWidth: 1,
   },
   replyActionsText: {
@@ -505,7 +502,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: "row",
     borderLeftColor: "#1A3561",
-    borderLeftStyle: "solid",
+    borderStyle: "solid",
     borderLeftWidth: 1,
   },
   commentImgContainer: {
@@ -584,7 +581,7 @@ const styles = StyleSheet.create({
   upperEditDivAbsolute: {
     marginTop: height * 0.05,
     height: height * 0.15,
-    zIndex: "3",
+    zIndex: 3,
   },
   clipsEditDiv: {
     height: height * 0.5,
@@ -653,7 +650,7 @@ const styles = StyleSheet.create({
     color: "black",
     fontStyle: "italic",
     fontSize: small,
-    fontWeight: 600,
+    fontWeight: "600",
   },
   recordingSettings: {
     maxHeight: height * 0.3,
@@ -676,7 +673,7 @@ const styles = StyleSheet.create({
   playButtonContainer: {
     height: height * 0.1,
     alignItems: "center",
-    justifyContent: "end",
+    justifyContent: "flex-end",
   },
   playButton: {
     fontSize: large,
@@ -689,7 +686,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   resultsContainer: {
-    zIndex: "2",
+    zIndex: 2,
     flexDirection: "row",
     maxHeight: height * 0.35,
     backgroundColor: "white",
