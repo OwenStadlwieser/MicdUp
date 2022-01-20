@@ -292,6 +292,8 @@ PODS:
     - React-jsi (= 0.64.3)
     - React-perflogger (= 0.64.3)
   - React-jsinspector (0.64.3)
+  - react-native-audio-engine (1.0.0):
+    - React
   - react-native-voice (3.2.2):
     - React-Core
   - React-perflogger (0.64.3)
@@ -397,6 +399,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-audio-engine (from `../node_modules/react-native-micdup-audio-engine`)
   - "react-native-voice (from `../node_modules/@react-native-voice/voice`)"
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -482,6 +485,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-audio-engine:
+    :path: "../node_modules/react-native-micdup-audio-engine"
   react-native-voice:
     :path: "../node_modules/@react-native-voice/voice"
   React-perflogger:
@@ -547,6 +552,7 @@ SPEC CHECKSUMS:
   React-jsi: a8b09c29521c798f1783348b37b511ba7b3dbeb3
   React-jsiexecutor: df6abc9fafbecb8e5b7a5fbc5e6d4bd017d594d5
   React-jsinspector: 34e23860273a23695342f58eed3ffd3ba10c31e0
+  react-native-audio-engine: c007f52cc012b80e1947a07ac59d43a4f61830d1
   react-native-voice: 634b2749a0f67676a999e97df4d8220ce59ac738
   React-perflogger: cc76a4254d19640f1d8ad1c66fdee800414b805c
   React-RCTActionSheet: 7448f049318d8d7e8a9a1ebb742ada721757eea8
@@ -563,6 +569,6 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: ea6b5c280997b2b32a587793163b1f10e580c4f7
   Yoga: e6ecf3fa25af9d4c87e94ad7d5d292eedef49749
 
-PODFILE CHECKSUM: 1b92cc5ae846d5b8c24849caa10b2522d81927fa
+PODFILE CHECKSUM: e82fb9d026f539658528701ec77991413046e6e9
 
 COCOAPODS: 1.11.2

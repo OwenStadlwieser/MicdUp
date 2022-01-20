@@ -3,10 +3,9 @@ import { AppRegistry, Platform } from "react-native";
 import Root from "./Root";
 import { Provider } from "react-redux";
 import store from "./redux/index";
-import AudioEngine from "react-native-micdup-audio-engine";
+import { AudioEngine } from "react-native-micdup-audio-engine";
 
 export default function App() {
-  AudioEngine.log();
   console.log(AudioEngine);
   if (Platform.OS === "ios") {
     AudioEngine.sampleMethod("String Arg", 1, (string) => {
