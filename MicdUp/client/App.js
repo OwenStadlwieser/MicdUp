@@ -7,6 +7,12 @@ import AudioEngine from "react-native-micdup-audio-engine";
 
 export default function App() {
   AudioEngine.log();
+  console.log(AudioEngine);
+  if (Platform.OS === "ios") {
+    AudioEngine.sampleMethod("String Arg", 1, (string) => {
+      console.log(string);
+    });
+  }
   return (
     <Provider store={store}>
       <Root />
