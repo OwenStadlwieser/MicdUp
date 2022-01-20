@@ -1,4 +1,8 @@
 rootProject.name = 'MicdUp'
+include ':react-native-micdup-audio-engine'
+project(':react-native-micdup-audio-engine').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-micdup-audio-engine/android')
+include ':react-native-audio-engine'
+project(':react-native-audio-engine').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-audio-engine/android')
 
 apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle");
 useExpoModules()
