@@ -71,5 +71,6 @@ buck-out/
 .expo/
 web-build/
 dist/
+!node_modules/react-native-micdup-audio-engine/*
 
 # @end expo-cli
