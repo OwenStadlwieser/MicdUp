@@ -12,7 +12,6 @@ import {
   Platform,
   NativeModules,
 } from "react-native";
-const { NativeOfflineAudioEngine } = NativeModules;
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -53,10 +52,6 @@ export class Create extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    NativeOfflineAudioEngine.createCalendarEvent("test", "test", 1, 2, (e) => {
-      console.log("here");
-      console.log(e);
-    });
     const interval = setInterval(() => {
       const { v } = this.state;
       this.mounted &&
