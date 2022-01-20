@@ -127,7 +127,7 @@ export class Comment extends Component {
           paddingLeft: index > 0 && index < 12 ? 10 : 0,
           right: index >= 12 ? 10 : 0,
           borderLeftColor: "#1A3561",
-          borderLeftStyle: "solid",
+          borderStyle: "solid",
           borderLeftWidth: 1,
         }}
       >
@@ -139,7 +139,7 @@ export class Comment extends Component {
             paddingHorizontal: 15,
             flexDirection: "row",
             borderLeftColor: "#1A3561",
-            borderLeftStyle: "solid",
+            borderStyle: "solid",
             left: index >= 12 ? -1 : 0,
             borderLeftWidth: index >= 12 ? 0 : 1,
             zIndex: index >= 12 ? 1 : 0,
@@ -228,7 +228,7 @@ export class Comment extends Component {
             left: index >= 12 ? -1 : 0,
             flexDirection: "row",
             borderLeftColor: "#1A3561",
-            borderLeftStyle: "solid",
+            borderStyle: "solid",
             borderLeftWidth: index >= 12 ? 0 : 1,
             paddingTop: 5,
           }}

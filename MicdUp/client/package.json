@@ -4,7 +4,7 @@
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
-    "ios": "expo run:ios",
+    "ios": "expo start --no-dev --minify",
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest"
@@ -30,6 +30,7 @@
     "react-native": "0.64.3",
     "react-native-datepicker": "^1.7.2",
     "react-native-drag-sort": "^2.4.4",
+    "react-native-micdup-audio-engine": "1.0.0",
     "react-native-modal": "^13.0.0",
     "react-native-paper": "^4.11.1",
     "react-native-swipe-gestures": "^1.0.5",

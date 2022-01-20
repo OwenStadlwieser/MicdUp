@@ -110,7 +110,8 @@ export class Chat extends Component {
     }
   };
   setPlaying(id) {
-    this.mounted && this.setState({ playingId: id });
+    console.log(id);
+    this.mounted && this.setState({ currentPlayingId: id });
   }
 
   onPlaybackStatusUpdate(status) {
