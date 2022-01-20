@@ -39,12 +39,6 @@ build/Release
 
 # Dependency directories
 node_modules/
-!node_modules/react-native-micdup-audio-engine/
-!node_modules/react-native-micdup-audio-engine/*/
-!node_modules/react-native-micdup-audio-engine/*/ios/
-!node_modules/react-native-micdup-audio-engine/*/ios/*/
-!node_modules/react-native-micdup-audio-engine/*/ios/*/AudioEngine.xcodeproj/*
-!node_modules/react-native-micdup-audio-engine/*/ios/*/AudioEngine.xcworkspace/*
 jspm_packages/
 
 # TypeScript v1 declaration files
