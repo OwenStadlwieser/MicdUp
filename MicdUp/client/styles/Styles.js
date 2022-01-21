@@ -584,8 +584,13 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   clipsEditDiv: {
-    height: height * 0.5,
+    height: height * 0.3,
     width: width * 0.95,
+  },
+  filterEditDiv: {
+    height: height * 0.2,
+    width: width * 0.95,
+    backgroundColor: "white",
   },
   continueEditDiv: {
     height: height * 0.18,

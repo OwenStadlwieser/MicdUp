@@ -2,7 +2,14 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
 import Clips from "./Clips";
-import { View, TextInput, TouchableOpacity, Text } from "react-native";
+import Filters from "./Filters";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  Platform,
+} from "react-native";
 //icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
@@ -10,6 +17,7 @@ import { styles } from "../../../styles/Styles";
 // redux
 import { updateTitle } from "../../../redux/actions/recording";
 import { showMessage } from "../../../redux/actions/display";
+
 export class EditRecording extends Component {
   constructor() {
     super();
@@ -54,6 +62,9 @@ export class EditRecording extends Component {
         </View>
         <View style={styles.clipsEditDiv}>
           <Clips />
+        </View>
+        <View style={styles.filterEditDiv}>
+          {Platform.OS === "ios" && <Filters />}
         </View>
         <View style={styles.continueEditDiv}>
           <TouchableOpacity
