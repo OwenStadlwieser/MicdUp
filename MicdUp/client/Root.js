@@ -14,7 +14,6 @@ import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
-import { Create } from "./components/private/Create/Create";
 
 export class Root extends Component {
   constructor() {
@@ -76,7 +75,7 @@ export class Root extends Component {
           {mountedComponent === "Feed" ? (
             <View style={styles.containerPrivate}>
               <View style={styles.contentContainer}>
-                <Create />
+                <Feed />
               </View>
               <Navbar />
             </View>
