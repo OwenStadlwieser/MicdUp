@@ -151,6 +151,9 @@ const styles = StyleSheet.create({
     fontSize: small,
   },
   profileText: {
+    paddingLeft: width * 0.075,
+    width: width * 0.6,
+    textAlign: 'left',
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",

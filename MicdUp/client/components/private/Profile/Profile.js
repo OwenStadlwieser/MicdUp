@@ -252,7 +252,7 @@ export class Profile extends Component {
                   )}
                 </View>
                 <Text style={styles.followersText}>
-                  {currentProfile.followersCount} Followers
+                  {currentProfile ? currentProfile.followersCount : 0} Followers
                 </Text>
               </View>
               <Text style={styles.profileText}>@{userName}</Text>
