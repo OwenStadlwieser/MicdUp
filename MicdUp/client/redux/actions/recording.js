@@ -10,7 +10,7 @@ import {
   UPDATE_COMMENT_TO_POST,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
-  UPDATE_COMMENT,
+  ADD_POSTS,
   UPDATE_CURRENT_RECORDINGS,
 } from "../types";
 import {
@@ -142,10 +142,17 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
-    dispatch({
-      type: SET_POSTS,
-      payload: res.data.getUserPosts,
-    });
+    if(skipMult === 0) {
+      dispatch({
+        type: SET_POSTS,
+        payload: res.data.getUserPosts,
+      });
+    } else {
+      dispatch({
+        type: ADD_POSTS,
+        payload: res.data.getUserPosts,
+      });
+    }
     return res.data.getUserPosts;
   } catch (err) {
     console.log(err);

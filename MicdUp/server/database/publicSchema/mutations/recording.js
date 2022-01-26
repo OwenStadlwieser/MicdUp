@@ -170,6 +170,8 @@ const uploadBio = {
       console.log(err);
     }
     // create post record
+    const session = await mongoose.startSession();
+    session.startTransaction();
     const profile = context.profile;
     if (profile.bio) {
       const oldBio = await File.findByIdAndDelete(profile.bio, { session });
@@ -189,8 +191,6 @@ const uploadBio = {
       `${bio._id}.mp4`
     );
     // convert file to mp4 (might as well keep them all the same)
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
       await ffmpegMergeAndUpload(fileName, bio._id, fileNames, command);
       await profile.save({ session });

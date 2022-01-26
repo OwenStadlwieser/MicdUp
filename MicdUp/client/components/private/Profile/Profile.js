@@ -14,7 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 // styles
-import { styles } from "../../../styles/Styles";
+import { styles, postHeight, postPadding } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
@@ -51,6 +51,21 @@ export class Profile extends Component {
     };
     this.scrollView = null;
     this.mounted = true;
+  }
+
+  async handleScroll(event) {
+    const { posts, getUserPosts, currentProfile } = this.props
+    const { loading } = this.state
+    try {
+      if(event.nativeEvent.contentOffset.y > (posts.length * (postHeight)) && !loading  
+      && posts.length % 20 === 0) {
+        this.mounted && this.setState({ loading: true })
+        await getUserPosts(currentProfile.id, posts.length / 20);
+        this.mounted && this.setState({ loading: false })
+      }
+    } catch(err) {
+      console.log(err)
+    }
   }
 
   async onSwipeDown(gestureState) {
@@ -300,9 +315,10 @@ export class Profile extends Component {
               style={styles.postsContainer}
               scrollEventThrottle={16}
               ref={(view) => (this.scrollView = view)}
+              onScroll={this.handleScroll.bind(this)}
             >
               {posts &&
-                posts.map((post, index) => (
+                posts.map((post, index) => post && (
                   <Post
                     isUserProfile={isUserProfile}
                     setCommentPosts={this.setCommentPosts.bind(this)}

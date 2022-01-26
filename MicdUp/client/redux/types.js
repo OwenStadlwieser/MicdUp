@@ -32,3 +32,4 @@ export const SET_ACTIVE_CHATS = "SET_ACTIVE_CHATS";
 export const ADD_CHATS = "ADD_CHATS";
 export const HIDE_CHATS = "HIDE_CHATS";
 export const SET_SOCKET = "SET_SOCKET";
+export const ADD_POSTS = "ADD_POSTS";

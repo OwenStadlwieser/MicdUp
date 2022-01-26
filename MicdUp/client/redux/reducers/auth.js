@@ -11,6 +11,7 @@ import {
   UPDATE_COMMENT_TO_POST,
   DELETE_POST,
   SET_SOCKET,
+  ADD_POSTS
 } from "../types";
 
 const initialState = {
@@ -71,6 +72,11 @@ export default function (state = { ...initialState }, action) {
             image: { ...payload },
           },
         },
+      };
+    case ADD_POSTS: 
+      return {
+        ...state,
+        posts: [...state.posts, ...payload],
       };
     case SET_POSTS:
       return {

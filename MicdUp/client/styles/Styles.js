@@ -17,7 +17,8 @@ const small = normalize(15);
 const medium = normalize(17);
 const large = normalize(20);
 const xl = normalize(24);
-
+const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
+const postPadding = height * 0.02;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -385,11 +386,11 @@ const styles = StyleSheet.create({
     zIndex: 99,
   },
   postContainer: {
-    height: width > 1000 ? height * 0.25 : height * 0.14,
+    height: postHeight,
     width: width > 1000 ? width * 0.8 : width,
     borderRadius: 8,
     borderWidth: 2,
-    marginBottom: height * 0.02,
+    marginBottom: postPadding,
     backgroundColor: "white",
     justifyContent: "center",
     paddingHorizontal: 15,
@@ -776,4 +777,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles };
+export { styles, postPadding, postHeight };
