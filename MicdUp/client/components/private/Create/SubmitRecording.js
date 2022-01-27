@@ -5,11 +5,12 @@ import { RadioButton } from "react-native-paper";
 import {
   View,
   ScrollView,
-  TextInput,
+  Dimensions,
   TouchableOpacity,
   Text,
 } from "react-native";
 import SearchComponent from "../../reuseable/SearchComponent";
+import PlayButton from "../../reuseable/PlayButton";
 //icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
@@ -18,8 +19,9 @@ import { styles } from "../../../styles/Styles";
 import { updateTags, uploadRecording } from "../../../redux/actions/recording";
 import { searchTags, randomTag } from "../../../redux/actions/tag";
 // helpers
+import { playSound } from "../../../reuseableFunctions/helpers";
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
-
+const { height, width } = Dimensions.get("window")
 export class SubmitRecording extends Component {
   constructor() {
     super();
@@ -29,6 +31,9 @@ export class SubmitRecording extends Component {
       allowStitch: true,
       allowRebuttal: true,
       privatePost: false,
+      activeClip: 0,
+      playingId: '',
+      clipId: "CLIP"
     };
 
     this.mounted = true;
@@ -46,11 +51,33 @@ export class SubmitRecording extends Component {
     this.mounted && this.setState({ tags });
   };
 
+  setPlaying(id) {
+    this.mounted && this.setState({ playingId: id });
+  }
+
+  async onPlaybackStatusUpdate(status) {
+    const { clips } = this.props
+    const { activeClip } =this.state
+    if (status.didJustFinish) {
+      this.mounted && this.setState({ activeClip: activeClip < (clips.length - 1) ? activeClip + 1 : 0 });
+      if (activeClip < clips.length - 1){
+        this.mounted && this.setState({ playingId: "CLIP"})
+        await playSound(
+          clips[this.state.activeClip].uri,
+          this.onPlaybackStatusUpdate.bind(this)
+        );
+      } else {
+        this.mounted && this.setState({ playingId: ""})
+      }
+    }
+  }
+
   render() {
     const { updateSubmitRecording, clips, tags, title } = this.props;
-    const { nsfw, allowRebuttal, allowStitch, privatePost } = this.state;
+    const { nsfw, allowRebuttal, allowStitch, privatePost, activeClip, playingId, clipId } = this.state;
+    console.log(activeClip)
     return (
-      <View style={styles.pane}>
+      <View style={styles.paneSpaceEvenly}>
         <AntDesign
           style={styles.topLeftIcon}
           name="leftcircle"
@@ -121,14 +148,19 @@ export class SubmitRecording extends Component {
             />
           </View>
         </ScrollView>
-        <View style={styles.playButtonContainer}>
-          <AntDesign
-            style={styles.playButton}
-            name="play"
-            size={48}
-            color="white"
-          />
-        </View>
+        <PlayButton
+          containerStyle={{ width: width * 0.2, height: width * 0.2 }}
+          color={"white"}
+          currentPlayingId={playingId}
+          size={72}
+          post={{
+            id: clipId,
+            signedUrl: clips[activeClip].uri,
+          }}
+          playButtonSty={{ fontSize: 72 }}
+          setPlaying={this.setPlaying.bind(this)}
+          onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
+        />
         <View style={styles.continueButtonContainer}>
           <TouchableOpacity style={styles.nextButton}>
             <Text style={styles.nextButtonText}>Discard</Text>

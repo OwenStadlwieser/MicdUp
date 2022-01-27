@@ -241,6 +241,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  paneSpaceEvenly: {
+    flex: 1,
+    backgroundColor: "#1A3561",
+    width: width,
+    height: height * 0.9,
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
   paneUncentered: {
     flex: 1,
     backgroundColor: "#1A3561",
@@ -583,9 +591,9 @@ const styles = StyleSheet.create({
     height: height * 0.15,
   },
   upperEditDivAbsolute: {
-    marginTop: height * 0.05,
     height: height * 0.15,
     zIndex: 3,
+    justifyContent: 'space-evenly'
   },
   clipsEditDiv: {
     height: height * 0.3,

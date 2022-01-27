@@ -36,7 +36,9 @@ export class PlayButton extends Component {
       post,
       setPlaying,
       onPlaybackStatusUpdate,
+      playButtonSty
     } = this.props;
+
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -56,7 +58,7 @@ export class PlayButton extends Component {
               this.mounted && this.setState({ playbackObject });
               setPlaying(post.id);
             }}
-            style={styles.playButton}
+            style={playButtonSty ? playButtonSty : styles.playButton}
             name="play"
             size={this.props.size ? this.props.size : 24}
             color={color}
@@ -66,7 +68,7 @@ export class PlayButton extends Component {
             onPress={async () => {
               await this.stopCurrentSound();
             }}
-            style={styles.playButton}
+            style={playButtonSty ? playButtonSty : styles.playButton}
             name="pausecircle"
             size={this.props.size ? this.props.size : 24}
             color={color}
