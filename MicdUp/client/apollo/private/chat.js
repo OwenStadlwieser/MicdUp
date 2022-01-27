@@ -36,6 +36,10 @@ const FETCH_CHATS_QUERY = gql`
       }
       members {
         id
+        image {
+          id
+          signedUrl
+        }
         user {
           _id
           userName
@@ -77,6 +81,10 @@ const FETCH_CHAT_MUTATION = gql`
       }
       members {
         id
+        image {
+          id
+          signedUrl
+        }
         user {
           _id
           userName
