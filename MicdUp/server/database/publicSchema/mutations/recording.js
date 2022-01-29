@@ -70,6 +70,7 @@ const createRecording = {
     try {
       for (let i = 0; i < files.length; i++) {
         var fileType = fileTypes[i].replace("audio/", "");
+        fileType = fileType.replace(".", "");
         var jsonPath = path.join(
           __dirname,
           "..",
@@ -151,6 +152,7 @@ const uploadBio = {
     });
     try {
       var fileType = fileTypes.replace("audio/", "");
+      fileType = fileType.replace(".", "");
       var jsonPath = path.join(
         __dirname,
         "..",
@@ -312,6 +314,7 @@ const commentToPost = {
       var fileNames = [];
       var command = ffmpeg();
       try {
+        fileType = fileType.replace(".", "");
         var jsonPath = path.join(
           __dirname,
           "..",

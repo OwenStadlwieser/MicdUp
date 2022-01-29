@@ -10,7 +10,5 @@
     <integer>0</integer>
     <key>EXUpdatesSDKVersion</key>
     <string>44.0.0</string>
-    <key>EXUpdatesURL</key>
-    <string>https://exp.host/@mrudolf/MicdUp</string>
   </dict>
 </plist>

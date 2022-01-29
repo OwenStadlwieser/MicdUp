@@ -3,7 +3,7 @@ import { AppRegistry, Platform } from "react-native";
 import Root from "./Root";
 import { Provider } from "react-redux";
 import store from "./redux/index";
-import { AudioEngine } from "react-native-micdup-audio-engine";
+import { AudioEngine } from "react-native-audio-engine";
 
 export default function App() {
   console.log(AudioEngine);
