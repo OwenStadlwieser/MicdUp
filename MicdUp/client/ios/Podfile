@@ -6,7 +6,7 @@ platform :ios, '12.0'
 
 require 'json'
 podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {}
-
+source 'https://github.com/CocoaPods/Specs.git'
 target 'MicdUp' do
   use_expo_modules!
   config = use_native_modules!
@@ -24,8 +24,7 @@ target 'MicdUp' do
   #   use_flipper!('Flipper' => '0.75.1', 'Flipper-Folly' => '2.5.3', 'Flipper-RSocket' => '1.3.1')
   # end
 
-
-  pod 'react-native-audio-engine', :path => '../node_modules/react-native-micdup-audio-engine'
+  pod 'react-native-audio-engine', :path => '../node_modules/react-native-audio-engine'
 
   post_install do |installer|
     react_native_post_install(installer)
