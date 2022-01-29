@@ -56,7 +56,7 @@ export class Dms extends Component {
                       <Image
                         source={
                           member && member.image
-                            ? member.image.signedUrl
+                            ? { uri: member.image.signedUrl }
                             : require("../../../assets/no-profile-pic-icon-27.jpg")
                         }
                         style={styles.commentImg}

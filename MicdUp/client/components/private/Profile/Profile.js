@@ -190,7 +190,7 @@ export class Profile extends Component {
       selectImage,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
-
+    console.log('here')
     const isUserProfile =
       profile && currentProfile ? profile.id === currentProfile.id : false;
 
@@ -245,7 +245,7 @@ export class Profile extends Component {
                     <Image
                       source={
                         currentProfile && currentProfile.image
-                          ? currentProfile.image.signedUrl
+                          ? { uri: currentProfile.image.signedUrl }
                           : require("../../../assets/no-profile-pic-icon-27.jpg")
                       }
                       style={styles.profileImgSmall}
