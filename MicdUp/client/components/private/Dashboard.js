@@ -18,6 +18,7 @@ import { removeItemValue, getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
 //styles
 import { styles } from "../../styles/Styles";
+import NotificationView from "./Notifs/NotificationView";
 
 export class Dashboard extends Component {
   constructor() {
@@ -68,6 +69,8 @@ export class Dashboard extends Component {
             <Profile userName={user && user.userName ? user.userName : ""} />
           ) : mountedComponent === "Search" ? (
             <Search key={keyForSearch} />
+          ) : mountedComponent === "Notifs" ? (
+            <NotificationView/>
           ) : (
             <Feed />
           )}
