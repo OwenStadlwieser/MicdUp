@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Dimensions, TouchableOpacity, Platform } from "react-native";
-import { styles } from "../../../styles/Styles";
+import { View, Dimensions, TouchableOpacity, Text } from "react-native";
+import { filterHeight } from "../../../styles/Styles";
 import Carousel from "react-native-snap-carousel";
+import { showMessage } from "../../../redux/actions/display";
 // import { AudioEngine } from "react-native-audio-engine";
 //(applyFilter: (NSString *)filePath numberParameter:(nonnull NSNumber *)
 //reverbSetting numberParameter:(nonnull NSNumber *)pitchChange
@@ -13,12 +14,20 @@ export class Filters extends Component {
     super();
     this.state = {
       loading: false,
-      entries: {
-        title: "Chipmunk",
-        pitch: 50,
-        reverb: 0,
-        speed: 0,
-      },
+      entries: [
+        {
+          title: "Chipmunk",
+          pitch: 50,
+          reverb: 0,
+          speed: 0,
+        },
+        {
+          title: "Scary",
+          pitch: 50,
+          reverb: 0,
+          speed: 0,
+        },
+      ],
     };
     this._carousel = {};
     this.mounted = true;
@@ -29,42 +38,50 @@ export class Filters extends Component {
   componentDidMount = () => {};
 
   _renderItem = ({ item, index }) => {
-    const { clips } = this.props;
+    const { selectedClips, clips } = this.props;
     return (
       <TouchableOpacity
         style={{
-          backgroundColor: "floralwhite",
+          backgroundColor: "black",
           borderRadius: 5,
-          height: 250,
-          padding: 50,
-          marginLeft: 25,
-          marginRight: 25,
+          marginHorizontal: 25,
+          height: filterHeight,
+          alignItems: "center",
+          flexDirection: "row",
+          justifyContent: "center",
         }}
         key={index}
         onPress={() => {
-          console.log("Calling native function");
-          // AudioEngine.applyFilter(
-          //   clips[0].uri,
-          //   item.reverb,
-          //   item.pitch,
-          //   item.speed,
-          //   (path) => {
-          //     console.log(path, "success");
-          //   },
-          //   (info) => {
-          //     console.log(info, "info");
-          //   },
-          //   (err) => console.log(err)
-          // );
+          console.log("here");
+          try {
+            const keys = Object.keys(selectedClips);
+            if (!keys || keys.length === 0) {
+              this.props.showMessage({
+                message: "Select a Klip before applying filter",
+                success: false,
+              });
+              return;
+            }
+            for (let i = 0; i < keys.length; i++) {
+              console.log(clips[i]);
+            }
+          } catch (err) {
+            console.log(err);
+            this.props.showMessage({
+              message: "Something went wrong",
+              success: false,
+            });
+            return;
+          }
         }}
       >
-        <Text>{item.title}</Text>
+        <Text style={{ color: "white" }}>{item.title}</Text>
       </TouchableOpacity>
     );
   };
 
   render() {
-    const { width } = Dimensions;
+    const { width } = Dimensions.get("window");
     return (
       <Carousel
         ref={(c) => {
@@ -74,7 +91,7 @@ export class Filters extends Component {
         renderItem={this._renderItem}
         sliderWidth={width - 40}
         itemWidth={width / 2}
-        style={{}}
+        style={{ alignItems: "center", justifyContent: "space-evenly" }}
       />
     );
   }
@@ -84,4 +101,4 @@ const mapStateToProps = (state) => ({
   clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, {})(Filters);
+export default connect(mapStateToProps, { showMessage })(Filters);
