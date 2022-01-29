@@ -12,6 +12,7 @@ import {
   Platform,
   NativeModules,
 } from "react-native";
+import Voice from '@react-native-voice/voice'
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -44,8 +45,10 @@ export class Create extends Component {
       promptShown: false,
       functionID: "",
       prompt: {},
+      results: []
     };
-
+    Voice.onSpeechResults = this.onSpeechResults.bind(this)
+    Voice.onSpeechStart = this.onSpeechStart.bind(this)
     this.mounted = true;
     this.colors = ["white", "red"];
   }
@@ -63,7 +66,12 @@ export class Create extends Component {
   updateSubmitRecording = (submitRecording) => {
     this.mounted && this.setState({ submitRecording });
   };
-
+  onSpeechStart = () => {
+    this.mounted && this.setState({ recognizing: true});
+  }
+  onSpeechResults = (e) => {
+    this.mounted && this.setState({ results: e.value});
+  }
   startRecording = async () => {
     try {
       await Audio.requestPermissionsAsync();
@@ -72,6 +80,10 @@ export class Create extends Component {
         playsInSilentModeIOS: true,
       });
       console.log("Starting recording..");
+      Voice.start('en-US')
+      await Voice.isRecognizing()
+      console.log('is recognizing', Voice.isAvailable())
+      console.log('is recognizing', Voice.isRecognizing())
       const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
@@ -85,11 +97,12 @@ export class Create extends Component {
   };
 
   stopRecording = async () => {
-    const { recording } = this.state;
+    const { recording, results } = this.state;
     const { clips } = this.props;
     console.log("Stopping recording..");
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
+    Voice.stop();
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -101,6 +114,7 @@ export class Create extends Component {
                 uri,
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+                results
               },
             ]
           : [
@@ -108,10 +122,12 @@ export class Create extends Component {
                 uri,
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+                results
               },
             ],
         v: 0,
       });
+    console.log(this.state.audioBlobs);
     this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
   };

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { View, Dimensions, TouchableOpacity, Platform } from "react-native";
 import { styles } from "../../../styles/Styles";
 import Carousel from "react-native-snap-carousel";
-import { AudioEngine } from "react-native-micdup-audio-engine";
+// import { AudioEngine } from "react-native-audio-engine";
 //(applyFilter: (NSString *)filePath numberParameter:(nonnull NSNumber *)
 //reverbSetting numberParameter:(nonnull NSNumber *)pitchChange
 //numberParameter:(nonnull NSNumber *)speedChange callback:(RCTResponseSenderBlock)successCallback callback:(RCTResponseSenderBlock)callback)
@@ -43,19 +43,19 @@ export class Filters extends Component {
         key={index}
         onPress={() => {
           console.log("Calling native function");
-          AudioEngine.applyFilter(
-            clips[0].uri,
-            item.reverb,
-            item.pitch,
-            item.speed,
-            (path) => {
-              console.log(path, "success");
-            },
-            (info) => {
-              console.log(info, "info");
-            },
-            (err) => console.log(err)
-          );
+          // AudioEngine.applyFilter(
+          //   clips[0].uri,
+          //   item.reverb,
+          //   item.pitch,
+          //   item.speed,
+          //   (path) => {
+          //     console.log(path, "success");
+          //   },
+          //   (info) => {
+          //     console.log(info, "info");
+          //   },
+          //   (err) => console.log(err)
+          // );
         }}
       >
         <Text>{item.title}</Text>
