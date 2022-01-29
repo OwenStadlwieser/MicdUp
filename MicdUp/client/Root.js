@@ -14,6 +14,7 @@ import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
+import NotificationBell from "./components/private/NotificationBell";
 
 export class Root extends Component {
   constructor() {
@@ -62,6 +63,7 @@ export class Root extends Component {
     let app;
     if (!loggedIn && !token)
       app = (
+        
         <View style={styles.rootContainer}>
           {displayMessage && (
             <View style={styles.messageContainer}>
@@ -114,6 +116,7 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
+          <NotificationBell/>
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
