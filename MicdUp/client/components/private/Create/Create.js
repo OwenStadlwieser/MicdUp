@@ -12,7 +12,7 @@ import {
   Platform,
   NativeModules,
 } from "react-native";
-import Voice from '@react-native-voice/voice'
+import Voice from "@react-native-voice/voice";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -45,10 +45,14 @@ export class Create extends Component {
       promptShown: false,
       functionID: "",
       prompt: {},
-      results: []
+      results: [],
     };
-    Voice.onSpeechResults = this.onSpeechResults.bind(this)
-    Voice.onSpeechStart = this.onSpeechStart.bind(this)
+    try {
+      Voice.onSpeechResults = this.onSpeechResults.bind(this);
+      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+    } catch (err) {
+      console.log(err);
+    }
     this.mounted = true;
     this.colors = ["white", "red"];
   }
@@ -67,11 +71,11 @@ export class Create extends Component {
     this.mounted && this.setState({ submitRecording });
   };
   onSpeechStart = () => {
-    this.mounted && this.setState({ recognizing: true});
-  }
+    this.mounted && this.setState({ recognizing: true });
+  };
   onSpeechResults = (e) => {
-    this.mounted && this.setState({ results: e.value});
-  }
+    this.mounted && this.setState({ results: e.value });
+  };
   startRecording = async () => {
     try {
       await Audio.requestPermissionsAsync();
@@ -80,10 +84,14 @@ export class Create extends Component {
         playsInSilentModeIOS: true,
       });
       console.log("Starting recording..");
-      Voice.start('en-US')
-      await Voice.isRecognizing()
-      console.log('is recognizing', Voice.isAvailable())
-      console.log('is recognizing', Voice.isRecognizing())
+      try {
+        Voice &&
+          Platform.OS !== "web" &&
+          (await Voice.isAvailable()) &&
+          Voice.start("en-US");
+      } catch (err) {
+        console.log(err);
+      }
       const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
@@ -102,7 +110,11 @@ export class Create extends Component {
     console.log("Stopping recording..");
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
-    Voice.stop();
+    try {
+      Voice && Platform.OS !== "web" && Voice.stop();
+    } catch (err) {
+      console.log(err);
+    }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -114,7 +126,7 @@ export class Create extends Component {
                 uri,
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-                results
+                results,
               },
             ]
           : [
@@ -122,7 +134,7 @@ export class Create extends Component {
                 uri,
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-                results
+                results,
               },
             ],
         v: 0,
