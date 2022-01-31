@@ -24,7 +24,7 @@ const parentWidth = width < 1000 ? width * 0.95 : width * 0.8;
 const childrenWidth = width < 1000 ? width * 0.95 : width * 0.8;
 const childrenHeight = 48;
 
-export class OneRowsPage extends Component {
+export class Clips extends Component {
   constructor(props) {
     super();
 
@@ -41,6 +41,8 @@ export class OneRowsPage extends Component {
   componentDidMount = () => {};
   render() {
     const dataProp = this.props.clips;
+    const { itemClicked } = this.props;
+    console.log(itemClicked)
     return (
       <SafeAreaView style={{ backgroundColor: "#fff", flex: 1 }}>
         <ScrollView
@@ -70,7 +72,9 @@ export class OneRowsPage extends Component {
               }
             }}
             keyExtractor={(item, index) => item.finalDuration}
-            onClickItem={(data, item, index) => {}}
+            onClickItem={(data, item, index) => {
+              itemClicked && itemClicked(index)
+            }}
             renderItem={(item, index) => {
               return this.renderItem(item, index);
             }}
@@ -97,9 +101,10 @@ export class OneRowsPage extends Component {
   }
   renderItem(item, index) {
     const { playingIndex } = this.state;
+    const { selectedClips } = this.props;
     return (
       <View style={styles.item}>
-        <View style={styles.item_children}>
+        <View style={selectedClips && selectedClips[index] ? styles.selectedItem : styles.item_children}>
           <Text style={styles.item_text}>Clip {index + 1}</Text>
           <Text style={styles.item_text}>
             {Math.round(item.finalDuration / 1000)} Seconds
@@ -160,6 +165,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  selectedItem: {
+    width: childrenWidth,
+    height: childrenHeight - 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+    paddingHorizontal: 15,
+    backgroundColor: "#06C1D7"
+  },
   item_children: {
     width: childrenWidth,
     height: childrenHeight - 4,
@@ -193,4 +208,4 @@ const mapStateToProps = (state) => ({
   clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, { updateClips })(OneRowsPage);
+export default connect(mapStateToProps, { updateClips })(Clips);
