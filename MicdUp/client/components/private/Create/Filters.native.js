@@ -1,9 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Dimensions, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+  NativeModules,
+} from "react-native";
 import { filterHeight } from "../../../styles/Styles";
 import Carousel from "react-native-snap-carousel";
 import { showMessage } from "../../../redux/actions/display";
+import { updateClips } from "../../../redux/actions/recording";
 // import { AudioEngine } from "react-native-audio-engine";
 //(applyFilter: (NSString *)filePath numberParameter:(nonnull NSNumber *)
 //reverbSetting numberParameter:(nonnull NSNumber *)pitchChange
@@ -63,6 +70,29 @@ export class Filters extends Component {
               return;
             }
             for (let i = 0; i < keys.length; i++) {
+              let x = String(clips[i].uri);
+              console.log(x);
+              try {
+                NativeModules.AudioEngineOBJC.applyFilter(
+                  x,
+                  0,
+                  100,
+                  100,
+                  0,
+                  100,
+                  0,
+                  0,
+                  (filePath) => {
+                    clips[i].originalUri = clips[i].uri;
+                    clips[i].uri = filePath;
+                    clips[i].filter = true;
+                    this.props.updateClips(clips);
+                  }
+                );
+              } catch (err) {
+                console.log(2);
+                console.log(err);
+              }
               console.log(clips[i]);
             }
           } catch (err) {
@@ -101,4 +131,4 @@ const mapStateToProps = (state) => ({
   clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, { showMessage })(Filters);
+export default connect(mapStateToProps, { showMessage, updateClips })(Filters);
