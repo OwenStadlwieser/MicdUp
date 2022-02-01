@@ -4,8 +4,8 @@ const { GraphQLList, GraphQLInt } = require("graphql");
 
 const getFilters = {
   type: new GraphQLList(FilterType),
-  args: { skipMult: GraphQLInt },
-  async resolve(parent, {}, context) {
+  args: { skipMult: { type: GraphQLInt } },
+  async resolve(parent, { skipMult }, context) {
     const size = 30;
     try {
       const res = await Filter.aggregate([

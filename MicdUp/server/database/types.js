@@ -425,6 +425,12 @@ const ChatMessageType = new GraphQLObjectType({
 const FilterType = new GraphQLObjectType({
   name: "Filter",
   fields: () => ({
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent._id;
+      },
+    },
     title: {
       type: GraphQLString,
     },
