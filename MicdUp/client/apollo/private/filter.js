@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 const GET_FILTERS_QUERY = gql`
-  query getFilters($skipMult: Int!)) {
-    getFilters(skipMult: $skipMult){
+  query getFilters($skipMult: Int!) {
+    getFilters(skipMult: $skipMult) {
       id
       title
       type
