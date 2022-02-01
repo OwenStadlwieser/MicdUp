@@ -24,6 +24,7 @@ export class EditRecording extends Component {
     this.state = {
       loading: false,
       title: "",
+      selectedClips: {}
     };
 
     this.mounted = true;
@@ -36,9 +37,18 @@ export class EditRecording extends Component {
     this.mounted && this.setState({ title: reduxTitle });
   };
 
+  itemClicked = (index) => {
+    const { selectedClips } = this.state
+    if(selectedClips[index]) {
+      delete selectedClips[index];
+    } else {
+      selectedClips[index]= true
+    }
+    this.mounted && this.setState({ selectedClips})
+  }
   render() {
     const { hideEditRecording, updateSubmitRecording } = this.props;
-    const { title } = this.state;
+    const { title, selectedClips } = this.state;
     return (
       <View style={styles.pane}>
         <AntDesign
@@ -61,10 +71,10 @@ export class EditRecording extends Component {
           />
         </View>
         <View style={styles.clipsEditDiv}>
-          <Clips />
+          <Clips selectedClips={selectedClips} itemClicked={this.itemClicked.bind(this)} />
         </View>
         <View style={styles.filterEditDiv}>
-          {Platform.OS === "ios" && <Filters />}
+          {Platform.OS === "ios" && <Filters selectedClips={selectedClips}/>}
         </View>
         <View style={styles.continueEditDiv}>
           <TouchableOpacity

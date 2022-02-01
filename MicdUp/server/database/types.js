@@ -22,10 +22,11 @@ const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
     _id: { type: GraphQLID },
-    id: {type: GraphQLID,
+    id: {
+      type: GraphQLID,
       resolve(parent) {
         return parent._id;
-      }, 
+      },
     },
     userName: { type: GraphQLString },
     email: { type: GraphQLString },
@@ -421,6 +422,54 @@ const ChatMessageType = new GraphQLObjectType({
   }),
 });
 
+const FilterType = new GraphQLObjectType({
+  name: "Filter",
+  fields: () => ({
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent._id;
+      },
+    },
+    title: {
+      type: GraphQLString,
+    },
+    type: {
+      type: GraphQLString,
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      async resolve(parent) {
+        return await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+    image: {
+      type: FileType,
+      async resolve(parent) {
+        const res = await File.findOne({ _id: parent.image });
+        return res;
+      },
+    },
+    reverbPreset: {
+      type: GraphQLInt,
+    },
+    reverb: {
+      type: GraphQLInt,
+    },
+    distortionPreset: {
+      type: GraphQLInt,
+    },
+    distortion: {
+      type: GraphQLInt,
+    },
+    equalizerPreset: {
+      type: GraphQLInt,
+    },
+    pitchNum: {
+      type: GraphQLInt,
+    },
+  }),
+});
 const FileType = new GraphQLObjectType({
   name: "File",
   fields: () => ({
@@ -526,4 +575,5 @@ module.exports = {
   ProfileType,
   ChatType,
   ChatMessageType,
+  FilterType,
 };

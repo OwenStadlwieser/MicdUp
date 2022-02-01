@@ -5,16 +5,6 @@ import { Provider } from "react-redux";
 import store from "./redux/index";
 
 export default function App() {
-  try {
-    console.log(AudioEngine);
-  } catch (err) {
-    console.log(err, 1)
-  }
-  try {
-    console.log(NativeModules.SpeechRecognizer)
-  } catch (err) {
-    console.log(err, 12)
-  }
   // if (Platform.OS === "ios") {
   //   AudioEngine.sampleMethod("String Arg", 1, (string) => {
   //     console.log(string);

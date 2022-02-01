@@ -19,6 +19,7 @@ const large = normalize(20);
 const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
+const filterHeight = height * 0.2;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -600,7 +601,7 @@ const styles = StyleSheet.create({
     width: width * 0.95,
   },
   filterEditDiv: {
-    height: height * 0.2,
+    height: filterHeight,
     width: width * 0.95,
     backgroundColor: "white",
   },
@@ -785,4 +786,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles, postPadding, postHeight };
+export { styles, postPadding, postHeight, filterHeight };
