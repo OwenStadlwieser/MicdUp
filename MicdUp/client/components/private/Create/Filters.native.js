@@ -23,20 +23,7 @@ export class Filters extends Component {
     this.state = {
       loading: false,
       size: 30,
-      entries: [
-        {
-          title: "Chipmunk",
-          pitch: 50,
-          reverb: 0,
-          speed: 0,
-        },
-        {
-          title: "Scary",
-          pitch: 50,
-          reverb: 0,
-          speed: 0,
-        },
-      ],
+      entries: [],
     };
     this._carousel = {};
     this.mounted = true;
@@ -46,7 +33,8 @@ export class Filters extends Component {
 
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
-    const res = this.props.getFilters(0);
+    const res = await this.props.getFilters(0);
+    console.log(res);
     this.mounted && this.setState({ entries: res, loading: false });
   };
 
@@ -82,7 +70,7 @@ export class Filters extends Component {
             );
             break;
           case "REVERB":
-            NativeModules.AudioEngineOBJC.applyEqualizerFilter(
+            NativeModules.AudioEngineOBJC.applyReverbFilter(
               x,
               item.reverbPreset,
               item.reverb,
@@ -99,7 +87,7 @@ export class Filters extends Component {
             );
             break;
           case "DISTORTION":
-            NativeModules.AudioEngineOBJC.applyEqualizerFilter(
+            NativeModules.AudioEngineOBJC.applyDistortionFilter(
               x,
               item.distortionPreset,
               item.distortion,
@@ -160,10 +148,10 @@ export class Filters extends Component {
         ref={(c) => {
           this._carousel = c;
         }}
-        onSnapToItem={(index) => {
+        onSnapToItem={async (index) => {
           if ((index + 1) % 30 === 0 && index > 0) {
             this.mounted && this.setState({ loading: true });
-            const res = this.props.getFilters((index + 1) / 30);
+            const res = await this.props.getFilters((index + 1) / 30);
             this.mounted &&
               this.setState({
                 filters: [...this.state.filters, ...res],

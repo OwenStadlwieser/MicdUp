@@ -12,7 +12,7 @@
 @implementation AudioEngineOBJC
 
 // filter for everything
-RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull NSNumber*)reverbPreset rever: (nonnull NSNumber*)rever distPreset: (nonnull NSNumber*)distPreset pitchNum: (nonnull NSNumber*)pitchNum dist: (nonnull NSNumber*)dist filter: (nonnull NSNumber*)filter callback:(RCTResponseSenderBlock)callback){
+RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull NSNumber*)reverbPreset rever: (nonnull NSNumber*)rever distPreset: (nonnull NSNumber*)distPreset pitchNum: (nonnull NSNumber*)pitchNum dist: (nonnull NSNumber*)dist filter: (nonnull NSNumber*)filter callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");
   @try {
     AVAudioEngine *audioEngine = [[AVAudioEngine alloc] init];
@@ -33,7 +33,7 @@ RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull N
     RCTLogInfo(@"%@", soundUrl.path);
     NSError* myErr = nil;
     AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
-    if(myErr) { callback(@[myErr.description]); }
+    if(myErr) { errCallback(@[myErr.description]); }
 
     RCTLogInfo(@"%@", file.description);
     RCTLogInfo(@"file allocated");
@@ -86,7 +86,7 @@ RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull N
       if(myErr) {
         [player stop];
         [audioEngine stop];
-        callback(@[myErr.description]);
+        errCallback(@[myErr.description]);
         
       }
 
@@ -96,12 +96,12 @@ RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull N
           if(myErr) {
             [player stop];
             [audioEngine stop];
-            callback(@[myErr.description]);
+            errCallback(@[myErr.description]);
             
           }
           break;
         case AVAudioEngineManualRenderingStatusError:
-          callback(@[@"ERROR"]);
+          errCallback(@[@"ERROR"]);
         default:
           break;
       }
@@ -112,13 +112,13 @@ RCT_EXPORT_METHOD(applyFilter: (nonnull NSString *)name reverbPreset: (nonnull N
     RCTLogInfo(@"success");
   } @catch (NSException* e){
     RCTLogInfo(@"errror");
-    callback(@[e.reason]);
+    errCallback(@[e.reason]);
   } @finally {
   }
 }
 
 // filter for pitch
-RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnull NSNumber*)pitchNum callback:(RCTResponseSenderBlock)callback){
+RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnull NSNumber*)pitchNum callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");
   @try {
     AVAudioEngine *audioEngine = [[AVAudioEngine alloc] init];
@@ -133,7 +133,7 @@ RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnul
     RCTLogInfo(@"%@", soundUrl.path);
     NSError* myErr = nil;
     AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
-    if(myErr) { callback(@[myErr.description]); }
+    if(myErr) { errCallback(@[myErr.description]); }
 
     RCTLogInfo(@"%@", file.description);
     RCTLogInfo(@"file allocated");
@@ -175,7 +175,7 @@ RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnul
       if(myErr) {
         [player stop];
         [audioEngine stop];
-        callback(@[myErr.description]);
+        errCallback(@[myErr.description]);
         
       }
 
@@ -185,12 +185,12 @@ RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnul
           if(myErr) {
             [player stop];
             [audioEngine stop];
-            callback(@[myErr.description]);
+            errCallback(@[myErr.description]);
             
           }
           break;
         case AVAudioEngineManualRenderingStatusError:
-          callback(@[@"ERROR"]);
+          errCallback(@[@"ERROR"]);
         default:
           break;
       }
@@ -201,13 +201,13 @@ RCT_EXPORT_METHOD(applyPitchFilter:  (nonnull NSString *)name  pitchNum: (nonnul
     RCTLogInfo(@"success");
   } @catch (NSException* e){
     RCTLogInfo(@"errror");
-    callback(@[e.reason]);
+    errCallback(@[e.reason]);
   } @finally {
   }
 }
 // filter for equalizer
 
-RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnull NSNumber*)filter callback:(RCTResponseSenderBlock)callback){
+RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnull NSNumber*)filter callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");
   @try {
     AVAudioEngine *audioEngine = [[AVAudioEngine alloc] init];
@@ -222,7 +222,7 @@ RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnu
     RCTLogInfo(@"%@", soundUrl.path);
     NSError* myErr = nil;
     AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
-    if(myErr) { callback(@[myErr.description]); }
+    if(myErr) { errCallback(@[myErr.description]); }
 
     RCTLogInfo(@"%@", file.description);
     RCTLogInfo(@"file allocated");
@@ -264,7 +264,7 @@ RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnu
       if(myErr) {
         [player stop];
         [audioEngine stop];
-        callback(@[myErr.description]);
+        errCallback(@[myErr.description]);
         
       }
 
@@ -274,12 +274,12 @@ RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnu
           if(myErr) {
             [player stop];
             [audioEngine stop];
-            callback(@[myErr.description]);
+            errCallback(@[myErr.description]);
             
           }
           break;
         case AVAudioEngineManualRenderingStatusError:
-          callback(@[@"ERROR"]);
+          errCallback(@[@"ERROR"]);
         default:
           break;
       }
@@ -290,12 +290,12 @@ RCT_EXPORT_METHOD(applyEqualizerFilter:  (nonnull NSString *)name filter: (nonnu
     RCTLogInfo(@"success");
   } @catch (NSException* e){
     RCTLogInfo(@"errror");
-    callback(@[e.reason]);
+    errCallback(@[e.reason]);
   } @finally {
   }
 }
 // filter for distortion
-RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (nonnull NSNumber*)distPreset dist: (nonnull NSNumber*)dist callback:(RCTResponseSenderBlock)callback){
+RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (nonnull NSNumber*)distPreset dist: (nonnull NSNumber*)dist callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");
   @try {
     AVAudioEngine *audioEngine = [[AVAudioEngine alloc] init];
@@ -310,7 +310,7 @@ RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (n
     RCTLogInfo(@"%@", soundUrl.path);
     NSError* myErr = nil;
     AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
-    if(myErr) { callback(@[myErr.description]); }
+    if(myErr) { errCallback(@[myErr.description]); }
 
     RCTLogInfo(@"%@", file.description);
     RCTLogInfo(@"file allocated");
@@ -353,7 +353,7 @@ RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (n
       if(myErr) {
         [player stop];
         [audioEngine stop];
-        callback(@[myErr.description]);
+        errCallback(@[myErr.description]);
         
       }
 
@@ -363,12 +363,12 @@ RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (n
           if(myErr) {
             [player stop];
             [audioEngine stop];
-            callback(@[myErr.description]);
+            errCallback(@[myErr.description]);
             
           }
           break;
         case AVAudioEngineManualRenderingStatusError:
-          callback(@[@"ERROR"]);
+          errCallback(@[@"ERROR"]);
         default:
           break;
       }
@@ -379,13 +379,13 @@ RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (n
     RCTLogInfo(@"success");
   } @catch (NSException* e){
     RCTLogInfo(@"errror");
-    callback(@[e.reason]);
+    errCallback(@[e.reason]);
   } @finally {
   }
 }
 
 // filter for reverb
-RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (nonnull NSNumber*)reverbPreset rever: (nonnull NSNumber*)rever callback:(RCTResponseSenderBlock)callback){
+RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (nonnull NSNumber*)reverbPreset rever: (nonnull NSNumber*)rever callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");
   @try {
     AVAudioEngine *audioEngine = [[AVAudioEngine alloc] init];
@@ -400,7 +400,7 @@ RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (non
     RCTLogInfo(@"%@", soundUrl.path);
     NSError* myErr = nil;
     AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
-    if(myErr) { callback(@[myErr.description]); }
+    if(myErr) { errCallback(@[myErr.description]); }
 
     RCTLogInfo(@"%@", file.description);
     RCTLogInfo(@"file allocated");
@@ -446,7 +446,7 @@ RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (non
       if(myErr) {
         [player stop];
         [audioEngine stop];
-        callback(@[myErr.description]);
+        errCallback(@[myErr.description]);
         
       }
 
@@ -456,12 +456,12 @@ RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (non
           if(myErr) {
             [player stop];
             [audioEngine stop];
-            callback(@[myErr.description]);
+            errCallback(@[myErr.description]);
             
           }
           break;
         case AVAudioEngineManualRenderingStatusError:
-          callback(@[@"ERROR"]);
+          errCallback(@[@"ERROR"]);
         default:
           break;
       }
@@ -472,7 +472,7 @@ RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (non
     RCTLogInfo(@"success");
   } @catch (NSException* e){
     RCTLogInfo(@"errror");
-    callback(@[e.reason]);
+    errCallback(@[e.reason]);
   } @finally {
   }
 }
