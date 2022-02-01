@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { navigate } from "../../redux/actions/display";
 const { width,height} = Dimensions.get("window");
 
+
 export class NotificationBell extends Component {
   constructor() {
     super();
@@ -17,7 +18,8 @@ export class NotificationBell extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+  };
 
   render() {
     const {

@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View, TouchableOpacity } from "react-native";
-import React, { Component } from "react";
+import { Text, View, TouchableOpacity, Platform } from "react-native";
+import React, { Component, useEffect } from "react";
 import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
@@ -16,6 +16,8 @@ import Feed from "./components/private/Feed/Feed";
 import { getData } from "./reuseableFunctions/helpers";
 import NotificationBell from "./components/private/NotificationBell";
 
+
+
 export class Root extends Component {
   constructor() {
     super();
@@ -27,6 +29,7 @@ export class Root extends Component {
 
     this.mounted = true;
   }
+
 
   componentWillUnmount = () => {
     this.mounted = false;
@@ -49,7 +52,10 @@ export class Root extends Component {
     }
   };
 
+
   render() {
+
+
     const { token } = this.state;
     const {
       showLogin,

@@ -17,6 +17,7 @@ const getData = async (key) => {
     }
   } catch (e) {
     // error reading value
+    return false;
   }
 };
 
@@ -51,6 +52,45 @@ const playSound = async (uri, onPlayBackStatusUpdate) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+const duplicateNotifsString = (n) => {
+  let string = "";
+  for (let i = 0; i < n; i++) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = 0; j < i; j++) {
+      tabString = tabString + tabStringC;
+    }
+    let startString = `${tabString}allReplies {
+      ${tabString}id
+      ${tabString}text
+      ${tabString}notifsLength
+      ${tabString}signedUrl
+      ${tabString}navTo
+      ${tabString}owner {
+        ${tabString}id
+        ${tabString}user {
+          ${tabString}id
+          ${tabString}userName
+          ${tabString}}
+          ${tabString}image {
+            ${tabString}id
+            ${tabString}signedUrl
+            ${tabString}}
+          ${tabString}}
+    `;
+    string = string + startString;
+  }
+  for (let i = n; i > 0; i--) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = i; j > 0; j--) {
+      tabString = tabString + tabStringC;
+    }
+    string = string + `${tabString}}\n`;
+  }
+  return string;
 };
 
 const duplicateCommentsString = (n) => {
@@ -133,4 +173,5 @@ export {
   playSound,
   soundBlobToBase64,
   duplicateCommentsString,
+  duplicateNotifsString
 };
