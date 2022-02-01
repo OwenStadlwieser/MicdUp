@@ -11,6 +11,7 @@ import { filterHeight } from "../../../styles/Styles";
 import Carousel from "react-native-snap-carousel";
 import { showMessage } from "../../../redux/actions/display";
 import { updateClips } from "../../../redux/actions/recording";
+import { getFilters } from "../../../redux/actions/filter";
 // import { AudioEngine } from "react-native-audio-engine";
 //(applyFilter: (NSString *)filePath numberParameter:(nonnull NSNumber *)
 //reverbSetting numberParameter:(nonnull NSNumber *)pitchChange
@@ -21,6 +22,7 @@ export class Filters extends Component {
     super();
     this.state = {
       loading: false,
+      size: 30,
       entries: [
         {
           title: "Chipmunk",
@@ -42,10 +44,96 @@ export class Filters extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = async () => {
+    this.mounted && this.setState({ loading: true });
+    const res = this.props.getFilters(0);
+    this.mounted && this.setState({ entries: res, loading: false });
+  };
 
-  _renderItem = ({ item, index }) => {
+  selectFilter(item) {
     const { selectedClips, clips } = this.props;
+    try {
+      const keys = Object.keys(selectedClips);
+      if (!keys || keys.length === 0) {
+        this.props.showMessage({
+          message: "Select a Klip before applying filter",
+          success: false,
+        });
+        return;
+      }
+      const assignPath = (filePath, i) => {
+        clips[i].originalUri = clips[i].uri;
+        clips[i].uri = filePath;
+        clips[i].filter = true;
+        this.props.updateClips(clips);
+      };
+      const handleError = (e) => {
+        console.log(e);
+      };
+      for (let i = 0; i < keys.length; i++) {
+        let x = String(clips[i].uri);
+        switch (item.type) {
+          case "EQUALIZER":
+            NativeModules.AudioEngineOBJC.applyEqualizerFilter(
+              x,
+              item.equalizerPreset,
+              (path) => assignPath(path, i),
+              (e) => handleError(e)
+            );
+            break;
+          case "REVERB":
+            NativeModules.AudioEngineOBJC.applyEqualizerFilter(
+              x,
+              item.reverbPreset,
+              item.reverb,
+              (path) => assignPath(path, i),
+              (e) => handleError(e)
+            );
+            break;
+          case "PITCH":
+            NativeModules.AudioEngineOBJC.applyPitchFilter(
+              x,
+              item.pitchNum,
+              (path) => assignPath(path, i),
+              (e) => handleError(e)
+            );
+            break;
+          case "DISTORTION":
+            NativeModules.AudioEngineOBJC.applyEqualizerFilter(
+              x,
+              item.distortionPreset,
+              item.distortion,
+              (path) => assignPath(path, i),
+              (e) => handleError(e)
+            );
+            break;
+          case "ALL":
+            NativeModules.AudioEngineOBJC.applyFilter(
+              x,
+              item.reverbPreset,
+              item.reverb,
+              item.distortionPreset,
+              item.pitchNum,
+              item.distortion,
+              item.equalizerPreset,
+              (path) => assignPath(path, i),
+              (e) => handleError(e)
+            );
+            break;
+          default:
+            break;
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      this.props.showMessage({
+        message: "Something went wrong",
+        success: false,
+      });
+      return;
+    }
+  }
+  _renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity
         style={{
@@ -58,52 +146,7 @@ export class Filters extends Component {
           justifyContent: "center",
         }}
         key={index}
-        onPress={() => {
-          console.log("here");
-          try {
-            const keys = Object.keys(selectedClips);
-            if (!keys || keys.length === 0) {
-              this.props.showMessage({
-                message: "Select a Klip before applying filter",
-                success: false,
-              });
-              return;
-            }
-            for (let i = 0; i < keys.length; i++) {
-              let x = String(clips[i].uri);
-              console.log(x);
-              try {
-                NativeModules.AudioEngineOBJC.applyFilter(
-                  x,
-                  0,
-                  100,
-                  100,
-                  0,
-                  100,
-                  0,
-                  0,
-                  (filePath) => {
-                    clips[i].originalUri = clips[i].uri;
-                    clips[i].uri = filePath;
-                    clips[i].filter = true;
-                    this.props.updateClips(clips);
-                  }
-                );
-              } catch (err) {
-                console.log(2);
-                console.log(err);
-              }
-              console.log(clips[i]);
-            }
-          } catch (err) {
-            console.log(err);
-            this.props.showMessage({
-              message: "Something went wrong",
-              success: false,
-            });
-            return;
-          }
-        }}
+        onPress={() => this.selectFilter(item)}
       >
         <Text style={{ color: "white" }}>{item.title}</Text>
       </TouchableOpacity>
@@ -116,6 +159,17 @@ export class Filters extends Component {
       <Carousel
         ref={(c) => {
           this._carousel = c;
+        }}
+        onSnapToItem={(index) => {
+          if ((index + 1) % 30 === 0 && index > 0) {
+            this.mounted && this.setState({ loading: true });
+            const res = this.props.getFilters((index + 1) / 30);
+            this.mounted &&
+              this.setState({
+                filters: [...this.state.filters, ...res],
+                loading: false,
+              });
+          }
         }}
         data={this.state.entries}
         renderItem={this._renderItem}
@@ -131,4 +185,8 @@ const mapStateToProps = (state) => ({
   clips: state.recording.clips,
 });
 
-export default connect(mapStateToProps, { showMessage, updateClips })(Filters);
+export default connect(mapStateToProps, {
+  showMessage,
+  updateClips,
+  getFilters,
+})(Filters);
