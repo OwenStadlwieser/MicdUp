@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { storeData, getData } from '../reuseableFunctions/helpers';
 import store from '../redux';
+import { Platform } from 'react-native';
 
 const registerForPushNotificationsAsync = async () => {
     if(getData("expoToken")){
@@ -8,7 +9,8 @@ const registerForPushNotificationsAsync = async () => {
         console.log(token);
         return;
     }
-    if (Platform.OS !== 'web') {
+    console.log(Platform.OS);
+    if (Platform.OS) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
