@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
+
 const storeData = async (key, value) => {
   try {
     await AsyncStorage.setItem(key, value);
@@ -34,7 +35,6 @@ const clearAsyncStorage = async () => {
 };
 
 const playSound = async (uri, onPlayBackStatusUpdate) => {
-  console.log(uri);
   try {
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
@@ -42,12 +42,13 @@ const playSound = async (uri, onPlayBackStatusUpdate) => {
     });
     const playbackObject = new Audio.Sound();
     // OR
-    const res = await Audio.Sound.createAsync(
+    await playbackObject.loadAsync(
       { uri },
       { shouldPlay: true },
       onPlayBackStatusUpdate
     );
-    return res.sound;
+    await playbackObject.playAsync();
+    return playbackObject;
   } catch (err) {
     console.log(err);
   }

@@ -91,8 +91,9 @@ export class Clips extends Component {
     this.mounted && this.setState({ playingIndex: -1 });
   };
   onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
+    if (status.didJustFinish) {
       this.mounted && this.setState({ playingIndex: -1 });
+    }
   }
   deleteItem(index) {
     const clips = [...this.props.clips];
@@ -122,7 +123,7 @@ export class Clips extends Component {
                 item.filter = false;
                 item.filterId = [];
                 clips[index] = item;
-                this.props.updateClips(clips);
+                this.props.updateClips([...clips]);
               }}
             >
               <Text style={styles.item_text}>Remove Filter</Text>
@@ -137,8 +138,31 @@ export class Clips extends Component {
                     this.props.clips[index].uri,
                     this.onPlaybackStatusUpdate.bind(this)
                   );
+                  const intervalId = setInterval(async () => {
+                    const status = await playbackObject.getStatusAsync();
+                    if (
+                      !status.isPlaying &&
+                      this.state.playingIndex === index
+                    ) {
+                      this.mounted && this.setState({ playingIndex: -1 });
+                      if (this.state.intervalId)
+                        clearInterval(this.state.intervalId);
+                    } else if (
+                      !status.isPlaying &&
+                      this.state.playingIndex !== index
+                    ) {
+                      if (this.state.intervalId)
+                        clearInterval(this.state.intervalId);
+                    }
+                  }, 500);
+                  if (this.state.intervalId)
+                    clearInterval(this.state.intervalId);
                   this.mounted &&
-                    this.setState({ playingIndex: index, playbackObject });
+                    this.setState({
+                      intervalId,
+                      playingIndex: index,
+                      playbackObject,
+                    });
                 }}
                 style={styles.playButton}
                 name="play"
