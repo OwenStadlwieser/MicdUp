@@ -57,6 +57,9 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false
   },
+  pushTokens: {
+    type: mongoose.Schema.Types.Array,
+  }
 });
 
 UserSchema.methods.getPasswordResetToken = async function () {

@@ -70,6 +70,7 @@ const likeComment = {
       );
       return comment;
     });
+
     if (comment && index < 0) {
       comment.likers.push(context.profile._id);
       await comment.save();

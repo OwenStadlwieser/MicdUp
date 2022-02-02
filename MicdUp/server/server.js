@@ -20,7 +20,7 @@ app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: false }));
 app.use(cors());
 
-const verifiedUrls = ["http://localhost:19006"];
+const verifiedUrls = ["http://localhost:19006","http://192.168.0.193:19006"];
 function useHttps(req, res, next) {
   if (!req.secure && process.env.NODE_ENV !== "DEVELOPMENT")
     return res.redirect("https://" + req.get("host") + req.url);
@@ -60,6 +60,7 @@ app.use(function (req, res, next) {
 app.use(async (req, res, next) => {
   const authHeader = req.get("Authorization");
   let token, userId;
+  console.log(req);
   if (authHeader) {
     token = authHeader.split(" ")[1];
     try {
