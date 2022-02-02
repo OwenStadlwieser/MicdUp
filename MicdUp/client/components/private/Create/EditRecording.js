@@ -24,7 +24,7 @@ export class EditRecording extends Component {
     this.state = {
       loading: false,
       title: "",
-      selectedClips: {}
+      selectedClips: {},
     };
 
     this.mounted = true;
@@ -38,14 +38,14 @@ export class EditRecording extends Component {
   };
 
   itemClicked = (index) => {
-    const { selectedClips } = this.state
-    if(selectedClips[index]) {
+    const { selectedClips } = this.state;
+    if (selectedClips[index]) {
       delete selectedClips[index];
     } else {
-      selectedClips[index]= true
+      selectedClips[index] = true;
     }
-    this.mounted && this.setState({ selectedClips})
-  }
+    this.mounted && this.setState({ selectedClips });
+  };
   render() {
     const { hideEditRecording, updateSubmitRecording } = this.props;
     const { title, selectedClips } = this.state;
@@ -71,10 +71,18 @@ export class EditRecording extends Component {
           />
         </View>
         <View style={styles.clipsEditDiv}>
-          <Clips selectedClips={selectedClips} itemClicked={this.itemClicked.bind(this)} />
+          <Clips
+            selectedClips={selectedClips}
+            itemClicked={this.itemClicked.bind(this)}
+          />
         </View>
         <View style={styles.filterEditDiv}>
-          {Platform.OS === "ios" && <Filters selectedClips={selectedClips}/>}
+          {Platform.OS === "ios" && (
+            <Filters
+              selectedClips={selectedClips}
+              removeFromSelected={this.itemClicked.bind(this)}
+            />
+          )}
         </View>
         <View style={styles.continueEditDiv}>
           <TouchableOpacity

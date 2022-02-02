@@ -50,10 +50,16 @@ export class Filters extends Component {
         return;
       }
       const assignPath = (filePath, i) => {
-        clips[i].originalUri = clips[i].uri;
+        if (!clips[i].filter) {
+          clips[i].originalUri = clips[i].uri;
+        }
         clips[i].uri = filePath;
         clips[i].filter = true;
+        clips[i].filterId = clips[i].filterId
+          ? clips[i].filterId.push(item.id)
+          : [clips[i].filterId];
         this.props.updateClips(clips);
+        this.props.removeFromSelected(i);
       };
       const handleError = (e) => {
         console.log(e);
