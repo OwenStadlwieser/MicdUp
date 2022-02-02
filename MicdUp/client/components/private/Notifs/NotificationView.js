@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { FlatList, View, ScrollView, StyleSheet } from "react-native";
 import Notification from "./Notification";
+
+import { getData } from "../../../reuseableFunctions/helpers";
+
+
+
 export class NotificationView extends Component {
   constructor() {
     super();
@@ -16,13 +21,23 @@ export class NotificationView extends Component {
 
   componentDidMount = () => {};
 
-  render() {
+  async render() {
     
 
+    /*
+    Notification content:
+    {
+          id:id
+          content:content,
+          image:image,
+          navTo:navTo
+    }
+    */
+    let notifs = await getData("notifications");
 
-    const notifications = [{id:1,text: "notification!",clickable: true, user:"andrew"},{id:2,text: "notification2!",clickable: true, user:"andrew"},{id:3,text: "notification3!",clickable: true, user:"andrew"},{id:4,text: "notification4!",clickable: true, user:"andrew"}];
-
-
+    if(!notifs){
+      return (<View/>);
+    }
     return (
     <View>
             <ScrollView>

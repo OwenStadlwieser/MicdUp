@@ -6,6 +6,7 @@ import { Platform } from 'react-native';
 import { addToken } from '../redux/actions/notifs';
 
 
+const MAX_NOTIFICATION_QUEUE_SIZE = 10;
 
 
 const registerForPushNotificationsAsync = async () => {
@@ -52,7 +53,18 @@ const registerForPushNotificationsAsync = async () => {
     }
 };
 
-const receiveNotificationListener = (notification) => {
+
+
+/*
+Notification content:
+{
+      id:id
+      content:content,
+      image:image,
+      navTo:navTo
+}
+*/
+const receiveNotificationListener = async(notification) => {
     let loggedIn = false;
     try{
         loggedIn = store.getState().auth.loggedIn;
@@ -61,6 +73,24 @@ const receiveNotificationListener = (notification) => {
         console.log("not logged in!");
         return
     }
+
+
+    let notifs = await getData("notifications");
+
+    if(!notifs){
+      notifs = [];
+    }
+
+    if(notifs.length >= MAX_NOTIFICATION_QUEUE_SIZE){
+      //remove from front of notifs array if you got too many.
+      //might want to add something for compacting notifications. i.e you received 20 likes on this post.
+      notifs.shift();
+    }
+
+    //add to notification list.
+    notifs.push(notification);
+
+    storeData("notifications",notifs);
 
 
     if (!loggedIn){
