@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import { connect } from "react-redux";
 // helpers
@@ -42,7 +43,6 @@ export class Clips extends Component {
   render() {
     const dataProp = this.props.clips;
     const { itemClicked } = this.props;
-    console.log(itemClicked)
     return (
       <SafeAreaView style={{ backgroundColor: "#fff", flex: 1 }}>
         <ScrollView
@@ -73,7 +73,7 @@ export class Clips extends Component {
             }}
             keyExtractor={(item, index) => item.finalDuration}
             onClickItem={(data, item, index) => {
-              itemClicked && itemClicked(index)
+              itemClicked && itemClicked(index);
             }}
             renderItem={(item, index) => {
               return this.renderItem(item, index);
@@ -91,8 +91,9 @@ export class Clips extends Component {
     this.mounted && this.setState({ playingIndex: -1 });
   };
   onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
+    if (status.didJustFinish) {
       this.mounted && this.setState({ playingIndex: -1 });
+    }
   }
   deleteItem(index) {
     const clips = [...this.props.clips];
@@ -101,14 +102,33 @@ export class Clips extends Component {
   }
   renderItem(item, index) {
     const { playingIndex } = this.state;
-    const { selectedClips } = this.props;
+    const { selectedClips, clips } = this.props;
     return (
       <View style={styles.item}>
-        <View style={selectedClips && selectedClips[index] ? styles.selectedItem : styles.item_children}>
+        <View
+          style={
+            selectedClips && selectedClips[index]
+              ? styles.selectedItem
+              : styles.item_children
+          }
+        >
           <Text style={styles.item_text}>Clip {index + 1}</Text>
           <Text style={styles.item_text}>
             {Math.round(item.finalDuration / 1000)} Seconds
           </Text>
+          {item.filter && (
+            <TouchableOpacity
+              onPress={() => {
+                item.uri = item.originalUri;
+                item.filter = false;
+                item.filterId = [];
+                clips[index] = item;
+                this.props.updateClips([...clips]);
+              }}
+            >
+              <Text style={styles.item_text}>Remove Filter</Text>
+            </TouchableOpacity>
+          )}
           <View style={styles.iconContainerClips}>
             {playingIndex !== index ? (
               <AntDesign
@@ -118,8 +138,31 @@ export class Clips extends Component {
                     this.props.clips[index].uri,
                     this.onPlaybackStatusUpdate.bind(this)
                   );
+                  const intervalId = setInterval(async () => {
+                    const status = await playbackObject.getStatusAsync();
+                    if (
+                      !status.isPlaying &&
+                      this.state.playingIndex === index
+                    ) {
+                      this.mounted && this.setState({ playingIndex: -1 });
+                      if (this.state.intervalId)
+                        clearInterval(this.state.intervalId);
+                    } else if (
+                      !status.isPlaying &&
+                      this.state.playingIndex !== index
+                    ) {
+                      if (this.state.intervalId)
+                        clearInterval(this.state.intervalId);
+                    }
+                  }, 500);
+                  if (this.state.intervalId)
+                    clearInterval(this.state.intervalId);
                   this.mounted &&
-                    this.setState({ playingIndex: index, playbackObject });
+                    this.setState({
+                      intervalId,
+                      playingIndex: index,
+                      playbackObject,
+                    });
                 }}
                 style={styles.playButton}
                 name="play"
@@ -173,7 +216,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 4,
     paddingHorizontal: 15,
-    backgroundColor: "#06C1D7"
+    backgroundColor: "#06C1D7",
   },
   item_children: {
     width: childrenWidth,

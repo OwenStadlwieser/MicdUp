@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
 const { User } = require("./database/models/User");
 const { Profile } = require("./database/models/Profile");
+const { Filter } = require("./database/models/Filter");
 const { resetSearches } = require("./cron/searches");
 const chatSocket = require("./sockets/chat");
 const app = express();
@@ -97,7 +98,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then((connected) => {
+  .then(async (connected) => {
     if (connected) {
       console.log("MongoDB connected");
       resetSearches.start();
