@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   profileText: {
     paddingLeft: width * 0.075,
     width: width * 0.6,
-    textAlign: 'left',
+    textAlign: "left",
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     width,
     justifyContent: "center",
     alignItems: "center",
-    height: "5vh",
+    height: height * 0.05,
     zIndex: 99,
   },
   postContainer: {
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   upperEditDivAbsolute: {
     height: height * 0.15,
     zIndex: 3,
-    justifyContent: 'space-evenly'
+    justifyContent: "space-evenly",
   },
   clipsEditDiv: {
     height: height * 0.3,
