@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 // helpers
-import { playSound } from "../../../reuseableFunctions/helpers";
+import { changeSound, pauseSound } from "../../../redux/actions/sound";
 // components
 import { DragSortableView } from "react-native-drag-sort";
 // icons
@@ -31,7 +31,6 @@ export class Clips extends Component {
 
     this.state = {
       scrollEnabled: true,
-      playingIndex: -1,
       playbackObject: null,
     };
     this.mounted = true;
@@ -84,25 +83,13 @@ export class Clips extends Component {
     );
   }
 
-  stopCurrentSound = async () => {
-    const { playbackObject } = this.state;
-    if (!playbackObject) return;
-    await playbackObject.stopAsync();
-    this.mounted && this.setState({ playingIndex: -1 });
-  };
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish) {
-      this.mounted && this.setState({ playingIndex: -1 });
-    }
-  }
   deleteItem(index) {
     const clips = [...this.props.clips];
     clips.splice(index, 1);
     this.props.updateClips(clips);
   }
   renderItem(item, index) {
-    const { playingIndex } = this.state;
-    const { selectedClips, clips } = this.props;
+    const { selectedClips, clips, playingId, isPause } = this.props;
     return (
       <View style={styles.item}>
         <View
@@ -130,39 +117,13 @@ export class Clips extends Component {
             </TouchableOpacity>
           )}
           <View style={styles.iconContainerClips}>
-            {playingIndex !== index ? (
+            {playingId !== item.id || isPause ? (
               <AntDesign
                 onPress={async () => {
-                  await this.stopCurrentSound();
-                  const playbackObject = await playSound(
-                    this.props.clips[index].uri,
-                    this.onPlaybackStatusUpdate.bind(this)
+                  await this.props.changeSound(
+                    this.props.clips[index],
+                    this.props.clips[index].uri
                   );
-                  const intervalId = setInterval(async () => {
-                    const status = await playbackObject.getStatusAsync();
-                    if (
-                      !status.isPlaying &&
-                      this.state.playingIndex === index
-                    ) {
-                      this.mounted && this.setState({ playingIndex: -1 });
-                      if (this.state.intervalId)
-                        clearInterval(this.state.intervalId);
-                    } else if (
-                      !status.isPlaying &&
-                      this.state.playingIndex !== index
-                    ) {
-                      if (this.state.intervalId)
-                        clearInterval(this.state.intervalId);
-                    }
-                  }, 500);
-                  if (this.state.intervalId)
-                    clearInterval(this.state.intervalId);
-                  this.mounted &&
-                    this.setState({
-                      intervalId,
-                      playingIndex: index,
-                      playbackObject,
-                    });
                 }}
                 style={styles.playButton}
                 name="play"
@@ -172,7 +133,7 @@ export class Clips extends Component {
             ) : (
               <AntDesign
                 onPress={async () => {
-                  await this.stopCurrentSound();
+                  await this.props.pauseSound();
                 }}
                 style={styles.playButton}
                 name="pausecircle"
@@ -249,6 +210,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => ({
   clips: state.recording.clips,
+  isPause: state.sound.isPause,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
 });
 
-export default connect(mapStateToProps, { updateClips })(Clips);
+export default connect(mapStateToProps, {
+  updateClips,
+  changeSound,
+  pauseSound,
+})(Clips);

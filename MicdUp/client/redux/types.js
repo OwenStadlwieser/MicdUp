@@ -34,3 +34,6 @@ export const HIDE_CHATS = "HIDE_CHATS";
 export const SET_SOCKET = "SET_SOCKET";
 export const ADD_POSTS = "ADD_POSTS";
 export const GET_NOTIFS = "GET_NOTIFS";
+export const CHANGE_SOUND = "CHANGE_SOUND";
+export const SOUND_ENDED = "SOUND_ENDED";
+export const SOUND_PAUSE = "SOUND_PAUSE";

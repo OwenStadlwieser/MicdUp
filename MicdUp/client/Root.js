@@ -16,7 +16,7 @@ import Feed from "./components/private/Feed/Feed";
 import { getData } from "./reuseableFunctions/helpers";
 import NotificationBell from "./components/private/NotificationBell";
 
-
+import { Audio } from "expo-av";
 
 export class Root extends Component {
   constructor() {
@@ -30,7 +30,6 @@ export class Root extends Component {
     this.mounted = true;
   }
 
-
   componentWillUnmount = () => {
     this.mounted = false;
   };
@@ -38,6 +37,10 @@ export class Root extends Component {
   componentDidMount = async () => {
     const token = await getData("token");
     this.mounted && this.setState({ token });
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      allowsRecordingIOS: false,
+    });
   };
   componentDidUpdate = async (prevProps, prevState) => {
     const { token } = this.state;
@@ -52,10 +55,7 @@ export class Root extends Component {
     }
   };
 
-
   render() {
-
-
     const { token } = this.state;
     const {
       showLogin,
@@ -69,7 +69,6 @@ export class Root extends Component {
     let app;
     if (!loggedIn && !token)
       app = (
-        
         <View style={styles.rootContainer}>
           {displayMessage && (
             <View style={styles.messageContainer}>
@@ -122,7 +121,7 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
-          <NotificationBell/>
+          <NotificationBell />
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
