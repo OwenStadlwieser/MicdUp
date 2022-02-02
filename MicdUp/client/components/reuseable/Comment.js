@@ -188,11 +188,8 @@ export class Comment extends Component {
                 <PlayButton
                   containerStyle={{}}
                   color={"#1A3561"}
-                  currentPlayingId={this.props.currentPlayingId}
                   size={48}
                   post={comment}
-                  setPlaying={this.props.setPlaying}
-                  onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
                 />
               )}
               {!comment.isDeleted &&

@@ -45,8 +45,6 @@ export class Bio extends Component {
       startRecording,
       stopRecordingBio,
       currentSound,
-      onPlaybackStatusUpdate,
-      setPlaying,
       profile,
       newBioRecording,
       bio,
@@ -67,8 +65,6 @@ export class Bio extends Component {
                 id: bio.id,
                 signedUrl: bio.signedUrl,
               }}
-              setPlaying={setPlaying}
-              onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
           </View>
         )}
@@ -110,8 +106,6 @@ export class Bio extends Component {
                     id: "NewBioRecording",
                     signedUrl: newBioRecording.uri,
                   }}
-                  setPlaying={setPlaying}
-                  onPlaybackStatusUpdate={onPlaybackStatusUpdate}
                 />
               </View>
             )}

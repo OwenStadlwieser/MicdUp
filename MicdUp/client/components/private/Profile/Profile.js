@@ -43,9 +43,7 @@ export class Profile extends Component {
       settingsShown: false,
       recording: false,
       playbackObject: {},
-      playing: "",
       currentBioRecording: "",
-      playingId: "",
       newBioRecording: {},
       selectImage: false,
     };
@@ -54,17 +52,20 @@ export class Profile extends Component {
   }
 
   async handleScroll(event) {
-    const { posts, getUserPosts, currentProfile } = this.props
-    const { loading } = this.state
+    const { posts, getUserPosts, currentProfile } = this.props;
+    const { loading } = this.state;
     try {
-      if(event.nativeEvent.contentOffset.y > (posts.length * (postHeight)) && !loading  
-      && posts.length % 20 === 0) {
-        this.mounted && this.setState({ loading: true })
+      if (
+        event.nativeEvent.contentOffset.y > posts.length * postHeight &&
+        !loading &&
+        posts.length % 20 === 0
+      ) {
+        this.mounted && this.setState({ loading: true });
         await getUserPosts(currentProfile.id, posts.length / 20);
-        this.mounted && this.setState({ loading: false })
+        this.mounted && this.setState({ loading: false });
       }
-    } catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -139,11 +140,6 @@ export class Profile extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
-      this.mounted && this.setState({ playing: "", playingId: "" });
-  }
-
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
@@ -158,10 +154,6 @@ export class Profile extends Component {
   hideSetting = () => {
     this.mounted && this.setState({ settingsShown: false });
   };
-
-  setPlaying(id) {
-    this.mounted && this.setState({ playingId: id });
-  }
 
   setNewBioRecording = (newR) => {
     this.mounted && this.setState({ newBioRecording: newR });
@@ -190,7 +182,7 @@ export class Profile extends Component {
       selectImage,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
-    console.log('here')
+    console.log("here");
     const isUserProfile =
       profile && currentProfile ? profile.id === currentProfile.id : false;
 
@@ -275,8 +267,6 @@ export class Profile extends Component {
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}
                 currentSound={playingId}
-                onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
-                setPlaying={this.setPlaying.bind(this)}
                 setNewBioRecording={this.setNewBioRecording.bind(this)}
                 newBioRecording={newBioRecording}
               />
@@ -318,23 +308,22 @@ export class Profile extends Component {
               onScroll={this.handleScroll.bind(this)}
             >
               {posts &&
-                posts.map((post, index) => post && (
-                  <Post
-                    isUserProfile={isUserProfile}
-                    setCommentPosts={this.setCommentPosts.bind(this)}
-                    removeCommentPosts={this.removeCommentPosts.bind(this)}
-                    key={post.id}
-                    post={post}
-                    postArray={posts}
-                    index={index}
-                    currentSound={playingId}
-                    onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                      this
-                    )}
-                    higherUp={false}
-                    setPlaying={this.setPlaying.bind(this)}
-                  />
-                ))}
+                posts.map(
+                  (post, index) =>
+                    post && (
+                      <Post
+                        isUserProfile={isUserProfile}
+                        setCommentPosts={this.setCommentPosts.bind(this)}
+                        removeCommentPosts={this.removeCommentPosts.bind(this)}
+                        key={post.id}
+                        post={post}
+                        postArray={posts}
+                        index={index}
+                        currentSound={playingId}
+                        higherUp={false}
+                      />
+                    )
+                )}
             </ScrollView>
           </View>
         )}
