@@ -4,13 +4,15 @@ import store from '../redux';
 import { Platform } from 'react-native';
 
 const registerForPushNotificationsAsync = async () => {
-    if(getData("expoToken")){
+    if(await getData("expoToken")){
         let token = await getData("expoPushToken");
+        console.log("FOUND TOKEN!");
         console.log(token);
         return;
     }
-    console.log(Platform.OS);
-    if (Platform.OS) {
+
+
+    if (Platform.OS !== 'web') {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
@@ -22,6 +24,7 @@ const registerForPushNotificationsAsync = async () => {
         return;
       }
       const token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log("new token: ");
       console.log(token);
       // this.setState({ expoPushToken: token });
       storeData("expoPushToken",token);

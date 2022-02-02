@@ -4,9 +4,14 @@ import { registerRootComponent } from 'expo';
 
 import App from './App';
 
+import { clearAsyncStorage } from './reuseableFunctions/helpers';
+
 import {registerForPushNotificationsAsync,setUpListeners} from './notifications/helpers';
 
 //get push notification permissions.
+console.log("TEST!");
+
+async() => {clearAsyncStorage()};
 
 registerForPushNotificationsAsync();
 setUpListeners();
