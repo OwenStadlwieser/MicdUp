@@ -3,6 +3,11 @@ import { storeData, getData } from '../reuseableFunctions/helpers';
 import store from '../redux';
 import { Platform } from 'react-native';
 
+import { addToken } from '../redux/actions/notifs';
+
+
+
+
 const registerForPushNotificationsAsync = async () => {
     if(await getData("expoToken")){
         let token = await getData("expoPushToken");
@@ -25,7 +30,12 @@ const registerForPushNotificationsAsync = async () => {
       }
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log("new token: ");
-      console.log(token);
+      const addToDB = await addToken(token);
+
+      if (addToDB){
+        console.log("Push Token added to DB");
+      }
+
       // this.setState({ expoPushToken: token });
       storeData("expoPushToken",token);
     } else {
@@ -35,7 +45,7 @@ const registerForPushNotificationsAsync = async () => {
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
         name: 'default',
-        importance: Notification.AndroidImportance.MAX,
+        importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
@@ -47,11 +57,14 @@ const receiveNotificationListener = (notification) => {
     try{
         loggedIn = store.getState().auth.loggedIn;
     }catch(e){
-        //not logged in yet
+        //not logged in yet maybe. or redux broke
+        console.log("not logged in!");
         return
     }
 
+
     if (!loggedIn){
+        console.log("not logged in!");
         return;
     }
 

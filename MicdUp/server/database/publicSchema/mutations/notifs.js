@@ -15,44 +15,33 @@ const {
   GraphQLFloat,
 } = graphql;
 
-const { Notif } = require("../../models/Notif");
-const {NotifType} = require("../../types");
+const {User} = require("../../models/User");
+const {NotifType, UserType} = require("../../types");
 
 
-const likeComment = {
+const addToken = {
   type: NotifType,
   args: {
-    userId: { type: GraphQLID },
+    token: { type: GraphQLString },
   },
-  async resolve(parent, { commentId }, context) {
+  async resolve(parent, { token }, context) {
     // check if already liked and unlike
     if (!context.user.id) {
-      throw new Error("Must be signed in to like comment");
+      throw new Error("Must be signed in to add a push token.");
     }
     let index = -1;
-    const comment = await Comment.findOne({
-      _id: commentId,
-    }).then((comment) => {
-      index = comment.likers.findIndex(
-        (id) => id.toString() === context.profile.id
-      );
-      return comment;
-    });
 
-    if (comment && index < 0) {
-      comment.likers.push(context.profile._id);
-      await comment.save();
-      return comment;
+    if ( await User.exists( {_id: context.user.id,pushTokens : token} )){
+      console.log("token already exists in user");
+      return;
     }
-    if (comment && index > -1) {
-      comment.likers.splice(index, 1);
-      await comment.save();
-      return comment;
+
+    if(! (await User.updateOne({_id : context.user.id},{$push: {pushTokens:token}}))){
+      console.log("updating push token failed.");
     }
   },
 };
 
 module.exports = {
-  likeComment,
-  deleteComment,
+  addToken,
 };

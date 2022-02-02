@@ -2,19 +2,21 @@ import {
     GET_NOTIFS
 } from "../types";
 
-import { SHOW_MORE_NOTIFS } from "../../apollo/private/notifs";
+import { client } from "../../apollo/client";
 
-export const getNotifs = async (payload) => {
+import { NOTIF_TOKEN_MUTATION } from "../../apollo/private/notifs";
+
+export const addToken = async (token) => {
     try {
         let fetchPolicy = "no-cache";
-        const res = await client.query({
-          query: SHOW_MORE_NOTIFS(3),
+        const res = await client.mutate({
+          mutation: NOTIF_TOKEN_MUTATION(),
           variables: {
-            userId,
+            token,
           },
           fetchPolicy,
         });
-        if (!res.data || !res.data.getNotifs) {
+        if (!res.data) {
           dispatch(
             showMessage({
               success: false,
@@ -23,7 +25,7 @@ export const getNotifs = async (payload) => {
           );
           return false;
         }
-        return res.data.getNotifs;
+        return res.data.success;
       } catch (err) {
         console.log(err);
       }
