@@ -96,7 +96,6 @@ export class Create extends Component {
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
       );
-      console.log(recording);
       this.mounted && this.setState({ recording });
       console.log("Recording started");
     } catch (err) {
@@ -127,6 +126,7 @@ export class Create extends Component {
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
                 results,
+                id: Date.now(),
               },
             ]
           : [
@@ -135,6 +135,7 @@ export class Create extends Component {
                 finalDuration,
                 type: Platform.OS === "web" ? "audio/webm" : ".m4a",
                 results,
+                id: Date.now(),
               },
             ],
         v: 0,
