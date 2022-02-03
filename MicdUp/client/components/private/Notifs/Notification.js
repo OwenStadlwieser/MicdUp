@@ -21,9 +21,7 @@ export class Notification extends Component {
 
   render() {
     const {
-        text,
-        image,
-        user,
+        data,
         clickable,
         navigateTo,
         navigate,
@@ -33,12 +31,12 @@ export class Notification extends Component {
         return (
         <View style={styles.notif}>
             <TouchableOpacity onPress={() => navigate(navigateTo)}>
-                <Text style={styles.text}>{text}</Text>
+                <Text style={styles.text}>{data.request.content.body}</Text>
             </TouchableOpacity>
         </View>);   
     }
     return (<View style={styles.notif}>
-        <Text style={styles.text}>{text}</Text>
+        <Text style={styles.text}>{data.request.content.body}</Text>
     </View>);
   }
 }

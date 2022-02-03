@@ -66,7 +66,7 @@ export class NotificationView extends Component {
                 {
                     this.state.notif_data.map((notif,index) => {
                         return (
-                            <Notification text={notif.request.content.body} key={notif.identifier}/>
+                            <Notification data={notif} key={notif.identifier}/>
                         )
                     } )
                 }
