@@ -22,7 +22,9 @@ Notifications.setNotificationHandler({
     }),
   });
 
+async() => clearAsyncStorage();
 registerForPushNotificationsAsync();
+
 setUpListeners();
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

@@ -2,8 +2,10 @@ import * as Notifications from 'expo-notifications';
 import { storeData, getData } from '../reuseableFunctions/helpers';
 import store from '../redux';
 import { Platform } from 'react-native';
+import { connect } from 'react-redux';
 
 import { addToken } from '../redux/actions/notifs';
+import { receiveNotif } from '../redux/actions/display';
 
 
 const MAX_NOTIFICATION_QUEUE_SIZE = 10;
@@ -16,6 +18,9 @@ const registerForPushNotificationsAsync = async () => {
         console.log(token);
         return;
     }
+
+    
+    await storeData("notifications",'[]');
 
 
     if (Platform.OS !== 'web') {
@@ -31,6 +36,7 @@ const registerForPushNotificationsAsync = async () => {
       }
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log("new token: ");
+      console.log(token);
       const addToDB = await addToken(token);
 
       if (addToDB){
@@ -65,38 +71,40 @@ Notification content:
 }
 */
 const receiveNotificationListener = async(notification) => {
-    let loggedIn = false;
-    try{
-        loggedIn = store.getState().auth.loggedIn;
-    }catch(e){
-        //not logged in yet maybe. or redux broke
-        console.log("not logged in!");
-        return
-    }
 
+  //   let loggedIn = store.getState().auth.loggedIn;
 
+  //   if (!loggedIn){
+  //     console.log("not logged in!");
+  //     return;
+  // }
+
+    //console.log("LOGGED IN!");
     let notifs = await getData("notifications");
 
     if(!notifs){
-      notifs = [];
+      notifs = '[]';
     }
+
+    notifs = JSON.parse(notifs);
+
+    
 
     if(notifs.length >= MAX_NOTIFICATION_QUEUE_SIZE){
       //remove from front of notifs array if you got too many.
       //might want to add something for compacting notifications. i.e you received 20 likes on this post.
       notifs.shift();
     }
-
+    
     //add to notification list.
     notifs.push(notification);
 
-    storeData("notifications",notifs);
+    console.log(notifs);
 
+    storeData("notifications",JSON.stringify(notifs));
 
-    if (!loggedIn){
-        console.log("not logged in!");
-        return;
-    }
+    //update redux state!
+    store.dispatch(receiveNotif())
 
     console.log(notification)
 
@@ -107,6 +115,6 @@ const setUpListeners = () => {
 }
 
 
-
+connect({}, {receiveNotif})(receiveNotificationListener);
 
 export {registerForPushNotificationsAsync,setUpListeners};

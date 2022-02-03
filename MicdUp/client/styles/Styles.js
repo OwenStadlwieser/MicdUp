@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
     height: height,
     width: width,
     margin: 0,
+    overflow:'visible',
   },
   containerPrivate: {
     flex: 1,
