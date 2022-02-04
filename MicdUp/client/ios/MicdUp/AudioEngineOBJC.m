@@ -383,7 +383,26 @@ RCT_EXPORT_METHOD(applyDistortionFilter: (nonnull NSString *)name distPreset: (n
   } @finally {
   }
 }
+RCT_EXPORT_METHOD(audioFileToFloatArray: (nonnull NSString *)name callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback) {
+  NSURL *soundUrl = [NSURL fileURLWithPath:name];
+  RCTLogInfo(@"%@", name);
+  RCTLogInfo(@"%@", soundUrl.path);
+  NSError* myErr = nil;
+  AVAudioFile *file=[[AVAudioFile alloc] initForReading:soundUrl error:&myErr];
+  if(myErr) { errCallback(@[myErr.description]); }
 
+  RCTLogInfo(@"%@", file.description);
+  RCTLogInfo(@"file allocated");
+  AVAudioFormat *format=file.processingFormat;
+  AVAudioPCMBuffer *buffer=[[AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:(UInt32)file.length];
+  [file readIntoBuffer:buffer error:&myErr];
+  if(myErr) { errCallback(@[myErr.description]); }
+  NSArray* floatArray = [NSMutableArray new];
+  for (AVAudioFrameCount i = 0; i < buffer.frameLength; i++) {
+    [floatArray arrayByAddingObject:@(buffer.floatChannelData[0][i])];
+  }
+  callback(@[floatArray]);
+}
 // filter for reverb
 RCT_EXPORT_METHOD(applyReverbFilter: (nonnull NSString *)name reverbPreset: (nonnull NSNumber*)reverbPreset rever: (nonnull NSNumber*)rever callback:(RCTResponseSenderBlock)callback errCallback:(RCTResponseSenderBlock)errCallback){
   RCTLogInfo(@"In objc implementation file");

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import PlayButton from "../../reuseable/PlayButton";
 import Like from "../../reuseable/Like";
 import Comment from "../../reuseable/Comment";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 // styles
 import { FontAwesome } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
@@ -14,6 +14,9 @@ import { Feather } from "@expo/vector-icons";
 //redux
 import { deletePost } from "../../../redux/actions/recording";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
+
+// components
+import WaveForm from "react-native-audiowaveform";
 export class Post extends Component {
   constructor() {
     super();
@@ -44,6 +47,15 @@ export class Post extends Component {
       isPause,
     } = this.props;
     const { commentsShowing } = this.state;
+    // try {
+    //   NativeModules.AudioEngineOBJC.audioFileToFloatArray(
+    //     post.signedUrl,
+    //     (e) => console.log(e),
+    //     (success) => console.log(success)
+    //   );
+    // } catch (err) {
+    //   console.log(err);
+    // }
     return (
       <TouchableOpacity
         onPress={async () => {
@@ -61,6 +73,14 @@ export class Post extends Component {
         <Text style={styles.postTitle}>
           {post.title ? post.title : "Untitled"}
         </Text>
+        <WaveForm
+          style={{
+            width: Dimensions.get("window").width * 0.5,
+            backgroundColor: "grey",
+          }}
+          waveFormStyle={{ waveColor: "red", scrubColor: "black" }}
+          source={{ uri: post.signedUrl }}
+        />
         <Comment
           isUserProfile={isUserProfile}
           containerStyle={{}}
