@@ -13,6 +13,7 @@ import {
   NativeModules,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
+import AudioRecordingVisualization from "./AudioRecordingVisualization";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -30,6 +31,7 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
+import RNSoundLevel from "react-native-sound-level";
 
 export class Create extends Component {
   constructor() {
@@ -86,6 +88,12 @@ export class Create extends Component {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
+      RNSoundLevel.start(75);
+      RNSoundLevel.onNewFrame = (data) => {
+        const { soundLevels } = this.state;
+        soundLevels.unshift(data);
+        this.mounted && this.setState({ soundLevels });
+      };
       console.log("Starting recording..");
       try {
         Voice &&
@@ -111,6 +119,7 @@ export class Create extends Component {
     const { clips } = this.props;
     console.log("Stopping recording..");
     await recording.stopAndUnloadAsync();
+    RNSoundLevel.stop();
     const uri = recording.getURI();
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
