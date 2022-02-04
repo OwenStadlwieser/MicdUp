@@ -502,7 +502,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   profileImgContainer: {
-    height: height * 0.2,
     width: height * 0.2,
     borderRadius: height * 0.2,
     overflow: "hidden",

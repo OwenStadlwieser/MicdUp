@@ -86,7 +86,7 @@ export class Create extends Component {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      RNSoundLevel.start(50);
+      RNSoundLevel.start(75);
       RNSoundLevel.onNewFrame = (data) => {
         const { soundLevels } = this.state;
         soundLevels.unshift(data);
