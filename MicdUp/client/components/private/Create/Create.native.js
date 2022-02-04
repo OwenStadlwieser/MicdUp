@@ -19,7 +19,6 @@ import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // audio
@@ -59,7 +58,10 @@ export class Create extends Component {
     this.mounted = true;
     this.colors = ["white", "red"];
   }
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = async () => {
+    this.stopRecording();
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
     const interval = setInterval(() => {
@@ -224,10 +226,6 @@ export class Create extends Component {
               </Text>
             </View>
           )}
-          <AudioRecordingVisualization
-            key={soundLevels.length}
-            arrayOfDecibels={soundLevels}
-          />
         </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
@@ -242,21 +240,13 @@ export class Create extends Component {
             />
           </View>
           <View style={styles.iconContainer}>
-            {!recording ? (
+            {!recording && (
               <MaterialCommunityIcons
                 onPress={this.startRecording}
                 name="microphone-plus"
                 size={75}
                 color="red"
                 style={styles.recordingMicIcon}
-              />
-            ) : (
-              <FontAwesome5
-                onPress={this.stopRecording}
-                style={styles.currentRecordingIcon}
-                name="record-vinyl"
-                size={24}
-                color={this.colors[v]}
               />
             )}
             <TouchableOpacity
@@ -307,6 +297,13 @@ export class Create extends Component {
             />
           </View>
         </View>
+        <AudioRecordingVisualization
+          recording={recording}
+          key={soundLevels.length}
+          arrayOfDecibels={soundLevels}
+          buttonColor={this.colors[v]}
+          stopRecording={this.stopRecording.bind(this)}
+        />
       </View>
     );
     return app;
