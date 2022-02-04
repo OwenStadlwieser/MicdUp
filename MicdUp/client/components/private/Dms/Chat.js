@@ -23,6 +23,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
+// audio
 import { Audio } from "expo-av";
 // redux
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
@@ -129,7 +130,6 @@ export class Chat extends Component {
         >
           <Appbar.BackAction
             onPress={() => {
-              console.log("here");
               this.props.hideChats();
             }}
           />
@@ -318,4 +318,7 @@ const mapStateToProps = (state) => ({
   socket: state.auth.socket,
 });
 
-export default connect(mapStateToProps, { hideChats, viewMoreChats })(Chat);
+export default connect(mapStateToProps, {
+  hideChats,
+  viewMoreChats,
+})(Chat);

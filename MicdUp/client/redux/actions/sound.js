@@ -6,6 +6,7 @@ import { Audio } from "expo-av";
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (sound, url, queue) => async (dispatch) => {
+  console.log("here");
   let { currentPlayingSound, currentPlaybackObject, currentIntervalId } =
     store.getState().sound;
   sound.uri = url;
@@ -28,7 +29,10 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
   const playbackObject = await playSound(sound.uri, soundExpo);
   const intervalId = setInterval(async () => {
     const status = await playbackObject.getStatusAsync();
-    if (status.didJustFinish) {
+    if (
+      status.didJustFinish ||
+      status.durationMillis === status.positionMillis
+    ) {
       let { queue } = store.getState().sound;
       if (queue && queue.length > 0) {
         let newSound = queue.shift();

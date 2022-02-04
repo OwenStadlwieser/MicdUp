@@ -89,9 +89,15 @@ export class SearchComponent extends Component {
             }}
             onFocus={() => {
               this.mounted && this.setState({ showDropDown: true });
+              if (this.props.onFocus) {
+                this.props.onFocus();
+              }
             }}
             placeholder={this.props.placeholder}
             onChangeText={(searchTerm) => {
+              if (this.props.onFocus) {
+                this.props.onFocus();
+              }
               if (this.props.setStateOnChange) {
                 this.props.setStateOnChangeFunc(searchTerm);
               }
@@ -111,7 +117,9 @@ export class SearchComponent extends Component {
             <DropDown
               onPressFunc={this.onPressFunc.bind(this)}
               results={results}
+              title={"title"}
               onBlur={this.onBlur.bind(this)}
+              style={styles.resultsContainer}
             />
           )}
         </View>
