@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Dimensions } from "react-native";
 import Svg, { Rect } from "react-native-svg";
-const barWidth = 5;
-const barMargin = 1;
 const offset = width / 2;
 const { width, height } = Dimensions.get("window");
 export class AudioRecordingVisualization extends Component {
@@ -21,9 +19,8 @@ export class AudioRecordingVisualization extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { arrayOfDecibels, recording } = this.props;
-    const svgHeight = height * 0.15;
-    const slice = arrayOfDecibels.slice(0, Math.floor(width / barWidth));
+    const { arrayOfDecibels, recording, barWidth, barMargin } = this.props;
+    const svgHeight = height * 0.3;
     const app = recording ? (
       <View
         style={{
@@ -54,7 +51,7 @@ export class AudioRecordingVisualization extends Component {
               color: "white",
             }}
           >
-            {slice.map((decibel, index) => (
+            {arrayOfDecibels.map((decibel, index) => (
               <Rect
                 key={index}
                 y={(svgHeight - (decibel.value + 80) * 2) / 2}

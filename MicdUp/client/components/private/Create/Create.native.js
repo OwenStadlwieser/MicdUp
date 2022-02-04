@@ -34,6 +34,8 @@ import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
 const { width, height } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Create extends Component {
   constructor() {
     super();
@@ -91,8 +93,11 @@ export class Create extends Component {
       });
       RNSoundLevel.start(75);
       RNSoundLevel.onNewFrame = (data) => {
-        const { soundLevels } = this.state;
+        let { soundLevels } = this.state;
         soundLevels.unshift(data);
+        if (soundLevels.length > Math.floor(width / barWidth)) {
+          soundLevels.pop();
+        }
         this.mounted && this.setState({ soundLevels });
       };
       console.log("Starting recording..");
@@ -152,6 +157,7 @@ export class Create extends Component {
               },
             ],
         v: 0,
+        soundLevels: [],
       });
     this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
@@ -164,8 +170,6 @@ export class Create extends Component {
     const { user } = this.props;
     const {
       recording,
-      clips,
-      v,
       editRecording,
       submitRecording,
       promptShown,
@@ -301,8 +305,12 @@ export class Create extends Component {
         {recording && (
           <AudioRecordingVisualization
             recording={recording}
-            key={soundLevels.length}
+            key={
+              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
+            }
             arrayOfDecibels={soundLevels}
+            barWidth={barWidth}
+            barMargin={barMargin}
           />
         )}
         {recording && (
