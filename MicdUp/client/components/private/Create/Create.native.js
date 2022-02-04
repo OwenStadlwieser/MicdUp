@@ -124,6 +124,9 @@ export class Create extends Component {
     const { recording, results } = this.state;
     const { clips } = this.props;
     console.log("Stopping recording..");
+    if (!recording || !recording.stopAndUnloadAsync) {
+      return;
+    }
     await recording.stopAndUnloadAsync();
     RNSoundLevel.stop();
     const uri = recording.getURI();
