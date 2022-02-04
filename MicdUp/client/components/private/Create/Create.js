@@ -13,7 +13,7 @@ import {
   NativeModules,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
-import AudioRecordingVisualization from "./AudioRecordingVisualization";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

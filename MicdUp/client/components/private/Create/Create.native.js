@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
-import AudioRecordingVisualization from "./AudioRecordingVisualization";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 import RNSoundLevel from "react-native-sound-level";
 //icons
 import { Fontisto } from "@expo/vector-icons";

@@ -144,9 +144,32 @@ export class Profile extends Component {
 
   componentDidMount = async () => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
-    if (profile.id !== currentProfile.id || !posts || posts.length === 0) {
+    if (
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
       this.mounted && this.setState({ loading: true });
-      await getUserPosts(currentProfile.id, 0);
+      await getUserPosts(id, 0);
+      this.mounted && this.setState({ loading: false });
+    }
+  };
+
+  componentDidUpdate = async () => {
+    const { getUserPosts, currentProfile, profile, posts } = this.props;
+    if (
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
+      this.mounted && this.setState({ loading: true });
+      await getUserPosts(id, 0);
       this.mounted && this.setState({ loading: false });
     }
   };
@@ -182,9 +205,15 @@ export class Profile extends Component {
       selectImage,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
-    console.log("here");
+    if (!profile && !currentProfile) {
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      );
+    }
     const isUserProfile =
-      profile && currentProfile ? profile.id === currentProfile.id : false;
+      profile && currentProfile ? profile.id === currentProfile.id : true;
 
     return (
       <GestureRecognizer
@@ -279,7 +308,9 @@ export class Profile extends Component {
                     style={styles.smallNextButton}
                   >
                     <Text style={styles.nextButtonText}>
-                      {currentProfile.isFollowedByUser ? "unfollow" : "follow"}
+                      {currentProfile && currentProfile.isFollowedByUser
+                        ? "unfollow"
+                        : "follow"}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.smallNextButton}>
@@ -302,10 +333,9 @@ export class Profile extends Component {
               scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              style={styles.postsContainer}
-              scrollEventThrottle={16}
+              style={{}}
+              scrollEventThrottle={100}
               ref={(view) => (this.scrollView = view)}
-              onScroll={this.handleScroll.bind(this)}
             >
               {posts &&
                 posts.map(
