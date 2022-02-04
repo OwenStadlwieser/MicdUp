@@ -54,8 +54,6 @@ export class SubmitRecording extends Component {
       clip.signedUrl = clip.uri;
       return clip;
     });
-    console.log(clips);
-    console.log(playingId);
     return (
       <View style={styles.paneSpaceEvenly}>
         <AntDesign
@@ -79,7 +77,7 @@ export class SubmitRecording extends Component {
             splitSearchTerm={true}
             inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
-            initValue={tags}
+            initValue={tags ? tags.toString() : ""}
             displayResults={true}
           />
         </View>

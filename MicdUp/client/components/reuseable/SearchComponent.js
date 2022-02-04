@@ -7,7 +7,7 @@ import { styles } from "../../styles/Styles";
 // helpers
 import debounce from "lodash.debounce";
 
-export class DropdownResults extends Component {
+export class SearchComponent extends Component {
   constructor() {
     super();
     this.state = {
@@ -122,4 +122,4 @@ export class DropdownResults extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(DropdownResults);
+export default connect(mapStateToProps, {})(SearchComponent);

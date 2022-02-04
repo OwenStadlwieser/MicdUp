@@ -71,6 +71,7 @@ export class Profile extends Component {
 
   async onSwipeDown(gestureState) {
     const { getUserPosts, currentProfile } = this.props;
+    if (this.state.loading) return;
     this.mounted && this.setState({ loading: true });
     await getUserPosts(currentProfile.id, 0);
     this.mounted && this.setState({ loading: false });
@@ -158,9 +159,11 @@ export class Profile extends Component {
     }
   };
 
-  componentDidUpdate = async () => {
+  componentDidUpdate = async (prevProps) => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
+
     if (
+      !prevProps.profile &&
       ((profile && currentProfile && profile.id !== currentProfile.id) ||
         (!posts && profile) ||
         (posts.length === 0 && profile)) &&
