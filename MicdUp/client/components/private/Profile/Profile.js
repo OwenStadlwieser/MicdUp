@@ -43,9 +43,7 @@ export class Profile extends Component {
       settingsShown: false,
       recording: false,
       playbackObject: {},
-      playing: "",
       currentBioRecording: "",
-      playingId: "",
       newBioRecording: {},
       selectImage: false,
     };
@@ -54,22 +52,26 @@ export class Profile extends Component {
   }
 
   async handleScroll(event) {
-    const { posts, getUserPosts, currentProfile } = this.props
-    const { loading } = this.state
+    const { posts, getUserPosts, currentProfile } = this.props;
+    const { loading } = this.state;
     try {
-      if(event.nativeEvent.contentOffset.y > (posts.length * (postHeight)) && !loading  
-      && posts.length % 20 === 0) {
-        this.mounted && this.setState({ loading: true })
+      if (
+        event.nativeEvent.contentOffset.y > posts.length * postHeight &&
+        !loading &&
+        posts.length % 20 === 0
+      ) {
+        this.mounted && this.setState({ loading: true });
         await getUserPosts(currentProfile.id, posts.length / 20);
-        this.mounted && this.setState({ loading: false })
+        this.mounted && this.setState({ loading: false });
       }
-    } catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   }
 
   async onSwipeDown(gestureState) {
     const { getUserPosts, currentProfile } = this.props;
+    if (this.state.loading) return;
     this.mounted && this.setState({ loading: true });
     await getUserPosts(currentProfile.id, 0);
     this.mounted && this.setState({ loading: false });
@@ -139,18 +141,38 @@ export class Profile extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
-      this.mounted && this.setState({ playing: "", playingId: "" });
-  }
-
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
-    if (profile.id !== currentProfile.id || !posts || posts.length === 0) {
+    if (
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
       this.mounted && this.setState({ loading: true });
-      await getUserPosts(currentProfile.id, 0);
+      await getUserPosts(id, 0);
+      this.mounted && this.setState({ loading: false });
+    }
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const { getUserPosts, currentProfile, profile, posts } = this.props;
+
+    if (
+      !prevProps.profile &&
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
+      this.mounted && this.setState({ loading: true });
+      await getUserPosts(id, 0);
       this.mounted && this.setState({ loading: false });
     }
   };
@@ -158,10 +180,6 @@ export class Profile extends Component {
   hideSetting = () => {
     this.mounted && this.setState({ settingsShown: false });
   };
-
-  setPlaying(id) {
-    this.mounted && this.setState({ playingId: id });
-  }
 
   setNewBioRecording = (newR) => {
     this.mounted && this.setState({ newBioRecording: newR });
@@ -190,9 +208,15 @@ export class Profile extends Component {
       selectImage,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
-    console.log('here')
+    if (!profile && !currentProfile) {
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      );
+    }
     const isUserProfile =
-      profile && currentProfile ? profile.id === currentProfile.id : false;
+      profile && currentProfile ? profile.id === currentProfile.id : true;
 
     return (
       <GestureRecognizer
@@ -275,8 +299,6 @@ export class Profile extends Component {
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}
                 currentSound={playingId}
-                onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
-                setPlaying={this.setPlaying.bind(this)}
                 setNewBioRecording={this.setNewBioRecording.bind(this)}
                 newBioRecording={newBioRecording}
               />
@@ -289,7 +311,9 @@ export class Profile extends Component {
                     style={styles.smallNextButton}
                   >
                     <Text style={styles.nextButtonText}>
-                      {currentProfile.isFollowedByUser ? "unfollow" : "follow"}
+                      {currentProfile && currentProfile.isFollowedByUser
+                        ? "unfollow"
+                        : "follow"}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.smallNextButton}>
@@ -312,29 +336,27 @@ export class Profile extends Component {
               scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              style={styles.postsContainer}
-              scrollEventThrottle={16}
+              style={{}}
+              scrollEventThrottle={100}
               ref={(view) => (this.scrollView = view)}
-              onScroll={this.handleScroll.bind(this)}
             >
               {posts &&
-                posts.map((post, index) => post && (
-                  <Post
-                    isUserProfile={isUserProfile}
-                    setCommentPosts={this.setCommentPosts.bind(this)}
-                    removeCommentPosts={this.removeCommentPosts.bind(this)}
-                    key={post.id}
-                    post={post}
-                    postArray={posts}
-                    index={index}
-                    currentSound={playingId}
-                    onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                      this
-                    )}
-                    higherUp={false}
-                    setPlaying={this.setPlaying.bind(this)}
-                  />
-                ))}
+                posts.map(
+                  (post, index) =>
+                    post && (
+                      <Post
+                        isUserProfile={isUserProfile}
+                        setCommentPosts={this.setCommentPosts.bind(this)}
+                        removeCommentPosts={this.removeCommentPosts.bind(this)}
+                        key={post.id}
+                        post={post}
+                        postArray={posts}
+                        index={index}
+                        currentSound={playingId}
+                        higherUp={false}
+                      />
+                    )
+                )}
             </ScrollView>
           </View>
         )}

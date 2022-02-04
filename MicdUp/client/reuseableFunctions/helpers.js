@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Audio } from "expo-av";
+
 const storeData = async (key, value) => {
   try {
     await AsyncStorage.setItem(key, value);
@@ -17,6 +17,7 @@ const getData = async (key) => {
     }
   } catch (e) {
     // error reading value
+    return false;
   }
 };
 
@@ -33,24 +34,57 @@ const clearAsyncStorage = async () => {
   AsyncStorage.clear();
 };
 
-const playSound = async (uri, onPlayBackStatusUpdate) => {
-  console.log(uri);
+const playSound = async (uri, sound) => {
   try {
-    await Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      allowsRecordingIOS: false,
-    });
-    const playbackObject = new Audio.Sound();
+    const playbackObject = sound;
     // OR
-    const res = await Audio.Sound.createAsync(
-      { uri },
-      { shouldPlay: true },
-      onPlayBackStatusUpdate
-    );
-    return res.sound;
+    const result = await sound.getStatusAsync();
+    if (!result.isLoaded)
+      await playbackObject.loadAsync({ uri }, { shouldPlay: true }, () => {});
+    await playbackObject.playAsync();
+    return playbackObject;
   } catch (err) {
     console.log(err);
   }
+};
+
+const duplicateNotifsString = (n) => {
+  let string = "";
+  for (let i = 0; i < n; i++) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = 0; j < i; j++) {
+      tabString = tabString + tabStringC;
+    }
+    let startString = `${tabString}allReplies {
+      ${tabString}id
+      ${tabString}text
+      ${tabString}notifsLength
+      ${tabString}signedUrl
+      ${tabString}navTo
+      ${tabString}owner {
+        ${tabString}id
+        ${tabString}user {
+          ${tabString}id
+          ${tabString}userName
+          ${tabString}}
+          ${tabString}image {
+            ${tabString}id
+            ${tabString}signedUrl
+            ${tabString}}
+          ${tabString}}
+    `;
+    string = string + startString;
+  }
+  for (let i = n; i > 0; i--) {
+    let tabString = "";
+    let tabStringC = "\t";
+    for (let j = i; j > 0; j--) {
+      tabString = tabString + tabStringC;
+    }
+    string = string + `${tabString}}\n`;
+  }
+  return string;
 };
 
 const duplicateCommentsString = (n) => {
@@ -133,4 +167,5 @@ export {
   playSound,
   soundBlobToBase64,
   duplicateCommentsString,
+  duplicateNotifsString
 };

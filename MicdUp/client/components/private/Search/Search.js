@@ -67,7 +67,7 @@ export class Search extends Component {
           placeHolderColor={"white"}
           scrollable={true}
           displayResults={false}
-          initValue={users}
+          initValue={users ? users.toString() : ""}
         />
         {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (

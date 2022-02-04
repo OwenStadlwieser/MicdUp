@@ -6,10 +6,11 @@ import {
   View,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import { connect } from "react-redux";
 // helpers
-import { playSound } from "../../../reuseableFunctions/helpers";
+import { changeSound, pauseSound } from "../../../redux/actions/sound";
 // components
 import { DragSortableView } from "react-native-drag-sort";
 // icons
@@ -30,7 +31,6 @@ export class Clips extends Component {
 
     this.state = {
       scrollEnabled: true,
-      playingIndex: -1,
       playbackObject: null,
     };
     this.mounted = true;
@@ -42,7 +42,6 @@ export class Clips extends Component {
   render() {
     const dataProp = this.props.clips;
     const { itemClicked } = this.props;
-    console.log(itemClicked)
     return (
       <SafeAreaView style={{ backgroundColor: "#fff", flex: 1 }}>
         <ScrollView
@@ -73,7 +72,7 @@ export class Clips extends Component {
             }}
             keyExtractor={(item, index) => item.finalDuration}
             onClickItem={(data, item, index) => {
-              itemClicked && itemClicked(index)
+              itemClicked && itemClicked(index);
             }}
             renderItem={(item, index) => {
               return this.renderItem(item, index);
@@ -84,42 +83,47 @@ export class Clips extends Component {
     );
   }
 
-  stopCurrentSound = async () => {
-    const { playbackObject } = this.state;
-    if (!playbackObject) return;
-    await playbackObject.stopAsync();
-    this.mounted && this.setState({ playingIndex: -1 });
-  };
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
-      this.mounted && this.setState({ playingIndex: -1 });
-  }
   deleteItem(index) {
     const clips = [...this.props.clips];
     clips.splice(index, 1);
     this.props.updateClips(clips);
   }
   renderItem(item, index) {
-    const { playingIndex } = this.state;
-    const { selectedClips } = this.props;
+    const { selectedClips, clips, playingId, isPause } = this.props;
     return (
       <View style={styles.item}>
-        <View style={selectedClips && selectedClips[index] ? styles.selectedItem : styles.item_children}>
+        <View
+          style={
+            selectedClips && selectedClips[index]
+              ? styles.selectedItem
+              : styles.item_children
+          }
+        >
           <Text style={styles.item_text}>Clip {index + 1}</Text>
           <Text style={styles.item_text}>
             {Math.round(item.finalDuration / 1000)} Seconds
           </Text>
+          {item.filter && (
+            <TouchableOpacity
+              onPress={() => {
+                item.uri = item.originalUri;
+                item.filter = false;
+                item.filterId = [];
+                clips[index] = item;
+                this.props.updateClips([...clips]);
+              }}
+            >
+              <Text style={styles.item_text}>Remove Filter</Text>
+            </TouchableOpacity>
+          )}
           <View style={styles.iconContainerClips}>
-            {playingIndex !== index ? (
+            {playingId !== item.id || isPause ? (
               <AntDesign
                 onPress={async () => {
-                  await this.stopCurrentSound();
-                  const playbackObject = await playSound(
-                    this.props.clips[index].uri,
-                    this.onPlaybackStatusUpdate.bind(this)
+                  await this.props.changeSound(
+                    this.props.clips[index],
+                    this.props.clips[index].uri
                   );
-                  this.mounted &&
-                    this.setState({ playingIndex: index, playbackObject });
                 }}
                 style={styles.playButton}
                 name="play"
@@ -129,7 +133,7 @@ export class Clips extends Component {
             ) : (
               <AntDesign
                 onPress={async () => {
-                  await this.stopCurrentSound();
+                  await this.props.pauseSound();
                 }}
                 style={styles.playButton}
                 name="pausecircle"
@@ -173,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 4,
     paddingHorizontal: 15,
-    backgroundColor: "#06C1D7"
+    backgroundColor: "#06C1D7",
   },
   item_children: {
     width: childrenWidth,
@@ -206,6 +210,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => ({
   clips: state.recording.clips,
+  isPause: state.sound.isPause,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
 });
 
-export default connect(mapStateToProps, { updateClips })(Clips);
+export default connect(mapStateToProps, {
+  updateClips,
+  changeSound,
+  pauseSound,
+})(Clips);

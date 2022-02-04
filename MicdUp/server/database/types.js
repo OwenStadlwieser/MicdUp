@@ -518,6 +518,14 @@ const MessageType = new GraphQLObjectType({
   }),
 });
 
+const NotifType = new GraphQLObjectType({
+  name: "Notif",
+  fields: () => ({
+    success: { type: GraphQLBoolean },
+    message: { type: GraphQLString },
+  }),
+});
+
 const TagsType = new GraphQLObjectType({
   name: "Tags",
   fields: () => ({
@@ -575,5 +583,6 @@ module.exports = {
   ProfileType,
   ChatType,
   ChatMessageType,
+  NotifType,
   FilterType,
 };

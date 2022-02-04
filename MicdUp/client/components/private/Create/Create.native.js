@@ -10,17 +10,19 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Platform,
-  NativeModules,
+  Dimensions,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
+import RNSoundLevel from "react-native-sound-level";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles } from "../../../styles/Styles";
+import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
@@ -31,7 +33,9 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
-
+const { width, height } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Create extends Component {
   constructor() {
     super();
@@ -87,6 +91,15 @@ export class Create extends Component {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
+      RNSoundLevel.start(75);
+      RNSoundLevel.onNewFrame = (data) => {
+        let { soundLevels } = this.state;
+        soundLevels.unshift(data);
+        if (soundLevels.length > Math.floor(width / barWidth)) {
+          soundLevels.pop();
+        }
+        this.mounted && this.setState({ soundLevels });
+      };
       console.log("Starting recording..");
       try {
         Voice &&
@@ -115,6 +128,7 @@ export class Create extends Component {
       return;
     }
     await recording.stopAndUnloadAsync();
+    RNSoundLevel.stop();
     const uri = recording.getURI();
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
@@ -146,6 +160,7 @@ export class Create extends Component {
               },
             ],
         v: 0,
+        soundLevels: [],
       });
     this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
@@ -158,8 +173,6 @@ export class Create extends Component {
     const { user } = this.props;
     const {
       recording,
-      clips,
-      v,
       editRecording,
       submitRecording,
       promptShown,
@@ -292,13 +305,45 @@ export class Create extends Component {
             />
           </View>
         </View>
-        <AudioRecordingVisualization
-          recording={recording}
-          key={soundLevels.length}
-          arrayOfDecibels={soundLevels}
-          buttonColor={this.colors[v]}
-          stopRecording={this.stopRecording.bind(this)}
-        />
+        {recording && (
+          <AudioRecordingVisualization
+            recording={recording}
+            key={
+              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
+            }
+            arrayOfDecibels={soundLevels}
+            barWidth={barWidth}
+            barMargin={barMargin}
+          />
+        )}
+        {recording && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 50,
+              position: "absolute",
+              bottom: height * 0.08,
+              width,
+              left: 0,
+              opacity: 1.0,
+              zIndex: 6,
+            }}
+          >
+            <FontAwesome5
+              onPress={() => {
+                console.log("stopping");
+                this.stopRecording();
+              }}
+              style={{
+                fontSize: largeIconFontSize,
+                opacity: 1.0,
+              }}
+              name="record-vinyl"
+              color={"red"}
+            />
+          </View>
+        )}
       </View>
     );
     return app;

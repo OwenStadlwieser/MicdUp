@@ -23,6 +23,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
+// audio
 import { Audio } from "expo-av";
 // redux
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
@@ -33,7 +34,6 @@ export class Chat extends Component {
     super();
     this.state = {
       loading: false,
-      currentPlayingId: "",
       recording: false,
       audioBlobs: false,
       v: 0,
@@ -109,24 +109,13 @@ export class Chat extends Component {
       this.scrollView.scrollToEnd({ animated: true });
     }
   };
-  setPlaying(id) {
-    console.log(id);
-    this.mounted && this.setState({ currentPlayingId: id });
-  }
-
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
-      this.mounted && this.setState({ playing: "", playingId: "" });
-  }
-
   goBack = () => console.log("Went back");
 
   handleMore = () => console.log("Shown more");
 
   render() {
-    const { activeChats, activeChatId, profile, activeChatMembers, userName } =
-      this.props;
-    const { currentPlayingId, recording, audioBlobs, v, loading } = this.state;
+    const { activeChats, profile, activeChatMembers, userName } = this.props;
+    const { recording, audioBlobs, v, loading } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -141,7 +130,6 @@ export class Chat extends Component {
         >
           <Appbar.BackAction
             onPress={() => {
-              console.log("here");
               this.props.hideChats();
             }}
           />
@@ -238,13 +226,8 @@ export class Chat extends Component {
                       <PlayButton
                         containerStyle={{}}
                         color={"#1A3561"}
-                        currentPlayingId={currentPlayingId}
                         size={48}
                         post={chat}
-                        setPlaying={this.setPlaying.bind(this)}
-                        onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                          this
-                        )}
                       />
                     )}
                     {chat.owner.id === profile.id && (
@@ -335,4 +318,7 @@ const mapStateToProps = (state) => ({
   socket: state.auth.socket,
 });
 
-export default connect(mapStateToProps, { hideChats, viewMoreChats })(Chat);
+export default connect(mapStateToProps, {
+  hideChats,
+  viewMoreChats,
+})(Chat);

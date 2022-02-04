@@ -6,7 +6,11 @@ const { User } = require("../database/models/User");
 const { Message, File } = require("../database/models/File");
 const fs = require("fs");
 var path = require("path");
-const { uploadFileFromBase64, getSignedUrl } = require("../utils/awsS3");
+const {
+  uploadFileFromBase64,
+  getSignedUrl,
+  getFile,
+} = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
 } = require("../database/publicSchema/mutations/recording");
@@ -22,6 +26,7 @@ exports = module.exports = function (io) {
     try {
       socket.on("new user", async function (token) {
         const userId = jwt.verify(token, "secret");
+        console.log("new user connection");
         if (!userId || !userId.user) {
           throw new Error("Invalid token");
         }
@@ -56,13 +61,12 @@ exports = module.exports = function (io) {
         });
 
         var fileTypeFixed = fileType.replace("audio/", "");
+        fileTypeFixed = fileTypeFixed.replace(".", "");
         var jsonPath = path.join(
           __dirname,
           "..",
           "temp",
-          `${message._id}${
-            fileTypeFixed[0] === "." ? fileTypeFixed : "." + fileTypeFixed
-          }`
+          `${message._id}.${fileTypeFixed}`
         );
         const base64 = messageData.substr(messageData.indexOf(",") + 1);
 
@@ -96,9 +100,7 @@ exports = module.exports = function (io) {
             ) {
               image.signedUrl = image.signedUrl;
             } else {
-              image.signedUrl = await getFile(
-                parent._id + parent.fileExtension
-              );
+              image.signedUrl = await getFile(image._id + image.fileExtension);
               image.lastFetched = Date.now();
               await image.save({ session });
             }

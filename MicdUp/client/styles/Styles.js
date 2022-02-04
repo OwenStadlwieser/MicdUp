@@ -20,6 +20,10 @@ const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
+const largeIconFontSize =
+  width * 0.24 < (height * 0.21) / 1.7 - 10
+    ? width * 0.24
+    : (height * 0.21) / 1.7 - 10;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
   profileText: {
     paddingLeft: width * 0.075,
     width: width * 0.6,
-    textAlign: 'left',
+    textAlign: "left",
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",
@@ -391,7 +395,7 @@ const styles = StyleSheet.create({
     width,
     justifyContent: "center",
     alignItems: "center",
-    height: "5vh",
+    height: height * 0.05,
     zIndex: 99,
   },
   postContainer: {
@@ -450,7 +454,7 @@ const styles = StyleSheet.create({
     width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
-    height: height * 0.21,
+    height: height * 0.25,
     width: width,
     flexDirection: "row",
   },
@@ -466,16 +470,10 @@ const styles = StyleSheet.create({
   },
   recordingMicIcon: {
     paddingLeft: 10,
-    fontSize:
-      width * 0.24 < (height * 0.21) / 1.7 - 10
-        ? width * 0.24
-        : (height * 0.21) / 1.7 - 10,
+    fontSize: largeIconFontSize,
   },
   currentRecordingIcon: {
-    fontSize:
-      width * 0.24 < (height * 0.21) / 1.7 - 10
-        ? width * 0.24
-        : (height * 0.21) / 1.7 - 10,
+    fontSize: largeIconFontSize,
   },
   recordingCircleIcon: {
     fontSize:
@@ -502,7 +500,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   profileImgContainer: {
-    height: height * 0.2,
     width: height * 0.2,
     borderRadius: height * 0.2,
     overflow: "hidden",
@@ -594,7 +591,7 @@ const styles = StyleSheet.create({
   upperEditDivAbsolute: {
     height: height * 0.15,
     zIndex: 3,
-    justifyContent: 'space-evenly'
+    justifyContent: "space-evenly",
   },
   clipsEditDiv: {
     height: height * 0.3,
@@ -786,4 +783,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles, postPadding, postHeight, filterHeight };
+export { styles, postPadding, postHeight, filterHeight, largeIconFontSize };

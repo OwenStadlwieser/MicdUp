@@ -7,7 +7,7 @@ import { styles } from "../../styles/Styles";
 // helpers
 import debounce from "lodash.debounce";
 
-export class DropdownResults extends Component {
+export class SearchComponent extends Component {
   constructor() {
     super();
     this.state = {
@@ -89,9 +89,15 @@ export class DropdownResults extends Component {
             }}
             onFocus={() => {
               this.mounted && this.setState({ showDropDown: true });
+              if (this.props.onFocus) {
+                this.props.onFocus();
+              }
             }}
             placeholder={this.props.placeholder}
             onChangeText={(searchTerm) => {
+              if (this.props.onFocus) {
+                this.props.onFocus();
+              }
               if (this.props.setStateOnChange) {
                 this.props.setStateOnChangeFunc(searchTerm);
               }
@@ -111,7 +117,9 @@ export class DropdownResults extends Component {
             <DropDown
               onPressFunc={this.onPressFunc.bind(this)}
               results={results}
+              title={"title"}
               onBlur={this.onBlur.bind(this)}
+              style={styles.resultsContainer}
             />
           )}
         </View>
@@ -122,4 +130,4 @@ export class DropdownResults extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(DropdownResults);
+export default connect(mapStateToProps, {})(SearchComponent);

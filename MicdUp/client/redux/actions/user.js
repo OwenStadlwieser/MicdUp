@@ -6,7 +6,7 @@ import {
   SET_EMAIL_VERIFIED_MUTATION,
   SEARCH_USERS_QUERY,
 } from "../../apollo/private/user";
-import { SET_USER, LOG_IN, DELETE_ACCOUNT } from "../types";
+import { SET_USER, LOG_IN, DELETE_ACCOUNT, VIEW_PROFILE } from "../types";
 import { showMessage } from "./display";
 
 export const getUserQuery = () => async (dispatch) => {
@@ -19,9 +19,13 @@ export const getUserQuery = () => async (dispatch) => {
         type: SET_USER,
         payload: res.data.getUser,
       });
-      if (res.data.getUser && res.data.getUser.id) {
+      if (res.data.getUser && res.data.getUser._id) {
         dispatch({
           type: LOG_IN,
+        });
+        dispatch({
+          type: VIEW_PROFILE,
+          payload: res.data.getUser.profile,
         });
       }
     }

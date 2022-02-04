@@ -34,7 +34,6 @@ export class Filters extends Component {
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
     const res = await this.props.getFilters(0);
-    console.log(res);
     this.mounted && this.setState({ entries: res, loading: false });
   };
 
@@ -49,52 +48,60 @@ export class Filters extends Component {
         });
         return;
       }
+
       const assignPath = (filePath, i) => {
-        clips[i].originalUri = clips[i].uri;
+        if (!clips[i].filter) {
+          clips[i].originalUri = clips[i].uri;
+        }
         clips[i].uri = filePath;
         clips[i].filter = true;
+        clips[i].filterId = clips[i].filterId
+          ? [...clips[i].filterId, item.id]
+          : [item.id];
         this.props.updateClips(clips);
+        this.props.removeFromSelected(i);
       };
       const handleError = (e) => {
-        console.log(e);
+        console.log(e, 1234);
       };
-      for (let i = 0; i < keys.length; i++) {
-        let x = String(clips[i].uri);
+      let mapped = keys.map((x) => parseInt(x));
+      for (let j = 0; j < mapped.length; j++) {
+        let x = String(clips[j].uri);
         switch (item.type) {
           case "EQUALIZER":
             NativeModules.AudioEngineOBJC.applyEqualizerFilter(
               x,
               item.equalizerPreset,
-              (path) => assignPath(path, i),
+              (path) => assignPath(path, mapped[j]),
               (e) => handleError(e)
             );
-            break;
+            continue;
           case "REVERB":
             NativeModules.AudioEngineOBJC.applyReverbFilter(
               x,
               item.reverbPreset,
               item.reverb,
-              (path) => assignPath(path, i),
+              (path) => assignPath(path, mapped[j]),
               (e) => handleError(e)
             );
-            break;
+            continue;
           case "PITCH":
             NativeModules.AudioEngineOBJC.applyPitchFilter(
               x,
               item.pitchNum,
-              (path) => assignPath(path, i),
+              (path) => assignPath(path, mapped[j]),
               (e) => handleError(e)
             );
-            break;
+            continue;
           case "DISTORTION":
             NativeModules.AudioEngineOBJC.applyDistortionFilter(
               x,
               item.distortionPreset,
               item.distortion,
-              (path) => assignPath(path, i),
+              (path) => assignPath(path, mapped[j]),
               (e) => handleError(e)
             );
-            break;
+            continue;
           case "ALL":
             NativeModules.AudioEngineOBJC.applyFilter(
               x,
@@ -104,16 +111,15 @@ export class Filters extends Component {
               item.pitchNum,
               item.distortion,
               item.equalizerPreset,
-              (path) => assignPath(path, i),
+              (path) => assignPath(path, mapped[j]),
               (e) => handleError(e)
             );
-            break;
+            continue;
           default:
-            break;
+            continue;
         }
       }
     } catch (err) {
-      console.log(err);
       this.props.showMessage({
         message: "Something went wrong",
         success: false,
@@ -149,12 +155,16 @@ export class Filters extends Component {
           this._carousel = c;
         }}
         onSnapToItem={async (index) => {
-          if ((index + 1) % 30 === 0 && index > 0) {
+          if (
+            (index + 1) % 30 === 0 &&
+            index > 0 &&
+            !this.state.entries[index + 1]
+          ) {
             this.mounted && this.setState({ loading: true });
             const res = await this.props.getFilters((index + 1) / 30);
             this.mounted &&
               this.setState({
-                filters: [...this.state.filters, ...res],
+                entries: [...this.state.entries, ...res],
                 loading: false,
               });
           }

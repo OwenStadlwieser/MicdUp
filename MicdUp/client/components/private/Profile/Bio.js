@@ -45,14 +45,13 @@ export class Bio extends Component {
       startRecording,
       stopRecordingBio,
       currentSound,
-      onPlaybackStatusUpdate,
-      setPlaying,
       profile,
       newBioRecording,
       bio,
     } = this.props;
     const { isRecording } = this.state;
-    const isUserProfile = profile.id === currentProfile.id;
+    const isUserProfile =
+      profile && currentProfile ? profile.id === currentProfile.id : true;
     return (
       <View style={styles.bioContainer}>
         {bio && (
@@ -67,8 +66,6 @@ export class Bio extends Component {
                 id: bio.id,
                 signedUrl: bio.signedUrl,
               }}
-              setPlaying={setPlaying}
-              onPlaybackStatusUpdate={onPlaybackStatusUpdate}
             />
           </View>
         )}
@@ -110,8 +107,6 @@ export class Bio extends Component {
                     id: "NewBioRecording",
                     signedUrl: newBioRecording.uri,
                   }}
-                  setPlaying={setPlaying}
-                  onPlaybackStatusUpdate={onPlaybackStatusUpdate}
                 />
               </View>
             )}

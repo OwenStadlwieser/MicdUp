@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
 import { styles } from "../../styles/Styles";
-import { playSound } from "../../reuseableFunctions/helpers";
 import { AntDesign } from "@expo/vector-icons";
+import { changeSound, pauseSound } from "../../redux/actions/sound";
 export class PlayButton extends Component {
   constructor() {
     super();
@@ -32,13 +32,12 @@ export class PlayButton extends Component {
     const {
       containerStyle,
       color,
-      currentPlayingId,
       post,
-      setPlaying,
-      onPlaybackStatusUpdate,
-      playButtonSty
+      playButtonSty,
+      playingId,
+      isPause,
+      queue,
     } = this.props;
-
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -47,16 +46,10 @@ export class PlayButton extends Component {
         }}
         style={containerStyle}
       >
-        {currentPlayingId !== post.id ? (
+        {playingId !== post.id || isPause ? (
           <AntDesign
             onPress={async () => {
-              await this.stopCurrentSound();
-              const playbackObject = await playSound(
-                post.signedUrl,
-                onPlaybackStatusUpdate
-              );
-              this.mounted && this.setState({ playbackObject });
-              setPlaying(post.id);
+              await this.props.changeSound(post, post.signedUrl, queue);
             }}
             style={playButtonSty ? playButtonSty : styles.playButton}
             name="play"
@@ -66,7 +59,7 @@ export class PlayButton extends Component {
         ) : (
           <AntDesign
             onPress={async () => {
-              await this.stopCurrentSound();
+              await this.props.pauseSound();
             }}
             style={playButtonSty ? playButtonSty : styles.playButton}
             name="pausecircle"
@@ -79,6 +72,12 @@ export class PlayButton extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  isPause: state.sound.isPause,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+});
 
-export default connect(mapStateToProps, {})(PlayButton);
+export default connect(mapStateToProps, { changeSound, pauseSound })(
+  PlayButton
+);

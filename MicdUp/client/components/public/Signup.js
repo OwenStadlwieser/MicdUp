@@ -12,7 +12,7 @@ import {
 } from "../../reuseableFunctions/regex";
 import {
   Platform,
-  View,
+  Dimensions,
   TextInput,
   Text,
   TouchableOpacity,
@@ -21,6 +21,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import DatePicker from "react-native-datepicker";
 
+const { height } = Dimensions.get("window");
 export class Signup extends Component {
   constructor() {
     super();
@@ -125,7 +126,7 @@ export class Signup extends Component {
               width: "60%",
               height: 40,
               borderRadius: "5px",
-              marginTop: "5vh",
+              marginTop: 0.05 * height,
               position: "relative",
             }}
           />

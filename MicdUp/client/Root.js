@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View, TouchableOpacity } from "react-native";
-import React, { Component } from "react";
+import { Text, View, TouchableOpacity, Platform } from "react-native";
+import React, { Component, useEffect } from "react";
 import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
@@ -14,6 +14,9 @@ import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
+import NotificationBell from "./components/private/NotificationBell";
+
+import { Audio } from "expo-av";
 
 export class Root extends Component {
   constructor() {
@@ -34,6 +37,10 @@ export class Root extends Component {
   componentDidMount = async () => {
     const token = await getData("token");
     this.mounted && this.setState({ token });
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      allowsRecordingIOS: false,
+    });
   };
   componentDidUpdate = async (prevProps, prevState) => {
     const { token } = this.state;
@@ -114,6 +121,7 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
+          <NotificationBell />
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
