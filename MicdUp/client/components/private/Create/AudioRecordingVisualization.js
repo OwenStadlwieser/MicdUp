@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Dimensions, TouchableOpacity } from "react-native";
+import { View, Dimensions } from "react-native";
 import Svg, { Rect } from "react-native-svg";
-import { styles } from "../../../styles/Styles";
-import { FontAwesome5 } from "@expo/vector-icons";
 const barWidth = 5;
 const barMargin = 1;
-const { width, height } = Dimensions.get("window");
 const offset = width / 2;
+const { width, height } = Dimensions.get("window");
 export class AudioRecordingVisualization extends Component {
   constructor() {
     super();
@@ -23,8 +21,7 @@ export class AudioRecordingVisualization extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { arrayOfDecibels, recording, buttonColor, stopRecording } =
-      this.props;
+    const { arrayOfDecibels, recording } = this.props;
     const svgHeight = height * 0.15;
     const slice = arrayOfDecibels.slice(0, Math.floor(width / barWidth));
     const app = recording ? (
@@ -68,41 +65,6 @@ export class AudioRecordingVisualization extends Component {
               ></Rect>
             ))}
           </Svg>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 50,
-            position: "absolute",
-            bottom: height * 0.08,
-            width,
-            left: 0,
-            opacity: 1.0,
-            zIndex: 6,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              console.log("stopping2");
-              stopRecording();
-            }}
-            style={{ height: 50, width: 50, backgroundColor: "orange" }}
-          >
-            <FontAwesome5
-              onPress={() => {
-                console.log("stopping");
-                stopRecording();
-              }}
-              style={{
-                fontSize: 60,
-                opacity: 1.0,
-              }}
-              name="record-vinyl"
-              size={60}
-              color={buttonColor}
-            />
-          </TouchableOpacity>
         </View>
       </View>
     ) : (

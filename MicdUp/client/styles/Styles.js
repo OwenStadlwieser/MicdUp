@@ -20,6 +20,10 @@ const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
+const largeIconFontSize =
+  width * 0.24 < (height * 0.21) / 1.7 - 10
+    ? width * 0.24
+    : (height * 0.21) / 1.7 - 10;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -450,7 +454,7 @@ const styles = StyleSheet.create({
     width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
-    height: height * 0.21,
+    height: height * 0.25,
     width: width,
     flexDirection: "row",
   },
@@ -466,16 +470,10 @@ const styles = StyleSheet.create({
   },
   recordingMicIcon: {
     paddingLeft: 10,
-    fontSize:
-      width * 0.24 < (height * 0.21) / 1.7 - 10
-        ? width * 0.24
-        : (height * 0.21) / 1.7 - 10,
+    fontSize: largeIconFontSize,
   },
   currentRecordingIcon: {
-    fontSize:
-      width * 0.24 < (height * 0.21) / 1.7 - 10
-        ? width * 0.24
-        : (height * 0.21) / 1.7 - 10,
+    fontSize: largeIconFontSize,
   },
   recordingCircleIcon: {
     fontSize:
@@ -785,4 +783,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles, postPadding, postHeight, filterHeight };
+export { styles, postPadding, postHeight, filterHeight, largeIconFontSize };

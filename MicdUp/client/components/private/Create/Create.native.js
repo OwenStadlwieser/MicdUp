@@ -10,17 +10,19 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Platform,
-  NativeModules,
+  Dimensions,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
 import AudioRecordingVisualization from "./AudioRecordingVisualization";
+import RNSoundLevel from "react-native-sound-level";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles } from "../../../styles/Styles";
+import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
@@ -31,8 +33,7 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
-import RNSoundLevel from "react-native-sound-level";
-
+const { width, height } = Dimensions.get("window");
 export class Create extends Component {
   constructor() {
     super();
@@ -297,13 +298,41 @@ export class Create extends Component {
             />
           </View>
         </View>
-        <AudioRecordingVisualization
-          recording={recording}
-          key={soundLevels.length}
-          arrayOfDecibels={soundLevels}
-          buttonColor={this.colors[v]}
-          stopRecording={this.stopRecording.bind(this)}
-        />
+        {recording && (
+          <AudioRecordingVisualization
+            recording={recording}
+            key={soundLevels.length}
+            arrayOfDecibels={soundLevels}
+          />
+        )}
+        {recording && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 50,
+              position: "absolute",
+              bottom: height * 0.08,
+              width,
+              left: 0,
+              opacity: 1.0,
+              zIndex: 6,
+            }}
+          >
+            <FontAwesome5
+              onPress={() => {
+                console.log("stopping");
+                this.stopRecording();
+              }}
+              style={{
+                fontSize: largeIconFontSize,
+                opacity: 1.0,
+              }}
+              name="record-vinyl"
+              color={"red"}
+            />
+          </View>
+        )}
       </View>
     );
     return app;
