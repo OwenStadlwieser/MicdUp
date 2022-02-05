@@ -350,7 +350,7 @@ export class Comment extends Component {
                   }}
                 />
               )}
-              {!recording && Platform.OS === "web" ? (
+              {!recording ? (
                 <MaterialCommunityIcons
                   onPress={this.startRecordingComment}
                   name="microphone-plus"
