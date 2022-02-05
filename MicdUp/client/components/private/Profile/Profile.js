@@ -14,7 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 // styles
-import { styles, postHeight, postPadding } from "../../../styles/Styles";
+import { styles, postHeight, largeIconFontSize } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
