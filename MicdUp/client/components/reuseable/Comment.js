@@ -15,13 +15,18 @@ import {
 } from "react-native";
 import PlayButton from "./PlayButton";
 import Like from "./Like";
+import AudioRecordingVisualization from "./AudioRecordingVisualization";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
 import { soundBlobToBase64 } from "../../reuseableFunctions/helpers";
 import onClickOutside from "react-onclickoutside";
+import {
+  startRecording,
+  stopRecording,
+} from "../../reuseableFunctions/recording";
 // audio
-import { Audio } from "expo-av";
+import Voice from "@react-native-voice/voice";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -38,6 +43,8 @@ import {
 } from "../../redux/actions/comment";
 
 var { height, width } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Comment extends Component {
   constructor() {
     super();
@@ -52,11 +59,27 @@ export class Comment extends Component {
       replyingToName: "",
       parents: null,
     };
+    try {
+      Voice.onSpeechResults = this.onSpeechResults.bind(this);
+      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+    } catch (err) {
+      console.log(err);
+    }
     this.colors = ["white", "red"];
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  onSpeechStart = () => {
+    this.mounted && this.setState({ recognizing: true });
+  };
+  onSpeechResults = (e) => {
+    this.mounted && this.setState({ results: e.value });
+  };
+
+  componentWillUnmount = () => {
+    this.stopRecordingComment();
+    this.mounted = false;
+  };
 
   componentDidMount = () => {
     const interval = setInterval(() => {
@@ -67,33 +90,18 @@ export class Comment extends Component {
     }, 1000);
   };
 
-  startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
-      this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
+  startRecordingComment = async () => {
+    const recording = await startRecording(Voice, () => {});
+    this.mounted && this.setState({ recording });
   };
 
-  stopRecording = async () => {
+  stopRecordingComment = async () => {
     const { recording } = this.state;
     console.log("Stopping recording..");
     if (!recording) {
       return;
     }
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
+    const uri = await stopRecording(recording);
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -104,7 +112,6 @@ export class Comment extends Component {
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
-    console.log("Recording stopped and stored at", uri);
   };
 
   handleMap(comment, i, index, parentId, parent) {
@@ -280,7 +287,7 @@ export class Comment extends Component {
   }
 
   handleClickOutside = async (evt) => {
-    await this.stopRecording();
+    await this.stopRecordingComment();
     this.props.removeCommentPosts();
     this.props.setCommentsShowing(false);
     this.mounted && this.setState({ isShowing: false });
@@ -343,22 +350,24 @@ export class Comment extends Component {
                   }}
                 />
               )}
-              {!recording ? (
+              {!recording && Platform.OS === "web" ? (
                 <MaterialCommunityIcons
-                  onPress={this.startRecording}
+                  onPress={this.startRecordingComment}
                   name="microphone-plus"
                   size={75}
                   color="red"
                   style={styles.recordingMicIconComments}
                 />
               ) : (
-                <FontAwesome5
-                  onPress={this.stopRecording}
-                  style={styles.currentRecordingIconComments}
-                  name="record-vinyl"
-                  size={24}
-                  color={this.colors[v]}
-                />
+                Platform.OS === "web" && (
+                  <FontAwesome5
+                    onPress={this.stopRecordingComment}
+                    style={styles.currentRecordingIconComments}
+                    name="record-vinyl"
+                    size={24}
+                    color={this.colors[v]}
+                  />
+                )
               )}
               <TouchableOpacity onPress={async () => {}}>
                 <Entypo
@@ -393,6 +402,40 @@ export class Comment extends Component {
               )}
             </View>
           </View>
+          {recording && Platform.OS !== "web" && (
+            <AudioRecordingVisualization
+              recording={recording}
+              barWidth={barWidth}
+              barMargin={barMargin}
+            />
+          )}
+          {recording && Platform.OS !== "web" && (
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 50,
+                position: "absolute",
+                bottom: height * 0.08,
+                width,
+                left: 0,
+                opacity: 1.0,
+                zIndex: 6,
+              }}
+            >
+              <FontAwesome5
+                onPress={() => {
+                  this.stopRecordingComment();
+                }}
+                style={{
+                  fontSize: largeIconFontSize,
+                  opacity: 1.0,
+                }}
+                name="record-vinyl"
+                color={"red"}
+              />
+            </View>
+          )}
         </KeyboardAvoidingView>
       )
     );

@@ -28,8 +28,11 @@ import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import Voice from "@react-native-voice/voice";
 // redux
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
-import { startRecording } from "../../../reuseableFunctions/recording";
-import { stopRecording } from "../../../reuseableFunctions/recording";
+import {
+  startRecording,
+  stopRecording,
+} from "../../../reuseableFunctions/recording";
+
 const { width, height } = Dimensions.get("window");
 
 const barWidth = 5;
@@ -63,7 +66,9 @@ export class Chat extends Component {
   onSpeechResults = (e) => {
     this.mounted && this.setState({ results: e.value });
   };
-  startRecording = async () => {
+
+  startRecordingChat = async () => {
+    console.log("here");
     if (Platform.OS !== "web") {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording });
@@ -98,7 +103,10 @@ export class Chat extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.stopRecording();
+    this.mounted = false;
+  };
 
   componentDidMount = () => {
     const interval = setInterval(() => {
@@ -278,7 +286,7 @@ export class Chat extends Component {
             )}
             {!recording ? (
               <MaterialCommunityIcons
-                onPress={this.startRecording}
+                onPress={this.startRecordingChat}
                 name="microphone-plus"
                 size={75}
                 color="red"
