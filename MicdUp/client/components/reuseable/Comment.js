@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import PlayButton from "./PlayButton";
 import Like from "./Like";
-import AudioRecordingVisualization from "./AudioRecordingVisualization";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -86,6 +85,13 @@ export class Comment extends Component {
         this.state.recording &&
         this.setState({ v: v === 1 ? 0 : v + 1 });
     }, 1000);
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const { isRecordingComment } = this.props;
+    if (!isRecordingComment && prevProps.isRecordingComment) {
+      await this.stopRecordingComment();
+    }
   };
 
   startRecordingComment = async () => {

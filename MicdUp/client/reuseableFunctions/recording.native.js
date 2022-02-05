@@ -39,5 +39,6 @@ const stopRecording = async (recording, Voice) => {
   } catch (err) {
     console.log(err);
   }
+  return uri;
 };
 export { startRecording, stopRecording };

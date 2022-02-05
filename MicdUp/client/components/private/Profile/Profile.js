@@ -13,6 +13,7 @@ import {
 // icons
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles, postHeight, largeIconFontSize } from "../../../styles/Styles";
 // children
@@ -49,6 +50,7 @@ export class Profile extends Component {
       currentBioRecording: "",
       newBioRecording: {},
       selectImage: false,
+      isRecordingComment: false
     };
     this.scrollView = null;
     this.mounted = true;
@@ -209,6 +211,7 @@ export class Profile extends Component {
       playingId,
       loading,
       selectImage,
+      isRecordingComment
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
     if (!profile && !currentProfile) {
@@ -348,6 +351,7 @@ export class Profile extends Component {
                   (post, index) =>
                     post && (
                       <Post
+                        isRecordingComment={isRecordingComment}
                         isUserProfile={isUserProfile}
                         setCommentPosts={this.setCommentPosts.bind(this)}
                         removeCommentPosts={this.removeCommentPosts.bind(this)}
@@ -358,7 +362,7 @@ export class Profile extends Component {
                         currentSound={playingId}
                         higherUp={false}
                         setRecording={((val) => {
-                          this.mounted && this.setState({ recording: val });
+                          this.mounted && this.setState({ recording: val, isRecordingComment: true });
                         }).bind(this)}
                       />
                     )
@@ -387,7 +391,7 @@ export class Profile extends Component {
               >
                 <FontAwesome5
                   onPress={() => {
-                    this.stopRecordingComment();
+                    this.mounted && this.setState({ recording: false, isRecordingComment: false });
                   }}
                   style={{
                     fontSize: largeIconFontSize,
