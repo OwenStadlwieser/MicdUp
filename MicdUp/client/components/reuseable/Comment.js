@@ -42,9 +42,6 @@ import {
   deleteComment,
 } from "../../redux/actions/comment";
 
-var { height, width } = Dimensions.get("window");
-const barWidth = 5;
-const barMargin = 1;
 export class Comment extends Component {
   constructor() {
     super();
@@ -402,40 +399,6 @@ export class Comment extends Component {
               )}
             </View>
           </View>
-          {recording && Platform.OS !== "web" && (
-            <AudioRecordingVisualization
-              recording={recording}
-              barWidth={barWidth}
-              barMargin={barMargin}
-            />
-          )}
-          {recording && Platform.OS !== "web" && (
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 50,
-                position: "absolute",
-                bottom: height * 0.08,
-                width,
-                left: 0,
-                opacity: 1.0,
-                zIndex: 6,
-              }}
-            >
-              <FontAwesome5
-                onPress={() => {
-                  this.stopRecordingComment();
-                }}
-                style={{
-                  fontSize: largeIconFontSize,
-                  opacity: 1.0,
-                }}
-                name="record-vinyl"
-                color={"red"}
-              />
-            </View>
-          )}
         </KeyboardAvoidingView>
       )
     );

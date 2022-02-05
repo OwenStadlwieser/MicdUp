@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View } from "react-native";
+import { View, Dimensions } from "react-native";
+const { width, height } = Dimensions.get("window");
 export class AudioRecordingVisualization extends Component {
   constructor() {
     super();
@@ -16,7 +17,33 @@ export class AudioRecordingVisualization extends Component {
   componentDidMount = () => {};
 
   render() {
-    return <View></View>;
+    return (
+      <View
+        style={{
+          width,
+          height,
+          backgroundColor: "black",
+          opacity: 0.8,
+          position: "absolute",
+          bottom: 0,
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          zIndex: 5,
+        }}
+      >
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            height: 50,
+            width,
+            bottom: 0,
+            left: 0,
+          }}
+        ></View>
+      </View>
+    );
   }
 }
 

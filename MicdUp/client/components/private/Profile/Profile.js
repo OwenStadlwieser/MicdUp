@@ -20,6 +20,7 @@ import Settings from "./Settings";
 import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 // redux
 import {
   uploadBio,
@@ -34,7 +35,9 @@ import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
-
+var { height, width } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Profile extends Component {
   constructor() {
     super();
@@ -354,10 +357,47 @@ export class Profile extends Component {
                         index={index}
                         currentSound={playingId}
                         higherUp={false}
+                        setRecording={() => {
+                          this.mounted && this.setState({ recording: true });
+                        }}
                       />
                     )
                 )}
             </ScrollView>
+            {recording && Platform.OS !== "web" && (
+              <AudioRecordingVisualization
+                recording={recording}
+                barWidth={barWidth}
+                barMargin={barMargin}
+              />
+            )}
+            {recording && Platform.OS !== "web" && (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 50,
+                  position: "absolute",
+                  bottom: height * 0.08,
+                  width,
+                  left: 0,
+                  opacity: 1.0,
+                  zIndex: 6,
+                }}
+              >
+                <FontAwesome5
+                  onPress={() => {
+                    this.stopRecordingComment();
+                  }}
+                  style={{
+                    fontSize: largeIconFontSize,
+                    opacity: 1.0,
+                  }}
+                  name="record-vinyl"
+                  color={"red"}
+                />
+              </View>
+            )}
           </View>
         )}
       </GestureRecognizer>
