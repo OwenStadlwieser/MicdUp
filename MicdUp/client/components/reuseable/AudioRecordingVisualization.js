@@ -4,22 +4,43 @@ import { View, Dimensions } from "react-native";
 import Svg, { Rect } from "react-native-svg";
 const offset = width / 2;
 const { width, height } = Dimensions.get("window");
+import RNSoundLevel from "react-native-sound-level";
 export class AudioRecordingVisualization extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
+      soundLevels: [],
     };
 
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  onNewFrame = (data) => {
+    let { soundLevels } = this.state;
+    const { barWidth } = this.props;
+    soundLevels.unshift(data);
+    if (soundLevels.length > Math.floor(width / barWidth)) {
+      soundLevels.pop();
+    }
+    this.mounted && this.setState({ soundLevels });
+  };
 
-  componentDidMount = () => {};
+  componentWillUnmount = () => {
+    RNSoundLevel.stop();
+    this.mounted = false;
+  };
+
+  componentDidMount = () => {
+    RNSoundLevel.start(75);
+    RNSoundLevel.onNewFrame = (data) => {
+      this.onNewFrame(data);
+    };
+  };
 
   render() {
-    const { arrayOfDecibels, recording, barWidth, barMargin } = this.props;
+    const { recording, barWidth, barMargin } = this.props;
+    const { soundLevels } = this.state;
     const svgHeight = height * 0.3;
     const app = recording ? (
       <View
@@ -51,7 +72,7 @@ export class AudioRecordingVisualization extends Component {
               color: "white",
             }}
           >
-            {arrayOfDecibels.map((decibel, index) => (
+            {soundLevels.map((decibel, index) => (
               <Rect
                 key={index}
                 y={(svgHeight - (decibel.value + 80) * 2) / 2}
@@ -77,7 +98,7 @@ export class AudioRecordingVisualization extends Component {
             color: "white",
           }}
         >
-          {arrayOfDecibels.map((decibel, index) => (
+          {soundLevels.map((decibel, index) => (
             <Rect
               key={index}
               y={(svgHeight - (decibel.value + 80) * 2) / 2}

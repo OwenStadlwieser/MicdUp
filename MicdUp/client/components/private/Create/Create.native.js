@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Voice from "@react-native-voice/voice";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
-import RNSoundLevel from "react-native-sound-level";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -51,7 +50,6 @@ export class Create extends Component {
       functionID: "",
       prompt: {},
       results: [],
-      soundLevels: [],
     };
     try {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
@@ -86,20 +84,8 @@ export class Create extends Component {
     this.mounted && this.setState({ results: e.value });
   };
 
-  onNewFrame = (data) => {
-    let { soundLevels } = this.state;
-    soundLevels.unshift(data);
-    if (soundLevels.length > Math.floor(width / barWidth)) {
-      soundLevels.pop();
-    }
-    this.mounted && this.setState({ soundLevels });
-  };
   startRecording = async () => {
-    const recording = await startRecording(
-      this.onNewFrame.bind(this),
-      Voice,
-      () => {}
-    );
+    const recording = await startRecording(Voice, () => {});
     this.mounted && this.setState({ recording });
   };
 
@@ -111,7 +97,6 @@ export class Create extends Component {
       return;
     }
     await recording.stopAndUnloadAsync();
-    RNSoundLevel.stop();
     const uri = recording.getURI();
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
@@ -143,7 +128,6 @@ export class Create extends Component {
               },
             ],
         v: 0,
-        soundLevels: [],
       });
     this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
@@ -154,14 +138,8 @@ export class Create extends Component {
   };
   render() {
     const { user } = this.props;
-    const {
-      recording,
-      editRecording,
-      submitRecording,
-      promptShown,
-      prompt,
-      soundLevels,
-    } = this.state;
+    const { recording, editRecording, submitRecording, promptShown, prompt } =
+      this.state;
     const app = submitRecording ? (
       <SubmitRecording
         updateSubmitRecording={this.updateSubmitRecording.bind(this)}
@@ -291,10 +269,6 @@ export class Create extends Component {
         {recording && (
           <AudioRecordingVisualization
             recording={recording}
-            key={
-              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
-            }
-            arrayOfDecibels={soundLevels}
             barWidth={barWidth}
             barMargin={barMargin}
           />

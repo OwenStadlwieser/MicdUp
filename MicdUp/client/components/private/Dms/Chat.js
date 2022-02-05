@@ -16,7 +16,7 @@ import {
 import { Appbar } from "react-native-paper";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //styles
-import { styles } from "../../../styles/Styles";
+import { styles, largeIconFontSize } from "../../../styles/Styles";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -63,21 +63,9 @@ export class Chat extends Component {
   onSpeechResults = (e) => {
     this.mounted && this.setState({ results: e.value });
   };
-  onNewFrame = (data) => {
-    let { soundLevels } = this.state;
-    soundLevels.unshift(data);
-    if (soundLevels.length > Math.floor(width / barWidth)) {
-      soundLevels.pop();
-    }
-    this.mounted && this.setState({ soundLevels });
-  };
   startRecording = async () => {
     if (Platform.OS !== "web") {
-      const recording = await startRecording(
-        this.onNewFrame.bind(this),
-        Voice,
-        () => {}
-      );
+      const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording });
     } else {
       const recording = await startRecording(Voice, () => {});
@@ -333,41 +321,37 @@ export class Chat extends Component {
           </View>
         </View>
         {recording && Platform.OS !== "web" && (
-          <View>
-            <AudioRecordingVisualization
-              recording={recording}
-              key={
-                soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
-              }
-              arrayOfDecibels={soundLevels}
-              barWidth={barWidth}
-              barMargin={barMargin}
-            />
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 50,
-                position: "absolute",
-                bottom: height * 0.08,
-                width,
-                left: 0,
-                opacity: 1.0,
-                zIndex: 6,
+          <AudioRecordingVisualization
+            recording={recording}
+            barWidth={barWidth}
+            barMargin={barMargin}
+          />
+        )}
+        {recording && Platform.OS !== "web" && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 50,
+              position: "absolute",
+              bottom: height * 0.08,
+              width,
+              left: 0,
+              opacity: 1.0,
+              zIndex: 6,
+            }}
+          >
+            <FontAwesome5
+              onPress={() => {
+                this.stopRecording();
               }}
-            >
-              <FontAwesome5
-                onPress={() => {
-                  this.stopRecording();
-                }}
-                style={{
-                  fontSize: largeIconFontSize,
-                  opacity: 1.0,
-                }}
-                name="record-vinyl"
-                color={"red"}
-              />
-            </View>
+              style={{
+                fontSize: largeIconFontSize,
+                opacity: 1.0,
+              }}
+              name="record-vinyl"
+              color={"red"}
+            />
           </View>
         )}
       </View>

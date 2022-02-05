@@ -1,17 +1,13 @@
 import { Audio } from "expo-av";
-import RNSoundLevel from "react-native-sound-level";
+
 import { Platform } from "react-native";
-const startRecording = async (onNewFrame, Voice, onRecordingStatusUpdate) => {
+const startRecording = async (Voice, onRecordingStatusUpdate) => {
   try {
     await Audio.requestPermissionsAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
       playsInSilentModeIOS: true,
     });
-    RNSoundLevel.start(75);
-    RNSoundLevel.onNewFrame = (data) => {
-      onNewFrame(data);
-    };
     console.log("Starting recording..");
     try {
       Voice &&
@@ -37,7 +33,6 @@ const stopRecording = async (recording, Voice) => {
     return;
   }
   await recording.stopAndUnloadAsync();
-  RNSoundLevel.stop();
   const uri = recording.getURI();
   try {
     Voice && Platform.OS !== "web" && Voice.stop();
