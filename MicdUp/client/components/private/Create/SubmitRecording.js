@@ -19,7 +19,6 @@ import { styles } from "../../../styles/Styles";
 import { updateTags, uploadRecording } from "../../../redux/actions/recording";
 import { searchTags, randomTag } from "../../../redux/actions/tag";
 // helpers
-import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 const { height, width } = Dimensions.get("window");
 export class SubmitRecording extends Component {
@@ -55,8 +54,6 @@ export class SubmitRecording extends Component {
       clip.signedUrl = clip.uri;
       return clip;
     });
-    console.log(clips);
-    console.log(playingId);
     return (
       <View style={styles.paneSpaceEvenly}>
         <AntDesign
@@ -80,7 +77,7 @@ export class SubmitRecording extends Component {
             splitSearchTerm={true}
             inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
-            initValue={tags}
+            initValue={tags ? tags.toString() : ""}
             displayResults={true}
           />
         </View>
@@ -200,6 +197,4 @@ export default connect(mapStateToProps, {
   updateTags,
   uploadRecording,
   searchTags,
-  pauseSound,
-  changeSound,
 })(SubmitRecording);

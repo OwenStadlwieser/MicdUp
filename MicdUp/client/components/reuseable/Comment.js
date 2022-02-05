@@ -20,8 +20,12 @@ import { styles } from "../../styles/Styles";
 // helpers
 import { soundBlobToBase64 } from "../../reuseableFunctions/helpers";
 import onClickOutside from "react-onclickoutside";
+import {
+  startRecording,
+  stopRecording,
+} from "../../reuseableFunctions/recording";
 // audio
-import { Audio } from "expo-av";
+import Voice from "@react-native-voice/voice";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -37,7 +41,7 @@ import {
   deleteComment,
 } from "../../redux/actions/comment";
 
-var { height, width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
     super();
@@ -52,11 +56,27 @@ export class Comment extends Component {
       replyingToName: "",
       parents: null,
     };
+    try {
+      Voice.onSpeechResults = this.onSpeechResults.bind(this);
+      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+    } catch (err) {
+      console.log(err);
+    }
     this.colors = ["white", "red"];
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  onSpeechStart = () => {
+    this.mounted && this.setState({ recognizing: true });
+  };
+  onSpeechResults = (e) => {
+    this.mounted && this.setState({ results: e.value });
+  };
+
+  componentWillUnmount = () => {
+    this.stopRecordingComment();
+    this.mounted = false;
+  };
 
   componentDidMount = () => {
     const interval = setInterval(() => {
@@ -67,33 +87,27 @@ export class Comment extends Component {
     }, 1000);
   };
 
-  startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
-      this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
+  componentDidUpdate = async (prevProps) => {
+    const { isRecordingComment } = this.props;
+    if (!isRecordingComment && prevProps.isRecordingComment) {
+      await this.stopRecordingComment();
     }
   };
 
-  stopRecording = async () => {
+  startRecordingComment = async () => {
+    this.props.setRecording(true);
+    const recording = await startRecording(Voice, () => {});
+    this.mounted && this.setState({ recording });
+  };
+
+  stopRecordingComment = async () => {
     const { recording } = this.state;
+    this.props.setRecording(false);
     console.log("Stopping recording..");
     if (!recording) {
       return;
     }
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
+    const uri = await stopRecording(recording);
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -104,7 +118,6 @@ export class Comment extends Component {
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
-    console.log("Recording stopped and stored at", uri);
   };
 
   handleMap(comment, i, index, parentId, parent) {
@@ -188,11 +201,8 @@ export class Comment extends Component {
                 <PlayButton
                   containerStyle={{}}
                   color={"#1A3561"}
-                  currentPlayingId={this.props.currentPlayingId}
                   size={48}
                   post={comment}
-                  setPlaying={this.props.setPlaying}
-                  onPlaybackStatusUpdate={this.props.onPlaybackStatusUpdate}
                 />
               )}
               {!comment.isDeleted &&
@@ -283,7 +293,7 @@ export class Comment extends Component {
   }
 
   handleClickOutside = async (evt) => {
-    await this.stopRecording();
+    await this.stopRecordingComment();
     this.props.removeCommentPosts();
     this.props.setCommentsShowing(false);
     this.mounted && this.setState({ isShowing: false });
@@ -348,20 +358,22 @@ export class Comment extends Component {
               )}
               {!recording ? (
                 <MaterialCommunityIcons
-                  onPress={this.startRecording}
+                  onPress={this.startRecordingComment}
                   name="microphone-plus"
                   size={75}
                   color="red"
                   style={styles.recordingMicIconComments}
                 />
               ) : (
-                <FontAwesome5
-                  onPress={this.stopRecording}
-                  style={styles.currentRecordingIconComments}
-                  name="record-vinyl"
-                  size={24}
-                  color={this.colors[v]}
-                />
+                Platform.OS === "web" && (
+                  <FontAwesome5
+                    onPress={this.stopRecordingComment}
+                    style={styles.currentRecordingIconComments}
+                    name="record-vinyl"
+                    size={24}
+                    color={this.colors[v]}
+                  />
+                )
               )}
               <TouchableOpacity onPress={async () => {}}>
                 <Entypo

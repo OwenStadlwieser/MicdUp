@@ -38,8 +38,6 @@ export class PlayButton extends Component {
       isPause,
       queue,
     } = this.props;
-    console.log(post);
-    console.log(post.id, playingId, 1);
     return (
       <View
         onStartShouldSetResponder={(event) => true}

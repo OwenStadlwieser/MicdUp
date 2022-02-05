@@ -8,12 +8,12 @@ import { View, Text, TouchableOpacity } from "react-native";
 // styles
 import { FontAwesome } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
-import { playSound } from "../../../reuseableFunctions/helpers";
+
 //icons
 import { Feather } from "@expo/vector-icons";
 //redux
 import { deletePost } from "../../../redux/actions/recording";
-
+import { changeSound, pauseSound } from "../../../redux/actions/sound";
 export class Post extends Component {
   constructor() {
     super();
@@ -25,16 +25,6 @@ export class Post extends Component {
     this.mounted = true;
   }
 
-  stopCurrentSound = async () => {
-    const { playbackObject } = this.state;
-    if (!playbackObject) return;
-    try {
-      await playbackObject.stopAsync();
-    } catch (err) {}
-    this.mounted && this.setState({ playing: "", playingId: "" });
-    this.props.setPlaying({});
-  };
-
   setCommentsShowing = (commentsShowing) => {
     this.mounted && this.setState({ commentsShowing });
   };
@@ -45,29 +35,23 @@ export class Post extends Component {
   render() {
     const {
       post,
-      setPlaying,
-      onPlaybackStatusUpdate,
       currentSound,
       setCommentPosts,
       removeCommentPosts,
       index,
       isUserProfile,
+      playingId,
+      isPause,
+      isRecordingComment
     } = this.props;
     const { commentsShowing } = this.state;
     return (
       <TouchableOpacity
         onPress={async () => {
-          if (currentSound === post.id) {
-            await this.stopCurrentSound();
-            setPlaying({});
+          if (playingId === post.id && !isPause) {
+            await this.props.pauseSound();
           } else {
-            await this.stopCurrentSound();
-            const playbackObject = await playSound(
-              post.signedUrl,
-              onPlaybackStatusUpdate
-            );
-            this.mounted && this.setState({ playbackObject });
-            setPlaying(post.id);
+            await this.props.changeSound(post, post.signedUrl);
           }
         }}
         style={
@@ -88,9 +72,9 @@ export class Post extends Component {
           post={post}
           isShowing={commentsShowing}
           setCommentsShowing={this.setCommentsShowing.bind(this)}
-          setPlaying={setPlaying}
           index={index}
-          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+          setRecording={this.props.setRecording}
+          isRecordingComment={isRecordingComment}
         />
         <View style={styles.textAndPlayButtonContainer}>
           <Text style={styles.postText}></Text>
@@ -104,14 +88,7 @@ export class Post extends Component {
             >
               <FontAwesome name="comment" size={24} color="black" />
             </TouchableOpacity>
-            <PlayButton
-              containerStyle={{}}
-              color={"#1A3561"}
-              currentPlayingId={currentSound}
-              post={post}
-              setPlaying={setPlaying}
-              onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-            />
+            <PlayButton containerStyle={{}} color={"#1A3561"} post={post} />
             {isUserProfile && (
               <Feather
                 onPress={async () => {
@@ -131,6 +108,13 @@ export class Post extends Component {
 
 const mapStateToProps = (state) => ({
   posts: state.recording.posts,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+  isPause: state.sound.isPause,
 });
 
-export default connect(mapStateToProps, { deletePost })(Post);
+export default connect(mapStateToProps, {
+  deletePost,
+  changeSound,
+  pauseSound,
+})(Post);

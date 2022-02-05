@@ -16,7 +16,17 @@ const fetchChat = {
     const session = await mongoose.startSession();
     session.startTransaction();
     members.sort();
+
     try {
+      if (members.length > 20) {
+        throw new Error("Too many members");
+      }
+      const index = members.findIndex(
+        (member) => member.toString() === creator.toString()
+      );
+      if (index === -1) {
+        throw new Error("Creator must be in chat");
+      }
       if (!context.user.id) {
         throw new Error("Must be signed in to message");
       }

@@ -1,4 +1,8 @@
 rootProject.name = 'MicdUp'
+include ':react-native-svg'
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
+include ':react-native-sound-level'
+project(':react-native-sound-level').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sound-level/android')
 include ':react-native-audio-engine'
 project(':react-native-audio-engine').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-audio-engine/android')
 include ':react-native-audio-engine'

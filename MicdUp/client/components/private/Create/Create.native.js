@@ -10,9 +10,10 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Platform,
-  NativeModules,
+  Dimensions,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,8 +21,10 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles } from "../../../styles/Styles";
+import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
+import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
+import { Audio } from "expo-av";
 import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
@@ -30,7 +33,9 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
-
+const { width, height } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Create extends Component {
   constructor() {
     super();
@@ -45,7 +50,6 @@ export class Create extends Component {
       functionID: "",
       prompt: {},
       results: [],
-      soundLevels: [],
     };
     try {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
@@ -79,6 +83,7 @@ export class Create extends Component {
   onSpeechResults = (e) => {
     this.mounted && this.setState({ results: e.value });
   };
+
   startRecording = async () => {
     const recording = await startRecording(Voice, () => {});
     this.mounted && this.setState({ recording });
@@ -133,16 +138,8 @@ export class Create extends Component {
   };
   render() {
     const { user } = this.props;
-    const {
-      recording,
-      clips,
-      v,
-      editRecording,
-      submitRecording,
-      promptShown,
-      prompt,
-      soundLevels,
-    } = this.state;
+    const { recording, editRecording, submitRecording, promptShown, prompt } =
+      this.state;
     const app = submitRecording ? (
       <SubmitRecording
         updateSubmitRecording={this.updateSubmitRecording.bind(this)}
@@ -212,21 +209,13 @@ export class Create extends Component {
             />
           </View>
           <View style={styles.iconContainer}>
-            {!recording ? (
+            {!recording && (
               <MaterialCommunityIcons
                 onPress={this.startRecording}
                 name="microphone-plus"
                 size={75}
                 color="red"
                 style={styles.recordingMicIcon}
-              />
-            ) : (
-              <FontAwesome5
-                onPress={this.stopRecording}
-                style={styles.currentRecordingIcon}
-                name="record-vinyl"
-                size={24}
-                color={this.colors[v]}
               />
             )}
             <TouchableOpacity
@@ -277,6 +266,40 @@ export class Create extends Component {
             />
           </View>
         </View>
+        {recording && (
+          <AudioRecordingVisualization
+            recording={recording}
+            barWidth={barWidth}
+            barMargin={barMargin}
+          />
+        )}
+        {recording && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 50,
+              position: "absolute",
+              bottom: height * 0.08,
+              width,
+              left: 0,
+              opacity: 1.0,
+              zIndex: 6,
+            }}
+          >
+            <FontAwesome5
+              onPress={() => {
+                this.stopRecording();
+              }}
+              style={{
+                fontSize: largeIconFontSize,
+                opacity: 1.0,
+              }}
+              name="record-vinyl"
+              color={"red"}
+            />
+          </View>
+        )}
       </View>
     );
     return app;

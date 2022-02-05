@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { ScrollView, Text, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Image,
+  TouchableWithoutFeedback,
+  Dimensions,
+  View,
+} from "react-native";
 import onClickOutside from "react-onclickoutside";
 import { styles } from "../../styles/Styles";
 export class DropDown extends Component {
@@ -21,22 +29,48 @@ export class DropDown extends Component {
     this.props.onBlur();
   };
   render() {
-    const { results } = this.props;
+    const { results, title, containerStyle, image } = this.props;
+    const { width, height } = Dimensions.get("window");
     return (
-      <ScrollView style={styles.resultsContainer}>
-        {results &&
-          results.map((res, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                this.props.onPressFunc(res);
-              }}
-              style={styles.listItemContainer}
-            >
-              <Text style={styles.listItemText}>{res.title}</Text>
-            </TouchableOpacity>
-          ))}
-      </ScrollView>
+      <TouchableWithoutFeedback onPress={this.handleClickOutside}>
+        <View
+          style={{
+            width,
+            height,
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            alignItems: "center",
+          }}
+        >
+          <ScrollView style={containerStyle}>
+            {results &&
+              results.map((res, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    this.props.onPressFunc(res);
+                  }}
+                  style={styles.listItemContainer}
+                >
+                  {image && (
+                    <Image
+                      source={
+                        res.image
+                          ? {
+                              uri: res.image,
+                            }
+                          : require("../../assets/no-profile-pic-icon-27.jpg")
+                      }
+                      style={styles.listItemProfileImg}
+                    />
+                  )}
+                  <Text style={styles.listItemText}>{res[title]}</Text>
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

@@ -13,13 +13,15 @@ import {
 // icons
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles, postHeight, postPadding } from "../../../styles/Styles";
+import { styles, postHeight, largeIconFontSize } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 // redux
 import {
   uploadBio,
@@ -34,7 +36,9 @@ import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
-
+var { height, width } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Profile extends Component {
   constructor() {
     super();
@@ -43,33 +47,37 @@ export class Profile extends Component {
       settingsShown: false,
       recording: false,
       playbackObject: {},
-      playing: "",
       currentBioRecording: "",
-      playingId: "",
       newBioRecording: {},
       selectImage: false,
+      bio: false,
+      isRecordingComment: false,
     };
     this.scrollView = null;
     this.mounted = true;
   }
 
   async handleScroll(event) {
-    const { posts, getUserPosts, currentProfile } = this.props
-    const { loading } = this.state
+    const { posts, getUserPosts, currentProfile } = this.props;
+    const { loading } = this.state;
     try {
-      if(event.nativeEvent.contentOffset.y > (posts.length * (postHeight)) && !loading  
-      && posts.length % 20 === 0) {
-        this.mounted && this.setState({ loading: true })
+      if (
+        event.nativeEvent.contentOffset.y > posts.length * postHeight &&
+        !loading &&
+        posts.length % 20 === 0
+      ) {
+        this.mounted && this.setState({ loading: true });
         await getUserPosts(currentProfile.id, posts.length / 20);
-        this.mounted && this.setState({ loading: false })
+        this.mounted && this.setState({ loading: false });
       }
-    } catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   }
 
   async onSwipeDown(gestureState) {
     const { getUserPosts, currentProfile } = this.props;
+    if (this.state.loading) return;
     this.mounted && this.setState({ loading: true });
     await getUserPosts(currentProfile.id, 0);
     this.mounted && this.setState({ loading: false });
@@ -111,8 +119,7 @@ export class Profile extends Component {
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
       );
-      console.log(recording);
-      this.mounted && this.setState({ recording });
+      this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -139,18 +146,38 @@ export class Profile extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  onPlaybackStatusUpdate(status) {
-    if (status.didJustFinish)
-      this.mounted && this.setState({ playing: "", playingId: "" });
-  }
-
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
-    if (profile.id !== currentProfile.id || !posts || posts.length === 0) {
+    if (
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
       this.mounted && this.setState({ loading: true });
-      await getUserPosts(currentProfile.id, 0);
+      await getUserPosts(id, 0);
+      this.mounted && this.setState({ loading: false });
+    }
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const { getUserPosts, currentProfile, profile, posts } = this.props;
+
+    if (
+      !prevProps.profile &&
+      ((profile && currentProfile && profile.id !== currentProfile.id) ||
+        (!posts && profile) ||
+        (posts.length === 0 && profile)) &&
+      !this.state.loading
+    ) {
+      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
+      if (!id) return;
+      this.mounted && this.setState({ loading: true });
+      await getUserPosts(id, 0);
       this.mounted && this.setState({ loading: false });
     }
   };
@@ -158,10 +185,6 @@ export class Profile extends Component {
   hideSetting = () => {
     this.mounted && this.setState({ settingsShown: false });
   };
-
-  setPlaying(id) {
-    this.mounted && this.setState({ playingId: id });
-  }
 
   setNewBioRecording = (newR) => {
     this.mounted && this.setState({ newBioRecording: newR });
@@ -188,11 +211,18 @@ export class Profile extends Component {
       playingId,
       loading,
       selectImage,
+      isRecordingComment,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
-    console.log('here')
+    if (!profile && !currentProfile) {
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      );
+    }
     const isUserProfile =
-      profile && currentProfile ? profile.id === currentProfile.id : false;
+      profile && currentProfile ? profile.id === currentProfile.id : true;
 
     return (
       <GestureRecognizer
@@ -275,8 +305,6 @@ export class Profile extends Component {
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}
                 currentSound={playingId}
-                onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(this)}
-                setPlaying={this.setPlaying.bind(this)}
                 setNewBioRecording={this.setNewBioRecording.bind(this)}
                 newBioRecording={newBioRecording}
               />
@@ -289,7 +317,9 @@ export class Profile extends Component {
                     style={styles.smallNextButton}
                   >
                     <Text style={styles.nextButtonText}>
-                      {currentProfile.isFollowedByUser ? "unfollow" : "follow"}
+                      {currentProfile && currentProfile.isFollowedByUser
+                        ? "unfollow"
+                        : "follow"}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.smallNextButton}>
@@ -312,30 +342,79 @@ export class Profile extends Component {
               scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              style={styles.postsContainer}
-              scrollEventThrottle={16}
+              style={{}}
+              scrollEventThrottle={100}
               ref={(view) => (this.scrollView = view)}
-              onScroll={this.handleScroll.bind(this)}
             >
               {posts &&
-                posts.map((post, index) => post && (
-                  <Post
-                    isUserProfile={isUserProfile}
-                    setCommentPosts={this.setCommentPosts.bind(this)}
-                    removeCommentPosts={this.removeCommentPosts.bind(this)}
-                    key={post.id}
-                    post={post}
-                    postArray={posts}
-                    index={index}
-                    currentSound={playingId}
-                    onPlaybackStatusUpdate={this.onPlaybackStatusUpdate.bind(
-                      this
-                    )}
-                    higherUp={false}
-                    setPlaying={this.setPlaying.bind(this)}
-                  />
-                ))}
+                posts.map(
+                  (post, index) =>
+                    post && (
+                      <Post
+                        isRecordingComment={isRecordingComment}
+                        isUserProfile={isUserProfile}
+                        setCommentPosts={this.setCommentPosts.bind(this)}
+                        removeCommentPosts={this.removeCommentPosts.bind(this)}
+                        key={post.id}
+                        post={post}
+                        postArray={posts}
+                        index={index}
+                        currentSound={playingId}
+                        higherUp={false}
+                        setRecording={((val) => {
+                          this.mounted &&
+                            this.setState({
+                              recording: val,
+                              isRecordingComment: true,
+                            });
+                        }).bind(this)}
+                      />
+                    )
+                )}
             </ScrollView>
+            {recording && Platform.OS !== "web" && (
+              <AudioRecordingVisualization
+                recording={recording}
+                barWidth={barWidth}
+                barMargin={barMargin}
+              />
+            )}
+            {recording && Platform.OS !== "web" && (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 50,
+                  position: "absolute",
+                  bottom: height * 0.08,
+                  width,
+                  left: 0,
+                  opacity: 1.0,
+                  zIndex: 6,
+                }}
+              >
+                <FontAwesome5
+                  onPress={async () => {
+                    const { bio } = this.state;
+                    this.mounted &&
+                      this.setState({
+                        recording: false,
+                        isRecordingComment: false,
+                      });
+                    if (bio) {
+                      await this.stopRecordingBio();
+                      this.mounted && this.setState({ bio: false });
+                    }
+                  }}
+                  style={{
+                    fontSize: largeIconFontSize,
+                    opacity: 1.0,
+                  }}
+                  name="record-vinyl"
+                  color={"red"}
+                />
+              </View>
+            )}
           </View>
         )}
       </GestureRecognizer>
