@@ -13,17 +13,16 @@ import {
   NativeModules,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
-import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // audio
-import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
-import { Audio } from "expo-av";
+import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
 // redux
@@ -81,30 +80,8 @@ export class Create extends Component {
     this.mounted && this.setState({ results: e.value });
   };
   startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      try {
-        Voice &&
-          Platform.OS !== "web" &&
-          (await Voice.isAvailable()) &&
-          Voice.start("en-US");
-      } catch (err) {
-        console.log(err);
-      }
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
-      this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
+    const recording = await startRecording(Voice, () => {});
+    this.mounted && this.setState({ recording });
   };
 
   stopRecording = async () => {
@@ -235,13 +212,21 @@ export class Create extends Component {
             />
           </View>
           <View style={styles.iconContainer}>
-            {!recording && (
+            {!recording ? (
               <MaterialCommunityIcons
                 onPress={this.startRecording}
                 name="microphone-plus"
                 size={75}
                 color="red"
                 style={styles.recordingMicIcon}
+              />
+            ) : (
+              <FontAwesome5
+                onPress={this.stopRecording}
+                style={styles.currentRecordingIcon}
+                name="record-vinyl"
+                size={24}
+                color={this.colors[v]}
               />
             )}
             <TouchableOpacity
@@ -292,13 +277,6 @@ export class Create extends Component {
             />
           </View>
         </View>
-        <AudioRecordingVisualization
-          recording={recording}
-          key={soundLevels.length}
-          arrayOfDecibels={soundLevels}
-          buttonColor={this.colors[v]}
-          stopRecording={this.stopRecording.bind(this)}
-        />
       </View>
     );
     return app;

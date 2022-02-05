@@ -26,6 +26,7 @@ import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
+import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
 // redux
@@ -84,40 +85,22 @@ export class Create extends Component {
   onSpeechResults = (e) => {
     this.mounted && this.setState({ results: e.value });
   };
-  startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      RNSoundLevel.start(75);
-      RNSoundLevel.onNewFrame = (data) => {
-        let { soundLevels } = this.state;
-        soundLevels.unshift(data);
-        if (soundLevels.length > Math.floor(width / barWidth)) {
-          soundLevels.pop();
-        }
-        this.mounted && this.setState({ soundLevels });
-      };
-      console.log("Starting recording..");
-      try {
-        Voice &&
-          Platform.OS !== "web" &&
-          (await Voice.isAvailable()) &&
-          Voice.start("en-US");
-      } catch (err) {
-        console.log(err);
-      }
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
-      this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
+
+  onNewFrame = (data) => {
+    let { soundLevels } = this.state;
+    soundLevels.unshift(data);
+    if (soundLevels.length > Math.floor(width / barWidth)) {
+      soundLevels.pop();
     }
+    this.mounted && this.setState({ soundLevels });
+  };
+  startRecording = async () => {
+    const recording = await startRecording(
+      this.onNewFrame.bind(this),
+      Voice,
+      () => {}
+    );
+    this.mounted && this.setState({ recording });
   };
 
   stopRecording = async () => {

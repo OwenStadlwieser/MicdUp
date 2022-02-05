@@ -14,6 +14,7 @@ import {
   Image,
 } from "react-native";
 import { Appbar } from "react-native-paper";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //styles
 import { styles } from "../../../styles/Styles";
 // icons
@@ -24,11 +25,16 @@ import { Feather } from "@expo/vector-icons";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 // audio
-import { Audio } from "expo-av";
+import Voice from "@react-native-voice/voice";
 // redux
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
-
+import { startRecording } from "../../../reuseableFunctions/recording";
+import { stopRecording } from "../../../reuseableFunctions/recording";
 const { width, height } = Dimensions.get("window");
+
+const barWidth = 5;
+const barMargin = 1;
+
 export class Chat extends Component {
   constructor() {
     super();
@@ -39,28 +45,43 @@ export class Chat extends Component {
       v: 0,
       fetching: false,
       lastFetched: 0,
+      soundLevels: [],
     };
+    try {
+      Voice.onSpeechResults = this.onSpeechResults.bind(this);
+      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+    } catch (err) {
+      console.log(err);
+    }
     this.scrollView = null;
     this.colors = ["white", "red"];
     this.mounted = true;
   }
-
+  onSpeechStart = () => {
+    this.mounted && this.setState({ recognizing: true });
+  };
+  onSpeechResults = (e) => {
+    this.mounted && this.setState({ results: e.value });
+  };
+  onNewFrame = (data) => {
+    let { soundLevels } = this.state;
+    soundLevels.unshift(data);
+    if (soundLevels.length > Math.floor(width / barWidth)) {
+      soundLevels.pop();
+    }
+    this.mounted && this.setState({ soundLevels });
+  };
   startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
+    if (Platform.OS !== "web") {
+      const recording = await startRecording(
+        this.onNewFrame.bind(this),
+        Voice,
+        () => {}
       );
       this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
+    } else {
+      const recording = await startRecording(Voice, () => {});
+      this.mounted && this.setState({ recording });
     }
   };
 
@@ -70,8 +91,12 @@ export class Chat extends Component {
     if (!recording) {
       return;
     }
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
+    let uri;
+    if (Platform.OS !== "web") {
+      uri = await stopRecording(recording, Voice);
+    } else {
+      uri = await stopRecording(recording);
+    }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -115,7 +140,7 @@ export class Chat extends Component {
 
   render() {
     const { activeChats, profile, activeChatMembers, userName } = this.props;
-    const { recording, audioBlobs, v, loading } = this.state;
+    const { recording, audioBlobs, v, loading, soundLevels } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -272,13 +297,16 @@ export class Chat extends Component {
                 style={styles.recordingMicIconComments}
               />
             ) : (
-              <FontAwesome5
-                onPress={this.stopRecording}
-                style={styles.currentRecordingIconComments}
-                name="record-vinyl"
-                size={24}
-                color={this.colors[v]}
-              />
+              recording &&
+              Platform.OS === "web" && (
+                <FontAwesome5
+                  onPress={this.stopRecording}
+                  style={styles.currentRecordingIconComments}
+                  name="record-vinyl"
+                  size={24}
+                  color={this.colors[v]}
+                />
+              )
             )}
             {audioBlobs && (
               <TouchableOpacity
@@ -304,6 +332,17 @@ export class Chat extends Component {
             )}
           </View>
         </View>
+        {recording && Platform.OS !== "web" && (
+          <AudioRecordingVisualization
+            recording={recording}
+            key={
+              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
+            }
+            arrayOfDecibels={soundLevels}
+            barWidth={barWidth}
+            barMargin={barMargin}
+          />
+        )}
       </View>
     );
   }

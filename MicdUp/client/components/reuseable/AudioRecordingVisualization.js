@@ -77,7 +77,7 @@ export class AudioRecordingVisualization extends Component {
             color: "white",
           }}
         >
-          {slice.map((decibel, index) => (
+          {arrayOfDecibels.map((decibel, index) => (
             <Rect
               key={index}
               y={(svgHeight - (decibel.value + 80) * 2) / 2}
