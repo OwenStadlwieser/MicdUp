@@ -13,13 +13,15 @@ import {
 // icons
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles, postHeight, postPadding } from "../../../styles/Styles";
+import { styles, postHeight, largeIconFontSize } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 // redux
 import {
   uploadBio,
@@ -34,7 +36,9 @@ import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
 import { Audio } from "expo-av";
-
+var { height, width } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 export class Profile extends Component {
   constructor() {
     super();
@@ -46,6 +50,8 @@ export class Profile extends Component {
       currentBioRecording: "",
       newBioRecording: {},
       selectImage: false,
+      bio: false,
+      isRecordingComment: false,
     };
     this.scrollView = null;
     this.mounted = true;
@@ -113,8 +119,7 @@ export class Profile extends Component {
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
       );
-      console.log(recording);
-      this.mounted && this.setState({ recording });
+      this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -206,6 +211,7 @@ export class Profile extends Component {
       playingId,
       loading,
       selectImage,
+      isRecordingComment,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
     if (!profile && !currentProfile) {
@@ -345,6 +351,7 @@ export class Profile extends Component {
                   (post, index) =>
                     post && (
                       <Post
+                        isRecordingComment={isRecordingComment}
                         isUserProfile={isUserProfile}
                         setCommentPosts={this.setCommentPosts.bind(this)}
                         removeCommentPosts={this.removeCommentPosts.bind(this)}
@@ -354,10 +361,60 @@ export class Profile extends Component {
                         index={index}
                         currentSound={playingId}
                         higherUp={false}
+                        setRecording={((val) => {
+                          this.mounted &&
+                            this.setState({
+                              recording: val,
+                              isRecordingComment: true,
+                            });
+                        }).bind(this)}
                       />
                     )
                 )}
             </ScrollView>
+            {recording && Platform.OS !== "web" && (
+              <AudioRecordingVisualization
+                recording={recording}
+                barWidth={barWidth}
+                barMargin={barMargin}
+              />
+            )}
+            {recording && Platform.OS !== "web" && (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 50,
+                  position: "absolute",
+                  bottom: height * 0.08,
+                  width,
+                  left: 0,
+                  opacity: 1.0,
+                  zIndex: 6,
+                }}
+              >
+                <FontAwesome5
+                  onPress={async () => {
+                    const { bio } = this.state;
+                    this.mounted &&
+                      this.setState({
+                        recording: false,
+                        isRecordingComment: false,
+                      });
+                    if (bio) {
+                      await this.stopRecordingBio();
+                      this.mounted && this.setState({ bio: false });
+                    }
+                  }}
+                  style={{
+                    fontSize: largeIconFontSize,
+                    opacity: 1.0,
+                  }}
+                  name="record-vinyl"
+                  color={"red"}
+                />
+              </View>
+            )}
           </View>
         )}
       </GestureRecognizer>

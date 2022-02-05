@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Voice from "@react-native-voice/voice";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
-import RNSoundLevel from "react-native-sound-level";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -26,6 +25,7 @@ import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
+import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
 // redux
@@ -50,7 +50,6 @@ export class Create extends Component {
       functionID: "",
       prompt: {},
       results: [],
-      soundLevels: [],
     };
     try {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
@@ -84,40 +83,10 @@ export class Create extends Component {
   onSpeechResults = (e) => {
     this.mounted && this.setState({ results: e.value });
   };
+
   startRecording = async () => {
-    try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      RNSoundLevel.start(75);
-      RNSoundLevel.onNewFrame = (data) => {
-        let { soundLevels } = this.state;
-        soundLevels.unshift(data);
-        if (soundLevels.length > Math.floor(width / barWidth)) {
-          soundLevels.pop();
-        }
-        this.mounted && this.setState({ soundLevels });
-      };
-      console.log("Starting recording..");
-      try {
-        Voice &&
-          Platform.OS !== "web" &&
-          (await Voice.isAvailable()) &&
-          Voice.start("en-US");
-      } catch (err) {
-        console.log(err);
-      }
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
-      this.mounted && this.setState({ recording });
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
+    const recording = await startRecording(Voice, () => {});
+    this.mounted && this.setState({ recording });
   };
 
   stopRecording = async () => {
@@ -128,7 +97,6 @@ export class Create extends Component {
       return;
     }
     await recording.stopAndUnloadAsync();
-    RNSoundLevel.stop();
     const uri = recording.getURI();
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
@@ -160,7 +128,6 @@ export class Create extends Component {
               },
             ],
         v: 0,
-        soundLevels: [],
       });
     this.props.updateClips(this.state.audioBlobs);
     console.log("Recording stopped and stored at", uri);
@@ -171,14 +138,8 @@ export class Create extends Component {
   };
   render() {
     const { user } = this.props;
-    const {
-      recording,
-      editRecording,
-      submitRecording,
-      promptShown,
-      prompt,
-      soundLevels,
-    } = this.state;
+    const { recording, editRecording, submitRecording, promptShown, prompt } =
+      this.state;
     const app = submitRecording ? (
       <SubmitRecording
         updateSubmitRecording={this.updateSubmitRecording.bind(this)}
@@ -308,10 +269,6 @@ export class Create extends Component {
         {recording && (
           <AudioRecordingVisualization
             recording={recording}
-            key={
-              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
-            }
-            arrayOfDecibels={soundLevels}
             barWidth={barWidth}
             barMargin={barMargin}
           />
@@ -332,7 +289,6 @@ export class Create extends Component {
           >
             <FontAwesome5
               onPress={() => {
-                console.log("stopping");
                 this.stopRecording();
               }}
               style={{

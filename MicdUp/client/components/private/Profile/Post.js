@@ -42,6 +42,7 @@ export class Post extends Component {
       isUserProfile,
       playingId,
       isPause,
+      isRecordingComment
     } = this.props;
     const { commentsShowing } = this.state;
     return (
@@ -72,6 +73,8 @@ export class Post extends Component {
           isShowing={commentsShowing}
           setCommentsShowing={this.setCommentsShowing.bind(this)}
           index={index}
+          setRecording={this.props.setRecording}
+          isRecordingComment={isRecordingComment}
         />
         <View style={styles.textAndPlayButtonContainer}>
           <Text style={styles.postText}></Text>

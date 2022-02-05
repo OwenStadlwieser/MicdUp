@@ -73,7 +73,7 @@ export class Bio extends Component {
           <View style={styles.subBioContainer}>
             <TouchableOpacity
               onPress={async () => {
-                if (!isRecording) {
+                if (!isRecording || Platform.OS !== "web") {
                   await startRecording();
                   this.mounted && this.setState({ isRecording: true });
                 } else {
@@ -92,7 +92,7 @@ export class Bio extends Component {
                   ? "Create Bio"
                   : !newBioRecording.uri && !isRecording
                   ? "Edit Bio"
-                  : !isRecording
+                  : !isRecording || Platform.OS !== "web"
                   ? "Overwrite"
                   : "Stop Recording"}
               </Text>
