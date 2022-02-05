@@ -315,7 +315,6 @@ export class Create extends Component {
           >
             <FontAwesome5
               onPress={() => {
-                console.log("stopping");
                 this.stopRecording();
               }}
               style={{

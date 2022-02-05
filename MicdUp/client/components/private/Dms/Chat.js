@@ -333,15 +333,42 @@ export class Chat extends Component {
           </View>
         </View>
         {recording && Platform.OS !== "web" && (
-          <AudioRecordingVisualization
-            recording={recording}
-            key={
-              soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
-            }
-            arrayOfDecibels={soundLevels}
-            barWidth={barWidth}
-            barMargin={barMargin}
-          />
+          <View>
+            <AudioRecordingVisualization
+              recording={recording}
+              key={
+                soundLevels && soundLevels.length > 0 ? soundLevels[0].value : 0
+              }
+              arrayOfDecibels={soundLevels}
+              barWidth={barWidth}
+              barMargin={barMargin}
+            />
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 50,
+                position: "absolute",
+                bottom: height * 0.08,
+                width,
+                left: 0,
+                opacity: 1.0,
+                zIndex: 6,
+              }}
+            >
+              <FontAwesome5
+                onPress={() => {
+                  this.stopRecording();
+                }}
+                style={{
+                  fontSize: largeIconFontSize,
+                  opacity: 1.0,
+                }}
+                name="record-vinyl"
+                color={"red"}
+              />
+            </View>
+          </View>
         )}
       </View>
     );
