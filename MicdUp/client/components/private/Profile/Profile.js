@@ -50,7 +50,8 @@ export class Profile extends Component {
       currentBioRecording: "",
       newBioRecording: {},
       selectImage: false,
-      isRecordingComment: false
+      bio: false,
+      isRecordingComment: false,
     };
     this.scrollView = null;
     this.mounted = true;
@@ -118,8 +119,7 @@ export class Profile extends Component {
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         this.onRecordingStatusUpdate
       );
-      console.log(recording);
-      this.mounted && this.setState({ recording });
+      this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -211,7 +211,7 @@ export class Profile extends Component {
       playingId,
       loading,
       selectImage,
-      isRecordingComment
+      isRecordingComment,
     } = this.state;
     const { userName, profile, currentProfile, posts } = this.props;
     if (!profile && !currentProfile) {
@@ -362,7 +362,11 @@ export class Profile extends Component {
                         currentSound={playingId}
                         higherUp={false}
                         setRecording={((val) => {
-                          this.mounted && this.setState({ recording: val, isRecordingComment: true });
+                          this.mounted &&
+                            this.setState({
+                              recording: val,
+                              isRecordingComment: true,
+                            });
                         }).bind(this)}
                       />
                     )
@@ -390,8 +394,17 @@ export class Profile extends Component {
                 }}
               >
                 <FontAwesome5
-                  onPress={() => {
-                    this.mounted && this.setState({ recording: false, isRecordingComment: false });
+                  onPress={async () => {
+                    const { bio } = this.state;
+                    this.mounted &&
+                      this.setState({
+                        recording: false,
+                        isRecordingComment: false,
+                      });
+                    if (bio) {
+                      await this.stopRecordingBio();
+                      this.mounted && this.setState({ bio: false });
+                    }
                   }}
                   style={{
                     fontSize: largeIconFontSize,
