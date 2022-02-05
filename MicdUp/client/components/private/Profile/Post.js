@@ -72,6 +72,7 @@ export class Post extends Component {
           isShowing={commentsShowing}
           setCommentsShowing={this.setCommentsShowing.bind(this)}
           index={index}
+          setRecording={this.props.setRecording}
         />
         <View style={styles.textAndPlayButtonContainer}>
           <Text style={styles.postText}></Text>

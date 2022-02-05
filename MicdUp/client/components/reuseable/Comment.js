@@ -42,6 +42,7 @@ import {
   deleteComment,
 } from "../../redux/actions/comment";
 
+const { height } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
     super();
@@ -88,12 +89,14 @@ export class Comment extends Component {
   };
 
   startRecordingComment = async () => {
+    this.props.setRecording(true);
     const recording = await startRecording(Voice, () => {});
     this.mounted && this.setState({ recording });
   };
 
   stopRecordingComment = async () => {
     const { recording } = this.state;
+    this.props.setRecording(false);
     console.log("Stopping recording..");
     if (!recording) {
       return;

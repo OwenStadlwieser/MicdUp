@@ -357,9 +357,9 @@ export class Profile extends Component {
                         index={index}
                         currentSound={playingId}
                         higherUp={false}
-                        setRecording={() => {
-                          this.mounted && this.setState({ recording: true });
-                        }}
+                        setRecording={((val) => {
+                          this.mounted && this.setState({ recording: val });
+                        }).bind(this)}
                       />
                     )
                 )}
