@@ -131,13 +131,15 @@ export class SubmitRecording extends Component {
           color={"white"}
           size={72}
           post={{
-            id:
-              playingId === null
-                ? clips[0].id
-                : clips.findIndex((item) => item.id === playingId) > -1
-                ? clips[clips.findIndex((item) => item.id === playingId)].id
-                : 123,
-            signedUrl: clips[0].uri,
+            id: !this.mounted
+              ? ""
+              : playingId === null
+              ? clips[0] && clips[0].id
+              : clips.findIndex((item) => item && item.id === playingId) > -1
+              ? clips[clips.findIndex((item) => item && item.id === playingId)]
+                  .id
+              : 123,
+            signedUrl: clips[0] && clips[0].uri,
           }}
           queue={newClips.length > 1 && [...newClips.slice(1, newClips.length)]}
           playButtonSty={{ fontSize: 72 }}
@@ -150,12 +152,14 @@ export class SubmitRecording extends Component {
             onPress={async () => {
               let files = [];
               let fileTypes = [];
+              let clipResults = [];
               for (let i = 0; i < clips.length; i++) {
                 const base64Url = await soundBlobToBase64(clips[i].uri);
                 if (base64Url != null) {
                   const fileType = clips[i].type;
                   files.push(base64Url);
                   fileTypes.push(fileType);
+                  clipResults.push(JSON.stringify(clips[i].results));
                 } else {
                   console.log("error with blob");
                 }
@@ -172,7 +176,8 @@ export class SubmitRecording extends Component {
                 nsfw,
                 allowRebuttal,
                 allowStitch,
-                privatePost
+                privatePost,
+                clipResults
               );
             }}
             style={styles.nextButton}

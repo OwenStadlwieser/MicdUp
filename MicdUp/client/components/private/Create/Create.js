@@ -46,6 +46,7 @@ export class Create extends Component {
       prompt: {},
       results: [],
       soundLevels: [],
+      startTime: null,
     };
     try {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
@@ -77,11 +78,24 @@ export class Create extends Component {
     this.mounted && this.setState({ recognizing: true });
   };
   onSpeechResults = (e) => {
-    this.mounted && this.setState({ results: e.value });
+    const { startTime, results } = this.state;
+    const { clips } = this.props;
+    const duration = clips.reduce((a, b) => a.finalDuration + b.finalDuration);
+    currentResults = results && results.length > 0 ? results : [];
+    this.mounted &&
+      this.setState({
+        results: [
+          ...currentResults,
+          {
+            word: e.value[e.value.length - 1],
+            time: Date.now() - startTime + duration,
+          },
+        ],
+      });
   };
   startRecording = async () => {
     const recording = await startRecording(Voice, () => {});
-    this.mounted && this.setState({ recording });
+    this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecording = async () => {
@@ -135,13 +149,11 @@ export class Create extends Component {
     const { user } = this.props;
     const {
       recording,
-      clips,
       v,
       editRecording,
       submitRecording,
       promptShown,
       prompt,
-      soundLevels,
     } = this.state;
     const app = submitRecording ? (
       <SubmitRecording

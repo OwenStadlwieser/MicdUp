@@ -35,6 +35,7 @@ const createRecording = {
     allowRebuttal: { type: GraphQLBoolean },
     allowStitch: { type: GraphQLBoolean },
     privatePost: { type: GraphQLBoolean },
+    speechToText: { type: new GraphQLList(GraphQLString) },
   },
   async resolve(
     parent,
@@ -56,6 +57,12 @@ const createRecording = {
       throw new Error("Must be signed in to post");
     }
     const fileNames = [];
+    try {
+      speechToText = speechToText.map((speech) => JSON.parse(speech));
+      speechToText = [].concat.apply([], speechToText);
+    } catch {
+      speechToText = [];
+    }
     // create post record
     const post = new Post({
       owner: context.profile.id,
@@ -65,6 +72,7 @@ const createRecording = {
       allowStitch,
       privatePost,
       fileExtension: ".mp4",
+      speechToText,
     });
     // prep files for combine
     try {

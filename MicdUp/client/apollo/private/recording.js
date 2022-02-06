@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { duplicateCommentsString } from "../../reuseableFunctions/helpers";
+import { postType } from "./types";
 const UPLOAD_RECORDING_MUTATION = gql`
   mutation createRecording(
     $files: [String!]
@@ -10,6 +11,7 @@ const UPLOAD_RECORDING_MUTATION = gql`
     $allowRebuttal: Boolean!
     $allowStitch: Boolean!
     $privatePost: Boolean!
+    $speechToText: [String]
   ) {
     createRecording(
       files: $files
@@ -20,9 +22,9 @@ const UPLOAD_RECORDING_MUTATION = gql`
       allowRebuttal: $allowRebuttal
       allowStitch: $allowStitch
       privatePost: $privatePost
+      speechToText: $speechToText
     ) {
-      id
-      filePath
+      ${postType}
     }
   }
 `;
@@ -38,14 +40,7 @@ const UPLOAD_BIO_MUTATION = gql`
 const GET_USER_POSTS_QUERY = gql`
   query getUserPosts($userId: ID!, $skipMult: Int!) {
     getUserPosts(userId: $userId, skipMult: $skipMult) {
-      id
-      title
-      signedUrl
-      likes
-      isLikedByUser
-      owner {
-        id
-      }
+      ${postType}
     }
   }
 `;
@@ -53,14 +48,7 @@ const GET_USER_POSTS_QUERY = gql`
 const LIKE_POST_MUTATION = gql`
   mutation likePost($postId: ID!) {
     likePost(postId: $postId) {
-      id
-      title
-      signedUrl
-      likes
-      isLikedByUser
-      owner {
-        id
-      }
+      ${postType}
     }
   }
 `;
@@ -85,18 +73,7 @@ const ADD_TAG_MUTATION = gql`
 const GET_RECORDINGS_FROM_TAG_QUERY = gql`
   query getRecordingsFromTag($searchTag: ID!, $skipMult: Int!) {
     getRecordingsFromTag(searchTag: $searchTag, skipMult: $skipMult) {
-      id
-      title
-      signedUrl
-      likes
-      isLikedByUser
-      owner {
-        id
-        image {
-          id
-          signedUrl
-        }
-      }
+      ${postType}
     }
   }
 `;
