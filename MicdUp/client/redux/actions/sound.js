@@ -6,7 +6,6 @@ import { Audio } from "expo-av";
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (sound, url, queue) => async (dispatch) => {
-  console.log("here");
   let { currentPlayingSound, currentPlaybackObject, currentIntervalId } =
     store.getState().sound;
   sound.uri = url;

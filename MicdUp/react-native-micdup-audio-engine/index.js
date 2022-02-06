@@ -6,15 +6,11 @@ const { AudioEngine } = NativeModules;
 
 if (Platform.OS === "ios") {
   module.exports = {
-    log: function () {
-      console.log("ios");
-    },
+    log: function () {},
     AudioEngine,
   };
 } else {
   module.exports = {
-    log: function () {
-      console.log("notios");
-    },
+    log: function () {},
   };
 }

@@ -56,24 +56,20 @@ mongoose
             .replace(/[0-9]/g, "");
           const tag = new Tag({ title: stringValue });
           let prompts = await page.$x(`//ul[${i + 1}]/li`);
-          console.log(stringValue);
           if (prompts.length === 0) {
             i = i + 1;
             continue;
           }
 
           for (let j = 0; j < prompts.length; j++) {
-            console.log(j);
             let pTextContent = await (
               await prompts[j].getProperty("textContent")
             ).jsonValue();
-            console.log(pTextContent);
             let pStringValue = new String(pTextContent);
             pStringValue = pStringValue.toString();
             const prompt = new Prompt({ tag: tag._id, prompt: pStringValue });
             await prompt.save({ session });
           }
-          console.log("\n");
           await tag.save({ session });
           i = i + 1;
         }
@@ -84,8 +80,6 @@ mongoose
       } finally {
         session.endSession();
       }
-
-      console.log("done writing");
     })();
   })
   .catch((err) => console.log(err));
