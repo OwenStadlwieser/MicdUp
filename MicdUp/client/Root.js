@@ -12,6 +12,8 @@ import Navbar from "./components/private/Navbar";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
+import Create from "./components/private/Create/Create";
+
 // helpers
 import { getData } from "./reuseableFunctions/helpers";
 import NotificationBell from "./components/private/NotificationBell";
@@ -82,7 +84,7 @@ export class Root extends Component {
           {mountedComponent === "Feed" ? (
             <View style={styles.containerPrivate}>
               <View style={styles.contentContainer}>
-                <Feed />
+                <Create />
               </View>
               <Navbar />
             </View>
