@@ -28,11 +28,16 @@ export class SpeechToText extends Component {
       adjustment: 0,
       index: 0,
       endIndex: 0,
+      intervalId: "",
     };
     this.animatedLeftMargin = new Animated.Value(0);
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    const { intervalId } = this.props;
+    clearInterval(intervalId);
+    this.mounted = false;
+  };
 
   getTextWidth(text, font) {
     const canvas = document.createElement("canvas");
@@ -117,9 +122,10 @@ export class SpeechToText extends Component {
         ? this.getNextLineOfTextWeb()
         : await this.getNextLineOfText();
     this.mounted && this.setState({ words });
-    setInterval(async () => {
+    const intervalId = setInterval(async () => {
       await this.SlidePane();
     }, 1000);
+    this.mounted && this.setState({ intervalId });
   };
 
   SlidePane = async () => {
@@ -171,7 +177,6 @@ export class SpeechToText extends Component {
               words: newWords,
               count: count + 1,
             });
-          this.text.forceUpdate();
         } else {
           let newWords =
             Platform.OS === "web"
