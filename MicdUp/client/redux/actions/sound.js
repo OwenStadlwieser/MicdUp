@@ -9,7 +9,7 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
   let { currentPlayingSound, currentPlaybackObject, currentIntervalId } =
     store.getState().sound;
   sound.uri = url;
-  if (currentPlayingSound && currentPlayingSound.uri != url) {
+  if (currentPlayingSound && currentPlayingSound.uri !== url) {
     await soundExpo.unloadAsync();
     clearInterval(currentIntervalId);
   } else if (currentPlayingSound) {
