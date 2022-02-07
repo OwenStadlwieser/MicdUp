@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from "react-native";
 import Voice from "@react-native-voice/voice";
-import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
+import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization.native";
 //icons
 import { Fontisto } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -25,7 +25,7 @@ import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 import { Audio } from "expo-av";
-import { startRecording } from "../../../reuseableFunctions/recording";
+import { startRecording } from "../../../reuseableFunctions/recording.native";
 // clips
 import Clips from "./Clips";
 // redux
@@ -52,8 +52,15 @@ export class Create extends Component {
       results: [],
     };
     try {
-      Voice.onSpeechResults = this.onSpeechResults.bind(this);
       Voice.onSpeechStart = this.onSpeechStart.bind(this);
+      Voice.onSpeechEnd = () => {
+        console.log("end");
+      };
+      Voice.onSpeechError = async (err) => {
+        console.log(err);
+        Voice.stop();
+      };
+      Voice.onSpeechResults = this.onSpeechResults.bind(this);
     } catch (err) {
       console.log(err);
     }
@@ -62,6 +69,7 @@ export class Create extends Component {
   }
   componentWillUnmount = async () => {
     this.stopRecording();
+    Voice.stop();
     this.mounted = false;
   };
 
@@ -78,31 +86,58 @@ export class Create extends Component {
     this.mounted && this.setState({ submitRecording });
   };
   onSpeechStart = () => {
+    console.log("started");
     this.mounted && this.setState({ recognizing: true });
   };
   onSpeechResults = (e) => {
-    this.mounted && this.setState({ results: e.value });
+    const { startTime, results } = this.state;
+    const { clips } = this.props;
+    console.log("here");
+    try {
+      const duration = clips.reduce(
+        (a, b) => a.finalDuration + b.finalDuration,
+        0
+      );
+      currentResults = results && results.length > 0 ? results : [];
+      const words = e.value[e.value.length - 1];
+      const mostRecentWord = words[words.length - 1];
+      this.mounted &&
+        this.setState({
+          results: [
+            ...currentResults,
+            {
+              word: mostRecentWord,
+              time: Date.now() - startTime + duration,
+            },
+          ],
+        });
+    } catch (err) {
+      console.log("speech recognition", err);
+    }
   };
 
   startRecording = async () => {
     const recording = await startRecording(Voice, () => {});
-    this.mounted && this.setState({ recording });
+    this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecording = async () => {
     const { recording, results } = this.state;
     const { clips } = this.props;
     console.log("Stopping recording..");
+
     if (!recording || !recording.stopAndUnloadAsync) {
       return;
     }
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     try {
+      console.log("stopping");
       Voice && Platform.OS !== "web" && Voice.stop();
     } catch (err) {
       console.log(err);
     }
+    console.log(results);
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({

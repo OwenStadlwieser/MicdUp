@@ -7,6 +7,16 @@ const postSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  speechToText: [
+    {
+      word: {
+        type: String,
+      },
+      time: {
+        type: Number,
+      },
+    },
+  ],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

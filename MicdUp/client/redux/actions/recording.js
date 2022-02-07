@@ -55,7 +55,8 @@ export const uploadRecording =
     nsfw,
     allowRebuttal,
     allowStitch,
-    privatePost
+    privatePost,
+    speechToText
   ) =>
   async (dispatch) => {
     try {
@@ -70,6 +71,7 @@ export const uploadRecording =
           allowRebuttal,
           allowStitch,
           privatePost,
+          speechToText,
         },
         fetchPolicy: "no-cache",
       });
@@ -142,7 +144,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
-    if(skipMult === 0) {
+    if (skipMult === 0) {
       dispatch({
         type: SET_POSTS,
         payload: res.data.getUserPosts,

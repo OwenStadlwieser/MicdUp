@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.github.amarcruz.rntextsize.RNTextSizePackage;
 import com.horcrux.svg.SvgPackage;
 import com.punarinta.RNSoundLevel.RNSoundLevel;
 import com.facebook.react.ReactInstanceManager;

@@ -1,26 +1,27 @@
-import 'expo-dev-client';
+import "expo-dev-client";
 
-import { registerRootComponent } from 'expo';
+import { registerRootComponent } from "expo";
 
-import * as Notifications from 'expo-notifications';
+import * as Notifications from "expo-notifications";
 
-import App from './App';
+import App from "./App";
 
-import { clearAsyncStorage } from './reuseableFunctions/helpers';
+import { clearAsyncStorage } from "./reuseableFunctions/helpers";
 
-import {registerForPushNotificationsAsync,setUpListeners} from './notifications/helpers';
+import {
+  registerForPushNotificationsAsync,
+  setUpListeners,
+} from "./notifications/helpers";
 
 //get push notification permissions.
-console.log("TEST!");
-
 
 Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 async() => clearAsyncStorage();
 registerForPushNotificationsAsync();
