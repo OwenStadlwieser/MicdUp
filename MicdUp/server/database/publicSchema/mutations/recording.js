@@ -48,6 +48,7 @@ const createRecording = {
       allowStitch,
       privatePost,
       tags,
+      speechToText,
     },
     context
   ) {
