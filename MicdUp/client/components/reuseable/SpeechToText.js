@@ -41,7 +41,7 @@ export class SpeechToText extends Component {
     return context.measureText(text).width;
   }
 
-  getNextLineOfTextWeb = async () => {
+  getNextLineOfTextWeb = () => {
     const { index } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
@@ -56,7 +56,7 @@ export class SpeechToText extends Component {
     let arr = [post.speechToText[startIndex]];
     let string = arr.map((p, i) => p.word + " " + p.time + " ").join();
     let measurement = this.getTextWidth(string, "Roboto");
-    while (measurement.width < screenWidth && post.speechToText[endIndex + 1]) {
+    while (measurement < screenWidth && post.speechToText[endIndex + 1]) {
       endIndex = endIndex + 1;
       arr.push(post.speechToText[endIndex]);
       string = arr.map((p, i) => p.word + " " + p.time + " ").join();
@@ -108,14 +108,14 @@ export class SpeechToText extends Component {
           fontWeight: "bold",
         },
       });
-    words =
+    let words =
       Platform.OS === "web"
         ? this.getNextLineOfTextWeb()
         : await this.getNextLineOfText();
     this.mounted && this.setState({ words });
     const intervalId = setInterval(async () => {
       await this.SlidePane();
-    }, 100);
+    }, 1000);
     this.mounted && this.setState({ intervalId });
   };
 
@@ -138,12 +138,12 @@ export class SpeechToText extends Component {
         size = this.getTextWidth(post.speechToText[index + 1].word, "Roboto");
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
-        duration: 100,
+        duration: 1000,
         useNativeDriver: Platform.OS !== "web" ? true : false,
       }).start(async () => {
         const { count, index, adjustment, words } = this.state;
         let size;
-        if (!post.speechToText[index + 1]) return;
+        if (!post.speechToText[index + 1] || !words || !words.length) return;
         let newWords = [...words, post.speechToText[index + 1]];
         if (Platform.OS !== "web") {
           size = await rnTextSize.measure({
@@ -153,9 +153,8 @@ export class SpeechToText extends Component {
           size = size.width;
         } else {
           size = this.getTextWidth(post.speechToText[index + 1].word, "Roboto");
-          size = size.width;
         }
-        if (count < 100) {
+        if (count < 5) {
           this.mounted &&
             this.setState({
               MainPosition: [
@@ -199,6 +198,7 @@ export class SpeechToText extends Component {
 
   render() {
     const { index, words } = this.state;
+    console.log(words);
     try {
       return (
         <Animated.View
@@ -209,6 +209,7 @@ export class SpeechToText extends Component {
           ]}
         >
           {words &&
+            words.length &&
             words.map((p, i) => (
               <Text key={i}>
                 {p.word} {p.time}
