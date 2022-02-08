@@ -63,7 +63,6 @@ export const forgotPass = (email) => async (dispatch) => {
 
 export const forgotPassVerify = (secureCode, email) => async (dispatch) => {
   try {
-    console.log(email);
     const res = await client.query({
       query: FORGOT_PASS_VERIFY_QUERY,
       variables: { secureCode, email },

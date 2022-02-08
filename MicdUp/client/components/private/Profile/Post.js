@@ -14,6 +14,7 @@ import { Feather } from "@expo/vector-icons";
 //redux
 import { deletePost } from "../../../redux/actions/recording";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
+import SpeechToText from "../../reuseable/SpeechToText";
 export class Post extends Component {
   constructor() {
     super();
@@ -42,7 +43,7 @@ export class Post extends Component {
       isUserProfile,
       playingId,
       isPause,
-      isRecordingComment
+      isRecordingComment,
     } = this.props;
     const { commentsShowing } = this.state;
     return (
@@ -62,6 +63,7 @@ export class Post extends Component {
         <Text style={styles.postTitle}>
           {post.title ? post.title : "Untitled"}
         </Text>
+        <SpeechToText fontSize={24} post={post} textStyle={{}} />
         <Comment
           isUserProfile={isUserProfile}
           containerStyle={{}}
@@ -77,7 +79,6 @@ export class Post extends Component {
           isRecordingComment={isRecordingComment}
         />
         <View style={styles.textAndPlayButtonContainer}>
-          <Text style={styles.postText}></Text>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />
             <TouchableOpacity

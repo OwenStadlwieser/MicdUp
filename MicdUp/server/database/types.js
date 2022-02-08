@@ -270,6 +270,17 @@ const PostType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "postType",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
+    },
     nsfw: { type: GraphQLBoolean },
     allowRebuttal: { type: GraphQLBoolean },
     allowStitch: { type: GraphQLBoolean },

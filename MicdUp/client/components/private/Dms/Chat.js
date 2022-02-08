@@ -68,7 +68,6 @@ export class Chat extends Component {
   };
 
   startRecordingChat = async () => {
-    console.log("here");
     if (Platform.OS !== "web") {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording });

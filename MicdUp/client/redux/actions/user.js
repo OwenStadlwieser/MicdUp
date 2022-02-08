@@ -63,7 +63,6 @@ export const verifyEmail = (email) => async (dispatch) => {
     if (res && res.data) {
       dispatch(showMessage(res.data.verifyEmail));
     }
-    console.log(res.data);
     return res;
   } catch (err) {
     console.log(err);

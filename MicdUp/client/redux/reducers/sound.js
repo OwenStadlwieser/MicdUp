@@ -1,4 +1,4 @@
-import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE } from "../types";
+import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE, SET_TIME } from "../types";
 
 const initialState = {
   currentPlayingSound: null,
@@ -6,6 +6,7 @@ const initialState = {
   queue: [],
   currentIntervalId: "",
   isPause: false,
+  time: 0,
 };
 
 export default function (state = { ...initialState }, action) {
@@ -19,6 +20,7 @@ export default function (state = { ...initialState }, action) {
         queue: payload.queue,
         currentIntervalId: payload.currentIntervalId,
         isPause: false,
+        time: 0,
       };
     case SOUND_ENDED:
       let queue = { state };
@@ -39,6 +41,11 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         isPause: payload,
+      };
+    case SET_TIME:
+      return {
+        ...state,
+        time: payload,
       };
     default:
       return state;

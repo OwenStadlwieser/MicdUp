@@ -1,4 +1,4 @@
-import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE } from "../types";
+import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE, SET_TIME } from "../types";
 import { playSound } from "../../reuseableFunctions/helpers";
 import store from "../index";
 import { Audio } from "expo-av";
@@ -6,11 +6,10 @@ import { Audio } from "expo-av";
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (sound, url, queue) => async (dispatch) => {
-  console.log("here");
   let { currentPlayingSound, currentPlaybackObject, currentIntervalId } =
     store.getState().sound;
   sound.uri = url;
-  if (currentPlayingSound && currentPlayingSound.uri != url) {
+  if (currentPlayingSound && currentPlayingSound.uri !== url) {
     await soundExpo.unloadAsync();
     clearInterval(currentIntervalId);
   } else if (currentPlayingSound) {
@@ -44,8 +43,10 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       dispatch({
         type: SOUND_ENDED,
       });
+    } else {
+      await dispatch(setTime(status.positionMillis));
     }
-  }, 500);
+  }, 100);
   dispatch({
     type: CHANGE_SOUND,
     payload: {
@@ -54,6 +55,13 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       currentPlaybackObject: playbackObject,
       queue,
     },
+  });
+};
+
+export const setTime = (time) => async (dispatch) => {
+  dispatch({
+    type: SET_TIME,
+    payload: time,
   });
 };
 
