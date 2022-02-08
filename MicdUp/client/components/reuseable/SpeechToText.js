@@ -33,11 +33,13 @@ export class SpeechToText extends Component {
   };
 
   getTextWidth(text, font) {
+    const { fontSize } = this.props;
+    const defaultFont = `"Times New Roman"`;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
-    context.font = font || getComputedStyle(document.body).font;
-
+    context.font = font
+      ? fontSize + "px" + " " + font
+      : fontSize + "px" + " " + defaultFont;
     return context.measureText(text).width;
   }
 
@@ -55,23 +57,22 @@ export class SpeechToText extends Component {
       return;
     let arr = [post.speechToText[startIndex]];
     let string = arr.map((p, i) => p.word + " " + p.time + " ").join();
-    let measurement = this.getTextWidth(string, "Roboto");
+    let measurement = this.getTextWidth(string);
     while (measurement < screenWidth && post.speechToText[endIndex + 1]) {
       endIndex = endIndex + 1;
       arr.push(post.speechToText[endIndex]);
       string = arr.map((p, i) => p.word + " " + p.time + " ").join();
-      measurement = this.getTextWidth(string, "Roboto");
+      measurement = this.getTextWidth(string);
     }
     this.mounted && this.setState({ endIndex });
     return arr;
   };
 
   getNextLineOfText = async () => {
-    const { fontSpecs, index, count } = this.state;
+    const { fontSpecs, index, count, endIndex } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
     let startIndex = index + 1;
-    let endIndex = index + 1;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -124,7 +125,7 @@ export class SpeechToText extends Component {
       screenWidth = Dimensions.get("window").width,
       theLeftMargin;
     const { post } = this.props;
-    const { fontSpecs, index, adjustment } = this.state;
+    const { fontSpecs, index, adjustment, count } = this.state;
     let size;
     try {
       if (!post.speechToText || !post.speechToText[index + 1]) return;
@@ -135,26 +136,23 @@ export class SpeechToText extends Component {
         });
         size = size.width;
       } else
-        size = this.getTextWidth(post.speechToText[index + 1].word, "Roboto");
+        size = this.getTextWidth(
+          post.speechToText[index + 1].word +
+            " " +
+            post.speechToText[index + 1].time +
+            " "
+        );
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
-        duration: 1000,
+        duration: 900,
         useNativeDriver: Platform.OS !== "web" ? true : false,
       }).start(async () => {
-        const { count, index, adjustment, words } = this.state;
-        let size;
-        if (!post.speechToText[index + 1] || !words || !words.length) return;
-        let newWords = [...words, post.speechToText[index + 1]];
-        if (Platform.OS !== "web") {
-          size = await rnTextSize.measure({
-            text: post.speechToText[index + 1].word + " ", // text to measure, can include symbols
-            ...fontSpecs, // RN font specification
-          });
-          size = size.width;
-        } else {
-          size = this.getTextWidth(post.speechToText[index + 1].word, "Roboto");
-        }
-        if (count < 5) {
+        const { adjustment, endIndex, words } = this.state;
+        if (!post.speechToText[endIndex + 1] || !words || !words.length) return;
+        let newWords = [...words, post.speechToText[endIndex + 1]];
+        // number of words in string
+        // this scrolls to next word using state
+        if (count < 50) {
           this.mounted &&
             this.setState({
               MainPosition: [
@@ -166,17 +164,19 @@ export class SpeechToText extends Component {
               index: index + 1,
               words: newWords,
               count: count + 1,
+              endIndex: endIndex + 1,
             });
         } else {
-          let newWords =
-            Platform.OS === "web"
-              ? this.getNextLineOfTextWeb()
-              : await this.getNextLineOfText();
+          // clears cached words and resets div
           Animated.timing(this.animatedLeftMargin, {
             toValue: 0,
             duration: 0,
             useNativeDriver: Platform.OS !== "web" ? true : false,
           }).start();
+          let newWords =
+            Platform.OS === "web"
+              ? this.getNextLineOfTextWeb()
+              : await this.getNextLineOfText();
           this.mounted &&
             this.setState({
               MainPosition: [
@@ -184,7 +184,7 @@ export class SpeechToText extends Component {
                 { height: screenHeight },
                 { marginTop: 0 },
               ],
-              adjustment: size,
+              adjustment: 0,
               index: index + 1,
               words: newWords,
               count: 0,
@@ -198,7 +198,7 @@ export class SpeechToText extends Component {
 
   render() {
     const { index, words } = this.state;
-    console.log(words);
+    const { fontSize } = this.props;
     try {
       return (
         <Animated.View
@@ -206,15 +206,41 @@ export class SpeechToText extends Component {
             this.state.MainPosition,
             { transform: [{ translateX: this.animatedLeftMargin }] },
             { flexDirection: "row" },
+            { position: "absolute" },
+            { left: 20 },
+            { top: 40 },
           ]}
         >
-          {words &&
+          {Platform.OS === "web" && words && words.length ? (
+            <Text
+              numberOfLines={1}
+              style={{
+                overflow: "visible",
+                flexWrap: "nowrap",
+                flex: 1,
+                fontSize: fontSize,
+              }}
+            >
+              {words.map((p, i) => {
+                return p.word + " " + p.time + " ";
+              })}
+            </Text>
+          ) : (
+            words &&
             words.length &&
             words.map((p, i) => (
-              <Text key={i}>
+              <Text
+                style={
+                  index === 0
+                    ? { color: "#6FF6fff", fontSize: fontSize }
+                    : { fontSize }
+                }
+                key={i}
+              >
                 {p.word} {p.time}
               </Text>
-            ))}
+            ))
+          )}
         </Animated.View>
       );
     } catch (err) {

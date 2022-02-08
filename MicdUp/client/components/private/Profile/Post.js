@@ -60,7 +60,10 @@ export class Post extends Component {
         }
         key={post.id}
       >
-        <SpeechToText post={post} textStyle={{}} />
+        <Text style={styles.postTitle}>
+          {post.title ? post.title : "Untitled"}
+        </Text>
+        <SpeechToText fontSize={24} post={post} textStyle={{}} />
         <Comment
           isUserProfile={isUserProfile}
           containerStyle={{}}
@@ -76,7 +79,6 @@ export class Post extends Component {
           isRecordingComment={isRecordingComment}
         />
         <View style={styles.textAndPlayButtonContainer}>
-          <Text style={styles.postText}></Text>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />
             <TouchableOpacity
