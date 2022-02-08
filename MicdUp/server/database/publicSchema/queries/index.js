@@ -4,32 +4,28 @@ const graphql = require("graphql"); //use graphql package
 */
 const { login, forgotPassVerify } = require("./auth");
 const { GraphQLObjectType, GraphQLID } = graphql;
-const { getUser, searchUsers } = require("./user");
 const { searchTags, randomPrompt } = require("./tag");
 const {
   getUserPosts,
   getComments,
   getRecordingsFromTag,
 } = require("./recording");
+const { searchUsers } = require("./user");
 const { getReplies } = require("./comment");
-const { fetchChats, fetchChatMessages } = require("./chat");
 const { getFilters } = require("./filter");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     login,
     forgotPassVerify,
-    fetchChatMessages,
-    getUser,
     searchTags,
     randomPrompt,
     getUserPosts,
     getComments,
     getReplies,
-    searchUsers,
     getRecordingsFromTag,
-    fetchChats,
     getFilters,
+    searchUsers,
   }, //fields end here
 });
 

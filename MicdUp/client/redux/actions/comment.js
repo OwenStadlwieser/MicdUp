@@ -10,11 +10,11 @@ import {
   ALTER_COMMENTS,
 } from "../types";
 import { showMessage } from "./display";
-import { client } from "../../apollo/client";
+import { publicClient, privateClient } from "../../apollo/client";
 export const getReplies = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.query({
+    const res = await publicClient.query({
       query: SHOW_MORE_REPLIES(3),
       variables: {
         commentId,
@@ -51,7 +51,7 @@ export const updateCommentDisplay =
 export const likeComment = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: LIKE_COMMENT_MUTATION(3),
       variables: {
         commentId,
@@ -76,7 +76,7 @@ export const likeComment = (commentId) => async (dispatch) => {
 export const deleteComment = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: DELETE_COMMENT_MUTATION(3),
       variables: {
         commentId,

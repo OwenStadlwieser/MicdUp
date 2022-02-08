@@ -1,4 +1,4 @@
-import { client } from "../../apollo/client/index";
+import { privateClient, publicClient } from "../../apollo/client/index";
 import {
   GET_USER_QUERY,
   DELETE_ACCOUNT_MUTATION,
@@ -11,7 +11,7 @@ import { showMessage } from "./display";
 
 export const getUserQuery = () => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await privateClient.query({
       query: GET_USER_QUERY,
     });
     if (res && res.data) {
@@ -37,7 +37,7 @@ export const getUserQuery = () => async (dispatch) => {
 
 export const deleteAccount = () => async (dispatch) => {
   try {
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: DELETE_ACCOUNT_MUTATION,
       fetchPolicy: "no-cache",
     });
@@ -55,7 +55,7 @@ export const deleteAccount = () => async (dispatch) => {
 
 export const verifyEmail = (email) => async (dispatch) => {
   try {
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: VERIFY_EMAIL_MUTATION,
       variables: { email },
       fetchPolicy: "no-cache",
@@ -72,7 +72,7 @@ export const verifyEmail = (email) => async (dispatch) => {
 export const setEmailVerified =
   (verificationCode, email) => async (dispatch) => {
     try {
-      const res = await client.mutate({
+      const res = await privateClient.mutate({
         mutation: SET_EMAIL_VERIFIED_MUTATION,
         variables: { verificationCode, email },
         fetchPolicy: "no-cache",
@@ -86,7 +86,7 @@ export const setEmailVerified =
 
 export const searchUsers = (searchTerm, skipMult) => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await publicClient.query({
       query: SEARCH_USERS_QUERY,
       variables: { searchTerm, skipMult },
       fetchPolicy: "no-cache",

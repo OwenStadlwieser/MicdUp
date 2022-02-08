@@ -12,7 +12,7 @@ import {
 } from "../../apollo/private/chat";
 import { showMessage } from "./display";
 import { navigate } from "./display";
-import { client } from "../../apollo/client/index";
+import { privateClient } from "../../apollo/client/index";
 
 export const hideChats = () => async (dispatch) => {
   try {
@@ -32,7 +32,7 @@ export const chatRecieved = (message, chatId) => (dispatch) => {
 };
 export const createOrOpenChat = (members, creator) => async (dispatch) => {
   try {
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: FETCH_CHAT_MUTATION,
       variables: { members, creator },
       fetchPolicy: "no-cache",
@@ -59,7 +59,7 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
 
 export const viewChats = (skipMult) => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await privateClient.query({
       query: FETCH_CHATS_QUERY,
       variables: { skipMult },
       fetchPolicy: "no-cache",
@@ -81,7 +81,7 @@ export const viewChats = (skipMult) => async (dispatch) => {
 
 export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await privateClient.query({
       query: FETCH_CHAT_MESSAGES_QUERY,
       variables: { skipMult, chatId: chat.id },
       fetchPolicy: "no-cache",

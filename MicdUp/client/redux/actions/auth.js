@@ -1,4 +1,4 @@
-import { client } from "../../apollo/client/index";
+import { publicClient } from "../../apollo/client/index";
 import {
   SIGNUP_MUTATION,
   LOGIN_QUERY,
@@ -22,7 +22,7 @@ export const setSocket = (socket) => async (dispatch) => {
 };
 export const login = (authenticator, password) => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await publicClient.query({
       query: LOGIN_QUERY,
       variables: { authenticator, password },
       fetchPolicy: "no-cache",
@@ -47,7 +47,7 @@ export const logout = () => async (dispatch) => {
 
 export const forgotPass = (email) => async (dispatch) => {
   try {
-    const res = await client.mutate({
+    const res = await publicClient.mutate({
       mutation: FORGOT_PASS_MUTATION,
       variables: { email },
       fetchPolicy: "no-cache",
@@ -63,7 +63,7 @@ export const forgotPass = (email) => async (dispatch) => {
 
 export const forgotPassVerify = (secureCode, email) => async (dispatch) => {
   try {
-    const res = await client.query({
+    const res = await publicClient.query({
       query: FORGOT_PASS_VERIFY_QUERY,
       variables: { secureCode, email },
       fetchPolicy: "no-cache",
@@ -78,7 +78,7 @@ export const forgotPassVerify = (secureCode, email) => async (dispatch) => {
 export const forgotPassChange =
   (secureCode, newPass, email) => async (dispatch) => {
     try {
-      const res = await client.mutate({
+      const res = await publicClient.mutate({
         mutation: FORGOT_PASS_CHANGE_MUTATION,
         variables: { secureCode, newPass, email },
         fetchPolicy: "no-cache",
@@ -93,7 +93,7 @@ export const forgotPassChange =
 export const register =
   (email, phone, password, user, dob) => async (dispatch) => {
     try {
-      const res = await client.mutate({
+      const res = await publicClient.mutate({
         mutation: SIGNUP_MUTATION,
         variables: { email, phone, password, user, dob },
         fetchPolicy: "no-cache",

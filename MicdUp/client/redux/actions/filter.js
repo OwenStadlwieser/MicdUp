@@ -1,4 +1,4 @@
-import { client } from "../../apollo/client/index";
+import { publicClient } from "../../apollo/client/index";
 import { GET_FILTERS_QUERY } from "../../apollo/private/filter";
 let previousQuery = -1;
 export const getFilters =
@@ -8,7 +8,7 @@ export const getFilters =
     if (previousQuery !== 0) fetchPolicy = "no-cache";
     previousQuery = skipMult;
     try {
-      const res = await client.query({
+      const res = await publicClient.query({
         query: GET_FILTERS_QUERY,
         variables: { skipMult },
         fetchPolicy,

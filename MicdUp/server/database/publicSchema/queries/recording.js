@@ -30,7 +30,6 @@ const getRecordingsFromTag = {
   type: new GraphQLList(PostType),
   args: { searchTag: { type: GraphQLID }, skipMult: { type: GraphQLInt } },
   async resolve(parent, { searchTag, skipMult }, context) {
-    if (!context.user.id) return [];
     try {
       const size = 20;
       const tag = await Tag.findByIdAndUpdate(searchTag, {

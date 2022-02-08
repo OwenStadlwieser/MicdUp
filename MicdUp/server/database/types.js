@@ -118,6 +118,7 @@ const ProfilePrivateType = new GraphQLObjectType({
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
         return index === "1";
       },
@@ -175,6 +176,7 @@ const ProfilePublicType = new GraphQLObjectType({
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
         return index === "1";
       },
@@ -235,6 +237,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -322,6 +325,7 @@ const CommentType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -413,6 +417,7 @@ const PostType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -470,6 +475,7 @@ const ChatMessageType = new GraphQLObjectType({
       resolve(parent, args, context, info) {
         // FIXME: unneeded logic
         parent.likers = parent.likers ? parent.likers : new Map();
+        if (!context.profile || !context.profile.id) return false;
         const index = parent.likers.get(context.profile.id);
         return index === "1";
       },

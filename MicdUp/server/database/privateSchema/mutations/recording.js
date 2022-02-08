@@ -20,9 +20,9 @@ const { Post } = require("../../models/Post");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const { Comment } = require("../../models/Comment");
-const {User} = require("../../models/User");
+const { User } = require("../../models/User");
 const mongoose = require("mongoose");
-const {makeLikeNotification} = require("../../../utils/sendNotification");
+const { makeLikeNotification } = require("../../../utils/sendNotification");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -246,7 +246,12 @@ const likePost = {
       post.likers.push(context.profile._id);
       await post.save();
       console.log("test");
-      makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
+      makeLikeNotification(
+        await User.findOne(context.profile.user),
+        "post",
+        {},
+        post.owner
+      );
       return post;
     }
     if (post && index > -1) {
