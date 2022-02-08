@@ -22,6 +22,7 @@ export class SpeechToText extends Component {
       index: 0,
       endIndex: 0,
       intervalId: "",
+      lastIndex: -1,
     };
     this.animatedLeftMargin = new Animated.Value(0);
   }
@@ -133,6 +134,7 @@ export class SpeechToText extends Component {
         });
         size = size.width;
       } else size = this.getTextWidth(post.speechToText[index + 1].word + " ");
+      console.log(adjustment, adjustment + size);
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
         duration:
@@ -196,7 +198,7 @@ export class SpeechToText extends Component {
 
   componentDidUpdate = async (prevProps) => {
     const { time, currentPlayingSound, post } = this.props;
-    const { index, playing } = this.state;
+    const { index, playing, lastIndex } = this.state;
     if (
       currentPlayingSound &&
       post &&
@@ -205,7 +207,8 @@ export class SpeechToText extends Component {
       post.speechToText[index].time < time
     ) {
       if (!playing) this.mounted && this.setState({ playing: true });
-      this.SlidePane();
+      lastIndex !== index && this.SlidePane();
+      this.mounted && this.setState({ lastIndex: index });
     } else if (
       prevProps.currentPlayingSound &&
       prevProps.post &&
@@ -220,6 +223,7 @@ export class SpeechToText extends Component {
             count: 1,
             adjustment: 0,
             playing: false,
+            lastIndex: -1,
           });
         let words =
           Platform.OS === "web"
