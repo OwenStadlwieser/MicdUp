@@ -69,10 +69,11 @@ export class SpeechToText extends Component {
   };
 
   getNextLineOfText = async () => {
-    const { fontSpecs, index, count, endIndex } = this.state;
+    const { fontSpecs, index, count } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
     let startIndex = index + 1;
+    let endIndex = index + 1;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -195,7 +196,7 @@ export class SpeechToText extends Component {
 
   componentDidUpdate = async (prevProps) => {
     const { time, currentPlayingSound, post } = this.props;
-    const { index } = this.state;
+    const { index, playing } = this.state;
     if (
       currentPlayingSound &&
       post &&
@@ -203,7 +204,7 @@ export class SpeechToText extends Component {
       post.speechToText[index] &&
       post.speechToText[index].time < time
     ) {
-      this.mounted && this.setState({ playing: true });
+      if (!playing) this.mounted && this.setState({ playing: true });
       this.SlidePane();
     } else if (
       prevProps.currentPlayingSound &&
@@ -211,24 +212,26 @@ export class SpeechToText extends Component {
       prevProps.currentPlayingSound.uri === prevProps.post.signedUrl &&
       (!currentPlayingSound || !(currentPlayingSound.uri === post.signedUrl))
     ) {
-      this.mounted &&
-        this.setState({
-          index: 0,
-          endIndex: 0,
-          count: 1,
-          adjustment: 0,
-          playing: false,
-        });
-      let words =
-        Platform.OS === "web"
-          ? this.getNextLineOfTextWeb()
-          : await this.getNextLineOfText();
-      this.mounted && this.setState({ words });
-      Animated.timing(this.animatedLeftMargin, {
-        toValue: 0,
-        duration: 0,
-        useNativeDriver: Platform.OS !== "web" ? true : false,
-      }).start();
+      if (playing) {
+        this.mounted &&
+          this.setState({
+            index: 0,
+            endIndex: 0,
+            count: 1,
+            adjustment: 0,
+            playing: false,
+          });
+        let words =
+          Platform.OS === "web"
+            ? this.getNextLineOfTextWeb()
+            : await this.getNextLineOfText();
+        this.mounted && this.setState({ words });
+        Animated.timing(this.animatedLeftMargin, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: Platform.OS !== "web" ? true : false,
+        }).start();
+      }
     }
   };
   render() {
