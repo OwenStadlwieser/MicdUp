@@ -37,10 +37,14 @@ const registerForPushNotificationsAsync = async () => {
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log("new token: ");
       console.log(token);
+
       const addToDB = await addToken(token);
 
       if (addToDB){
         console.log("Push Token added to DB");
+      }
+      else{
+        console.log("Failed to add push token!");
       }
 
       // this.setState({ expoPushToken: token });

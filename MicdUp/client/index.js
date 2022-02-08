@@ -23,7 +23,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async() => clearAsyncStorage();
+//async() => clearAsyncStorage();
 registerForPushNotificationsAsync();
 
 setUpListeners();

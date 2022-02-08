@@ -1,6 +1,8 @@
+const {User} = require("../../models/User")
 const { Comment } = require("../../models/Comment");
 const { Post } = require("../../models/Post");
 const mongoose = require("mongoose");
+const {makeLikeNotification} = require("../../../utils/sendNotification");
 const graphql = require("graphql");
 const {
   GraphQLObjectType,
@@ -74,11 +76,13 @@ const likeComment = {
     if (comment && index < 0) {
       comment.likers.push(context.profile._id);
       await comment.save();
+      makeLikeNotification(await User.findOne(context.profile.user),"comment",{},comment.owner);
       return comment;
     }
     if (comment && index > -1) {
       comment.likers.splice(index, 1);
       await comment.save();
+      // makeLikeNotification(await User.findOne(context.profile.user),"comment",{},comment.owner);
       return comment;
     }
   },

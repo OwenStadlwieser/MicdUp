@@ -350,7 +350,7 @@ export class Profile extends Component {
                 posts.map(
                   (post, index) =>
                     post &&
-                    index === 0 && (
+                    (
                       <Post
                         isRecordingComment={isRecordingComment}
                         isUserProfile={isUserProfile}
