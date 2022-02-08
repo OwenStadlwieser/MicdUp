@@ -17,6 +17,7 @@ export class AudioRecordingVisualization extends Component {
   }
 
   onNewFrame = (data) => {
+    console.log(data);
     let { soundLevels } = this.state;
     const { barWidth } = this.props;
     soundLevels.unshift(data);

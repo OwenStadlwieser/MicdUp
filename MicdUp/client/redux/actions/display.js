@@ -6,7 +6,24 @@ import {
   NAVIGATE,
   VIEW_PROFILE,
   VIEW_PROFILE_SEARCH,
+  RECEIVE_NOTIF,
+  HIDE_NOTIF
 } from "../types";
+
+
+export const receiveNotif = (payload) => (dispatch) => {
+  dispatch({
+    type:RECEIVE_NOTIF,
+    payload,
+  })
+}
+
+export const hideNotif = (payload) => (dispatch) => {
+  dispatch({
+    type:HIDE_NOTIF,
+    payload,
+  })
+}
 
 export const changeLogin = (payload) => (dispatch) => {
   dispatch({

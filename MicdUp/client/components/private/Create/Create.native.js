@@ -57,7 +57,7 @@ export class Create extends Component {
         console.log("end");
       };
       Voice.onSpeechError = async (err) => {
-        console.log(err);
+        // console.log(err);
         Voice.stop();
       };
       Voice.onSpeechResults = this.onSpeechResults.bind(this);

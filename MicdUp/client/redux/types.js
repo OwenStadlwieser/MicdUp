@@ -38,3 +38,5 @@ export const CHANGE_SOUND = "CHANGE_SOUND";
 export const SOUND_ENDED = "SOUND_ENDED";
 export const SOUND_PAUSE = "SOUND_PAUSE";
 export const SET_TIME = "SET_TIME";
+export const RECEIVE_NOTIF = "RECEIVE_NOTIF";
+export const HIDE_NOTIF = "HIDE_NOTIF";

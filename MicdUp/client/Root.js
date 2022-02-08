@@ -122,8 +122,9 @@ export class Root extends Component {
       );
     else
       app = (
+        
         <View style={styles.rootContainer}>
-          <NotificationBell />
+          <View><NotificationBell /></View>
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
