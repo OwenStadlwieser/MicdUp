@@ -1,13 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  View,
-  Text,
-  Animated,
-  Easing,
-  Dimensions,
-  Platform,
-} from "react-native";
+import { View, Text, Animated, Dimensions, Platform } from "react-native";
 import rnTextSize, { TSFontSpecs } from "react-native-text-size";
 import { styles } from "../../styles/Styles";
 export class SpeechToText extends Component {
@@ -49,10 +42,9 @@ export class SpeechToText extends Component {
   }
 
   getNextLineOfTextWeb = async () => {
-    const { fontSpecs, index, count } = this.state;
+    const { index } = this.state;
     const { post } = this.props;
-    let screenWidth = Dimensions.get("window").width,
-      screenHeight = Dimensions.get("window").height;
+    let screenWidth = Dimensions.get("window").width;
     let startIndex = index + 1;
     let endIndex = index + 1;
     if (
@@ -77,8 +69,7 @@ export class SpeechToText extends Component {
   getNextLineOfText = async () => {
     const { fontSpecs, index, count } = this.state;
     const { post } = this.props;
-    let screenWidth = Dimensions.get("window").width,
-      screenHeight = Dimensions.get("window").height;
+    let screenWidth = Dimensions.get("window").width;
     let startIndex = index + 1;
     let endIndex = index + 1;
     if (
@@ -124,7 +115,7 @@ export class SpeechToText extends Component {
     this.mounted && this.setState({ words });
     const intervalId = setInterval(async () => {
       await this.SlidePane();
-    }, 1000);
+    }, 100);
     this.mounted && this.setState({ intervalId });
   };
 
@@ -147,10 +138,10 @@ export class SpeechToText extends Component {
         size = this.getTextWidth(post.speechToText[index + 1].word, "Roboto");
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
-        duration: 500,
+        duration: 100,
         useNativeDriver: Platform.OS !== "web" ? true : false,
       }).start(async () => {
-        const { count, endIndex, index, adjustment, words } = this.state;
+        const { count, index, adjustment, words } = this.state;
         let size;
         if (!post.speechToText[index + 1]) return;
         let newWords = [...words, post.speechToText[index + 1]];
@@ -207,28 +198,22 @@ export class SpeechToText extends Component {
   };
 
   render() {
-    const { post, textStyle } = this.props;
-    const { xPos, index, words } = this.state;
+    const { index, words } = this.state;
     try {
       return (
         <Animated.View
           style={[
             this.state.MainPosition,
             { transform: [{ translateX: this.animatedLeftMargin }] },
+            { flexDirection: "row" },
           ]}
         >
-          <Text
-            key={index}
-            ref={(ref) => (this.text = ref)}
-            style={{ overflow: "visible", flexWrap: "nowrap", flex: 1 }}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {words &&
-              words.map((p, i) => {
-                return p.word ? p.word + " " + p.time + " " : "";
-              })}
-          </Text>
+          {words &&
+            words.map((p, i) => (
+              <Text key={i}>
+                {p.word} {p.time}
+              </Text>
+            ))}
         </Animated.View>
       );
     } catch (err) {
