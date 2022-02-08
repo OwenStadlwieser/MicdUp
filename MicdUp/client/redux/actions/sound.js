@@ -1,4 +1,4 @@
-import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE } from "../types";
+import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE, SET_TIME } from "../types";
 import { playSound } from "../../reuseableFunctions/helpers";
 import store from "../index";
 import { Audio } from "expo-av";
@@ -43,8 +43,10 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       dispatch({
         type: SOUND_ENDED,
       });
+    } else {
+      await dispatch(setTime(status.positionMillis));
     }
-  }, 500);
+  }, 100);
   dispatch({
     type: CHANGE_SOUND,
     payload: {
@@ -53,6 +55,13 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       currentPlaybackObject: playbackObject,
       queue,
     },
+  });
+};
+
+export const setTime = (time) => async (dispatch) => {
+  dispatch({
+    type: SET_TIME,
+    payload: time,
   });
 };
 

@@ -56,12 +56,12 @@ export class SpeechToText extends Component {
     )
       return;
     let arr = [post.speechToText[startIndex]];
-    let string = arr.map((p, i) => p.word + " " + p.time + " ").join();
+    let string = arr.map((p, i) => p.word + " ").join();
     let measurement = this.getTextWidth(string);
     while (measurement < screenWidth && post.speechToText[endIndex + 1]) {
       endIndex = endIndex + 1;
       arr.push(post.speechToText[endIndex]);
-      string = arr.map((p, i) => p.word + " " + p.time + " ").join();
+      string = arr.map((p, i) => p.word + " ").join();
       measurement = this.getTextWidth(string);
     }
     this.mounted && this.setState({ endIndex });
@@ -80,7 +80,7 @@ export class SpeechToText extends Component {
     )
       return;
     let arr = [post.speechToText[startIndex]];
-    let string = arr.map((p, i) => p.word + " " + p.time + " ").join();
+    let string = arr.map((p, i) => p.word + " ").join();
     let measurement = await rnTextSize.measure({
       text: string, // text to measure, can include symbols
       ...fontSpecs, // RN font specification
@@ -88,7 +88,7 @@ export class SpeechToText extends Component {
     while (measurement.width < screenWidth && post.speechToText[endIndex + 1]) {
       endIndex = endIndex + 1;
       arr.push(post.speechToText[endIndex]);
-      string = arr.map((p, i) => p.word + " " + p.time + " ").join();
+      string = arr.map((p, i) => p.word + " ").join();
       measurement = await rnTextSize.measure({
         text: string, // text to measure, can include symbols
         ...fontSpecs, // RN font specification
@@ -114,10 +114,6 @@ export class SpeechToText extends Component {
         ? this.getNextLineOfTextWeb()
         : await this.getNextLineOfText();
     this.mounted && this.setState({ words });
-    const intervalId = setInterval(async () => {
-      await this.SlidePane();
-    }, 1000);
-    this.mounted && this.setState({ intervalId });
   };
 
   SlidePane = async () => {
@@ -131,20 +127,15 @@ export class SpeechToText extends Component {
       if (!post.speechToText || !post.speechToText[index + 1]) return;
       if (Platform.OS !== "web") {
         size = await rnTextSize.measure({
-          text: post.speechToText[index + 1].word, // text to measure, can include symbols
+          text: post.speechToText[index + 1].word + " ", // text to measure, can include symbols
           ...fontSpecs, // RN font specification
         });
         size = size.width;
-      } else
-        size = this.getTextWidth(
-          post.speechToText[index + 1].word +
-            " " +
-            post.speechToText[index + 1].time +
-            " "
-        );
+      } else size = this.getTextWidth(post.speechToText[index + 1].word + " ");
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
-        duration: 900,
+        duration:
+          post.speechToText[index + 1].time - post.speechToText[index].time,
         useNativeDriver: Platform.OS !== "web" ? true : false,
       }).start(async () => {
         const { adjustment, endIndex, words } = this.state;
@@ -153,7 +144,12 @@ export class SpeechToText extends Component {
         // number of words in string
         // this scrolls to next word using state
         if (count < 50) {
+          const { playing } = this.state;
+          const { currentPlayingSound } = this.props;
           this.mounted &&
+            currentPlayingSound &&
+            currentPlayingSound.uri === post.signedUrl &&
+            playing &&
             this.setState({
               MainPosition: [
                 { width: screenWidth },
@@ -178,6 +174,7 @@ export class SpeechToText extends Component {
               ? this.getNextLineOfTextWeb()
               : await this.getNextLineOfText();
           this.mounted &&
+            this.state.playing &&
             this.setState({
               MainPosition: [
                 { width: screenWidth },
@@ -196,6 +193,44 @@ export class SpeechToText extends Component {
     }
   };
 
+  componentDidUpdate = async (prevProps) => {
+    const { time, currentPlayingSound, post } = this.props;
+    const { index } = this.state;
+    if (
+      currentPlayingSound &&
+      post &&
+      currentPlayingSound.uri === post.signedUrl &&
+      post.speechToText[index] &&
+      post.speechToText[index].time < time
+    ) {
+      this.mounted && this.setState({ playing: true });
+      this.SlidePane();
+    } else if (
+      prevProps.currentPlayingSound &&
+      prevProps.post &&
+      prevProps.currentPlayingSound.uri === prevProps.post.signedUrl &&
+      (!currentPlayingSound || !(currentPlayingSound.uri === post.signedUrl))
+    ) {
+      this.mounted &&
+        this.setState({
+          index: 0,
+          endIndex: 0,
+          count: 1,
+          adjustment: 0,
+          playing: false,
+        });
+      let words =
+        Platform.OS === "web"
+          ? this.getNextLineOfTextWeb()
+          : await this.getNextLineOfText();
+      this.mounted && this.setState({ words });
+      Animated.timing(this.animatedLeftMargin, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: Platform.OS !== "web" ? true : false,
+      }).start();
+    }
+  };
   render() {
     const { index, words } = this.state;
     const { fontSize } = this.props;
@@ -222,7 +257,7 @@ export class SpeechToText extends Component {
               }}
             >
               {words.map((p, i) => {
-                return p.word + " " + p.time + " ";
+                return p.word + " ";
               })}
             </Text>
           ) : (
@@ -237,14 +272,13 @@ export class SpeechToText extends Component {
                 }
                 key={i}
               >
-                {p.word} {p.time}
+                {p.word}{" "}
               </Text>
             ))
           )}
         </Animated.View>
       );
     } catch (err) {
-      console.log(err);
       return (
         <View>
           <Text>Err</Text>
@@ -254,6 +288,10 @@ export class SpeechToText extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  recording: state.sound.currentPlaybackObject,
+  currentPlayingSound: state.sound.currentPlayingSound,
+  time: state.sound.time,
+});
 
 export default connect(mapStateToProps, {})(SpeechToText);
