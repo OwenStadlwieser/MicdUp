@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Profile } = require("../../models/Profile");
 const { File } = require("../../models/File");
 const { GraphQLString, GraphQLID } = require("graphql");
-const { FileType, ProfileType, MessageType } = require("../../types");
+const { FileType, ProfilePublicType, MessageType } = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
 
 const updateProfilePic = {
@@ -49,7 +49,7 @@ const updateProfilePic = {
 };
 
 const followProfile = {
-  type: ProfileType,
+  type: ProfilePublicType,
   args: {
     profileId: { type: GraphQLID },
   },
