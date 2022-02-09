@@ -210,7 +210,7 @@ export class Comment extends Component {
             )}
           </View>
           {comment.signedUrl || comment.text ? (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, alignItems: "center" }}>
               {comment.signedUrl && (
                 <Like
                   post={comment}
@@ -334,11 +334,8 @@ export class Comment extends Component {
     } = this.state;
     return (
       isShowing && (
-        <KeyboardAvoidingView
+        <View
           onStartShouldSetResponder={(event) => true}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-          }}
           style={styles.commentOpenContainer}
         >
           <ScrollView
@@ -432,7 +429,7 @@ export class Comment extends Component {
               )}
             </View>
           </View>
-        </KeyboardAvoidingView>
+        </View>
       )
     );
   }

@@ -4,7 +4,12 @@ import { connect } from "react-redux";
 import PlayButton from "../../reuseable/PlayButton";
 import Like from "../../reuseable/Like";
 import Comment from "../../reuseable/Comment";
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
 // styles
 import { FontAwesome } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
@@ -74,20 +79,28 @@ export class Post extends Component {
           post={post}
           textStyle={{}}
         />
-        <Comment
-          isUserProfile={isUserProfile}
-          containerStyle={{}}
-          setCommentPosts={setCommentPosts}
-          removeCommentPosts={removeCommentPosts}
-          color={"#1A3561"}
-          currentPlayingId={currentSound}
-          post={post}
-          isShowing={commentsShowing}
-          setCommentsShowing={this.setCommentsShowing.bind(this)}
-          index={index}
-          setRecording={this.props.setRecording}
-          isRecordingComment={isRecordingComment}
-        />
+        <TouchableOpacity
+          onPress={(e) => {
+            console.log(e);
+            e.stopPropagation();
+          }}
+          style={styles.commentParent}
+        >
+          <Comment
+            isUserProfile={isUserProfile}
+            containerStyle={{}}
+            setCommentPosts={setCommentPosts}
+            removeCommentPosts={removeCommentPosts}
+            color={"#1A3561"}
+            currentPlayingId={currentSound}
+            post={post}
+            isShowing={commentsShowing}
+            setCommentsShowing={this.setCommentsShowing.bind(this)}
+            index={index}
+            setRecording={this.props.setRecording}
+            isRecordingComment={isRecordingComment}
+          />
+        </TouchableOpacity>
         <View style={styles.textAndPlayButtonContainer}>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />

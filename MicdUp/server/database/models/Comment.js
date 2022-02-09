@@ -69,6 +69,7 @@ commentSchema.pre("save", async function (next) {
     this.fileExtension = "";
     this.text = "";
     this.signedUrl = "";
+    this.speechToText = "";
   }
   next();
 });
