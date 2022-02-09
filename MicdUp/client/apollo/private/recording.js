@@ -41,7 +41,10 @@ const UPLOAD_BIO_MUTATION = gql`
     ) {
       id
       signedUrl
-      speechToText
+      speechToText {
+        word
+        time
+      }
     }
   }
 `;

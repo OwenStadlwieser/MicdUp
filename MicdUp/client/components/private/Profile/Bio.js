@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, Platform } from "react-native";
 import PlayButton from "../../reuseable/PlayButton";
 // style
 import { styles } from "../../../styles/Styles";
@@ -95,10 +95,14 @@ export class Bio extends Component {
               onPress={async () => {
                 if (!isRecording || Platform.OS !== "web") {
                   await startRecording();
-                  Voice.start();
+                  try {
+                    Platform.OS !== "web" && Voice.start();
+                  } catch (err) {}
                   this.mounted && this.setState({ isRecording: true });
                 } else {
-                  Voice.stop();
+                  try {
+                    Platform.OS !== "web" && Voice.stop();
+                  } catch (err) {}
                   await stopRecordingBio();
                   this.mounted && this.setState({ isRecording: false });
                 }
