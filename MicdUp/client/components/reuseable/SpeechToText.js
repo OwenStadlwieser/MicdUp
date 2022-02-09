@@ -101,7 +101,6 @@ export class SpeechToText extends Component {
 
   componentDidMount = async () => {
     const { fontSize, post } = this.props;
-    console.log(post);
     this.mounted &&
       this.setState({
         fontSpecs: {
@@ -115,7 +114,6 @@ export class SpeechToText extends Component {
       Platform.OS === "web"
         ? this.getNextLineOfTextWeb()
         : await this.getNextLineOfText();
-    console.log(words);
     this.mounted && this.setState({ words });
   };
 
@@ -135,7 +133,6 @@ export class SpeechToText extends Component {
         });
         size = size.width;
       } else size = this.getTextWidth(post.speechToText[index + 1].word + " ");
-      console.log(adjustment, adjustment + size);
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
         duration:
@@ -264,7 +261,6 @@ export class SpeechToText extends Component {
               }}
             >
               {words.map((p, i) => {
-                console.log(p.word);
                 return p.word + " ";
               })}
             </Text>

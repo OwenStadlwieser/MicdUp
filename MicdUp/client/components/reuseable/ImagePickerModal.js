@@ -2,12 +2,18 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
 import Modal from "react-native-modal";
-import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Dimensions,
+} from "react-native";
 // icons
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 // styles
 import { styles } from "../../styles/Styles";
+const { width, height } = Dimensions.get("window");
 export class ImagePickerModal extends Component {
   constructor() {
     super();
@@ -28,22 +34,33 @@ export class ImagePickerModal extends Component {
 
   render() {
     return (
-      <TouchableWithoutFeedback onPress={this.handleClickOutside}>
-        <TouchableOpacity
-          onPress={() => {
-            this.props.setSelected("camera");
-          }}
-        >
-          <Entypo name="camera" style={styles.largeIcon} color="#1A3561" />
+      <TouchableOpacity
+        onPress={() => {
+          this.handleClickOutside();
+        }}
+        style={styles.modalContainer}
+      >
+        <TouchableOpacity onPress={() => {}} style={styles.modalMainContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.setSelected("camera");
+            }}
+          >
+            <Entypo name="camera" style={styles.largeIcon} color="#1A3561" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.setSelected("picture");
+            }}
+          >
+            <AntDesign
+              name="picture"
+              style={styles.largeIcon}
+              color="#1A3561"
+            />
+          </TouchableOpacity>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            this.props.setSelected("picture");
-          }}
-        >
-          <AntDesign name="picture" style={styles.largeIcon} color="#1A3561" />
-        </TouchableOpacity>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     );
   }
 }

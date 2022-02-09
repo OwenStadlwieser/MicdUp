@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 //components
 import * as ImagePicker from "expo-image-picker";
-import { View } from "react-native";
 import ImagePickerModal from "./ImagePickerModal";
-import Modal from "react-native-modal";
 // redux
 import { showMessage } from "../../redux/actions/display";
 // styles
@@ -78,14 +76,10 @@ export class ImagePickerCustom extends Component {
   };
   render() {
     return (
-      <View style={styles.modalContainer}>
-        <Modal isVisible={true}>
-          <ImagePickerModal
-            setSelected={this.setSelected.bind(this)}
-            setHidden={this.props.setHidden}
-          />
-        </Modal>
-      </View>
+      <ImagePickerModal
+        setSelected={this.setSelected.bind(this)}
+        setHidden={this.props.setHidden}
+      />
     );
   }
 }
