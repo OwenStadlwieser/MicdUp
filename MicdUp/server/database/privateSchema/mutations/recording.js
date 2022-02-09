@@ -148,18 +148,28 @@ const uploadBio = {
   args: {
     files: { type: GraphQLString },
     fileTypes: { type: GraphQLString },
+    speechToText: { type: new GraphQLList(GraphQLString) },
   },
-  async resolve(parent, { files, fileTypes }, context) {
+  async resolve(parent, { files, fileTypes, speechToText }, context) {
     var command = ffmpeg();
     // check if logged in
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
     }
+
+    try {
+      speechToText = speechToText.map((speech) => JSON.parse(speech));
+      speechToText = [].concat.apply([], speechToText);
+    } catch {
+      speechToText = [];
+    }
+
     const fileNames = [];
     // prep files for combine
     const bio = new File({
       owner: context.profile.id,
       fileExtension: ".mp4",
+      speechToText,
     });
     try {
       var fileType = fileTypes.replace("audio/", "");

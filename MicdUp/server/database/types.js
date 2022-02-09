@@ -354,7 +354,7 @@ const PostType = new GraphQLObjectType({
     speechToText: {
       type: new GraphQLList(
         new GraphQLObjectType({
-          name: "postType",
+          name: "PostSpeech",
           fields: () => ({
             word: { type: GraphQLString },
             time: { type: GraphQLFloat },
@@ -573,6 +573,17 @@ const FileType = new GraphQLObjectType({
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
+    },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "FileSpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
     },
     signedUrl: {
       type: GraphQLString,

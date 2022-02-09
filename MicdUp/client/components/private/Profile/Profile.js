@@ -23,11 +23,7 @@ import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 // redux
-import {
-  uploadBio,
-  getUserPosts,
-  getComments,
-} from "../../../redux/actions/recording";
+import { getUserPosts, getComments } from "../../../redux/actions/recording";
 import {
   updateProfilePic,
   followProfile,
@@ -35,7 +31,11 @@ import {
 import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
-import { Audio } from "expo-av";
+import {
+  startRecording,
+  stopRecording,
+} from "../../../reuseableFunctions/recording";
+
 var { height, width } = Dimensions.get("window");
 const barWidth = 5;
 const barMargin = 1;
@@ -108,17 +108,7 @@ export class Profile extends Component {
 
   startRecording = async () => {
     try {
-      await this.stopCurrentSound();
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
+      const recording = await startRecording(null, () => {});
       this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
@@ -127,12 +117,17 @@ export class Profile extends Component {
   };
 
   stopRecordingBio = async () => {
-    const { recording } = this.state;
+    const { recording, results } = this.state;
     console.log("Stopping recording..");
-    try {
-      await recording.stopAndUnloadAsync();
-    } catch (err) {}
-    const uri = recording.getURI();
+    if (!recording) {
+      return;
+    }
+    let uri;
+    if (Platform.OS !== "web") {
+      uri = await stopRecording(recording, null);
+    } else {
+      uri = await stopRecording(recording);
+    }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -140,13 +135,17 @@ export class Profile extends Component {
         newBioRecording: {
           uri,
           finalDuration,
+          results,
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
     console.log("Recording stopped and stored at", uri);
   };
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = async () => {
+    await this.stopRecordingBio();
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
@@ -430,7 +429,6 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-  uploadBio,
   getUserPosts,
   updateProfilePic,
   getComments,

@@ -25,6 +25,10 @@ import {
   stopRecording,
 } from "../../reuseableFunctions/recording";
 // audio
+import {
+  onSpeechResults,
+  onSpeechStart,
+} from "../../reuseableFunctions/helpers";
 import Voice from "@react-native-voice/voice";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -57,8 +61,8 @@ export class Comment extends Component {
       parents: null,
     };
     try {
-      Voice.onSpeechResults = this.onSpeechResults.bind(this);
-      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+      Voice.onSpeechResults = onSpeechResults.bind(this);
+      Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
       console.log(err);
     }
@@ -73,8 +77,8 @@ export class Comment extends Component {
     this.mounted && this.setState({ results: e.value });
   };
 
-  componentWillUnmount = () => {
-    this.stopRecordingComment();
+  componentWillUnmount = async () => {
+    await this.stopRecordingComment();
     this.mounted = false;
   };
 
@@ -101,13 +105,19 @@ export class Comment extends Component {
   };
 
   stopRecordingComment = async () => {
-    const { recording } = this.state;
+    const { recording, results } = this.state;
     this.props.setRecording(false);
     console.log("Stopping recording..");
     if (!recording) {
+      Voice.stop();
       return;
     }
-    const uri = await stopRecording(recording);
+    let uri;
+    if (Platform.OS !== "web") {
+      uri = await stopRecording(recording, Voice);
+    } else {
+      uri = await stopRecording(recording);
+    }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -115,6 +125,7 @@ export class Comment extends Component {
         audioBlobs: {
           uri,
           finalDuration,
+          results,
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });

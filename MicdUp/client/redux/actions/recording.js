@@ -96,34 +96,36 @@ export const uploadRecording =
     }
   };
 
-export const uploadBio = (files, fileTypes) => async (dispatch) => {
-  try {
-    const res = await privateClient.mutate({
-      mutation: UPLOAD_BIO_MUTATION,
-      variables: {
-        files,
-        fileTypes,
-      },
-      fetchPolicy: "no-cache",
-    });
-    if (!res.data || !res.data.uploadBio) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
+export const uploadBio =
+  (files, fileTypes, speechToText) => async (dispatch) => {
+    try {
+      const res = await privateClient.mutate({
+        mutation: UPLOAD_BIO_MUTATION,
+        variables: {
+          files,
+          fileTypes,
+          speechToText,
+        },
+        fetchPolicy: "no-cache",
+      });
+      if (!res.data || !res.data.uploadBio) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      dispatch({
+        type: SET_BIO,
+        payload: { ...res.data.uploadBio },
+      });
+      return true;
+    } catch (err) {
+      console.log(err);
     }
-    dispatch({
-      type: SET_BIO,
-      payload: { ...res.data.uploadBio },
-    });
-    return true;
-  } catch (err) {
-    console.log(err);
-  }
-};
+  };
 export const getUserPosts = (userId, skipMult) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";

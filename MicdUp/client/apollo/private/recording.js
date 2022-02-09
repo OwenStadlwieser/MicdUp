@@ -29,10 +29,19 @@ const UPLOAD_RECORDING_MUTATION = gql`
   }
 `;
 const UPLOAD_BIO_MUTATION = gql`
-  mutation uploadBio($files: String!, $fileTypes: String!) {
-    uploadBio(files: $files, fileTypes: $fileTypes) {
+  mutation uploadBio(
+    $files: String!
+    $fileTypes: String!
+    $speechToText: [String]
+  ) {
+    uploadBio(
+      files: $files
+      fileTypes: $fileTypes
+      speechToText: $speechToText
+    ) {
       id
       signedUrl
+      speechToText
     }
   }
 `;

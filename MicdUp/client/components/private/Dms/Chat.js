@@ -32,7 +32,10 @@ import {
   startRecording,
   stopRecording,
 } from "../../../reuseableFunctions/recording";
-
+import {
+  onSpeechResults,
+  onSpeechStart,
+} from "../../../reuseableFunctions/helpers";
 const { width, height } = Dimensions.get("window");
 
 const barWidth = 5;
@@ -49,10 +52,11 @@ export class Chat extends Component {
       fetching: false,
       lastFetched: 0,
       soundLevels: [],
+      results: [],
     };
     try {
-      Voice.onSpeechResults = this.onSpeechResults.bind(this);
-      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+      Voice.onSpeechResults = onSpeechResults.bind(this);
+      Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
       console.log(err);
     }
@@ -60,12 +64,6 @@ export class Chat extends Component {
     this.colors = ["white", "red"];
     this.mounted = true;
   }
-  onSpeechStart = () => {
-    this.mounted && this.setState({ recognizing: true });
-  };
-  onSpeechResults = (e) => {
-    this.mounted && this.setState({ results: e.value });
-  };
 
   startRecordingChat = async () => {
     if (Platform.OS !== "web") {
@@ -78,7 +76,7 @@ export class Chat extends Component {
   };
 
   stopRecording = async () => {
-    const { recording } = this.state;
+    const { recording, results } = this.state;
     console.log("Stopping recording..");
     if (!recording) {
       return;
@@ -96,6 +94,7 @@ export class Chat extends Component {
         audioBlobs: {
           uri,
           finalDuration,
+          results,
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
@@ -104,6 +103,7 @@ export class Chat extends Component {
 
   componentWillUnmount = () => {
     this.stopRecording();
+    Voice.stop();
     this.mounted = false;
   };
 
@@ -308,6 +308,7 @@ export class Chat extends Component {
                 onPress={async () => {
                   let fileType;
                   const { socket, activeChatId } = this.props;
+                  const { results } = this.state;
                   const base64Url = await soundBlobToBase64(audioBlobs.uri);
                   if (base64Url != null) {
                     fileType = audioBlobs.type;
@@ -315,6 +316,7 @@ export class Chat extends Component {
                       messageData: base64Url,
                       chatId: activeChatId,
                       fileType,
+                      speechToText: results,
                     });
                   } else {
                     console.log("error with blob");

@@ -23,8 +23,10 @@ import { FontAwesome5 } from "@expo/vector-icons";
 // styles
 import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
-import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
-import { Audio } from "expo-av";
+import {
+  onSpeechResults,
+  onSpeechStart,
+} from "../../../reuseableFunctions/helpers";
 import { startRecording } from "../../../reuseableFunctions/recording.native";
 // clips
 import Clips from "./Clips";
@@ -52,7 +54,7 @@ export class Create extends Component {
       results: [],
     };
     try {
-      Voice.onSpeechStart = this.onSpeechStart.bind(this);
+      Voice.onSpeechStart = onSpeechStart.bind(this);
       Voice.onSpeechEnd = () => {
         console.log("end");
       };
@@ -60,7 +62,7 @@ export class Create extends Component {
         // console.log(err);
         Voice.stop();
       };
-      Voice.onSpeechResults = this.onSpeechResults.bind(this);
+      Voice.onSpeechResults = onSpeechResults.bind(this);
     } catch (err) {
       console.log(err);
     }
@@ -85,36 +87,6 @@ export class Create extends Component {
   updateSubmitRecording = (submitRecording) => {
     this.mounted && this.setState({ submitRecording });
   };
-  onSpeechStart = () => {
-    console.log("started");
-    this.mounted && this.setState({ recognizing: true });
-  };
-  onSpeechResults = (e) => {
-    const { startTime, results } = this.state;
-    const { clips } = this.props;
-    console.log("here");
-    try {
-      const duration = clips.reduce(
-        (a, b) => a.finalDuration + b.finalDuration,
-        0
-      );
-      currentResults = results && results.length > 0 ? results : [];
-      const words = e.value[e.value.length - 1];
-      const mostRecentWord = words[words.length - 1];
-      this.mounted &&
-        this.setState({
-          results: [
-            ...currentResults,
-            {
-              word: mostRecentWord,
-              time: Date.now() - startTime + duration,
-            },
-          ],
-        });
-    } catch (err) {
-      console.log("speech recognition", err);
-    }
-  };
 
   startRecording = async () => {
     const recording = await startRecording(Voice, () => {});
@@ -137,7 +109,6 @@ export class Create extends Component {
     } catch (err) {
       console.log(err);
     }
-    console.log(results);
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
