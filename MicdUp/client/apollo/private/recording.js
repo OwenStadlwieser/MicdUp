@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { duplicateCommentsString } from "../../reuseableFunctions/helpers";
-import { postType } from "./types";
+import { postType, commentType } from "./types";
 const UPLOAD_RECORDING_MUTATION = gql`
   mutation createRecording(
     $files: [String!]
@@ -93,43 +93,9 @@ const GET_RECORDINGS_FROM_TAG_QUERY = gql`
 const GET_COMMENT_POST_QUERY = gql`
   query getComments($postId: ID!, $skipMult: Int!) {
     getComments(postId: $postId, skipMult: $skipMult) {
-      id
-      signedUrl
-      text
-      likes
-      repliesLength
-      isDeleted
-      isLikedByUser
-      owner {
-        id
-        user {
-          _id
-          userName
-        }
-        image {
-          id
-          signedUrl
-        }
-      }
+      ${commentType}
       allReplies {
-        id
-        text
-        repliesLength
-        signedUrl
-        isDeleted
-        likes
-        isLikedByUser
-        owner {
-          id
-          user {
-            _id
-            userName
-          }
-          image {
-            id
-            signedUrl
-          }
-        }
+        ${commentType}
       }
     }
   }
@@ -142,6 +108,7 @@ const COMMENT_POST_MUTATION = (duplication) => {
       $files: String
       $fileTypes: String
       $text: String
+      $speechToText: [String]
     ) {
       commentToPost(
         postId: $postId
@@ -149,24 +116,9 @@ const COMMENT_POST_MUTATION = (duplication) => {
         files: $files
         fileTypes: $fileTypes
         text: $text
+        speechToText: $speechToText
       ) {
-        id
-        signedUrl
-        text
-        likes
-        isLikedByUser
-        repliesLength
-        owner {
-          id
-          user {
-            _id
-            userName
-          }
-          image {
-            id
-            signedUrl
-          }
-        }
+        ${commentType}
         ${duplicateCommentsString(duplication)}
       }
     }

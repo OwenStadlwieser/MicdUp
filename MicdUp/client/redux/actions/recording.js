@@ -255,7 +255,8 @@ export const getComments =
     }
   };
 export const commentPost =
-  (postId, replyingTo, files, fileTypes, text, parents) => async (dispatch) => {
+  (postId, replyingTo, files, fileTypes, text, speechToText, parents) =>
+  async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
       const res = await privateClient.mutate({
@@ -266,6 +267,7 @@ export const commentPost =
           files,
           fileTypes,
           text,
+          speechToText,
         },
         fetchPolicy,
       });

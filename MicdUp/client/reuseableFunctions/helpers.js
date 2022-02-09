@@ -103,6 +103,10 @@ const duplicateCommentsString = (n) => {
       ${tabString}isDeleted
       ${tabString}likes
       ${tabString}isLikedByUser
+      ${tabString}speechToText{
+        ${tabString}word
+        ${tabString}time
+      ${tabString}}
       ${tabString}owner {
         ${tabString}id
         ${tabString}user {

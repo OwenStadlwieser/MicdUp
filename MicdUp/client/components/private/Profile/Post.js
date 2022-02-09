@@ -63,7 +63,17 @@ export class Post extends Component {
         <Text style={styles.postTitle}>
           {post.title ? post.title : "Untitled"}
         </Text>
-        <SpeechToText fontSize={24} post={post} textStyle={{}} />
+        <SpeechToText
+          containerStyle={[
+            { flexDirection: "row" },
+            { position: "absolute" },
+            { left: 20 },
+            { top: 40 },
+          ]}
+          fontSize={24}
+          post={post}
+          textStyle={{}}
+        />
         <Comment
           isUserProfile={isUserProfile}
           containerStyle={{}}

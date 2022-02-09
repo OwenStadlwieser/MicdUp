@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import PlayButton from "./PlayButton";
 import Like from "./Like";
+import SpeechToText from "./SpeechToText";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -109,7 +110,7 @@ export class Comment extends Component {
     this.props.setRecording(false);
     console.log("Stopping recording..");
     if (!recording) {
-      Voice.stop();
+      Platform.OS !== "web" && Voice.stop();
       return;
     }
     let uri;
@@ -159,7 +160,7 @@ export class Comment extends Component {
           style={{
             paddingTop: height * 0.01,
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "space-evenly",
             paddingHorizontal: 15,
             flexDirection: "row",
             borderLeftColor: "#1A3561",
@@ -170,7 +171,7 @@ export class Comment extends Component {
             backgroundColor: index >= 12 ? "white" : "transparent",
           }}
         >
-          <View>
+          <View style={{ flex: 2 }}>
             <Text style={styles.blackText}>
               @
               {comment && comment.owner && comment.owner.user
@@ -198,8 +199,18 @@ export class Comment extends Component {
               />
             </TouchableHighlight>
           </View>
+          <View style={{ flex: 7, position: "relative", overflow: "hidden" }}>
+            {comment.speechToText && comment.speechToText[0] && (
+              <SpeechToText
+                containerStyle={[{ flexDirection: "row" }]}
+                fontSize={24}
+                post={comment}
+                textStyle={{}}
+              />
+            )}
+          </View>
           {comment.signedUrl || comment.text ? (
-            <View style={styles.commentPlayContainer}>
+            <View style={{ flex: 1 }}>
               {comment.signedUrl && (
                 <Like
                   post={comment}
@@ -237,7 +248,7 @@ export class Comment extends Component {
                 )}
             </View>
           ) : (
-            <View style={styles.commentTextContainer}>
+            <View style={{ flex: 1 }}>
               <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
@@ -397,6 +408,7 @@ export class Comment extends Component {
               {(text || audioBlobs) && (
                 <TouchableOpacity
                   onPress={async () => {
+                    const { results } = this.state;
                     let fileType;
                     const base64Url = await soundBlobToBase64(audioBlobs.uri);
                     if (base64Url != null) {
@@ -410,6 +422,7 @@ export class Comment extends Component {
                       base64Url,
                       fileType,
                       text,
+                      [JSON.stringify(results)],
                       parents
                     );
                   }}

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { duplicateCommentsString } from "../../reuseableFunctions/helpers";
-
+import { commentType } from "./types";
 const SHOW_MORE_REPLIES = (duplication) => {
   return gql`
       query getReplies(
@@ -9,25 +9,7 @@ const SHOW_MORE_REPLIES = (duplication) => {
         getReplies(
           commentId: $commentId
         ) {
-          id
-          ultimateParent
-          isDeleted
-          signedUrl
-          text
-          likes
-          isLikedByUser
-          repliesLength
-          owner {
-            id
-            user {
-              _id
-              userName
-            }
-            image {
-              id
-              signedUrl
-            }
-          }
+          ${commentType}
           ${duplicateCommentsString(duplication)}
         }
       }
@@ -42,25 +24,7 @@ const DELETE_COMMENT_MUTATION = (duplication) => {
         deleteComment(
           commentId: $commentId
         ) {
-          id
-          ultimateParent
-          isDeleted
-          signedUrl
-          text
-          likes
-          isLikedByUser
-          repliesLength
-          owner {
-            id
-            user {
-              _id
-              userName
-            }
-            image {
-              id
-              signedUrl
-            }
-          }
+          ${commentType}
           ${duplicateCommentsString(duplication)}
         }
       }
@@ -75,25 +39,7 @@ const LIKE_COMMENT_MUTATION = (duplication) => {
         likeComment(
           commentId: $commentId
         ) {
-          id
-          ultimateParent
-          isDeleted
-          signedUrl
-          text
-          likes
-          isLikedByUser
-          repliesLength
-          owner {
-            id
-            user {
-              _id
-              userName
-            }
-            image {
-              id
-              signedUrl
-            }
-          }
+          ${commentType}
           ${duplicateCommentsString(duplication)}
         }
       }

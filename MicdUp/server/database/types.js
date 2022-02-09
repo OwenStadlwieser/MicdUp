@@ -194,6 +194,17 @@ const CommentWithoutReplyType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "CommentWithoutReplySpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
+    },
     text: { type: GraphQLString },
     signedUrl: {
       type: GraphQLString,
@@ -256,6 +267,17 @@ const CommentType = new GraphQLObjectType({
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
+    },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "CommentSpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
     },
     isDeleted: { type: GraphQLBoolean },
     replies: {

@@ -13,7 +13,6 @@ export class SpeechToText extends Component {
       MainPosition: [
         styles.main,
         { width: screenWidth },
-        { height: screenHeight },
         { marginTop: 0 },
         { marginLeft: 0 },
       ],
@@ -48,8 +47,8 @@ export class SpeechToText extends Component {
     const { index } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
-    let startIndex = index + 1;
-    let endIndex = index + 1;
+    let startIndex = index;
+    let endIndex = index;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -73,8 +72,8 @@ export class SpeechToText extends Component {
     const { fontSpecs, index, count } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
-    let startIndex = index + 1;
-    let endIndex = index + 1;
+    let startIndex = index;
+    let endIndex = index;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -102,6 +101,7 @@ export class SpeechToText extends Component {
 
   componentDidMount = async () => {
     const { fontSize, post } = this.props;
+    console.log(post);
     this.mounted &&
       this.setState({
         fontSpecs: {
@@ -115,6 +115,7 @@ export class SpeechToText extends Component {
       Platform.OS === "web"
         ? this.getNextLineOfTextWeb()
         : await this.getNextLineOfText();
+    console.log(words);
     this.mounted && this.setState({ words });
   };
 
@@ -242,17 +243,14 @@ export class SpeechToText extends Component {
   };
   render() {
     const { index, words } = this.state;
-    const { fontSize } = this.props;
+    const { fontSize, containerStyle } = this.props;
     try {
       return (
         <Animated.View
           style={[
             this.state.MainPosition,
             { transform: [{ translateX: this.animatedLeftMargin }] },
-            { flexDirection: "row" },
-            { position: "absolute" },
-            { left: 20 },
-            { top: 40 },
+            ...containerStyle,
           ]}
         >
           {Platform.OS === "web" && words && words.length ? (
@@ -266,6 +264,7 @@ export class SpeechToText extends Component {
               }}
             >
               {words.map((p, i) => {
+                console.log(p.word);
                 return p.word + " ";
               })}
             </Text>

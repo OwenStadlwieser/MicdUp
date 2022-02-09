@@ -323,15 +323,22 @@ const commentToPost = {
     files: { type: GraphQLString },
     fileTypes: { type: GraphQLString },
     text: { type: GraphQLString },
+    speechToText: { type: new GraphQLList(GraphQLString) },
   },
   async resolve(
     parent,
-    { postId, replyingTo, files, fileTypes, text },
+    { postId, replyingTo, files, fileTypes, text, speechToText },
     context
   ) {
     // check if already liked and unlike
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
+    }
+    try {
+      speechToText = speechToText.map((speech) => JSON.parse(speech));
+      speechToText = [].concat.apply([], speechToText);
+    } catch {
+      speechToText = [];
     }
     let comment;
     if (text) {
@@ -341,6 +348,7 @@ const commentToPost = {
       comment = new Comment({
         owner: context.profile.id,
         fileExtension: ".mp4",
+        speechToText,
       });
       var fileNames = [];
       var command = ffmpeg();
