@@ -3,8 +3,13 @@ import { connect } from "react-redux";
 // components
 import PlayButton from "../../reuseable/PlayButton";
 import Like from "../../reuseable/Like";
-import Comment from "../../reuseable/Comment";
-import { View, Text, TouchableOpacity } from "react-native";
+import SpeechToText from "../../reuseable/SpeechToText";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
 // styles
 import { FontAwesome } from "@expo/vector-icons";
 import { styles } from "../../../styles/Styles";
@@ -14,7 +19,8 @@ import { Feather } from "@expo/vector-icons";
 //redux
 import { deletePost } from "../../../redux/actions/recording";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
-import SpeechToText from "../../reuseable/SpeechToText";
+import { showComments } from "../../../redux/actions/display";
+
 export class Post extends Component {
   constructor() {
     super();
@@ -34,18 +40,7 @@ export class Post extends Component {
   componentDidMount = () => {};
 
   render() {
-    const {
-      post,
-      currentSound,
-      setCommentPosts,
-      removeCommentPosts,
-      index,
-      isUserProfile,
-      playingId,
-      isPause,
-      isRecordingComment,
-    } = this.props;
-    const { commentsShowing } = this.state;
+    const { post, index, isUserProfile, playingId, isPause } = this.props;
     return (
       <TouchableOpacity
         onPress={async () => {
@@ -55,36 +50,29 @@ export class Post extends Component {
             await this.props.changeSound(post, post.signedUrl);
           }
         }}
-        style={
-          commentsShowing ? styles.higherPostContainer : styles.postContainer
-        }
+        style={styles.postContainer}
         key={post.id}
       >
         <Text style={styles.postTitle}>
           {post.title ? post.title : "Untitled"}
         </Text>
-        <SpeechToText fontSize={24} post={post} textStyle={{}} />
-        <Comment
-          isUserProfile={isUserProfile}
-          containerStyle={{}}
-          setCommentPosts={setCommentPosts}
-          removeCommentPosts={removeCommentPosts}
-          color={"#1A3561"}
-          currentPlayingId={currentSound}
+        <SpeechToText
+          containerStyle={[
+            { flexDirection: "row" },
+            { position: "absolute" },
+            { left: 20 },
+            { top: 40 },
+          ]}
+          fontSize={24}
           post={post}
-          isShowing={commentsShowing}
-          setCommentsShowing={this.setCommentsShowing.bind(this)}
-          index={index}
-          setRecording={this.props.setRecording}
-          isRecordingComment={isRecordingComment}
+          textStyle={{}}
         />
         <View style={styles.textAndPlayButtonContainer}>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />
             <TouchableOpacity
               onPress={() => {
-                setCommentPosts(post, index);
-                this.mounted && this.setState({ commentsShowing: true });
+                this.props.showComments(index);
               }}
             >
               <FontAwesome name="comment" size={24} color="black" />
@@ -118,4 +106,5 @@ export default connect(mapStateToProps, {
   deletePost,
   changeSound,
   pauseSound,
+  showComments,
 })(Post);

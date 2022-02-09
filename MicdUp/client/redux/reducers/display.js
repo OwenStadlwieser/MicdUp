@@ -9,6 +9,10 @@ import {
   VIEW_PROFILE_SEARCH,
   UPDATE_FOLLOWER_COUNT,
   UPDATE_CURRENT_RECORDINGS,
+  RECEIVE_NOTIF,
+  HIDE_NOTIF,
+  SHOW_COMMENTS,
+  HIDE_COMMENTS,
 } from "../types";
 
 const initialState = {
@@ -22,6 +26,9 @@ const initialState = {
   keyForSearch: Math.random(),
   searchViewingProfile: false,
   viewingPostsSearch: [],
+  receiveNotif: false,
+  showingComments: false,
+  postIndex: -1,
 };
 
 export default function (state = { ...initialState }, action) {
@@ -38,6 +45,27 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         viewingPostsSearch: payload,
+      };
+    case SHOW_COMMENTS:
+      return {
+        ...state,
+        postIndex: payload,
+        showingComments: true,
+      };
+    case HIDE_COMMENTS:
+      return {
+        ...state,
+        showingComments: false,
+      };
+    case RECEIVE_NOTIF:
+      return {
+        ...state,
+        receiveNotif: true,
+      };
+    case HIDE_NOTIF:
+      return {
+        ...state,
+        receiveNotif: false,
       };
     case CHANGE_LOGIN:
       return {

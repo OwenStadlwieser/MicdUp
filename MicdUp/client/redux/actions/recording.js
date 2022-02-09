@@ -23,7 +23,7 @@ import {
   GET_COMMENT_POST_QUERY,
   GET_RECORDINGS_FROM_TAG_QUERY,
 } from "../../apollo/private/recording";
-import { client } from "../../apollo/client";
+import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
@@ -60,7 +60,7 @@ export const uploadRecording =
   ) =>
   async (dispatch) => {
     try {
-      const res = await client.mutate({
+      const res = await privateClient.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
           files,
@@ -96,38 +96,40 @@ export const uploadRecording =
     }
   };
 
-export const uploadBio = (files, fileTypes) => async (dispatch) => {
-  try {
-    const res = await client.mutate({
-      mutation: UPLOAD_BIO_MUTATION,
-      variables: {
-        files,
-        fileTypes,
-      },
-      fetchPolicy: "no-cache",
-    });
-    if (!res.data || !res.data.uploadBio) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
+export const uploadBio =
+  (files, fileTypes, speechToText) => async (dispatch) => {
+    try {
+      const res = await privateClient.mutate({
+        mutation: UPLOAD_BIO_MUTATION,
+        variables: {
+          files,
+          fileTypes,
+          speechToText,
+        },
+        fetchPolicy: "no-cache",
+      });
+      if (!res.data || !res.data.uploadBio) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      dispatch({
+        type: SET_BIO,
+        payload: { ...res.data.uploadBio },
+      });
+      return true;
+    } catch (err) {
+      console.log(err);
     }
-    dispatch({
-      type: SET_BIO,
-      payload: { ...res.data.uploadBio },
-    });
-    return true;
-  } catch (err) {
-    console.log(err);
-  }
-};
+  };
 export const getUserPosts = (userId, skipMult) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.query({
+    const res = await publicClient.query({
       query: GET_USER_POSTS_QUERY,
       variables: {
         userId,
@@ -164,7 +166,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
 export const likePost = (postId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: LIKE_POST_MUTATION,
       variables: {
         postId,
@@ -193,7 +195,7 @@ export const likePost = (postId) => async (dispatch) => {
 export const deletePost = (postId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: DELETE_POST_MUTATION,
       variables: {
         postId,
@@ -226,7 +228,7 @@ export const getComments =
   async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
-      const res = await client.query({
+      const res = await publicClient.query({
         query: GET_COMMENT_POST_QUERY,
         variables: {
           postId,
@@ -253,10 +255,11 @@ export const getComments =
     }
   };
 export const commentPost =
-  (postId, replyingTo, files, fileTypes, text, parents) => async (dispatch) => {
+  (postId, replyingTo, files, fileTypes, text, speechToText, parents) =>
+  async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
-      const res = await client.mutate({
+      const res = await privateClient.mutate({
         mutation: COMMENT_POST_MUTATION(3),
         variables: {
           postId,
@@ -264,6 +267,7 @@ export const commentPost =
           files,
           fileTypes,
           text,
+          speechToText,
         },
         fetchPolicy,
       });
@@ -291,7 +295,7 @@ export const getRecordingsFromTag =
   async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
-      const res = await client.query({
+      const res = await publicClient.query({
         query: GET_RECORDINGS_FROM_TAG_QUERY,
         variables: {
           searchTag,

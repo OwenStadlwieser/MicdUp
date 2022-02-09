@@ -1,26 +1,11 @@
 const { User } = require("../../models/User");
-const { UserType } = require("../../types");
+const { UserPublicType } = require("../../types");
 const { GraphQLList, GraphQLString, GraphQLInt } = require("graphql");
-const { MessageType } = require("../../types");
-const bcrypt = require("bcryptjs");
-
-const getUser = {
-  type: UserType,
-  args: {},
-  async resolve(parent, {}, context) {
-    try {
-      return context.user;
-    } catch (err) {}
-  },
-};
 
 const searchUsers = {
-  type: new GraphQLList(UserType),
+  type: new GraphQLList(UserPublicType),
   args: { searchTerm: { type: GraphQLString }, skipMult: { type: GraphQLInt } },
   async resolve(parent, { searchTerm, skipMult }, context) {
-    if (!context.user.id) {
-      return [];
-    }
     try {
       const size = 20;
       const res = await User.aggregate([
@@ -59,6 +44,5 @@ const searchUsers = {
 };
 
 module.exports = {
-  getUser,
   searchUsers,
 };

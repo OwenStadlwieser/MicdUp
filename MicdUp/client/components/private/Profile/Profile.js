@@ -22,12 +22,9 @@ import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
+import Comment from "../../reuseable/Comment";
 // redux
-import {
-  uploadBio,
-  getUserPosts,
-  getComments,
-} from "../../../redux/actions/recording";
+import { getUserPosts, getComments } from "../../../redux/actions/recording";
 import {
   updateProfilePic,
   followProfile,
@@ -35,7 +32,11 @@ import {
 import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
 // audio
-import { Audio } from "expo-av";
+import {
+  startRecording,
+  stopRecording,
+} from "../../../reuseableFunctions/recording";
+
 var { height, width } = Dimensions.get("window");
 const barWidth = 5;
 const barMargin = 1;
@@ -83,20 +84,6 @@ export class Profile extends Component {
     this.mounted && this.setState({ loading: false });
   }
 
-  setCommentPosts = async (post, index) => {
-    var { height, width } = Dimensions.get("window");
-    await this.props.getComments(post.id);
-    this.scrollView.scrollTo({
-      y:
-        (width > 1000 ? height * 0.25 : height * 0.14) * index +
-        height * 0.02 * index,
-    });
-  };
-
-  removeCommentPosts = (post) => {
-    this.mounted && this.setState({ commentPosts: [] });
-  };
-
   stopCurrentSound = async () => {
     const { playbackObject } = this.state;
     if (!playbackObject) return;
@@ -108,17 +95,7 @@ export class Profile extends Component {
 
   startRecording = async () => {
     try {
-      await this.stopCurrentSound();
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-        this.onRecordingStatusUpdate
-      );
+      const recording = await startRecording(null, () => {});
       this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
@@ -127,12 +104,17 @@ export class Profile extends Component {
   };
 
   stopRecordingBio = async () => {
-    const { recording } = this.state;
+    const { recording, results } = this.state;
     console.log("Stopping recording..");
-    try {
-      await recording.stopAndUnloadAsync();
-    } catch (err) {}
-    const uri = recording.getURI();
+    if (!recording) {
+      return;
+    }
+    let uri;
+    if (Platform.OS !== "web") {
+      uri = await stopRecording(recording, null);
+    } else {
+      uri = await stopRecording(recording);
+    }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -140,13 +122,17 @@ export class Profile extends Component {
         newBioRecording: {
           uri,
           finalDuration,
+          results,
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
     console.log("Recording stopped and stored at", uri);
   };
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = async () => {
+    await this.stopRecordingBio();
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
     const { getUserPosts, currentProfile, profile, posts } = this.props;
@@ -213,7 +199,15 @@ export class Profile extends Component {
       selectImage,
       isRecordingComment,
     } = this.state;
-    const { userName, profile, currentProfile, posts } = this.props;
+    const {
+      userName,
+      profile,
+      currentProfile,
+      posts,
+      postIndex,
+      showingComments,
+    } = this.props;
+    console.log(showingComments);
     if (!profile && !currentProfile) {
       return (
         <View>
@@ -223,7 +217,7 @@ export class Profile extends Component {
     }
     const isUserProfile =
       profile && currentProfile ? profile.id === currentProfile.id : true;
-
+    console.log(postIndex, posts[postIndex]);
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -239,7 +233,7 @@ export class Profile extends Component {
             setImage={this.setImage.bind(this)}
           />
         )}
-        {!settingsShown && isUserProfile && (
+        {!settingsShown && isUserProfile && !showingComments && (
           <Ionicons
             onPress={() => {
               this.mounted && this.setState({ settingsShown: true });
@@ -259,6 +253,23 @@ export class Profile extends Component {
               <View style={styles.refresh}>
                 <Text style={styles.nextButtonText}>Loading</Text>
               </View>
+            )}
+            {showingComments && (
+              <Comment
+                isUserProfile={isUserProfile}
+                containerStyle={{}}
+                color={"#1A3561"}
+                currentPlayingId={playingId}
+                post={posts[postIndex]}
+                setRecording={((val) => {
+                  this.mounted &&
+                    this.setState({
+                      recording: val,
+                      isRecordingComment: true,
+                    });
+                }).bind(this)}
+                isRecordingComment={isRecordingComment}
+              />
             )}
             <View style={styles.profileHeader}>
               <View style={styles.imageAndFollowing}>
@@ -353,21 +364,11 @@ export class Profile extends Component {
                       <Post
                         isRecordingComment={isRecordingComment}
                         isUserProfile={isUserProfile}
-                        setCommentPosts={this.setCommentPosts.bind(this)}
-                        removeCommentPosts={this.removeCommentPosts.bind(this)}
                         key={post.id}
                         post={post}
                         postArray={posts}
                         index={index}
-                        currentSound={playingId}
                         higherUp={false}
-                        setRecording={((val) => {
-                          this.mounted &&
-                            this.setState({
-                              recording: val,
-                              isRecordingComment: true,
-                            });
-                        }).bind(this)}
                       />
                     )
                 )}
@@ -427,10 +428,11 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,
+  postIndex: state.display.postIndex,
+  showingComments: state.display.showingComments,
 });
 
 export default connect(mapStateToProps, {
-  uploadBio,
   getUserPosts,
   updateProfilePic,
   getComments,

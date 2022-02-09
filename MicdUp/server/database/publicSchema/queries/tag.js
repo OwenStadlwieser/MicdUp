@@ -1,6 +1,6 @@
 const { Tag } = require("../../models/Tag");
 const { Prompt } = require("../../models/Prompt");
-const { UserType, TagsType, PromptsType } = require("../../types");
+const { TagsType, PromptsType } = require("../../types");
 const { GraphQLList, GraphQLString } = require("graphql");
 
 const searchTags = {

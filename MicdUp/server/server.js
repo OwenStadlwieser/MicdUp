@@ -10,6 +10,7 @@ const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const jwt = require("jsonwebtoken");
 const publicSchema = require("./database/publicSchema/index");
+const privateSchema = require("./database/privateSchema/index");
 const { User } = require("./database/models/User");
 const { Profile } = require("./database/models/Profile");
 const { Filter } = require("./database/models/Filter");
@@ -82,7 +83,11 @@ app.use(async (req, res, next) => {
   req.host = req.get("host");
   next();
 });
-
+app.use((req, res, next) => {
+  if (req.isAuthenticated)
+    app.use("/private", graphqlHTTP({ schema: privateSchema, graphiql: true }));
+  next();
+});
 // FIXME: TEST
 app.get("/hello", bodyParser.json(), async (req, res) => {
   res.set("Content-Type", "text/html");
@@ -90,8 +95,7 @@ app.get("/hello", bodyParser.json(), async (req, res) => {
   return;
 });
 
-app.use("/", graphqlHTTP({ schema: publicSchema, graphiql: true }));
-
+app.use("/public", graphqlHTTP({ schema: publicSchema, graphiql: true }));
 mongoose
   .connect(db, {
     useNewUrlParser: true,

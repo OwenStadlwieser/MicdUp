@@ -18,8 +18,8 @@ const {
 } = graphql;
 const { getFile } = require("../utils/awsS3");
 
-const UserType = new GraphQLObjectType({
-  name: "User",
+const UserPrivateType = new GraphQLObjectType({
+  name: "UserPrivateType",
   fields: () => ({
     _id: { type: GraphQLID },
     id: {
@@ -34,7 +34,7 @@ const UserType = new GraphQLObjectType({
     dob: { type: GraphQLFloat },
     dateCreated: { type: GraphQLFloat },
     profile: {
-      type: ProfileType,
+      type: ProfilePrivateType,
       async resolve(parent) {
         return await Profile.findById(parent.profile);
       },
@@ -48,8 +48,28 @@ const UserType = new GraphQLObjectType({
   }),
 });
 
-const ProfileType = new GraphQLObjectType({
-  name: "Profile",
+const UserPublicType = new GraphQLObjectType({
+  name: "UserPublicType",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent._id;
+      },
+    },
+    userName: { type: GraphQLString },
+    profile: {
+      type: ProfilePublicType,
+      async resolve(parent) {
+        return await Profile.findById(parent.profile);
+      },
+    },
+  }),
+});
+
+const ProfilePrivateType = new GraphQLObjectType({
+  name: "ProfilePrivateType",
   fields: () => ({
     id: {
       type: GraphQLID,
@@ -78,7 +98,7 @@ const ProfileType = new GraphQLObjectType({
       },
     },
     user: {
-      type: UserType,
+      type: UserPrivateType,
       async resolve(parent) {
         return await User.findById(parent.user);
       },
@@ -98,6 +118,65 @@ const ProfileType = new GraphQLObjectType({
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
+        const index = parent.followers.get(context.profile.id);
+        return index === "1";
+      },
+    },
+  }),
+});
+
+const ProfilePublicType = new GraphQLObjectType({
+  name: "ProfilePublicType",
+  fields: () => ({
+    id: {
+      type: GraphQLID,
+      resolve(parent) {
+        return parent.id;
+      },
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      async resolve(parent) {
+        return await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+    bio: {
+      type: FileType,
+      async resolve(parent) {
+        const res = await File.findOne({ _id: parent.bio });
+        return res;
+      },
+    },
+    image: {
+      type: FileType,
+      async resolve(parent) {
+        const res = await File.findOne({ _id: parent.image });
+        return res;
+      },
+    },
+    user: {
+      type: UserPublicType,
+      async resolve(parent) {
+        return await User.findById(parent.user);
+      },
+    },
+    followingCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.following.keys()).length;
+      },
+    },
+    followersCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.followers.keys()).length;
+      },
+    },
+    isFollowedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
         return index === "1";
       },
@@ -110,10 +189,21 @@ const CommentWithoutReplyType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
+    },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "CommentWithoutReplySpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
     },
     text: { type: GraphQLString },
     signedUrl: {
@@ -143,7 +233,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
       },
     },
     likers: {
-      type: new GraphQLList(ProfileType),
+      type: new GraphQLList(ProfilePublicType),
       async resolve(parent) {
         return await Profile.find({ _id: { $in: parent.likers } });
       },
@@ -158,6 +248,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -172,10 +263,21 @@ const CommentType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
+    },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "CommentSpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
     },
     isDeleted: { type: GraphQLBoolean },
     replies: {
@@ -230,7 +332,7 @@ const CommentType = new GraphQLObjectType({
       },
     },
     likers: {
-      type: new GraphQLList(ProfileType),
+      type: new GraphQLList(ProfilePublicType),
       async resolve(parent) {
         return await Profile.find({ _id: { $in: parent.likers } });
       },
@@ -245,6 +347,7 @@ const CommentType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -265,7 +368,7 @@ const PostType = new GraphQLObjectType({
     },
     title: { type: GraphQLString },
     owner: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
@@ -273,7 +376,7 @@ const PostType = new GraphQLObjectType({
     speechToText: {
       type: new GraphQLList(
         new GraphQLObjectType({
-          name: "postType",
+          name: "PostSpeech",
           fields: () => ({
             word: { type: GraphQLString },
             time: { type: GraphQLFloat },
@@ -315,7 +418,7 @@ const PostType = new GraphQLObjectType({
       },
     },
     likers: {
-      type: new GraphQLList(ProfileType),
+      type: new GraphQLList(ProfilePublicType),
       async resolve(parent) {
         return await Profile.find({ _id: { $in: parent.likers } });
       },
@@ -336,6 +439,7 @@ const PostType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         const index = parent.likers.findIndex((id) => {
+          if (!context.profile || !context.profile.id) return false;
           return id.toString() === context.profile.id;
         });
         return index > -1;
@@ -350,13 +454,13 @@ const ChatType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     creator: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.creator);
       },
     },
     members: {
-      type: new GraphQLList(ProfileType),
+      type: new GraphQLList(ProfilePublicType),
       async resolve(parent) {
         return await Profile.find({ _id: { $in: parent.members } });
       },
@@ -380,7 +484,7 @@ const ChatMessageType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
@@ -393,6 +497,7 @@ const ChatMessageType = new GraphQLObjectType({
       resolve(parent, args, context, info) {
         // FIXME: unneeded logic
         parent.likers = parent.likers ? parent.likers : new Map();
+        if (!context.profile || !context.profile.id) return false;
         const index = parent.likers.get(context.profile.id);
         return index === "1";
       },
@@ -486,10 +591,21 @@ const FileType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     owner: {
-      type: ProfileType,
+      type: ProfilePublicType,
       async resolve(parent) {
         return await Profile.findById(parent.owner);
       },
+    },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "FileSpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
     },
     signedUrl: {
       type: GraphQLString,
@@ -584,14 +700,16 @@ const PromptsType = new GraphQLObjectType({
 });
 
 module.exports = {
-  UserType,
+  UserPublicType,
+  UserPrivateType,
   MessageType,
   PostType,
   TagsType,
   FileType,
   PromptsType,
   CommentType,
-  ProfileType,
+  ProfilePrivateType,
+  ProfilePublicType,
   ChatType,
   ChatMessageType,
   NotifType,

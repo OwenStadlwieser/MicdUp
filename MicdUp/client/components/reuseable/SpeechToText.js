@@ -13,7 +13,6 @@ export class SpeechToText extends Component {
       MainPosition: [
         styles.main,
         { width: screenWidth },
-        { height: screenHeight },
         { marginTop: 0 },
         { marginLeft: 0 },
       ],
@@ -48,8 +47,8 @@ export class SpeechToText extends Component {
     const { index } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
-    let startIndex = index + 1;
-    let endIndex = index + 1;
+    let startIndex = index;
+    let endIndex = index;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -73,8 +72,8 @@ export class SpeechToText extends Component {
     const { fontSpecs, index, count } = this.state;
     const { post } = this.props;
     let screenWidth = Dimensions.get("window").width;
-    let startIndex = index + 1;
-    let endIndex = index + 1;
+    let startIndex = index;
+    let endIndex = index;
     if (
       !post.speechToText ||
       post.speechToText.length === 0 ||
@@ -134,7 +133,6 @@ export class SpeechToText extends Component {
         });
         size = size.width;
       } else size = this.getTextWidth(post.speechToText[index + 1].word + " ");
-      console.log(adjustment, adjustment + size);
       Animated.timing(this.animatedLeftMargin, {
         toValue: -1 * (adjustment + size),
         duration:
@@ -207,8 +205,10 @@ export class SpeechToText extends Component {
       post.speechToText[index].time < time
     ) {
       if (!playing) this.mounted && this.setState({ playing: true });
-      lastIndex !== index && this.SlidePane();
-      this.mounted && this.setState({ lastIndex: index });
+      lastIndex !== index &&
+        this.SlidePane() &&
+        this.mounted &&
+        this.setState({ lastIndex: index });
     } else if (
       prevProps.currentPlayingSound &&
       prevProps.post &&
@@ -240,17 +240,14 @@ export class SpeechToText extends Component {
   };
   render() {
     const { index, words } = this.state;
-    const { fontSize } = this.props;
+    const { fontSize, containerStyle } = this.props;
     try {
       return (
         <Animated.View
           style={[
             this.state.MainPosition,
             { transform: [{ translateX: this.animatedLeftMargin }] },
-            { flexDirection: "row" },
-            { position: "absolute" },
-            { left: 20 },
-            { top: 40 },
+            ...containerStyle,
           ]}
         >
           {Platform.OS === "web" && words && words.length ? (
@@ -271,14 +268,7 @@ export class SpeechToText extends Component {
             words &&
             words.length &&
             words.map((p, i) => (
-              <Text
-                style={
-                  index === 0
-                    ? { color: "#6FF6fff", fontSize: fontSize }
-                    : { fontSize }
-                }
-                key={i}
-              >
+              <Text style={{ fontSize }} key={i}>
                 {p.word}{" "}
               </Text>
             ))

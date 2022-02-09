@@ -9,7 +9,6 @@ import {
   Dimensions,
   View,
 } from "react-native";
-import onClickOutside from "react-onclickoutside";
 import { styles } from "../../styles/Styles";
 export class DropDown extends Component {
   constructor() {
@@ -77,4 +76,4 @@ export class DropDown extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(onClickOutside(DropDown));
+export default connect(mapStateToProps, {})(DropDown);

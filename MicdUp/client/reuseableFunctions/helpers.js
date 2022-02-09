@@ -103,6 +103,10 @@ const duplicateCommentsString = (n) => {
       ${tabString}isDeleted
       ${tabString}likes
       ${tabString}isLikedByUser
+      ${tabString}speechToText{
+        ${tabString}word
+        ${tabString}time
+      ${tabString}}
       ${tabString}owner {
         ${tabString}id
         ${tabString}user {
@@ -159,6 +163,34 @@ const soundBlobToBase64 = async (uri) => {
   return base64Url;
 };
 
+function onSpeechStart() {
+  this.mounted && this.setState({ recognizing: true });
+}
+function onSpeechResults(e) {
+  const { startTime, results } = this.state;
+  const { clips } = this.props;
+  try {
+    const duration = clips.reduce(
+      (a, b) => a.finalDuration + b.finalDuration,
+      0
+    );
+    currentResults = results && results.length > 0 ? results : [];
+    const words = e.value[e.value.length - 1];
+    const mostRecentWord = words[words.length - 1];
+    this.mounted &&
+      this.setState({
+        results: [
+          ...currentResults,
+          {
+            word: mostRecentWord,
+            time: Date.now() - startTime + duration,
+          },
+        ],
+      });
+  } catch (err) {
+    console.log("speech recognition", err);
+  }
+}
 export {
   storeData,
   getData,
@@ -167,5 +199,7 @@ export {
   playSound,
   soundBlobToBase64,
   duplicateCommentsString,
-  duplicateNotifsString
+  duplicateNotifsString,
+  onSpeechResults,
+  onSpeechStart,
 };

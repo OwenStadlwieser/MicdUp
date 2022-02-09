@@ -13,7 +13,7 @@ const {
 } = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
-} = require("../database/publicSchema/mutations/recording");
+} = require("../database/privateSchema/mutations/recording");
 var ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;

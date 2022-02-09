@@ -23,6 +23,16 @@ const fileSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    speechToText: [
+      {
+        word: {
+          type: String,
+        },
+        time: {
+          type: Number,
+        },
+      },
+    ],
   },
   options
 );

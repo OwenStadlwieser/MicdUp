@@ -1,5 +1,5 @@
 import { UPDATE_PROFILE_PIC, UPDATE_FOLLOWER_COUNT } from "../types";
-import { client } from "../../apollo/client";
+import { privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
 import {
   UPDATE_PROFILE_PIC_MUTATION,
@@ -8,7 +8,7 @@ import {
 
 export const followProfile = (profileId) => async (dispatch) => {
   try {
-    const res = await client.mutate({
+    const res = await privateClient.mutate({
       mutation: FOLLOW_PROFILE_MUTATION,
       variables: {
         profileId,
@@ -39,7 +39,7 @@ export const updateProfilePic =
         type: UPDATE_PROFILE_PIC,
         payload: { signedUrl: file },
       });
-      const res = await client.mutate({
+      const res = await privateClient.mutate({
         mutation: UPDATE_PROFILE_PIC_MUTATION,
         variables: {
           file: base64,

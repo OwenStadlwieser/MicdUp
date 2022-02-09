@@ -52,6 +52,16 @@ const commentSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  speechToText: [
+    {
+      word: {
+        type: String,
+      },
+      time: {
+        type: Number,
+      },
+    },
+  ],
 });
 
 commentSchema.pre("save", async function (next) {
@@ -59,6 +69,7 @@ commentSchema.pre("save", async function (next) {
     this.fileExtension = "";
     this.text = "";
     this.signedUrl = "";
+    this.speechToText = "";
   }
   next();
 });
