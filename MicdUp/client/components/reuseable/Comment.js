@@ -20,7 +20,6 @@ import SpeechToText from "./SpeechToText";
 import { styles } from "../../styles/Styles";
 // helpers
 import { soundBlobToBase64 } from "../../reuseableFunctions/helpers";
-import onClickOutside from "react-onclickoutside";
 import {
   startRecording,
   stopRecording,
@@ -314,13 +313,6 @@ export class Comment extends Component {
     );
   }
 
-  handleClickOutside = async (evt) => {
-    await this.stopRecordingComment();
-    this.props.removeCommentPosts();
-    this.props.setCommentsShowing(false);
-    this.mounted && this.setState({ isShowing: false });
-  };
-
   render() {
     const { post, isShowing } = this.props;
     const {
@@ -445,4 +437,4 @@ export default connect(mapStateToProps, {
   updateCommentDisplay,
   updateComments,
   deleteComment,
-})(onClickOutside(Comment));
+})(Comment);

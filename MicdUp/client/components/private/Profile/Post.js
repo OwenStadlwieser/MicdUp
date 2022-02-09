@@ -79,28 +79,31 @@ export class Post extends Component {
           post={post}
           textStyle={{}}
         />
-        <TouchableOpacity
-          onPress={(e) => {
-            console.log(e);
-            e.stopPropagation();
-          }}
-          style={styles.commentParent}
-        >
-          <Comment
-            isUserProfile={isUserProfile}
-            containerStyle={{}}
-            setCommentPosts={setCommentPosts}
-            removeCommentPosts={removeCommentPosts}
-            color={"#1A3561"}
-            currentPlayingId={currentSound}
-            post={post}
-            isShowing={commentsShowing}
-            setCommentsShowing={this.setCommentsShowing.bind(this)}
-            index={index}
-            setRecording={this.props.setRecording}
-            isRecordingComment={isRecordingComment}
-          />
-        </TouchableOpacity>
+        {commentsShowing && (
+          <TouchableOpacity
+            onPress={(e) => {
+              console.log(e);
+              this.mounted && this.setState({ commentsShowing: false });
+              e.stopPropagation();
+            }}
+            style={styles.commentParent}
+          >
+            <Comment
+              isUserProfile={isUserProfile}
+              containerStyle={{}}
+              setCommentPosts={setCommentPosts}
+              removeCommentPosts={removeCommentPosts}
+              color={"#1A3561"}
+              currentPlayingId={currentSound}
+              post={post}
+              isShowing={commentsShowing}
+              setCommentsShowing={this.setCommentsShowing.bind(this)}
+              index={index}
+              setRecording={this.props.setRecording}
+              isRecordingComment={isRecordingComment}
+            />
+          </TouchableOpacity>
+        )}
         <View style={styles.textAndPlayButtonContainer}>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />
