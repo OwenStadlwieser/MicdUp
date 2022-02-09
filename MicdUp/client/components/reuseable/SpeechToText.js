@@ -207,8 +207,10 @@ export class SpeechToText extends Component {
       post.speechToText[index].time < time
     ) {
       if (!playing) this.mounted && this.setState({ playing: true });
-      lastIndex !== index && this.SlidePane();
-      this.mounted && this.setState({ lastIndex: index });
+      lastIndex !== index &&
+        this.SlidePane() &&
+        this.mounted &&
+        this.setState({ lastIndex: index });
     } else if (
       prevProps.currentPlayingSound &&
       prevProps.post &&
