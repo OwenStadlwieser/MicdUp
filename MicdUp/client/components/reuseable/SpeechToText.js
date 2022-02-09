@@ -268,14 +268,7 @@ export class SpeechToText extends Component {
             words &&
             words.length &&
             words.map((p, i) => (
-              <Text
-                style={
-                  index === 0
-                    ? { color: "#6FF6fff", fontSize: fontSize }
-                    : { fontSize }
-                }
-                key={i}
-              >
+              <Text style={{ fontSize }} key={i}>
                 {p.word}{" "}
               </Text>
             ))
