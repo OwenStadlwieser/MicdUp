@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
 import Modal from "react-native-modal";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 // icons
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
