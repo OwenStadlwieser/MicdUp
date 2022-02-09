@@ -36,14 +36,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 // redux
-import { commentPost } from "../../redux/actions/recording";
+import { commentPost, getComments } from "../../redux/actions/recording";
 import {
   getReplies,
   updateCommentDisplay,
   updateComments,
   deleteComment,
 } from "../../redux/actions/comment";
+import { hideComments } from "../../redux/actions/display";
 
 const { height } = Dimensions.get("window");
 export class Comment extends Component {
@@ -82,7 +84,9 @@ export class Comment extends Component {
     this.mounted = false;
   };
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    const { post } = this.props;
+    await this.props.getComments(post.id);
     const interval = setInterval(() => {
       const { v } = this.state;
       this.mounted &&
@@ -324,105 +328,129 @@ export class Comment extends Component {
       replyingToName,
       parents,
     } = this.state;
+    console.log(post);
     return (
-      isShowing && (
-        <View
-          onStartShouldSetResponder={(event) => true}
-          style={styles.commentOpenContainer}
-        >
-          <ScrollView
-            ref={(scrollView) => (this.scrollView = scrollView)}
-            scrollEnabled={true}
-            style={styles.commentsContainer}
-          >
-            {post.comments &&
-              post.comments.map((comment, index) => {
+      <View
+        onStartShouldSetResponder={(event) => true}
+        style={styles.commentOpenContainer}
+      >
+        <AntDesign
+          style={[styles.topLeftIcon, { zIndex: 4 }, { top: 10 }]}
+          name="leftcircle"
+          size={24}
+          color="#1A3561"
+          onPress={() => {
+            this.props.hideComments();
+          }}
+        />
+        <View style={styles.commentsContainer}>
+          {post.comments && post.comments.length > 0 ? (
+            <ScrollView
+              ref={(scrollView) => (this.scrollView = scrollView)}
+              scrollEnabled={true}
+            >
+              {post.comments.map((comment, index) => {
                 return this.handleMap(comment, index, 0, null, null);
               })}
-          </ScrollView>
-          <View style={styles.recordingContainerComments}>
-            <TextInput
-              value={replyingToName + text}
-              onChangeText={(e) => {
-                this.mounted && this.setState({ text });
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              style={styles.textInputComments}
-            ></TextInput>
-            <View style={styles.iconContainerComments}>
-              {!(!audioBlobs && !replyingTo && !text) && (
-                <Feather
-                  style={styles.recordingMicIconComments}
-                  name="delete"
-                  size={24}
-                  color="black"
-                  onPress={() => {
-                    this.mounted &&
-                      this.setState({
-                        audioBlobs: false,
-                        replyingTo: "",
-                        text: "",
-                        replyingToName: "",
-                        parents: null,
-                      });
-                  }}
-                />
-              )}
-              {!recording ? (
-                <MaterialCommunityIcons
-                  onPress={this.startRecordingComment}
-                  name="microphone-plus"
-                  size={75}
-                  color="red"
-                  style={styles.recordingMicIconComments}
-                />
-              ) : (
-                Platform.OS === "web" && (
-                  <FontAwesome5
-                    onPress={this.stopRecordingComment}
-                    style={styles.currentRecordingIconComments}
-                    name="record-vinyl"
-                    size={24}
-                    color={this.colors[v]}
-                  />
-                )
-              )}
-              <TouchableOpacity onPress={async () => {}}>
-                <Entypo
-                  style={styles.recordingMicIconComments}
-                  name="emoji-happy"
-                  size={24}
-                  color="black"
-                />
-              </TouchableOpacity>
-              {(text || audioBlobs) && (
-                <TouchableOpacity
-                  onPress={async () => {
-                    const { results } = this.state;
-                    let fileType;
-                    const base64Url = await soundBlobToBase64(audioBlobs.uri);
-                    if (base64Url != null) {
-                      fileType = audioBlobs.type;
-                    } else {
-                      console.log("error with blob");
-                    }
-                    const res = await this.props.commentPost(
-                      post.id,
-                      replyingTo,
-                      base64Url,
-                      fileType,
-                      text,
-                      [JSON.stringify(results)],
-                      parents
-                    );
-                  }}
-                >
-                  <FontAwesome name="send" size={24} color="black" />
-                </TouchableOpacity>
-              )}
+            >
+              <Text
+                style={{ color: "#1A3561", fontStyle: "italic", fontSize: 24 }}
+              >
+                Be the first to comment!
+              </Text>
             </View>
+          )}
+        </View>
+        <View style={styles.recordingContainerComments}>
+          <TextInput
+            value={replyingToName ? replyingToName : ""}
+            onChangeText={(e) => {
+              this.mounted && this.setState({ text });
+            }}
+            style={styles.textInputComments}
+          ></TextInput>
+          <View style={styles.iconContainerComments}>
+            {!(!audioBlobs && !replyingTo && !text) && (
+              <Feather
+                style={styles.recordingMicIconComments}
+                name="delete"
+                size={24}
+                color="black"
+                onPress={() => {
+                  this.mounted &&
+                    this.setState({
+                      audioBlobs: false,
+                      replyingTo: "",
+                      text: "",
+                      replyingToName: "",
+                      parents: null,
+                    });
+                }}
+              />
+            )}
+            {!recording ? (
+              <MaterialCommunityIcons
+                onPress={this.startRecordingComment}
+                name="microphone-plus"
+                size={75}
+                color="red"
+                style={styles.recordingMicIconComments}
+              />
+            ) : (
+              Platform.OS === "web" && (
+                <FontAwesome5
+                  onPress={this.stopRecordingComment}
+                  style={styles.currentRecordingIconComments}
+                  name="record-vinyl"
+                  size={24}
+                  color={this.colors[v]}
+                />
+              )
+            )}
+            <TouchableOpacity onPress={async () => {}}>
+              <Entypo
+                style={styles.recordingMicIconComments}
+                name="emoji-happy"
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+            {(text || audioBlobs) && (
+              <TouchableOpacity
+                onPress={async () => {
+                  const { results } = this.state;
+                  let fileType;
+                  const base64Url = await soundBlobToBase64(audioBlobs.uri);
+                  if (base64Url != null) {
+                    fileType = audioBlobs.type;
+                  } else {
+                    console.log("error with blob");
+                  }
+                  const res = await this.props.commentPost(
+                    post.id,
+                    replyingTo,
+                    base64Url,
+                    fileType,
+                    text,
+                    [JSON.stringify(results)],
+                    parents
+                  );
+                }}
+              >
+                <FontAwesome name="send" size={24} color="black" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
-      )
+      </View>
     );
   }
 }
@@ -437,4 +465,6 @@ export default connect(mapStateToProps, {
   updateCommentDisplay,
   updateComments,
   deleteComment,
+  hideComments,
+  getComments,
 })(Comment);

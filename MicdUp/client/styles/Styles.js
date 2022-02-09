@@ -34,12 +34,12 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.25,
   },
   commentsContainer: {
-    height: height * 0.3,
-    marginLeft: 10,
+    flex: 10,
+    paddingTop: 15,
   },
   recordingContainerComments: {
     width,
-    height: height * 0.1,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   },
   recordingContainerChat: {
     width,
-    height: height * 0.1,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -77,14 +76,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
   },
-  commentParent: {
-    width: width,
-    position: "absolute",
-    marginHorizontal: width > 1000 ? width * 0.2 : 0,
-    marginTop: postHeight,
-  },
+  commentParent: {},
   commentOpenContainer: {
-    height: height * 0.4,
+    height: height * 0.85,
     backgroundColor: "white",
     borderWidth: 2,
     borderStyle: "solid",
@@ -92,7 +86,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: width > 1000 ? width * 0.6 : width,
     position: "absolute",
-    zIndex: 2,
+    zIndex: 3,
+    top: 0,
+    left: 0,
   },
   backArrow: {
     flex: 1,
@@ -328,7 +324,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: width * 0.08,
     top: height * 0.06,
-    zIndex: 99,
+    zIndex: 2,
   },
   modalContainer: {
     zIndex: 998,

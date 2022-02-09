@@ -22,6 +22,7 @@ import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
+import Comment from "../../reuseable/Comment";
 // redux
 import { getUserPosts, getComments } from "../../../redux/actions/recording";
 import {
@@ -82,20 +83,6 @@ export class Profile extends Component {
     await getUserPosts(currentProfile.id, 0);
     this.mounted && this.setState({ loading: false });
   }
-
-  setCommentPosts = async (post, index) => {
-    var { height, width } = Dimensions.get("window");
-    await this.props.getComments(post.id);
-    this.scrollView.scrollTo({
-      y:
-        (width > 1000 ? height * 0.25 : height * 0.14) * index +
-        height * 0.02 * index,
-    });
-  };
-
-  removeCommentPosts = (post) => {
-    this.mounted && this.setState({ commentPosts: [] });
-  };
 
   stopCurrentSound = async () => {
     const { playbackObject } = this.state;
@@ -212,7 +199,15 @@ export class Profile extends Component {
       selectImage,
       isRecordingComment,
     } = this.state;
-    const { userName, profile, currentProfile, posts } = this.props;
+    const {
+      userName,
+      profile,
+      currentProfile,
+      posts,
+      postIndex,
+      showingComments,
+    } = this.props;
+    console.log(showingComments);
     if (!profile && !currentProfile) {
       return (
         <View>
@@ -222,7 +217,7 @@ export class Profile extends Component {
     }
     const isUserProfile =
       profile && currentProfile ? profile.id === currentProfile.id : true;
-
+    console.log(postIndex, posts[postIndex]);
     return (
       <GestureRecognizer
         onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -238,7 +233,7 @@ export class Profile extends Component {
             setImage={this.setImage.bind(this)}
           />
         )}
-        {!settingsShown && isUserProfile && (
+        {!settingsShown && isUserProfile && !showingComments && (
           <Ionicons
             onPress={() => {
               this.mounted && this.setState({ settingsShown: true });
@@ -258,6 +253,23 @@ export class Profile extends Component {
               <View style={styles.refresh}>
                 <Text style={styles.nextButtonText}>Loading</Text>
               </View>
+            )}
+            {showingComments && (
+              <Comment
+                isUserProfile={isUserProfile}
+                containerStyle={{}}
+                color={"#1A3561"}
+                currentPlayingId={playingId}
+                post={posts[postIndex]}
+                setRecording={((val) => {
+                  this.mounted &&
+                    this.setState({
+                      recording: val,
+                      isRecordingComment: true,
+                    });
+                }).bind(this)}
+                isRecordingComment={isRecordingComment}
+              />
             )}
             <View style={styles.profileHeader}>
               <View style={styles.imageAndFollowing}>
@@ -352,21 +364,11 @@ export class Profile extends Component {
                       <Post
                         isRecordingComment={isRecordingComment}
                         isUserProfile={isUserProfile}
-                        setCommentPosts={this.setCommentPosts.bind(this)}
-                        removeCommentPosts={this.removeCommentPosts.bind(this)}
                         key={post.id}
                         post={post}
                         postArray={posts}
                         index={index}
-                        currentSound={playingId}
                         higherUp={false}
-                        setRecording={((val) => {
-                          this.mounted &&
-                            this.setState({
-                              recording: val,
-                              isRecordingComment: true,
-                            });
-                        }).bind(this)}
                       />
                     )
                 )}
@@ -426,6 +428,8 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,
+  postIndex: state.display.postIndex,
+  showingComments: state.display.showingComments,
 });
 
 export default connect(mapStateToProps, {

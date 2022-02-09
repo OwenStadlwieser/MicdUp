@@ -7,23 +7,38 @@ import {
   VIEW_PROFILE,
   VIEW_PROFILE_SEARCH,
   RECEIVE_NOTIF,
-  HIDE_NOTIF
+  HIDE_NOTIF,
+  SHOW_COMMENTS,
+  HIDE_COMMENTS,
 } from "../types";
-
 
 export const receiveNotif = (payload) => (dispatch) => {
   dispatch({
-    type:RECEIVE_NOTIF,
+    type: RECEIVE_NOTIF,
     payload,
-  })
-}
+  });
+};
+
+export const showComments = (payload) => (dispatch) => {
+  console.log("here");
+  dispatch({
+    type: SHOW_COMMENTS,
+    payload,
+  });
+};
+
+export const hideComments = () => (dispatch) => {
+  dispatch({
+    type: HIDE_COMMENTS,
+  });
+};
 
 export const hideNotif = (payload) => (dispatch) => {
   dispatch({
-    type:HIDE_NOTIF,
+    type: HIDE_NOTIF,
     payload,
-  })
-}
+  });
+};
 
 export const changeLogin = (payload) => (dispatch) => {
   dispatch({
