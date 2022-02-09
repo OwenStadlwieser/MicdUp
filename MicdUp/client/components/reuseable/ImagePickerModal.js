@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-// helpers
-import onClickOutside from "react-onclickoutside";
 // components
 import Modal from "react-native-modal";
 import { View, TouchableOpacity } from "react-native";
@@ -30,7 +28,7 @@ export class ImagePickerModal extends Component {
 
   render() {
     return (
-      <View style={styles.modalMainContainer}>
+      <TouchableWithoutFeedback onPress={this.handleClickOutside}>
         <TouchableOpacity
           onPress={() => {
             this.props.setSelected("camera");
@@ -45,11 +43,11 @@ export class ImagePickerModal extends Component {
         >
           <AntDesign name="picture" style={styles.largeIcon} color="#1A3561" />
         </TouchableOpacity>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(onClickOutside(ImagePickerModal));
+export default connect(mapStateToProps, {})(ImagePickerModal);
