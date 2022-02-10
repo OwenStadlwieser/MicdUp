@@ -77,7 +77,6 @@ export class Chat extends Component {
 
   stopRecording = async () => {
     const { recording, results } = this.state;
-    console.log("Stopping recording..");
     if (!recording) {
       return;
     }
@@ -101,8 +100,8 @@ export class Chat extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  componentWillUnmount = () => {
-    this.stopRecording();
+  componentWillUnmount = async () => {
+    await this.stopRecording();
     Voice.stop();
     this.mounted = false;
   };
@@ -135,7 +134,7 @@ export class Chat extends Component {
 
   render() {
     const { activeChats, profile, activeChatMembers, userName } = this.props;
-    const { recording, audioBlobs, v, loading, soundLevels } = this.state;
+    const { recording, audioBlobs, v, loading } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header

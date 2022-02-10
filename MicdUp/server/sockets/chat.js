@@ -39,7 +39,7 @@ exports = module.exports = function (io) {
       });
 
       socket.on("new message", async function (data) {
-        const { messageData, chatId, fileType } = data;
+        const { messageData, chatId, fileType, speechToText } = data;
         socket.profileId = userIds[socket.id];
 
         if (!socket.profileId) {
@@ -57,6 +57,7 @@ exports = module.exports = function (io) {
 
         const message = new Message({
           owner: socket.profileId,
+          speechToText,
           fileExtension: ".mp4",
         });
 
