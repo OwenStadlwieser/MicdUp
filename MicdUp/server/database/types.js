@@ -489,6 +489,17 @@ const ChatMessageType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    speechToText: {
+      type: new GraphQLList(
+        new GraphQLObjectType({
+          name: "MessageSpeech",
+          fields: () => ({
+            word: { type: GraphQLString },
+            time: { type: GraphQLFloat },
+          }),
+        })
+      ),
+    },
     seenBy: {
       type: new GraphQLList(GraphQLID),
     },

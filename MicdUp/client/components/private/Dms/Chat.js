@@ -13,6 +13,7 @@ import {
   Text,
   Image,
 } from "react-native";
+import SpeechToText from "../../reuseable/SpeechToText";
 import { Appbar } from "react-native-paper";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //styles
@@ -208,7 +209,7 @@ export class Chat extends Component {
                     : styles.foreignChat
                 }
               >
-                <View>
+                <View style={{ flex: 3 }}>
                   <Text style={styles.blackText}>
                     @
                     {chat && chat.owner && chat.owner.user
@@ -236,8 +237,20 @@ export class Chat extends Component {
                     />
                   </TouchableHighlight>
                 </View>
+                <View
+                  style={{ flex: 7, position: "relative", overflow: "hidden" }}
+                >
+                  {chat.speechToText && chat.speechToText[0] && (
+                    <SpeechToText
+                      containerStyle={[{ flexDirection: "row" }]}
+                      fontSize={24}
+                      post={chat}
+                      textStyle={{}}
+                    />
+                  )}
+                </View>
                 {chat.signedUrl && (
-                  <View style={styles.commentPlayContainer}>
+                  <View style={{ flex: 2 }}>
                     {chat.signedUrl && (
                       <Like type={"Chat"} postId={chat.id} post={chat} />
                     )}

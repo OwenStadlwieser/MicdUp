@@ -15,6 +15,27 @@ owner {
   }
 }`;
 
+const chatType = `id
+owner {
+  id
+  image {
+    id
+    signedUrl
+  }
+  user {
+    _id
+    userName
+  }
+}
+isLikedByUser
+likersCount
+seenBy
+signedUrl
+dateCreated
+speechToText {
+  word
+  time
+}`;
 const commentType = `id
 ultimateParent
 isDeleted
@@ -38,4 +59,4 @@ owner {
     signedUrl
   }
 }`;
-export { postType, commentType };
+export { postType, commentType, chatType };
