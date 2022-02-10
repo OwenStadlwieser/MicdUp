@@ -105,7 +105,7 @@ export class Comment extends Component {
   startRecordingComment = async () => {
     this.props.setRecording(true);
     const recording = await startRecording(Voice, () => {});
-    this.mounted && this.setState({ recording });
+    this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecordingComment = async () => {

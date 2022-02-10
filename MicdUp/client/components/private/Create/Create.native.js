@@ -24,7 +24,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { styles, largeIconFontSize } from "../../../styles/Styles";
 // audio
 import {
-  onSpeechResults,
+  onSpeechResultsClips,
   onSpeechStart,
 } from "../../../reuseableFunctions/helpers";
 import { startRecording } from "../../../reuseableFunctions/recording.native";
@@ -62,7 +62,7 @@ export class Create extends Component {
         // console.log(err);
         Voice.stop();
       };
-      Voice.onSpeechResults = onSpeechResults.bind(this);
+      Voice.onSpeechResults = onSpeechResultsClips.bind(this);
     } catch (err) {
       console.log(err);
     }

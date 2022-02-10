@@ -239,7 +239,7 @@ export class SpeechToText extends Component {
     }
   };
   render() {
-    const { index, words } = this.state;
+    const { words } = this.state;
     const { fontSize, containerStyle } = this.props;
     try {
       return (

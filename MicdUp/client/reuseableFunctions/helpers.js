@@ -168,6 +168,29 @@ function onSpeechStart() {
 }
 function onSpeechResults(e) {
   const { startTime, results } = this.state;
+  try {
+    const duration = 0;
+    currentResults = results && results.length > 0 ? results : [];
+    const words = e.value[e.value.length - 1];
+    const wordsSplit = words.split(" ");
+    const mostRecentWord = wordsSplit[wordsSplit.length - 1];
+    this.mounted &&
+      this.setState({
+        results: [
+          ...currentResults,
+          {
+            word: mostRecentWord,
+            time: Date.now() - startTime + duration,
+          },
+        ],
+      });
+  } catch (err) {
+    console.log("speech recognition", err);
+  }
+}
+
+function onSpeechResultsClips(e) {
+  const { startTime, results } = this.state;
   const { clips } = this.props;
   try {
     const duration = clips.reduce(
@@ -176,7 +199,8 @@ function onSpeechResults(e) {
     );
     currentResults = results && results.length > 0 ? results : [];
     const words = e.value[e.value.length - 1];
-    const mostRecentWord = words[words.length - 1];
+    const wordsSplit = words.split(" ");
+    const mostRecentWord = wordsSplit[wordsSplit.length - 1];
     this.mounted &&
       this.setState({
         results: [
@@ -202,4 +226,5 @@ export {
   duplicateNotifsString,
   onSpeechResults,
   onSpeechStart,
+  onSpeechResultsClips,
 };

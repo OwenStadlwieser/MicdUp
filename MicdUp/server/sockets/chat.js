@@ -54,7 +54,7 @@ exports = module.exports = function (io) {
         if (!chat) {
           throw new Error("Chat not found");
         }
-
+        console.log(speechToText);
         const message = new Message({
           owner: socket.profileId,
           speechToText,
