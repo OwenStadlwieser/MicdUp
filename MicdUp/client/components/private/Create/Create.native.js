@@ -175,7 +175,9 @@ export class Create extends Component {
               style={styles.profileImg}
             />
           </TouchableHighlight>
-          <Text style={styles.whiteText}>@{user ? user.userName : ""}</Text>
+          <Text numberOfLines={1} style={[styles.whiteText, { width: 200 }]}>
+            @{user ? user.userName : ""}
+          </Text>
           {promptShown && (
             <View style={styles.promptTopic}>
               <TouchableOpacity

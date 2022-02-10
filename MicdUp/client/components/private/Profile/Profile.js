@@ -311,7 +311,9 @@ export class Profile extends Component {
                   {currentProfile ? currentProfile.followersCount : 0} Followers
                 </Text>
               </View>
-              <Text style={styles.profileText}>@{userName}</Text>
+              <Text numberOfLines={1} style={[styles.profileText]}>
+                @{userName}
+              </Text>
               <Bio
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}

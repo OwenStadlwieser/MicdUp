@@ -210,7 +210,10 @@ export class Chat extends Component {
                 }
               >
                 <View style={{ flex: 3 }}>
-                  <Text style={styles.blackText}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.blackText, { width: 200 }]}
+                  >
                     @
                     {chat && chat.owner && chat.owner.user
                       ? chat.owner.user.userName
