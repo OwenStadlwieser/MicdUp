@@ -95,6 +95,7 @@ export class Bio extends Component {
               onPress={async () => {
                 if (!isRecording || Platform.OS !== "web") {
                   await startRecording();
+                  this.mounted && this.setState({ startTime: Date.now() });
                   try {
                     Platform.OS !== "web" && Voice.start();
                   } catch (err) {}

@@ -21,16 +21,6 @@ const authLink = setContext(async (_, { headers }) => {
   };
 });
 
-const nonAuthLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {
-      ...headers,
-    },
-  };
-});
-
 const privateClient = new ApolloClient({
   cache: new InMemoryCache(),
   link: authLink.concat(httpLinkPrivate),
@@ -38,7 +28,7 @@ const privateClient = new ApolloClient({
 
 const publicClient = new ApolloClient({
   cache: new InMemoryCache(),
-  link: nonAuthLink.concat(httpLinkPublic),
+  link: authLink.concat(httpLinkPublic),
 });
 
 export { publicClient, privateClient };

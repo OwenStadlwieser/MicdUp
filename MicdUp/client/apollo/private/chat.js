@@ -1,25 +1,10 @@
 import { gql } from "@apollo/client";
+import { chatType } from "./types";
 
 const FETCH_CHAT_MESSAGES_QUERY = gql`
   query fetchChatMessages($skipMult: Int!, $chatId: ID!) {
     fetchChatMessages(skipMult: $skipMult, chatId: $chatId) {
-      id
-      owner {
-        id
-        image {
-          id
-          signedUrl
-        }
-        user {
-          _id
-          userName
-        }
-      }
-      isLikedByUser
-      likersCount
-      seenBy
-      signedUrl
-      dateCreated
+      ${chatType}
     }
   }
 `;
@@ -46,23 +31,7 @@ const FETCH_CHATS_QUERY = gql`
         }
       }
       chatMessages {
-        id
-        owner {
-          id
-          image {
-            id
-            signedUrl
-          }
-          user {
-            _id
-            userName
-          }
-        }
-        isLikedByUser
-        likersCount
-        seenBy
-        signedUrl
-        dateCreated
+        ${chatType}
       }
     }
   }
@@ -91,12 +60,7 @@ const FETCH_CHAT_MUTATION = gql`
         }
       }
       chatMessages {
-        id
-        isLikedByUser
-        likersCount
-        seenBy
-        signedUrl
-        dateCreated
+        ${chatType}
       }
     }
   }

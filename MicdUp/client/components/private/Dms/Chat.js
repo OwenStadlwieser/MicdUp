@@ -13,6 +13,7 @@ import {
   Text,
   Image,
 } from "react-native";
+import SpeechToText from "../../reuseable/SpeechToText";
 import { Appbar } from "react-native-paper";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //styles
@@ -68,16 +69,15 @@ export class Chat extends Component {
   startRecordingChat = async () => {
     if (Platform.OS !== "web") {
       const recording = await startRecording(Voice, () => {});
-      this.mounted && this.setState({ recording });
+      this.mounted && this.setState({ recording, startTime: Date.now() });
     } else {
       const recording = await startRecording(Voice, () => {});
-      this.mounted && this.setState({ recording });
+      this.mounted && this.setState({ recording, startTime: Date.now() });
     }
   };
 
   stopRecording = async () => {
     const { recording, results } = this.state;
-    console.log("Stopping recording..");
     if (!recording) {
       return;
     }
@@ -101,8 +101,8 @@ export class Chat extends Component {
     console.log("Recording stopped and stored at", uri);
   };
 
-  componentWillUnmount = () => {
-    this.stopRecording();
+  componentWillUnmount = async () => {
+    await this.stopRecording();
     Voice.stop();
     this.mounted = false;
   };
@@ -135,7 +135,7 @@ export class Chat extends Component {
 
   render() {
     const { activeChats, profile, activeChatMembers, userName } = this.props;
-    const { recording, audioBlobs, v, loading, soundLevels } = this.state;
+    const { recording, audioBlobs, v, loading } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -209,8 +209,11 @@ export class Chat extends Component {
                     : styles.foreignChat
                 }
               >
-                <View>
-                  <Text style={styles.blackText}>
+                <View style={{ flex: 3 }}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.blackText, { width: 200 }]}
+                  >
                     @
                     {chat && chat.owner && chat.owner.user
                       ? chat.owner.user.userName
@@ -237,8 +240,20 @@ export class Chat extends Component {
                     />
                   </TouchableHighlight>
                 </View>
+                <View
+                  style={{ flex: 7, position: "relative", overflow: "hidden" }}
+                >
+                  {chat.speechToText && chat.speechToText[0] && (
+                    <SpeechToText
+                      containerStyle={[{ flexDirection: "row" }]}
+                      fontSize={24}
+                      post={chat}
+                      textStyle={{}}
+                    />
+                  )}
+                </View>
                 {chat.signedUrl && (
-                  <View style={styles.commentPlayContainer}>
+                  <View style={{ flex: 2 }}>
                     {chat.signedUrl && (
                       <Like type={"Chat"} postId={chat.id} post={chat} />
                     )}

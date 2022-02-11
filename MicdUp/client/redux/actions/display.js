@@ -20,7 +20,6 @@ export const receiveNotif = (payload) => (dispatch) => {
 };
 
 export const showComments = (payload) => (dispatch) => {
-  console.log("here");
   dispatch({
     type: SHOW_COMMENTS,
     payload,

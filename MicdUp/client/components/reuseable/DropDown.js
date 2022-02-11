@@ -28,20 +28,11 @@ export class DropDown extends Component {
     this.props.onBlur();
   };
   render() {
-    const { results, title, containerStyle, image } = this.props;
+    const { results, title, containerStyle, parentStyle, image } = this.props;
     const { width, height } = Dimensions.get("window");
     return (
       <TouchableWithoutFeedback onPress={this.handleClickOutside}>
-        <View
-          style={{
-            width,
-            height,
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            alignItems: "center",
-          }}
-        >
+        <View style={parentStyle}>
           <ScrollView style={containerStyle}>
             {results &&
               results.map((res, index) => (

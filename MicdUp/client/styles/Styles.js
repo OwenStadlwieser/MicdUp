@@ -265,6 +265,7 @@ const styles = StyleSheet.create({
     width,
     paddingTop: height * 0.025,
     alignItems: "center",
+    paddingBottom: 10,
   },
   bioHeader: {
     position: "absolute",
@@ -438,12 +439,14 @@ const styles = StyleSheet.create({
     fontSize: large,
   },
   postTitle: {
-    flex: 9,
+    flex: 1,
     fontStyle: "italic",
     fontSize: width > 1000 ? medium : large,
   },
   textAndPlayButtonContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   postText: {
     flex: 9,

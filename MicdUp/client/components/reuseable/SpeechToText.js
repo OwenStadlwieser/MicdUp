@@ -7,8 +7,7 @@ export class SpeechToText extends Component {
   constructor() {
     super();
     this.mounted = true;
-    let screenWidth = Dimensions.get("window").width,
-      screenHeight = Dimensions.get("window").height;
+    let screenWidth = Dimensions.get("window").width;
     this.state = {
       MainPosition: [
         styles.main,
@@ -239,7 +238,7 @@ export class SpeechToText extends Component {
     }
   };
   render() {
-    const { index, words } = this.state;
+    const { words } = this.state;
     const { fontSize, containerStyle } = this.props;
     try {
       return (
