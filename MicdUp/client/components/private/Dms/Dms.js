@@ -133,10 +133,10 @@ export class Dms extends Component {
                 key={index}
                 onDelete={() => {
                   let currentNames = [...this.state.userNames];
-                  const index = currentNames.findIndex((user) => {
-                    return user.userName === user.userName;
+                  const index = currentNames.findIndex((user2) => {
+                    return user.userName === user2.userName;
                   });
-                  currentNames = currentNames.splice(1, index);
+                  currentNames.splice(1, index);
                   this.mounted && this.setState({ userNames: currentNames });
                 }}
               />
