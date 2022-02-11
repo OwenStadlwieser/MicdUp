@@ -53,18 +53,31 @@ export class Post extends Component {
         style={styles.postContainer}
         key={post.id}
       >
-        <View style={{ justifyContent: "space-evenly" }}>
-          <Text style={[styles.postTitle, { flexWrap: "nowrap" }]}>
+        <View
+          style={{
+            justifyContent: "space-evenly",
+            flex: 9,
+            overflow: "hidden",
+          }}
+        >
+          <Text
+            style={[
+              styles.postTitle,
+              { flexWrap: "nowrap", paddingTop: 10, fontWeight: "700" },
+            ]}
+          >
             {post.title ? post.title : "Untitled"}
           </Text>
           <SpeechToText
-            containerStyle={[{ flexDirection: "row", flexWrap: "nowrap" }]}
+            containerStyle={[
+              { flexDirection: "row", flexWrap: "nowrap", flex: 1 },
+            ]}
             fontSize={24}
             post={post}
             textStyle={{}}
           />
         </View>
-        <View style={styles.textAndPlayButtonContainer}>
+        <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
           <View style={styles.postPlayButton}>
             <Like post={post} type={"Post"} />
             <TouchableOpacity

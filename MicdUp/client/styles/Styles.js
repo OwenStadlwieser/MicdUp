@@ -438,12 +438,14 @@ const styles = StyleSheet.create({
     fontSize: large,
   },
   postTitle: {
-    flex: 9,
+    flex: 1,
     fontStyle: "italic",
     fontSize: width > 1000 ? medium : large,
   },
   textAndPlayButtonContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   postText: {
     flex: 9,
