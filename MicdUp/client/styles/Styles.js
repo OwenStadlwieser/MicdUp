@@ -384,8 +384,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   recordingPeopleContainer: {
-    paddingTop: height * 0.08,
-    height: height * 0.4,
+    flex: 3,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -461,11 +460,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   recordingClipsContainer: {
-    height: height * 0.29,
+    flex: 4,
     width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
-    height: height * 0.25,
+    flex: 3,
     width: width,
     flexDirection: "row",
   },
