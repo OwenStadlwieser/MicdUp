@@ -23,7 +23,7 @@ import DeleteableItem from "../../reuseable/DeleteableItem";
 import { styles } from "../../../styles/Styles";
 // chat
 import Chat from "./Chat";
-const { height, width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 export class Dms extends Component {
   constructor() {
     super();
@@ -130,6 +130,7 @@ export class Dms extends Component {
                 style={{ margin: 3 }}
                 color={"white"}
                 title={"userName"}
+                key={index}
                 onDelete={() => {
                   let currentNames = [...this.state.userNames];
                   const index = currentNames.findIndex((user) => {
