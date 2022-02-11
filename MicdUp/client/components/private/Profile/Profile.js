@@ -53,6 +53,7 @@ export class Profile extends Component {
       selectImage: false,
       bio: false,
       isRecordingComment: false,
+      postsInvalid: false,
     };
     this.scrollView = null;
     this.mounted = true;
@@ -147,6 +148,15 @@ export class Profile extends Component {
       this.mounted && this.setState({ loading: true });
       await getUserPosts(id, 0);
       this.mounted && this.setState({ loading: false });
+    } else if (
+      posts &&
+      currentProfile &&
+      posts.length > 0 &&
+      posts[0].owner.id !== currentProfile.id
+    ) {
+      this.mounted && this.setState({ loading: true, postsInvalid: true });
+      await getUserPosts(currentProfile.id, 0);
+      this.mounted && this.setState({ loading: false, postsInvalid: false });
     }
   };
 
@@ -198,6 +208,7 @@ export class Profile extends Component {
       loading,
       selectImage,
       isRecordingComment,
+      postsInvalid,
     } = this.state;
     const {
       userName,
@@ -216,7 +227,6 @@ export class Profile extends Component {
     }
     const isUserProfile =
       profile && currentProfile ? profile.id === currentProfile.id : true;
-    console.log(postIndex, posts[postIndex]);
     return (
       <View
         style={{
@@ -364,6 +374,7 @@ export class Profile extends Component {
               ref={(view) => (this.scrollView = view)}
             >
               {posts &&
+                !postsInvalid &&
                 posts.map(
                   (post, index) =>
                     post && (
