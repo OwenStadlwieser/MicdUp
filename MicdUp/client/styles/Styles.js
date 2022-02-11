@@ -265,6 +265,7 @@ const styles = StyleSheet.create({
     width,
     paddingTop: height * 0.025,
     alignItems: "center",
+    paddingBottom: 10,
   },
   bioHeader: {
     position: "absolute",

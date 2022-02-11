@@ -219,9 +219,7 @@ export class Profile extends Component {
       profile && currentProfile ? profile.id === currentProfile.id : true;
     console.log(postIndex, posts[postIndex]);
     return (
-      <GestureRecognizer
-        onSwipeDown={(state) => this.onSwipeDown(state)}
-        config={config}
+      <View
         style={{
           flex: 1,
           backgroundColor: this.state.backgroundColor,
@@ -271,86 +269,92 @@ export class Profile extends Component {
                 isRecordingComment={isRecordingComment}
               />
             )}
-            <View style={styles.profileHeader}>
-              <View style={styles.imageAndFollowing}>
-                <View style={styles.imageAndIcon}>
-                  <TouchableHighlight
-                    style={[
-                      styles.profileImgContainerSmall,
-                      {
-                        borderColor: recording ? "red" : "#30F3FF",
-                        borderWidth: 1,
-                      },
-                    ]}
-                  >
-                    <Image
-                      source={
-                        currentProfile && currentProfile.image
-                          ? { uri: currentProfile.image.signedUrl }
-                          : require("../../../assets/no-profile-pic-icon-27.jpg")
-                      }
-                      style={styles.profileImgSmall}
-                    />
-                  </TouchableHighlight>
-                  {isUserProfile && (
+            <GestureRecognizer
+              onSwipeDown={(state) => this.onSwipeDown(state)}
+              config={config}
+            >
+              <View style={styles.profileHeader}>
+                <View style={styles.imageAndFollowing}>
+                  <View style={styles.imageAndIcon}>
                     <TouchableHighlight
-                      onPress={() => {
-                        this.mounted && this.setState({ selectImage: true });
-                      }}
+                      style={[
+                        styles.profileImgContainerSmall,
+                        {
+                          borderColor: recording ? "red" : "#30F3FF",
+                          borderWidth: 1,
+                        },
+                      ]}
                     >
-                      <Entypo
-                        style={styles.uploadIcon}
-                        name="upload"
-                        size={24}
-                        color="#30F3FF"
+                      <Image
+                        source={
+                          currentProfile && currentProfile.image
+                            ? { uri: currentProfile.image.signedUrl }
+                            : require("../../../assets/no-profile-pic-icon-27.jpg")
+                        }
+                        style={styles.profileImgSmall}
                       />
                     </TouchableHighlight>
-                  )}
+                    {isUserProfile && (
+                      <TouchableHighlight
+                        onPress={() => {
+                          this.mounted && this.setState({ selectImage: true });
+                        }}
+                      >
+                        <Entypo
+                          style={styles.uploadIcon}
+                          name="upload"
+                          size={24}
+                          color="#30F3FF"
+                        />
+                      </TouchableHighlight>
+                    )}
+                  </View>
+                  <Text style={styles.followersText}>
+                    {currentProfile ? currentProfile.followersCount : 0}{" "}
+                    Followers
+                  </Text>
                 </View>
-                <Text style={styles.followersText}>
-                  {currentProfile ? currentProfile.followersCount : 0} Followers
+                <Text numberOfLines={1} style={[styles.profileText]}>
+                  @{userName}
                 </Text>
-              </View>
-              <Text numberOfLines={1} style={[styles.profileText]}>
-                @{userName}
-              </Text>
-              <Bio
-                startRecording={this.startRecording.bind(this)}
-                stopRecordingBio={this.stopRecordingBio.bind(this)}
-                currentSound={playingId}
-                setNewBioRecording={this.setNewBioRecording.bind(this)}
-                newBioRecording={newBioRecording}
-              />
-              {!isUserProfile && (
-                <View style={styles.foreignProfileButtons}>
-                  <TouchableOpacity
-                    onPress={async () => {
-                      await this.props.followProfile(currentProfile.id);
-                    }}
-                    style={styles.smallNextButton}
-                  >
-                    <Text style={styles.nextButtonText}>
-                      {currentProfile && currentProfile.isFollowedByUser
-                        ? "unfollow"
-                        : "follow"}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.smallNextButton}>
-                    <Text
+                <Bio
+                  startRecording={this.startRecording.bind(this)}
+                  stopRecordingBio={this.stopRecordingBio.bind(this)}
+                  currentSound={playingId}
+                  setNewBioRecording={this.setNewBioRecording.bind(this)}
+                  newBioRecording={newBioRecording}
+                />
+                {!isUserProfile && (
+                  <View style={styles.foreignProfileButtons}>
+                    <TouchableOpacity
                       onPress={async () => {
-                        await this.props.createOrOpenChat(
-                          [currentProfile.id, profile.id],
-                          profile.id
-                        );
+                        await this.props.followProfile(currentProfile.id);
                       }}
-                      style={styles.nextButtonText}
+                      style={styles.smallNextButton}
                     >
-                      Message
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
+                      <Text style={styles.nextButtonText}>
+                        {currentProfile && currentProfile.isFollowedByUser
+                          ? "unfollow"
+                          : "follow"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.smallNextButton}>
+                      <Text
+                        onPress={async () => {
+                          await this.props.createOrOpenChat(
+                            [currentProfile.id, profile.id],
+                            profile.id
+                          );
+                        }}
+                        style={styles.nextButtonText}
+                      >
+                        Message
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            </GestureRecognizer>
             <ScrollView
               scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
@@ -420,7 +424,7 @@ export class Profile extends Component {
             )}
           </View>
         )}
-      </GestureRecognizer>
+      </View>
     );
   }
 }
