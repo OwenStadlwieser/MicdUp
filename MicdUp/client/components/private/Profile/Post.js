@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 // components
-import PlayButton from "../../reuseable/PlayButton";
 import Like from "../../reuseable/Like";
 import SpeechToText from "../../reuseable/SpeechToText";
 import {
@@ -87,7 +86,6 @@ export class Post extends Component {
             >
               <FontAwesome name="comment" size={24} color="black" />
             </TouchableOpacity>
-            <PlayButton containerStyle={{}} color={"#1A3561"} post={post} />
             {isUserProfile && (
               <Feather
                 onPress={async () => {
