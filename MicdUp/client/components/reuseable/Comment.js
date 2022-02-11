@@ -86,8 +86,10 @@ export class Comment extends Component {
 
   componentDidMount = async () => {
     const { post } = this.props;
+    this.mounted && this.setState({ loading: true });
     await this.props.getComments(post.id);
-    const interval = setInterval(() => {
+    this.mounted && this.setState({ loading: false });
+    setInterval(() => {
       const { v } = this.state;
       this.mounted &&
         this.state.recording &&
@@ -318,7 +320,7 @@ export class Comment extends Component {
   }
 
   render() {
-    const { post, isShowing } = this.props;
+    const { post } = this.props;
     const {
       v,
       text,
@@ -327,8 +329,8 @@ export class Comment extends Component {
       audioBlobs,
       replyingToName,
       parents,
+      loading,
     } = this.state;
-    console.log(post);
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -353,7 +355,7 @@ export class Comment extends Component {
                 return this.handleMap(comment, index, 0, null, null);
               })}
             </ScrollView>
-          ) : (
+          ) : !loading ? (
             <View
               style={{
                 flex: 1,
@@ -367,6 +369,14 @@ export class Comment extends Component {
                 Be the first to comment!
               </Text>
             </View>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            ></View>
           )}
         </View>
         <View style={styles.recordingContainerComments}>
