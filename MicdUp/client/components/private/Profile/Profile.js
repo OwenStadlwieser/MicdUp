@@ -207,7 +207,6 @@ export class Profile extends Component {
       postIndex,
       showingComments,
     } = this.props;
-    console.log(showingComments);
     if (!profile && !currentProfile) {
       return (
         <View>
@@ -360,7 +359,8 @@ export class Profile extends Component {
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
               style={{}}
-              scrollEventThrottle={100}
+              onScroll={this.handleScroll.bind(this)}
+              scrollEventThrottle={50}
               ref={(view) => (this.scrollView = view)}
             >
               {posts &&
