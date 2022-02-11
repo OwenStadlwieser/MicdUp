@@ -25,6 +25,7 @@ import {
   stopRecording,
 } from "../../reuseableFunctions/recording";
 // audio
+import { changeSound, pauseSound } from "../../redux/actions/sound";
 import {
   onSpeechResults,
   onSpeechStart,
@@ -138,7 +139,7 @@ export class Comment extends Component {
   };
 
   handleMap(comment, i, index, parentId, parent) {
-    const { profile, post } = this.props;
+    const { profile, post, playingId, isPause } = this.props;
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -161,7 +162,14 @@ export class Comment extends Component {
           borderLeftWidth: 1,
         }}
       >
-        <View
+        <TouchableOpacity
+          onPress={async () => {
+            if (playingId === comment.id && !isPause) {
+              await this.props.pauseSound();
+            } else if (comment.signedUrl) {
+              await this.props.changeSound(comment, comment.signedUrl);
+            }
+          }}
           style={{
             paddingTop: height * 0.01,
             alignItems: "center",
@@ -257,7 +265,7 @@ export class Comment extends Component {
               <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
         <View
           style={{
             zIndex: index >= 12 ? 1 : 0,
@@ -467,6 +475,9 @@ export class Comment extends Component {
 
 const mapStateToProps = (state) => ({
   profile: state.auth.user.profile,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+  isPause: state.sound.isPause,
 });
 
 export default connect(mapStateToProps, {
@@ -477,4 +488,6 @@ export default connect(mapStateToProps, {
   deleteComment,
   hideComments,
   getComments,
+  changeSound,
+  pauseSound,
 })(Comment);
