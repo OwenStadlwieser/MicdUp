@@ -7,6 +7,7 @@ import {
   Image,
   Text,
   Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Button } from "react-native-paper";
 // helpers
@@ -23,7 +24,7 @@ import DeleteableItem from "../../reuseable/DeleteableItem";
 import { styles } from "../../../styles/Styles";
 // chat
 import Chat from "./Chat";
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 export class Dms extends Component {
   constructor() {
     super();
@@ -61,70 +62,83 @@ export class Dms extends Component {
         <Chat />
       </View>
     ) : (
-      <View style={styles.pane}>
-        <SearchComponent
-          parentViewStyle={styles.parentViewStyleUsers}
-          searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-          inputStyle={styles.inputStyleUsers}
-          isForUser={true}
-          placeholder={"Find Friends"}
-          setStateOnChange={true}
-          setStateOnChangeFunc={this.setSearchTerm.bind(this)}
-          setResOnChange={true}
-          setResOnChangeFunc={this.setUsersState.bind(this)}
-          searchFunction={this.props.searchUsers}
-          splitSearchTerm={true}
-          inputStyle={styles.textInputRecEdit}
-          placeHolderColor={"white"}
-          scrollable={true}
-          onFocus={() => this.mounted && this.setState({ showDropDown: true })}
-          displayResults={false}
-          initValue={users ? users.toString() : ""}
-        />
-        {showDropDown && (
-          <DropDown
-            containerStyle={{
-              marginTop: height * 0.25,
-              maxHeight: height * 0.4,
-              minHeight: 0,
-            }}
-            results={users.map((user) => {
-              user.image = user.profile.image
-                ? user.profile.image.signedUrl
-                : false;
-              return user;
-            })}
-            image={true}
-            title={"userName"}
-            onBlur={() => {
-              this.mounted && this.setState({ showDropDown: false });
-            }}
-            onPressFunc={(res) => {
-              const { userNames } = this.state;
-              if (
-                userNames.findIndex((user) => {
-                  return user.userName === res.userName;
-                }) > -1
-              ) {
-                return;
-              }
-              userNames.push(res);
-              this.mounted && this.setState({ userNames });
-            }}
+      <TouchableOpacity
+        onPress={() => {
+          this.mounted && this.setState({ showDropDown: false });
+        }}
+        delayPressIn={1000}
+        style={[styles.paneUncentered, { alignItems: "center" }]}
+      >
+        <View style={{ paddingBottom: 20 }}>
+          <SearchComponent
+            parentViewStyle={{ zIndex: 2 }}
+            searchInputContainerStyle={styles.searchInputContainerStyleUsers}
+            inputStyle={styles.inputStyleUsers}
+            isForUser={true}
+            placeholder={"Find Friends"}
+            setStateOnChange={true}
+            setStateOnChangeFunc={this.setSearchTerm.bind(this)}
+            setResOnChange={true}
+            setResOnChangeFunc={this.setUsersState.bind(this)}
+            searchFunction={this.props.searchUsers}
+            splitSearchTerm={true}
+            inputStyle={styles.textInputRecEdit}
+            placeHolderColor={"white"}
+            scrollable={true}
+            onFocus={() =>
+              this.mounted && this.setState({ showDropDown: true })
+            }
+            displayResults={false}
+            initValue={users ? users.toString() : ""}
           />
-        )}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            minHeight: 0,
-            marginTop: showDropDown ? height * 0.4 : height * 0.2,
-          }}
-        >
-          {userNames &&
-            userNames.map((user, index) => (
+          {showDropDown && (
+            <DropDown
+              containerStyle={{
+                zIndex: 2,
+                borderRadius: 8,
+              }}
+              parentStyle={{
+                zIndex: 2,
+                height: height * 0.3,
+              }}
+              results={users.map((user) => {
+                user.image = user.profile.image
+                  ? user.profile.image.signedUrl
+                  : false;
+                return user;
+              })}
+              image={true}
+              title={"userName"}
+              onBlur={() => {
+                this.mounted && this.setState({ showDropDown: false });
+              }}
+              onPressFunc={(res) => {
+                const { userNames } = this.state;
+                if (
+                  userNames.findIndex((user) => {
+                    return user.userName === res.userName;
+                  }) > -1
+                ) {
+                  return;
+                }
+                userNames.push(res);
+                this.mounted && this.setState({ userNames });
+              }}
+            />
+          )}
+        </View>
+        {userNames && userNames.length > 0 && (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              minHeight: 0,
+              paddingBottom: 20,
+            }}
+          >
+            {userNames.map((user, index) => (
               <DeleteableItem
                 item={user}
                 style={{ margin: 3 }}
@@ -136,65 +150,66 @@ export class Dms extends Component {
                   const index = currentNames.findIndex((user2) => {
                     return user.userName === user2.userName;
                   });
-                  currentNames.splice(1, index);
+                  console.log(index);
+                  currentNames.splice(index, 1);
                   this.mounted && this.setState({ userNames: currentNames });
                 }}
               />
             ))}
-          <View></View>
-          {userNames && userNames.length > 0 && (
-            <Button
-              style={{ margin: 3 }}
-              color="#6FF6FF"
-              icon="creation"
-              mode="contained"
-              onPress={async () => {
-                await this.props.createOrOpenChat(
-                  [...userNames.map((user) => user.profile.id), profile.id],
-                  profile.id
-                );
-              }}
-            >
-              Create Chat
-            </Button>
-          )}
-        </View>
-        <ScrollView
-          style={{ marginTop: showDropDown ? height * 0.05 : height * 0.2 }}
-        >
-          {chats &&
-            chats.length > 0 &&
-            chats.map((chat, index) => (
-              <TouchableOpacity
-                key={index}
+            {userNames && userNames.length > 0 && (
+              <Button
+                style={{ margin: 3 }}
+                color="#6FF6FF"
+                icon="creation"
+                mode="contained"
                 onPress={async () => {
-                  await this.props.viewMoreChats(chat, 0);
-                  this.mounted && this.setState({ showingChat: true });
+                  await this.props.createOrOpenChat(
+                    [...userNames.map((user) => user.profile.id), profile.id],
+                    profile.id
+                  );
                 }}
-                style={styles.listItemContainerChat}
               >
-                {chat &&
-                  chat.members &&
-                  chat.members.length > 0 &&
-                  chat.members.map((member, index) => (
-                    <View key={index} style={styles.messageMember}>
-                      <Image
-                        source={
-                          member && member.image
-                            ? { uri: member.image.signedUrl }
-                            : require("../../../assets/no-profile-pic-icon-27.jpg")
-                        }
-                        style={styles.commentImg}
-                      />
-                      <Text style={styles.listItemTextUser}>
-                        {member.user.userName}
-                      </Text>
-                    </View>
-                  ))}
-              </TouchableOpacity>
-            ))}
-        </ScrollView>
-      </View>
+                Create Chat
+              </Button>
+            )}
+          </View>
+        )}
+        <View style={{ zIndex: 1 }}>
+          <ScrollView style={{}}>
+            {chats &&
+              chats.length > 0 &&
+              chats.map((chat, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={async () => {
+                    await this.props.viewMoreChats(chat, 0);
+                    this.mounted && this.setState({ showingChat: true });
+                  }}
+                  style={styles.listItemContainerChat}
+                >
+                  {chat &&
+                    chat.members &&
+                    chat.members.length > 0 &&
+                    chat.members.map((member, index) => (
+                      <View key={index} style={styles.messageMember}>
+                        <Image
+                          source={
+                            member && member.image
+                              ? { uri: member.image.signedUrl }
+                              : require("../../../assets/no-profile-pic-icon-27.jpg")
+                          }
+                          style={styles.commentImg}
+                        />
+                        <Text style={styles.listItemTextUser}>
+                          {member.user.userName}
+                        </Text>
+                      </View>
+                    ))}
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
+        </View>
+      </TouchableOpacity>
     );
     return app;
   }

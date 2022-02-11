@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, TextInput } from "react-native";
+import { View, TextInput, Dimensions } from "react-native";
 import DropDown from "./DropDown";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
 import debounce from "lodash.debounce";
-
+const { height, width } = Dimensions.get("window");
 export class SearchComponent extends Component {
   constructor() {
     super();
@@ -115,6 +115,14 @@ export class SearchComponent extends Component {
           ></TextInput>
           {showDropDown && displayResults && (
             <DropDown
+              parentStyle={{
+                width,
+                height,
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                alignItems: "center",
+              }}
               onPressFunc={this.onPressFunc.bind(this)}
               results={results}
               title={"title"}
