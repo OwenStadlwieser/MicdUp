@@ -175,7 +175,10 @@ export class Create extends Component {
               style={styles.profileImg}
             />
           </TouchableHighlight>
-          <Text numberOfLines={1} style={[styles.whiteText, { width: 200 }]}>
+          <Text
+            numberOfLines={1}
+            style={[styles.whiteText, { width: 200, textAlign: "center" }]}
+          >
             @{user ? user.userName : ""}
           </Text>
           {promptShown && (
