@@ -7,7 +7,7 @@ import {
   Text,
   TouchableHighlight,
   Platform,
-  ScrollView,
+  StyleSheet,
   Dimensions,
 } from "react-native";
 // icons
@@ -23,8 +23,13 @@ import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 import Comment from "../../reuseable/Comment";
+import { SwipeListView } from "react-native-swipe-list-view";
 // redux
-import { getUserPosts, getComments } from "../../../redux/actions/recording";
+import {
+  getUserPosts,
+  getComments,
+  deletePost,
+} from "../../../redux/actions/recording";
 import {
   updateProfilePic,
   followProfile,
@@ -54,6 +59,7 @@ export class Profile extends Component {
       bio: false,
       isRecordingComment: false,
       postsInvalid: false,
+      prevLength: 0,
     };
     this.scrollView = null;
     this.mounted = true;
@@ -61,14 +67,16 @@ export class Profile extends Component {
 
   async handleScroll(event) {
     const { posts, getUserPosts, currentProfile } = this.props;
-    const { loading } = this.state;
+    const { loading, prevLength } = this.state;
     try {
       if (
-        event.nativeEvent.contentOffset.y > posts.length * postHeight &&
+        event.nativeEvent.contentOffset.y >
+          posts.length * postHeight - height &&
         !loading &&
-        posts.length % 20 === 0
+        prevLength !== posts.length
       ) {
-        this.mounted && this.setState({ loading: true });
+        this.mounted &&
+          this.setState({ loading: true, prevLength: posts.length });
         await getUserPosts(currentProfile.id, posts.length / 20);
         this.mounted && this.setState({ loading: false });
       }
@@ -364,32 +372,43 @@ export class Profile extends Component {
                 )}
               </View>
             </GestureRecognizer>
-            <ScrollView
-              scrollEnabled={true}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              style={{}}
+            <SwipeListView
+              data={posts}
+              disableRightSwipe
               onScroll={this.handleScroll.bind(this)}
               scrollEventThrottle={50}
               ref={(view) => (this.scrollView = view)}
-            >
-              {posts &&
-                !postsInvalid &&
-                posts.map(
-                  (post, index) =>
-                    post && (
-                      <Post
-                        isRecordingComment={isRecordingComment}
-                        isUserProfile={isUserProfile}
-                        key={post.id}
-                        post={post}
-                        postArray={posts}
-                        index={index}
-                        higherUp={false}
-                      />
-                    )
-                )}
-            </ScrollView>
+              useNativeDriver={false}
+              renderItem={(data, rowMap) => (
+                <Post
+                  isRecordingComment={isRecordingComment}
+                  isUserProfile={isUserProfile}
+                  key={data.item.id}
+                  post={data.item}
+                  postArray={posts}
+                  index={data.index}
+                  higherUp={false}
+                />
+              )}
+              renderHiddenItem={(data, rowMap) => {
+                return (
+                  <View style={listStyles.rowBack}>
+                    <TouchableOpacity
+                      style={[
+                        listStyles.backRightBtn,
+                        listStyles.backRightBtnRight,
+                      ]}
+                      onPress={async () => {
+                        await this.props.deletePost(data.item.id);
+                      }}
+                    >
+                      <Entypo name="trash" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
+              rightOpenValue={-75}
+            />
             {recording && Platform.OS !== "web" && (
               <AudioRecordingVisualization
                 recording={recording}
@@ -440,6 +459,50 @@ export class Profile extends Component {
   }
 }
 
+const listStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    flex: 1,
+  },
+  backTextWhite: {
+    color: "#FFF",
+  },
+  rowFront: {
+    alignItems: "center",
+    backgroundColor: "#CCC",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    height: 50,
+  },
+  rowBack: {
+    alignItems: "center",
+    backgroundColor: "transparent",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 15,
+    right: 0,
+    width,
+  },
+  backRightBtn: {
+    alignItems: "center",
+    bottom: 0,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    width: 75,
+    borderWidth: 2,
+    zIndex: -1,
+  },
+  backRightBtnRight: {
+    backgroundColor: "white",
+    right: 0,
+    height: postHeight,
+    borderRadius: 8,
+  },
+});
+
 const mapStateToProps = (state) => ({
   posts: state.auth.posts,
   user: state.auth.user,
@@ -455,4 +518,5 @@ export default connect(mapStateToProps, {
   getComments,
   followProfile,
   createOrOpenChat,
+  deletePost,
 })(Profile);

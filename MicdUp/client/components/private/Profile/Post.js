@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // components
 import Like from "../../reuseable/Like";
@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  TouchableHighlight,
 } from "react-native";
 import ProgressBar from "../../reuseable/ProgressBar";
 // styles
@@ -16,7 +17,6 @@ import { styles, postWidth, postHeight } from "../../../styles/Styles";
 //icons
 import { Feather } from "@expo/vector-icons";
 //redux
-import { deletePost } from "../../../redux/actions/recording";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { showComments } from "../../../redux/actions/display";
 
@@ -41,7 +41,7 @@ export class Post extends Component {
   render() {
     const { post, index, isUserProfile, playingId, isPause } = this.props;
     return (
-      <TouchableOpacity
+      <TouchableHighlight
         onPress={async () => {
           if (playingId === post.id && !isPause) {
             await this.props.pauseSound();
@@ -56,55 +56,48 @@ export class Post extends Component {
           },
         ]}
         key={post.id}
+        underlayColor="#6FF6FF"
       >
-        {playingId === post.id && <ProgressBar parentId={post.id} />}
-        <View
-          style={{
-            justifyContent: "space-evenly",
-            flex: 9,
-            overflow: "hidden",
-          }}
-        >
-          <Text
-            style={[
-              styles.postTitle,
-              { flexWrap: "nowrap", paddingTop: 10, fontWeight: "700" },
-            ]}
+        <Fragment>
+          {playingId === post.id && <ProgressBar parentId={post.id} />}
+          <View
+            style={{
+              justifyContent: "space-evenly",
+              flex: 9,
+              overflow: "hidden",
+            }}
           >
-            {post.title ? post.title : "Untitled"}
-          </Text>
-          <SpeechToText
-            containerStyle={[
-              { flexDirection: "row", flexWrap: "nowrap", flex: 1 },
-            ]}
-            fontSize={24}
-            post={post}
-            textStyle={{}}
-          />
-        </View>
-        <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
-          <View style={styles.postPlayButton}>
-            <Like post={post} type={"Post"} />
-            <TouchableOpacity
-              onPress={() => {
-                this.props.showComments(index);
-              }}
+            <Text
+              style={[
+                styles.postTitle,
+                { flexWrap: "nowrap", paddingTop: 10, fontWeight: "700" },
+              ]}
             >
-              <FontAwesome name="comment" size={24} color="black" />
-            </TouchableOpacity>
-            {isUserProfile && (
-              <Feather
-                onPress={async () => {
-                  await this.props.deletePost(post.id);
-                }}
-                name="scissors"
-                size={24}
-                color="red"
-              />
-            )}
+              {post.title ? post.title : "Untitled"}
+            </Text>
+            <SpeechToText
+              containerStyle={[
+                { flexDirection: "row", flexWrap: "nowrap", flex: 1 },
+              ]}
+              fontSize={24}
+              post={post}
+              textStyle={{}}
+            />
           </View>
-        </View>
-      </TouchableOpacity>
+          <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
+            <View style={styles.postPlayButton}>
+              <Like post={post} type={"Post"} />
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.showComments(index);
+                }}
+              >
+                <FontAwesome name="comment" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Fragment>
+      </TouchableHighlight>
     );
   }
 }
@@ -117,7 +110,6 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-  deletePost,
   changeSound,
   pauseSound,
   showComments,
