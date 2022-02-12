@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import ProgressBar from "../../reuseable/ProgressBar";
 // styles
 import { FontAwesome } from "@expo/vector-icons";
-import { styles } from "../../../styles/Styles";
-
+import { styles, postWidth, postHeight } from "../../../styles/Styles";
 //icons
 import { Feather } from "@expo/vector-icons";
 //redux
@@ -49,9 +49,15 @@ export class Post extends Component {
             await this.props.changeSound(post, post.signedUrl);
           }
         }}
-        style={styles.postContainer}
+        style={[
+          styles.postContainer,
+          {
+            backgroundColor: "white",
+          },
+        ]}
         key={post.id}
       >
+        {playingId === post.id && <ProgressBar parentId={post.id} />}
         <View
           style={{
             justifyContent: "space-evenly",

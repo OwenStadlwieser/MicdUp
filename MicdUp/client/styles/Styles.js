@@ -20,6 +20,7 @@ const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
+const postWidth = width > 1000 ? width * 0.8 : width;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -408,7 +409,7 @@ const styles = StyleSheet.create({
   },
   postContainer: {
     height: postHeight,
-    width: width > 1000 ? width * 0.8 : width,
+    width: postWidth,
     borderRadius: 8,
     borderWidth: 2,
     marginBottom: postPadding,
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
   },
   higherPostContainer: {
     height: postHeight,
-    width: width > 1000 ? width * 0.8 : width,
+    width: postWidth,
     borderRadius: 8,
     borderWidth: 2,
     marginBottom: height * 0.02,
@@ -793,4 +794,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles, postPadding, postHeight, filterHeight, largeIconFontSize };
+export {
+  styles,
+  postPadding,
+  postHeight,
+  filterHeight,
+  largeIconFontSize,
+  postWidth,
+};

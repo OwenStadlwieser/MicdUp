@@ -7,6 +7,7 @@ const initialState = {
   currentIntervalId: "",
   isPause: false,
   time: 0,
+  duration: 0,
 };
 
 export default function (state = { ...initialState }, action) {
@@ -21,6 +22,7 @@ export default function (state = { ...initialState }, action) {
         currentIntervalId: payload.currentIntervalId,
         isPause: false,
         time: 0,
+        duration: 0,
       };
     case SOUND_ENDED:
       let queue = { state };
@@ -45,7 +47,8 @@ export default function (state = { ...initialState }, action) {
     case SET_TIME:
       return {
         ...state,
-        time: payload,
+        time: payload.time,
+        duration: payload.duration,
       };
     default:
       return state;

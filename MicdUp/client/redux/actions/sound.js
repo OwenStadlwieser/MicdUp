@@ -44,7 +44,12 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
         type: SOUND_ENDED,
       });
     } else {
-      await dispatch(setTime(status.positionMillis));
+      await dispatch(
+        setTime({
+          time: status.positionMillis,
+          duration: status.durationMillis,
+        })
+      );
     }
   }, 100);
   dispatch({

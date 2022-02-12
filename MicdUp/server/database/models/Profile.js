@@ -20,6 +20,9 @@ const ProfileSchema = new Schema({
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  privateList: {
+    type: [mongoose.Schema.Types.ObjectId],
+  },
   posts: {
     type: [mongoose.Schema.Types.ObjectId],
   },

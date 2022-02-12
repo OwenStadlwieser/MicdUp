@@ -28,6 +28,7 @@ import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 // audio
 import Voice from "@react-native-voice/voice";
 // redux
+import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
 import {
   startRecording,
@@ -134,7 +135,14 @@ export class Chat extends Component {
   handleMore = () => console.log("Shown more");
 
   render() {
-    const { activeChats, profile, activeChatMembers, userName } = this.props;
+    const {
+      activeChats,
+      profile,
+      activeChatMembers,
+      userName,
+      playingId,
+      isPause,
+    } = this.props;
     const { recording, audioBlobs, v, loading } = this.state;
     return (
       <View style={styles.chatPane}>
@@ -201,13 +209,24 @@ export class Chat extends Component {
           {activeChats &&
             activeChats.length > 0 &&
             activeChats.map((chat, index) => (
-              <View
+              <TouchableOpacity
                 key={chat.id}
-                style={
+                style={[
                   profile.id === chat.owner.id
                     ? styles.userChat
-                    : styles.foreignChat
-                }
+                    : styles.foreignChat,
+                  {
+                    backgroundColor:
+                      playingId === chat.id && !isPause ? "#6FF6FF" : "white",
+                  },
+                ]}
+                onPress={async () => {
+                  if (playingId === chat.id && !isPause) {
+                    await this.props.pauseSound();
+                  } else if (chat.signedUrl) {
+                    await this.props.changeSound(chat, chat.signedUrl);
+                  }
+                }}
               >
                 <View style={{ flex: 3 }}>
                   <Text
@@ -257,14 +276,6 @@ export class Chat extends Component {
                     {chat.signedUrl && (
                       <Like type={"Chat"} postId={chat.id} post={chat} />
                     )}
-                    {chat.signedUrl && (
-                      <PlayButton
-                        containerStyle={{}}
-                        color={"#1A3561"}
-                        size={48}
-                        post={chat}
-                      />
-                    )}
                     {chat.owner.id === profile.id && (
                       <Feather
                         onPress={async () => {}}
@@ -275,7 +286,7 @@ export class Chat extends Component {
                     )}
                   </View>
                 )}
-              </View>
+              </TouchableOpacity>
             ))}
         </ScrollView>
         <View style={styles.recordingContainerComments}>
@@ -390,9 +401,14 @@ const mapStateToProps = (state) => ({
   activeChatMembers: state.chat.activeChatMembers,
   userName: state.auth.user.userName,
   socket: state.auth.socket,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+  isPause: state.sound.isPause,
 });
 
 export default connect(mapStateToProps, {
   hideChats,
   viewMoreChats,
+  changeSound,
+  pauseSound,
 })(Chat);

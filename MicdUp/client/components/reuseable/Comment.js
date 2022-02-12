@@ -25,7 +25,6 @@ import {
   stopRecording,
 } from "../../reuseableFunctions/recording";
 // audio
-import { changeSound, pauseSound } from "../../redux/actions/sound";
 import {
   onSpeechResults,
   onSpeechStart,
@@ -39,6 +38,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 // redux
+import { changeSound, pauseSound } from "../../redux/actions/sound";
 import { commentPost, getComments } from "../../redux/actions/recording";
 import {
   getReplies,
@@ -181,7 +181,12 @@ export class Comment extends Component {
             left: index >= 12 ? -1 : 0,
             borderLeftWidth: index >= 12 ? 0 : 1,
             zIndex: index >= 12 ? 1 : 0,
-            backgroundColor: index >= 12 ? "white" : "transparent",
+            backgroundColor:
+              playingId === comment.id && !isPause && index >= 12
+                ? "#6FF6FF"
+                : index >= 12
+                ? "white"
+                : "transparent",
           }}
         >
           <View style={{ flex: 2 }}>
@@ -230,14 +235,6 @@ export class Comment extends Component {
                   type={"Comment"}
                   parents={comment.parents}
                   postId={this.props.post.id}
-                />
-              )}
-              {comment.signedUrl && (
-                <PlayButton
-                  containerStyle={{}}
-                  color={"#1A3561"}
-                  size={48}
-                  post={comment}
                 />
               )}
               {!comment.isDeleted &&
