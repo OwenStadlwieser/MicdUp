@@ -47,9 +47,9 @@ export class Search extends Component {
     const { users, term, userName, tags, searchExecuted } = this.state;
     const { searchViewingProfile } = this.props;
     return (
-      <View style={styles.pane}>
+      <View style={[styles.paneUncentered, { alignItems: "center" }]}>
         <SearchComponent
-          parentViewStyle={styles.parentViewStyleUsers}
+          parentViewStyle={{ zIndex: 2 }}
           searchInputContainerStyle={styles.searchInputContainerStyleUsers}
           inputStyle={styles.inputStyleUsers}
           isForUser={true}

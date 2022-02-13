@@ -77,7 +77,7 @@ export class Profile extends Component {
       ) {
         this.mounted &&
           this.setState({ loading: true, prevLength: posts.length });
-        await getUserPosts(currentProfile.id, posts.length / 20);
+        await getUserPosts(currentProfile.id, Math.round(posts.length / 20));
         this.mounted && this.setState({ loading: false });
       }
     } catch (err) {
@@ -375,6 +375,7 @@ export class Profile extends Component {
             <SwipeListView
               data={posts}
               disableRightSwipe
+              disableLeftSwipe={!isUserProfile}
               onScroll={this.handleScroll.bind(this)}
               scrollEventThrottle={50}
               ref={(view) => (this.scrollView = view)}

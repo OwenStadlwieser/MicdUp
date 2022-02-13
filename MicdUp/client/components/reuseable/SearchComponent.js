@@ -27,6 +27,12 @@ export class SearchComponent extends Component {
     this.mounted && this.setState({ searchTerm: this.props.initValue });
   };
 
+  componentDidUpdate = (prevProps, prevState) => {
+    const { inputTerm } = this.props;
+    if (inputTerm !== prevProps.inputTerm) {
+      this.mounted && this.setState({ searchTerm: inputTerm });
+    }
+  };
   search = debounce(async (searchTerm) => {
     const {
       scrollable,
@@ -52,12 +58,15 @@ export class SearchComponent extends Component {
   }, 300);
 
   onPressFunc = (res) => {
-    const { searchTerm } = this.state;
+    let searchTerm;
+    const { inputTerm } = this.props;
+    if (!inputTerm) searchTerm = this.state.searchTerm;
+    else searchTerm = inputTerm;
     const pieces = searchTerm.split(/[\s,]+/);
     let newTerm = "";
     for (let i = 0; i < pieces.length - 1; i++) {
       newTerm.trim();
-      newTerm = newTerm + " " + pieces[i];
+      newTerm = i !== 0 ? newTerm + " " + pieces[i] : pieces[i];
     }
     if (newTerm) newTerm = newTerm + " ";
     this.mounted && this.setState({ searchTerm: newTerm + res.title + " " });
@@ -72,7 +81,11 @@ export class SearchComponent extends Component {
   };
 
   render() {
-    const { results, searchTerm, showDropDown } = this.state;
+    let searchTerm;
+    const { inputTerm } = this.props;
+    if (!inputTerm) searchTerm = this.state.searchTerm;
+    else searchTerm = inputTerm;
+    const { results, showDropDown } = this.state;
     const {
       isForUser,
       parentViewStyle,
@@ -119,7 +132,7 @@ export class SearchComponent extends Component {
                 width,
                 height,
                 position: "absolute",
-                bottom: 0,
+                top: 0,
                 left: 0,
                 alignItems: "center",
               }}

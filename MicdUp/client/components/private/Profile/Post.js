@@ -92,7 +92,7 @@ export class Post extends Component {
                   this.props.showComments(index);
                 }}
               >
-                <FontAwesome name="comment" size={24} color="black" />
+                <FontAwesome name="comment" size={24} color="#1A3561" />
               </TouchableOpacity>
             </View>
           </View>

@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
   },
   tagResultsContainer: {
     flex: 1,
-    marginTop: height * 0.1,
+    marginTop: height * 0.05,
     marginBottom: 20,
   },
   userResultsContainer: {
@@ -759,6 +759,7 @@ const styles = StyleSheet.create({
     width,
     justifyContent: "flex-start",
     alignItems: "center",
+    borderRadius: 8,
   },
   listItemContainerChat: {
     height: height * 0.1,

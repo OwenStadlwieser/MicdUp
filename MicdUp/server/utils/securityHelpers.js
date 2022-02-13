@@ -1,3 +1,4 @@
+const { Profile } = require("../database/models/Profile");
 const checkIfIsInPrivateList = async (context, parent) => {
   if (
     !context.postOwner ||
