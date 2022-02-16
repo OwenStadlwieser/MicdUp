@@ -13,6 +13,7 @@ import {
   HIDE_NOTIF,
   SHOW_COMMENTS,
   HIDE_COMMENTS,
+  UPDATE_FOLLOW_COUNTS,
 } from "../types";
 
 const initialState = {
@@ -111,6 +112,14 @@ export default function (state = { ...initialState }, action) {
           ...state.viewingProfile,
           followersCount: payload.followersCount,
           isFollowedByUser: payload.isFollowedByUser,
+        },
+      };
+    case UPDATE_FOLLOW_COUNTS:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          followingCount: payload.followingCount,
         },
       };
     case VIEW_PROFILE_SEARCH:

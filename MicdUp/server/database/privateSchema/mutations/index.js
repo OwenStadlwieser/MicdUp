@@ -13,7 +13,7 @@ const {
   commentToPost,
 } = require("./recording");
 const { verifyEmail, setEmailVerified, deleteAccount } = require("./user");
-const { updateProfilePic, followProfile } = require("./profile");
+const { updateProfilePic, followProfile, addToPrivates } = require("./profile");
 const { addToken } = require("./notifs");
 const { likeComment, deleteComment } = require("./comment");
 
@@ -35,6 +35,7 @@ const Mutation = new GraphQLObjectType({
     likeComment,
     fetchChat,
     deleteComment,
+    addToPrivates,
   }, //fields end here
 });
 

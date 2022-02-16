@@ -25,6 +25,7 @@ const GET_USER_QUERY = gql`
   }
 `;
 
+
 const DELETE_ACCOUNT_MUTATION = gql`
   mutation deleteAccount {
     deleteAccount {

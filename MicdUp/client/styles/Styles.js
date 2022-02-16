@@ -158,9 +158,8 @@ const styles = StyleSheet.create({
     fontSize: small,
   },
   profileText: {
-    paddingLeft: width * 0.075,
     width: width * 0.6,
-    textAlign: "left",
+    textAlign: "center",
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",
@@ -802,4 +801,7 @@ export {
   filterHeight,
   largeIconFontSize,
   postWidth,
+  small,
+  medium,
+  large,
 };

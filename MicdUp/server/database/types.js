@@ -116,6 +116,14 @@ const ProfilePrivateType = new GraphQLObjectType({
         return Array.from(parent.followers.keys()).length;
       },
     },
+    privates: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(context.profile.privates.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
+      },
+    },
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
@@ -172,6 +180,22 @@ const ProfilePublicType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent) {
         return Array.from(parent.followers.keys()).length;
+      },
+    },
+    followers: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(context.profile.followers.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
+      },
+    },
+    following: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(context.profile.following.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
       },
     },
     isFollowedByUser: {

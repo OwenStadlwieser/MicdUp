@@ -1,32 +1,55 @@
-import { UPDATE_PROFILE_PIC, UPDATE_FOLLOWER_COUNT } from "../types";
-import { privateClient } from "../../apollo/client";
+import {
+  UPDATE_PROFILE_PIC,
+  UPDATE_FOLLOWER_COUNT,
+  UPDATE_FOLLOW_COUNTS,
+} from "../types";
+import { privateClient, publicClient } from "../../apollo/client";
 import { showMessage } from "./display";
 import {
   UPDATE_PROFILE_PIC_MUTATION,
   FOLLOW_PROFILE_MUTATION,
+  GET_FOLLOWERS_QUERY,
+  GET_PRIVATES_QUERY,
+  ADD_TO_PRIVATES_MUTATION,
+  GET_FOLLOWING_QUERY,
 } from "../../apollo/private/profile";
 
-export const followProfile = (profileId) => async (dispatch) => {
-  try {
-    const res = await privateClient.mutate({
-      mutation: FOLLOW_PROFILE_MUTATION,
-      variables: {
-        profileId,
-      },
-      fetchPolicy: "no-cache",
-    });
-    if (!res.data || !res.data.followProfile) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
+export const followProfile =
+  (profileId, followingFromProfile = true) =>
+  async (dispatch) => {
+    try {
+      const res = await privateClient.mutate({
+        mutation: FOLLOW_PROFILE_MUTATION,
+        variables: {
+          profileId,
+        },
+        fetchPolicy: "no-cache",
+      });
+      if (!res.data || !res.data.followProfile) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      followingFromProfile &&
+        dispatch({
+          type: UPDATE_FOLLOWER_COUNT,
+          payload: { ...res.data.followProfile },
+        });
+      return res.data.followProfile;
+    } catch (err) {
+      console.log(err);
     }
+  };
+
+export const updateFollowCounts = (followingCount) => (dispatch) => {
+  try {
     dispatch({
-      type: UPDATE_FOLLOWER_COUNT,
-      payload: { ...res.data.followProfile },
+      type: UPDATE_FOLLOW_COUNTS,
+      payload: { followingCount },
     });
   } catch (err) {
     console.log(err);
@@ -65,3 +88,109 @@ export const updateProfilePic =
       console.log(err);
     }
   };
+
+export const getFollowersQuery =
+  (profileId, skipMult = 0) =>
+  async (dispatch) => {
+    try {
+      const res = await publicClient.query({
+        query: GET_FOLLOWERS_QUERY,
+        variables: {
+          profileId,
+          skipMult,
+        },
+        fetchPolicy: "no-cache",
+      });
+      if (!res.data || !res.data.getFollowers) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
+      return res.data.getFollowers;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+export const getFollowingQuery = (profileId, skipMult) => async (dispatch) => {
+  try {
+    const res = await publicClient.query({
+      query: GET_FOLLOWING_QUERY,
+      variables: {
+        profileId,
+        skipMult,
+      },
+      fetchPolicy: "no-cache",
+    });
+    if (!res.data || !res.data.getFollowing) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    return res.data.getFollowing;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const getPrivatesQuery = (skipMult) => async (dispatch) => {
+  try {
+    const res = await privateClient.query({
+      query: GET_PRIVATES_QUERY,
+      variables: {
+        profileId,
+      },
+      fetchPolicy: "no-cache",
+    });
+    if (!res.data || !res.data.getPrivates) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    return res.data.getPrivates;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const addToPrivates = (profileId) => async (dispatch) => {
+  try {
+    const res = await privateClient.mutate({
+      mutation: ADD_TO_PRIVATES_MUTATION,
+      variables: {
+        profileId,
+      },
+      fetchPolicy: "no-cache",
+    });
+    if (!res.data || !res.data.addToPrivates) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Something went wrong. Please contact support.",
+        })
+      );
+      return false;
+    }
+    dispatch(
+      showMessage({
+        success: true,
+        message: `${res.data.addToPrivates.userName} can now see your private posts`,
+      })
+    );
+    return res.data.addToPrivates;
+  } catch (err) {
+    console.log(err);
+  }
+};

@@ -15,7 +15,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 // styles
-import { styles, postHeight, largeIconFontSize } from "../../../styles/Styles";
+import {
+  styles,
+  postHeight,
+  largeIconFontSize,
+  small,
+} from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
 import Bio from "./Bio";
@@ -24,6 +29,7 @@ import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 import Comment from "../../reuseable/Comment";
 import { SwipeListView } from "react-native-swipe-list-view";
+import ListOfAccounts from "../../reuseable/ListOfAccounts";
 // redux
 import {
   getUserPosts,
@@ -33,6 +39,10 @@ import {
 import {
   updateProfilePic,
   followProfile,
+  getFollowersQuery,
+  getFollowingQuery,
+  getPrivatesQuery,
+  addToPrivates,
 } from "../../../redux/actions/profile";
 import { createOrOpenChat } from "../../../redux/actions/chat";
 import GestureRecognizer from "react-native-swipe-gestures";
@@ -60,6 +70,8 @@ export class Profile extends Component {
       isRecordingComment: false,
       postsInvalid: false,
       prevLength: 0,
+      showingListOfAccounts: false,
+      listOfAccountsParams: {},
     };
     this.scrollView = null;
     this.mounted = true;
@@ -216,7 +228,8 @@ export class Profile extends Component {
       loading,
       selectImage,
       isRecordingComment,
-      postsInvalid,
+      showingListOfAccounts,
+      listOfAccountsParams,
     } = this.state;
     const {
       userName,
@@ -246,6 +259,15 @@ export class Profile extends Component {
           <ImagePicker
             setHidden={this.setHidden.bind(this)}
             setImage={this.setImage.bind(this)}
+          />
+        )}
+        {showingListOfAccounts && (
+          <ListOfAccounts
+            hideList={() => {
+              this.mounted && this.setState({ showingListOfAccounts: false });
+            }}
+            isUserProfile={isUserProfile}
+            params={listOfAccountsParams}
           />
         )}
         {!settingsShown && isUserProfile && !showingComments && (
@@ -326,13 +348,86 @@ export class Profile extends Component {
                       </TouchableHighlight>
                     )}
                   </View>
-                  <Text style={styles.followersText}>
-                    {currentProfile ? currentProfile.followersCount : 0}{" "}
-                    Followers
-                  </Text>
                 </View>
                 <Text numberOfLines={1} style={[styles.profileText]}>
                   @{userName}
+                </Text>
+                <Text style={styles.followersText}>
+                  <Text
+                    onPress={() => {
+                      const { getFollowersQuery } = this.props;
+                      this.mounted &&
+                        this.setState({
+                          showingListOfAccounts: true,
+                          listOfAccountsParams: {
+                            title: "Followers",
+                            getData: async function (skipMult) {
+                              const res = await getFollowersQuery(
+                                currentProfile.id,
+                                skipMult
+                              );
+                              console.log(res);
+                              return res && res.followers ? res.followers : [];
+                            },
+                          },
+                        });
+                    }}
+                    style={{ fontSize: small, fontStyle: "italic " }}
+                  >
+                    {currentProfile ? currentProfile.followersCount : 0}{" "}
+                    Followers{"  "}
+                  </Text>
+                  {currentProfile && isUserProfile && (
+                    <Text
+                      onPress={() => {
+                        const { getFollowingQuery } = this.props;
+                        this.mounted &&
+                          this.setState({
+                            showingListOfAccounts: true,
+
+                            listOfAccountsParams: {
+                              title: "Following",
+                              getData: async function (skipMult) {
+                                const res = await getFollowingQuery(
+                                  currentProfile.id,
+                                  skipMult
+                                );
+                                return res && res.following
+                                  ? res.following
+                                  : [];
+                              },
+                            },
+                          });
+                      }}
+                      style={{ fontSize: small, fontStyle: "italic " }}
+                    >
+                      {currentProfile.followingCount + " Following  "}
+                    </Text>
+                  )}
+                  <Text
+                    onPress={() => {
+                      const { getPrivatesQuery } = this.props;
+                      if (!isUserProfile) return;
+                      this.mounted &&
+                        this.setState({
+                          showingListOfAccounts: true,
+                          isPrivates: true,
+                          listOfAccountsParams: {
+                            title: "Privates",
+                            getData: async function (skipMult) {
+                              const res = await getPrivatesQuery(skipMult);
+                              return res && res.privates ? res.privates : [];
+                            },
+                          },
+                        });
+                    }}
+                    style={{ fontSize: small, fontStyle: "italic " }}
+                  >
+                    {currentProfile && currentProfile.privatesCount
+                      ? currentProfile.privatesCount
+                      : 0}{" "}
+                    Privates{"        "}
+                  </Text>
                 </Text>
                 <Bio
                   startRecording={this.startRecording.bind(this)}
@@ -520,4 +615,8 @@ export default connect(mapStateToProps, {
   followProfile,
   createOrOpenChat,
   deletePost,
+  getFollowersQuery,
+  getFollowingQuery,
+  getPrivatesQuery,
+  addToPrivates,
 })(Profile);
