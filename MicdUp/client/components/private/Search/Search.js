@@ -48,27 +48,29 @@ export class Search extends Component {
     const { searchViewingProfile } = this.props;
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
-        <SearchComponent
-          parentViewStyle={{ zIndex: 2 }}
-          searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-          inputStyle={styles.inputStyleUsers}
-          isForUser={true}
-          placeholder={"Search"}
-          setStateOnChange={true}
-          setStateOnChangeFunc={this.setSearchTerm.bind(this)}
-          setResOnChange={true}
-          setResOnChangeFunc={this.setUsersState.bind(this)}
-          searchFunction={this.props.searchUsers}
-          secondSearchFunction={this.props.searchTags}
-          secondSearch={true}
-          setSecondRes={this.setTagsState.bind(this)}
-          splitSearchTerm={true}
-          inputStyle={styles.textInputRecEdit}
-          placeHolderColor={"white"}
-          scrollable={true}
-          displayResults={false}
-          initValue={users ? users.toString() : ""}
-        />
+        {!searchViewingProfile && (
+          <SearchComponent
+            parentViewStyle={{ zIndex: 2 }}
+            searchInputContainerStyle={styles.searchInputContainerStyleUsers}
+            inputStyle={styles.inputStyleUsers}
+            isForUser={true}
+            placeholder={"Search"}
+            setStateOnChange={true}
+            setStateOnChangeFunc={this.setSearchTerm.bind(this)}
+            setResOnChange={true}
+            setResOnChangeFunc={this.setUsersState.bind(this)}
+            searchFunction={this.props.searchUsers}
+            secondSearchFunction={this.props.searchTags}
+            secondSearch={true}
+            setSecondRes={this.setTagsState.bind(this)}
+            splitSearchTerm={true}
+            inputStyle={styles.textInputRecEdit}
+            placeHolderColor={"white"}
+            scrollable={true}
+            displayResults={false}
+            initValue={users ? users.toString() : ""}
+          />
+        )}
         {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
@@ -117,7 +119,15 @@ export class Search extends Component {
             </ScrollView>
           </View>
         ) : (
-          searchViewingProfile && <Profile userName={userName} />
+          searchViewingProfile && (
+            <Profile
+              backArrow={true}
+              backAction={(() => {
+                this.props.searchViewProfile(false);
+              }).bind(this)}
+              userName={userName}
+            />
+          )
         )}
       </View>
     );

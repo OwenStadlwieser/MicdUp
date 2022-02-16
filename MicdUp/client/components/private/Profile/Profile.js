@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 // styles
 import {
   styles,
@@ -238,6 +239,8 @@ export class Profile extends Component {
       posts,
       postIndex,
       showingComments,
+      backArrow,
+      backAction,
     } = this.props;
     if (!profile && !currentProfile) {
       return (
@@ -279,6 +282,17 @@ export class Profile extends Component {
             size={24}
             color="white"
             style={styles.topRightIcon}
+          />
+        )}
+        {backArrow && !showingListOfAccounts && (
+          <AntDesign
+            style={[styles.topLeftIcon, { zIndex: 8 }]}
+            name="leftcircle"
+            size={24}
+            color="white"
+            onPress={() => {
+              this.props.backAction();
+            }}
           />
         )}
         {settingsShown && (
@@ -362,6 +376,7 @@ export class Profile extends Component {
                           listOfAccountsParams: {
                             title: "Followers",
                             getData: async function (skipMult) {
+                              console.log(currentProfile);
                               const res = await getFollowersQuery(
                                 currentProfile.id,
                                 skipMult
@@ -377,33 +392,31 @@ export class Profile extends Component {
                     {currentProfile ? currentProfile.followersCount : 0}{" "}
                     Followers{"  "}
                   </Text>
-                  {currentProfile && isUserProfile && (
-                    <Text
-                      onPress={() => {
-                        const { getFollowingQuery } = this.props;
-                        this.mounted &&
-                          this.setState({
-                            showingListOfAccounts: true,
+                  <Text
+                    onPress={() => {
+                      const { getFollowingQuery } = this.props;
+                      this.mounted &&
+                        this.setState({
+                          showingListOfAccounts: true,
 
-                            listOfAccountsParams: {
-                              title: "Following",
-                              getData: async function (skipMult) {
-                                const res = await getFollowingQuery(
-                                  currentProfile.id,
-                                  skipMult
-                                );
-                                return res && res.following
-                                  ? res.following
-                                  : [];
-                              },
+                          listOfAccountsParams: {
+                            title: "Following",
+                            getData: async function (skipMult) {
+                              const res = await getFollowingQuery(
+                                currentProfile.id,
+                                skipMult
+                              );
+                              return res && res.following ? res.following : [];
                             },
-                          });
-                      }}
-                      style={{ fontSize: small, fontStyle: "italic " }}
-                    >
-                      {currentProfile.followingCount + " Following  "}
-                    </Text>
-                  )}
+                          },
+                        });
+                    }}
+                    style={{ fontSize: small, fontStyle: "italic " }}
+                  >
+                    {currentProfile
+                      ? currentProfile.followingCount + " Following  "
+                      : 0 + " Following  "}
+                  </Text>
                   <Text
                     onPress={() => {
                       const { getPrivatesQuery } = this.props;

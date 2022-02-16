@@ -186,7 +186,7 @@ const ProfilePublicType = new GraphQLObjectType({
       type: new GraphQLList(ProfilePublicType),
       async resolve(parent, args, context, info) {
         const skip = context.skipMult ? context.skipMult : 0;
-        const keys = Array.from(context.profile.followers.keys());
+        const keys = Array.from(parent.followers.keys());
         return await Profile.find({ _id: { $in: keys } }).skip(skip);
       },
     },
@@ -194,7 +194,7 @@ const ProfilePublicType = new GraphQLObjectType({
       type: new GraphQLList(ProfilePublicType),
       async resolve(parent, args, context, info) {
         const skip = context.skipMult ? context.skipMult : 0;
-        const keys = Array.from(context.profile.following.keys());
+        const keys = Array.from(parent.following.keys());
         return await Profile.find({ _id: { $in: keys } }).skip(skip);
       },
     },

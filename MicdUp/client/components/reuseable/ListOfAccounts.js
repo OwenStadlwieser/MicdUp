@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   View,
@@ -7,13 +7,17 @@ import {
   Platform,
   Text,
   Dimensions,
+  TouchableHighlight,
 } from "react-native";
 import { Button } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { styles, listItemHeight } from "../../styles/Styles";
 import { Appbar } from "react-native-paper";
+// redux
 import { followProfile, updateFollowCounts } from "../../redux/actions/profile";
-
+import { viewProfile } from "../../redux/actions/display";
+// children
+import Profile from "../private/Profile/Profile";
 const { height, width } = Dimensions.get("window");
 export class ListOfAccounts extends Component {
   constructor() {
@@ -22,6 +26,7 @@ export class ListOfAccounts extends Component {
       loading: false,
       data: [],
       prevLength: 0,
+      viewingProfile: false,
     };
 
     this.mounted = true;
@@ -60,13 +65,33 @@ export class ListOfAccounts extends Component {
   render() {
     const { action1, action2, swipeable, swipeAction } = this.props.params;
     const { isUserProfile } = this.props;
-    const { data } = this.state;
+    const { data, viewingProfile, userName } = this.state;
+    if (viewingProfile)
+      return (
+        <View
+          style={{
+            height: height * 0.9,
+            width,
+            zIndex: 5,
+            backgroundColor: "transparent",
+            position: "absolute",
+          }}
+        >
+          <Profile
+            backArrow={true}
+            backAction={(() => {
+              this.mounted && this.setState({ viewingProfile: false });
+            }).bind(this)}
+            userName={userName}
+          />
+        </View>
+      );
     return (
       <View
         style={{
           height: height * 0.9,
           width,
-          zIndex: 5,
+          zIndex: 6,
           backgroundColor: "white",
           position: "absolute",
         }}
@@ -95,78 +120,89 @@ export class ListOfAccounts extends Component {
           useNativeDriver={Platform.OS === "web" ? false : true}
           renderItem={(data, rowMap) => {
             return (
-              <View
+              <TouchableHighlight
                 key={data.index}
                 style={[styles.listItemContainer, { width, borderRadius: 8 }]}
+                underlayColor="#6FF6FF"
+                onPress={() => {
+                  this.props.viewProfile(data.item);
+                  this.mounted &&
+                    this.setState({
+                      viewingProfile: true,
+                      userName: data.item.user.userName,
+                    });
+                }}
               >
-                {data.item.image && (
-                  <Image
-                    source={
-                      data.item.image.signedUrl
-                        ? {
-                            uri: data.item.image.signedUrl,
+                <Fragment>
+                  {data.item.image && (
+                    <Image
+                      source={
+                        data.item.image.signedUrl
+                          ? {
+                              uri: data.item.image.signedUrl,
+                            }
+                          : require("../../assets/no-profile-pic-icon-27.jpg")
+                      }
+                      style={styles.listItemProfileImg}
+                    />
+                  )}
+                  <Text style={[styles.listItemText, { flex: 7 }]}>
+                    {data.item.user.userName}
+                  </Text>
+                  <View style={{}}>
+                    {isUserProfile && (
+                      <Text
+                        onPress={async () => {
+                          const { currentProfile } = this.props;
+                          const res = await this.props.followProfile(
+                            data.item.id,
+                            false
+                          );
+                          if (res.id) {
+                            const { data } = this.state;
+                            const index = data.findIndex((item) => {
+                              return item.id === res.id;
+                            });
+                            data[index].isFollowedByUser =
+                              !data[index].isFollowedByUser;
+                            this.mounted && this.setState({ data: [...data] });
+                            currentProfile &&
+                              this.props.updateFollowCounts(
+                                currentProfile.followingCount +
+                                  (data[index].isFollowedByUser ? 1 : -1)
+                              );
                           }
-                        : require("../../assets/no-profile-pic-icon-27.jpg")
-                    }
-                    style={styles.listItemProfileImg}
-                  />
-                )}
-                <Text style={[styles.listItemText, { flex: 7 }]}>
-                  {data.item.user.userName}
-                </Text>
-                <View style={{}}>
-                  {isUserProfile && (
-                    <Text
-                      onPress={async () => {
-                        const { currentProfile } = this.props;
-                        const res = await this.props.followProfile(
-                          data.item.id,
-                          false
-                        );
-                        if (res.id) {
-                          const { data } = this.state;
-                          const index = data.findIndex((item) => {
-                            return item.id === res.id;
-                          });
-                          data[index].isFollowedByUser =
-                            !data[index].isFollowedByUser;
-                          this.mounted && this.setState({ data: [...data] });
-                          currentProfile &&
-                            this.props.updateFollowCounts(
-                              currentProfile.followingCount +
-                                (data[index].isFollowedByUser ? 1 : -1)
-                            );
-                        }
-                      }}
-                      style={styles.nextButtonText}
-                    >
-                      {data.item.isFollowedByUser ? "unfollow" : "follow"}
-                    </Text>
-                  )}
-                  {action1 && (
-                    <Button
-                      icon={action1.icon}
-                      color={action1.color}
-                      mode="contained"
-                      onPress={() => {
-                        action1.onPress(data.item);
-                      }}
-                      style={action1.style}
-                    ></Button>
-                  )}
-                  {action2 && (
-                    <Button
-                      icon={action2.icon}
-                      color={action2.color}
-                      mode="contained"
-                      onPress={() => {
-                        action2.onPress(data.item);
-                      }}
-                      style={action2.style}
-                    ></Button>
-                  )}
-                </View>
-              </View>
+                        }}
+                        style={styles.nextButtonText}
+                      >
+                        {data.item.isFollowedByUser ? "unfollow" : "follow"}
+                      </Text>
+                    )}
+                    {action1 && (
+                      <Button
+                        icon={action1.icon}
+                        color={action1.color}
+                        mode="contained"
+                        onPress={() => {
+                          action1.onPress(data.item);
+                        }}
+                        style={action1.style}
+                      ></Button>
+                    )}
+                    {action2 && (
+                      <Button
+                        icon={action2.icon}
+                        color={action2.color}
+                        mode="contained"
+                        onPress={() => {
+                          action2.onPress(data.item);
+                        }}
+                        style={action2.style}
+                      ></Button>
+                    )}
+                  </View>
+                </Fragment>
+              </TouchableHighlight>
             );
           }}
           rightOpenValue={-75}
@@ -180,6 +216,8 @@ const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
 });
 
-export default connect(mapStateToProps, { followProfile, updateFollowCounts })(
-  ListOfAccounts
-);
+export default connect(mapStateToProps, {
+  followProfile,
+  updateFollowCounts,
+  viewProfile,
+})(ListOfAccounts);
