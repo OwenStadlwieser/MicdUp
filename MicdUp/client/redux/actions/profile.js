@@ -146,7 +146,7 @@ export const getPrivatesQuery = (skipMult) => async (dispatch) => {
     const res = await privateClient.query({
       query: GET_PRIVATES_QUERY,
       variables: {
-        profileId,
+        skipMult,
       },
       fetchPolicy: "no-cache",
     });

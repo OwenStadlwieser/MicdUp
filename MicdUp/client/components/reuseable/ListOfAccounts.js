@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
-import { styles } from "../../styles/Styles";
+import { styles, listItemHeight } from "../../styles/Styles";
 import { Appbar } from "react-native-paper";
 import { followProfile, updateFollowCounts } from "../../redux/actions/profile";
 
@@ -21,6 +21,7 @@ export class ListOfAccounts extends Component {
     this.state = {
       loading: false,
       data: [],
+      prevLength: 0,
     };
 
     this.mounted = true;
@@ -35,18 +36,39 @@ export class ListOfAccounts extends Component {
     this.mounted && this.setState({ loading: false, data: res });
   };
 
+  async handleScroll(event) {
+    const { params } = this.props;
+    const { loading, prevLength, data } = this.state;
+    const { getData } = params;
+    try {
+      if (
+        event.nativeEvent.contentOffset.y >
+          data.length * listItemHeight - height &&
+        !loading &&
+        prevLength !== data.length
+      ) {
+        this.mounted &&
+          this.setState({ loading: true, prevLength: data.length });
+        const res = await getData(Math.round(data.length / 20));
+        this.mounted &&
+          this.setState({ loading: false, data: [...data, ...res] });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
   render() {
-    const { action1, action2, swipeable, swipeAction, handleScroll } =
-      this.props.params;
+    const { action1, action2, swipeable, swipeAction } = this.props.params;
     const { isUserProfile } = this.props;
     const { data } = this.state;
     return (
       <View
         style={{
-          height,
+          height: height * 0.9,
           width,
           zIndex: 5,
           backgroundColor: "white",
+          position: "absolute",
         }}
       >
         <Appbar.Header
@@ -68,7 +90,7 @@ export class ListOfAccounts extends Component {
           data={data}
           disableRightSwipe
           disableLeftSwipe={!swipeable}
-          onScroll={handleScroll}
+          onScroll={this.handleScroll.bind(this)}
           scrollEventThrottle={50}
           useNativeDriver={Platform.OS === "web" ? false : true}
           renderItem={(data, rowMap) => {

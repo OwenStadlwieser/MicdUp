@@ -21,6 +21,7 @@ const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
+const listItemHeight = height * 0.08;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -683,7 +684,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   recordingSettingsOption: {
-    height: height * 0.08,
+    height: listItemHeight,
     width: width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -736,7 +737,7 @@ const styles = StyleSheet.create({
     width: width,
   },
   listItemContainer: {
-    height: height * 0.08,
+    height: listItemHeight,
     borderColor: "#1A3561",
     borderWidth: 2,
     borderStyle: "solid",
@@ -748,7 +749,7 @@ const styles = StyleSheet.create({
     width: width * 0.6,
   },
   listItemContainerUser: {
-    height: height * 0.08,
+    height: listItemHeight,
     borderColor: "#1A3561",
     borderWidth: 2,
     borderStyle: "solid",
@@ -804,4 +805,5 @@ export {
   small,
   medium,
   large,
+  listItemHeight,
 };
