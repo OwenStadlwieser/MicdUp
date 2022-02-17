@@ -15,6 +15,7 @@ import {
   HIDE_COMMENTS,
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
+  UPDATE_PRIVATE_COUNT_FROM_LIST,
 } from "../types";
 
 const initialState = {
@@ -130,6 +131,14 @@ export default function (state = { ...initialState }, action) {
         viewingProfile: {
           ...state.viewingProfile,
           followingCount: payload.followingCount,
+        },
+      };
+    case UPDATE_PRIVATE_COUNT_FROM_LIST:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          privatesCount: payload.privatesCount,
         },
       };
     case VIEW_PROFILE_SEARCH:

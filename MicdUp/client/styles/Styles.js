@@ -22,6 +22,7 @@ const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
 const listItemHeight = height * 0.08;
+const listItemHeight2X = listItemHeight * 2;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -807,4 +808,5 @@ export {
   medium,
   large,
   listItemHeight,
+  listItemHeight2X,
 };

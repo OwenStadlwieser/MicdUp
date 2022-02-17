@@ -240,7 +240,6 @@ export class Profile extends Component {
       postIndex,
       showingComments,
       backArrow,
-      backAction,
     } = this.props;
     if (!profile && !currentProfile) {
       return (

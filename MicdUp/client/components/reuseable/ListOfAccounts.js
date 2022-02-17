@@ -11,10 +11,15 @@ import {
 } from "react-native";
 import { Button } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
-import { styles, listItemHeight } from "../../styles/Styles";
+import { styles, listItemHeight2X } from "../../styles/Styles";
 import { Appbar } from "react-native-paper";
 // redux
-import { followProfile, updateFollowCounts } from "../../redux/actions/profile";
+import {
+  followProfile,
+  updateFollowCounts,
+  addToPrivates,
+  updatePrivateCounts,
+} from "../../redux/actions/profile";
 import { viewProfile } from "../../redux/actions/display";
 // children
 import Profile from "../private/Profile/Profile";
@@ -48,7 +53,7 @@ export class ListOfAccounts extends Component {
     try {
       if (
         event.nativeEvent.contentOffset.y >
-          data.length * listItemHeight - height &&
+          data.length * listItemHeight2X - height &&
         !loading &&
         prevLength !== data.length
       ) {
@@ -122,7 +127,10 @@ export class ListOfAccounts extends Component {
             return (
               <TouchableHighlight
                 key={data.index}
-                style={[styles.listItemContainer, { width, borderRadius: 8 }]}
+                style={[
+                  styles.listItemContainer,
+                  { width, borderRadius: 8, height: listItemHeight2X },
+                ]}
                 underlayColor="#6FF6FF"
                 onPress={() => {
                   this.props.viewProfile(data.item);
@@ -146,12 +154,21 @@ export class ListOfAccounts extends Component {
                       style={styles.listItemProfileImg}
                     />
                   )}
-                  <Text style={[styles.listItemText, { flex: 7 }]}>
+                  <Text
+                    style={[styles.listItemText, { flex: 8, fontSize: 24 }]}
+                  >
                     {data.item.user.userName}
                   </Text>
-                  <View style={{}}>
+                  <View
+                    style={{
+                      alignItems: "flex-start",
+                      flex: 7,
+                      flexWrap: "wrap",
+                    }}
+                  >
                     {isUserProfile && (
-                      <Text
+                      <Button
+                        color="white"
                         onPress={async () => {
                           const { currentProfile } = this.props;
                           const res = await this.props.followProfile(
@@ -173,10 +190,54 @@ export class ListOfAccounts extends Component {
                               );
                           }
                         }}
-                        style={styles.nextButtonText}
+                        style={[
+                          styles.nextButtonText,
+                          {
+                            backgroundColor: "#1A3561",
+                            alignSelf: "stretch",
+                          },
+                        ]}
                       >
                         {data.item.isFollowedByUser ? "unfollow" : "follow"}
-                      </Text>
+                      </Button>
+                    )}
+                    {isUserProfile && (
+                      <Button
+                        color="white"
+                        onPress={async () => {
+                          const { currentProfile } = this.props;
+                          const res = await this.props.addToPrivates(
+                            data.item.id,
+                            false
+                          );
+                          if (res.id) {
+                            const { data } = this.state;
+                            const index = data.findIndex((item) => {
+                              return item.id === res.id;
+                            });
+                            data[index].isPrivateByUser =
+                              !data[index].isPrivateByUser;
+                            this.mounted && this.setState({ data: [...data] });
+                            currentProfile &&
+                              this.props.updatePrivateCounts(
+                                currentProfile.privatesCount +
+                                  (data[index].isPrivateByUser ? 1 : -1)
+                              );
+                          }
+                        }}
+                        style={[
+                          styles.nextButtonText,
+                          {
+                            backgroundColor: "#1A3561",
+                            alignSelf: "stretch",
+                            marginTop: 10,
+                          },
+                        ]}
+                      >
+                        {data.item.isPrivateByUser
+                          ? "remove private"
+                          : "add private"}
+                      </Button>
                     )}
                     {action1 && (
                       <Button
@@ -220,4 +281,6 @@ export default connect(mapStateToProps, {
   followProfile,
   updateFollowCounts,
   viewProfile,
+  addToPrivates,
+  updatePrivateCounts,
 })(ListOfAccounts);

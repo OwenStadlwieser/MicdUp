@@ -3,6 +3,7 @@ import {
   UPDATE_FOLLOWER_COUNT,
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
+  UPDATE_PRIVATE_COUNT_FROM_LIST,
 } from "../types";
 import { privateClient, publicClient } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -56,6 +57,18 @@ export const updateFollowCounts = (followingCount) => (dispatch) => {
     console.log(err);
   }
 };
+
+export const updatePrivateCounts = (privatesCount) => (dispatch) => {
+  try {
+    dispatch({
+      type: UPDATE_PRIVATE_COUNT_FROM_LIST,
+      payload: { privatesCount },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const updateProfilePic =
   (file, base64, fileType) => async (dispatch) => {
     try {
