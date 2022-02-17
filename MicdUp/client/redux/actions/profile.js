@@ -2,6 +2,7 @@ import {
   UPDATE_PROFILE_PIC,
   UPDATE_FOLLOWER_COUNT,
   UPDATE_FOLLOW_COUNTS,
+  UPDATE_PRIVATE_COUNT,
 } from "../types";
 import { privateClient, publicClient } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -165,32 +166,39 @@ export const getPrivatesQuery = (skipMult) => async (dispatch) => {
   }
 };
 
-export const addToPrivates = (profileId) => async (dispatch) => {
-  try {
-    const res = await privateClient.mutate({
-      mutation: ADD_TO_PRIVATES_MUTATION,
-      variables: {
-        profileId,
-      },
-      fetchPolicy: "no-cache",
-    });
-    if (!res.data || !res.data.addToPrivates) {
+export const addToPrivates =
+  (profileId, addingFromProfile = true) =>
+  async (dispatch) => {
+    try {
+      const res = await privateClient.mutate({
+        mutation: ADD_TO_PRIVATES_MUTATION,
+        variables: {
+          profileId,
+        },
+        fetchPolicy: "no-cache",
+      });
+      if (!res.data || !res.data.addToPrivates) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Something went wrong. Please contact support.",
+          })
+        );
+        return false;
+      }
       dispatch(
         showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
+          success: true,
+          message: `${res.data.addToPrivates.userName} can now see your private posts`,
         })
       );
-      return false;
+      addingFromProfile &&
+        dispatch({
+          type: UPDATE_PRIVATE_COUNT,
+          payload: { ...res.data.addToPrivates },
+        });
+      return res.data.addToPrivates;
+    } catch (err) {
+      console.log(err);
     }
-    dispatch(
-      showMessage({
-        success: true,
-        message: `${res.data.addToPrivates.userName} can now see your private posts`,
-      })
-    );
-    return res.data.addToPrivates;
-  } catch (err) {
-    console.log(err);
-  }
-};
+  };

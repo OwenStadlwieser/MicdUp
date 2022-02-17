@@ -12,6 +12,7 @@ const GET_USER_QUERY = gql`
         id
         followingCount
         followersCount
+        privatesCount
         bio {
           id
           signedUrl
@@ -24,7 +25,6 @@ const GET_USER_QUERY = gql`
     }
   }
 `;
-
 
 const DELETE_ACCOUNT_MUTATION = gql`
   mutation deleteAccount {
@@ -62,7 +62,9 @@ const SEARCH_USERS_QUERY = gql`
         id
         followingCount
         followersCount
+        privatesCount
         isFollowedByUser
+        isPrivateByUser
         bio {
           id
           signedUrl

@@ -632,9 +632,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   smallNextButton: {
-    marginLeft: 30,
     height: width * 0.05,
-    width: width * 0.25,
+    flex: 1,
+    marginHorizontal: 10,
     minHeight: 50,
     maxHeight: 200,
     borderWidth: 1,
@@ -644,6 +644,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    textAlign: "center",
   },
   nextButtonBio: {
     height: width * 0.075,
@@ -733,7 +734,7 @@ const styles = StyleSheet.create({
   foreignProfileButtons: {
     marginTop: height * 0.02,
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-evenly",
     width: width,
   },
   listItemContainer: {

@@ -31,6 +31,8 @@ const GET_FOLLOWERS_QUERY = gql`
         followingCount
         followersCount
         isFollowedByUser
+        privatesCount
+        isPrivateByUser
         bio {
           id
           signedUrl
@@ -55,7 +57,9 @@ const GET_FOLLOWING_QUERY = gql`
         }
         followingCount
         followersCount
+        privatesCount
         isFollowedByUser
+        isPrivateByUser
         bio {
           id
           signedUrl
@@ -80,7 +84,9 @@ const GET_PRIVATES_QUERY = gql`
         }
         followingCount
         followersCount
+        privatesCount
         isFollowedByUser
+        isPrivateByUser
         bio {
           id
           signedUrl
@@ -97,21 +103,11 @@ const GET_PRIVATES_QUERY = gql`
 const ADD_TO_PRIVATES_MUTATION = gql`
   mutation addToPrivates($profileId: ID!) {
     addToPrivates(profileId: $profileId) {
-      _id
-      userName
-      profile {
-        id
-        followingCount
-        followersCount
-        isFollowedByUser
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+      id
+      privatesCount
+      isPrivateByUser
+      user {
+        userName
       }
     }
   }

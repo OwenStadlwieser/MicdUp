@@ -381,7 +381,6 @@ export class Profile extends Component {
                                 currentProfile.id,
                                 skipMult
                               );
-                              console.log(res);
                               return res && res.followers ? res.followers : [];
                             },
                           },
@@ -461,6 +460,18 @@ export class Profile extends Component {
                         {currentProfile && currentProfile.isFollowedByUser
                           ? "unfollow"
                           : "follow"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={async () => {
+                        await this.props.addToPrivates(currentProfile.id);
+                      }}
+                      style={styles.smallNextButton}
+                    >
+                      <Text style={styles.nextButtonText}>
+                        {currentProfile && currentProfile.isPrivateByUser
+                          ? "remove private"
+                          : "add private"}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.smallNextButton}>

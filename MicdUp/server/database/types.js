@@ -132,6 +132,20 @@ const ProfilePrivateType = new GraphQLObjectType({
         return index === "1";
       },
     },
+    isPrivateByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
+        const index = context.profile.privates.get(parent.id);
+        return index === "1";
+      },
+    },
+    privatesCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.privates.keys()).length;
+      },
+    },
   }),
 });
 
@@ -182,6 +196,12 @@ const ProfilePublicType = new GraphQLObjectType({
         return Array.from(parent.followers.keys()).length;
       },
     },
+    privatesCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.privates.keys()).length;
+      },
+    },
     followers: {
       type: new GraphQLList(ProfilePublicType),
       async resolve(parent, args, context, info) {
@@ -203,6 +223,14 @@ const ProfilePublicType = new GraphQLObjectType({
       resolve(parent, args, context, info) {
         if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
+        return index === "1";
+      },
+    },
+    isPrivateByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
+        const index = context.profile.privates.get(parent.id);
         return index === "1";
       },
     },

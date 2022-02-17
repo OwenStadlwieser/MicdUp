@@ -14,6 +14,7 @@ import {
   SHOW_COMMENTS,
   HIDE_COMMENTS,
   UPDATE_FOLLOW_COUNTS,
+  UPDATE_PRIVATE_COUNT,
 } from "../types";
 
 const initialState = {
@@ -112,6 +113,15 @@ export default function (state = { ...initialState }, action) {
           ...state.viewingProfile,
           followersCount: payload.followersCount,
           isFollowedByUser: payload.isFollowedByUser,
+        },
+      };
+    case UPDATE_PRIVATE_COUNT:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          privatesCount: payload.privatesCount,
+          isPrivateByUser: payload.isPrivateByUser,
         },
       };
     case UPDATE_FOLLOW_COUNTS:
