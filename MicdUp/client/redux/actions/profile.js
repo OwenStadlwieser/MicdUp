@@ -202,7 +202,7 @@ export const addToPrivates =
       dispatch(
         showMessage({
           success: true,
-          message: `${res.data.addToPrivates.userName} can now see your private posts`,
+          message: `${res.data.addToPrivates.user.userName} can now see your private posts`,
         })
       );
       addingFromProfile &&
