@@ -129,7 +129,7 @@ export class ListOfAccounts extends Component {
                 key={data.index}
                 style={[
                   styles.listItemContainer,
-                  { width, borderRadius: 8, height: listItemHeight2X },
+                  { width, borderRadius: 0, height: listItemHeight2X },
                 ]}
                 underlayColor="#6FF6FF"
                 onPress={() => {
