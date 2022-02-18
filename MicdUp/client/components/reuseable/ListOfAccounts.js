@@ -208,6 +208,7 @@ export class ListOfAccounts extends Component {
                           const { currentProfile } = this.props;
                           const res = await this.props.addToPrivates(
                             data.item.id,
+                            data.item.isPrivateByUser,
                             false
                           );
                           if (res.id) {

@@ -463,7 +463,10 @@ export class Profile extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={async () => {
-                        await this.props.addToPrivates(currentProfile.id);
+                        await this.props.addToPrivates(
+                          currentProfile.id,
+                          currentProfile.isPrivateByUser
+                        );
                       }}
                       style={styles.smallNextButton}
                     >

@@ -180,7 +180,7 @@ export const getPrivatesQuery = (skipMult) => async (dispatch) => {
 };
 
 export const addToPrivates =
-  (profileId, addingFromProfile = true) =>
+  (profileId, isPrivate, addingFromProfile = true) =>
   async (dispatch) => {
     try {
       const res = await privateClient.mutate({
@@ -199,12 +199,20 @@ export const addToPrivates =
         );
         return false;
       }
-      dispatch(
-        showMessage({
-          success: true,
-          message: `${res.data.addToPrivates.user.userName} can now see your private posts`,
-        })
-      );
+      if (!isPrivate)
+        dispatch(
+          showMessage({
+            success: true,
+            message: `${res.data.addToPrivates.user.userName} can now see your private posts`,
+          })
+        );
+      else
+        dispatch(
+          showMessage({
+            success: false,
+            message: `${res.data.addToPrivates.user.userName} can no longer see your private posts`,
+          })
+        );
       addingFromProfile &&
         dispatch({
           type: UPDATE_PRIVATE_COUNT,
