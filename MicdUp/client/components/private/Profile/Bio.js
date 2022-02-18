@@ -68,10 +68,10 @@ export class Bio extends Component {
       profile,
       newBioRecording,
       bio,
+      id,
     } = this.props;
     const { isRecording } = this.state;
-    const isUserProfile =
-      profile && currentProfile ? profile.id === currentProfile.id : true;
+    const isUserProfile = profile ? profile.id === id : true;
     return (
       <View style={styles.bioContainer}>
         {bio && (

@@ -12,9 +12,10 @@ import {
 } from "react-native";
 import ProgressBar from "../../reuseable/ProgressBar";
 // styles
-import { FontAwesome } from "@expo/vector-icons";
 import { styles, postWidth, postHeight } from "../../../styles/Styles";
 //icons
+import { FontAwesome } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 //redux
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
@@ -39,7 +40,8 @@ export class Post extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { post, index, isUserProfile, playingId, isPause } = this.props;
+    const { post, index, isUserProfile, playingId, isPause, canViewPrivate } =
+      this.props;
     return (
       <TouchableHighlight
         onPress={async () => {
@@ -59,6 +61,23 @@ export class Post extends Component {
         underlayColor="#6FF6FF"
       >
         <Fragment>
+          {post.privatePost && canViewPrivate ? (
+            <Entypo
+              name="lock-open"
+              size={24}
+              color="black"
+              style={{ position: "absolute", top: 0, left: 0 }}
+            />
+          ) : (
+            post.privatePost && (
+              <Entypo
+                name="lock"
+                size={24}
+                color="black"
+                style={{ position: "absolute", top: 0, left: 0 }}
+              />
+            )
+          )}
           {playingId === post.id && <ProgressBar parentId={post.id} />}
           <View
             style={{

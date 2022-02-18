@@ -95,7 +95,7 @@ export class Profile extends Component {
         this.mounted &&
           this.setState({
             loading: false,
-            posts: [...this.state.posts, ...postsNew],
+            posts: [...posts, ...postsNew],
           });
       }
     } catch (err) {
@@ -162,8 +162,7 @@ export class Profile extends Component {
   };
 
   componentDidMount = async () => {
-    const { getUserPosts, currentProfile, profile, cachedUserPosts, id } =
-      this.props;
+    const { getUserPosts, profile, cachedUserPosts, id } = this.props;
     if (!id) return;
     let postsNew;
     this.mounted && this.setState({ loading: true });
@@ -172,6 +171,7 @@ export class Profile extends Component {
     } else {
       postsNew = await getUserPosts(id, 0);
     }
+    if (!postsNew) postsNew = [];
     this.mounted && this.setState({ loading: false, posts: [...postsNew] });
   };
 
@@ -410,6 +410,7 @@ export class Profile extends Component {
                   </Text>
                 </Text>
                 <Bio
+                  id={id}
                   startRecording={this.startRecording.bind(this)}
                   stopRecordingBio={this.stopRecordingBio.bind(this)}
                   currentSound={playingId}
@@ -478,6 +479,11 @@ export class Profile extends Component {
                   post={data.item}
                   postArray={posts}
                   index={data.index}
+                  canViewPrivate={
+                    id === profile.id
+                      ? true
+                      : currentProfile.canViewPrivatesFromUser
+                  }
                   higherUp={false}
                 />
               )}

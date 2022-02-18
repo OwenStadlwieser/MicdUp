@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-
+import { profilePublicType } from "./types";
 const GET_USER_QUERY = gql`
   query getUser {
     getUser {
@@ -9,18 +9,7 @@ const GET_USER_QUERY = gql`
       phone
       dob
       profile {
-        id
-        followingCount
-        followersCount
-        privatesCount
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+        ${profilePublicType}
       }
     }
   }
@@ -59,20 +48,7 @@ const SEARCH_USERS_QUERY = gql`
       _id
       userName
       profile {
-        id
-        followingCount
-        followersCount
-        privatesCount
-        isFollowedByUser
-        isPrivateByUser
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+        ${profilePublicType}
       }
     }
   }

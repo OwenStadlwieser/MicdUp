@@ -146,6 +146,12 @@ const ProfilePrivateType = new GraphQLObjectType({
         return Array.from(parent.privates.keys()).length;
       },
     },
+    canViewPrivatesFromUser: {
+      type: GraphQLBoolean,
+      resolve() {
+        return true;
+      },
+    },
   }),
 });
 
@@ -231,6 +237,14 @@ const ProfilePublicType = new GraphQLObjectType({
       resolve(parent, args, context, info) {
         if (!context.profile || !context.profile.id) return false;
         const index = context.profile.privates.get(parent.id);
+        return index === "1";
+      },
+    },
+    canViewPrivatesFromUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!parent || !parent.privates) return false;
+        const index = parent.privates.get(context.profile.id);
         return index === "1";
       },
     },

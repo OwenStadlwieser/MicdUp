@@ -53,7 +53,7 @@ export class Dashboard extends Component {
   };
 
   render() {
-    const { mountedComponent, user, keyForSearch } = this.props;
+    const { mountedComponent, user, keyForSearch, profile } = this.props;
     return (
       <View style={styles.containerPrivate}>
         <View style={styles.contentContainer}>
@@ -67,7 +67,8 @@ export class Dashboard extends Component {
             <Live />
           ) : mountedComponent === "Profile" ? (
             <Profile
-              id={user && user.profile ? user.profile.id : ""}
+              key={profile ? profile.id : "notloggedin"}
+              id={profile ? profile.id : ""}
               userName={user && user.userName ? user.userName : ""}
             />
           ) : mountedComponent === "Search" ? (
@@ -87,6 +88,7 @@ export class Dashboard extends Component {
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
   user: state.auth.user,
+  profile: state.auth.user.profile,
   keyForSearch: state.display.keyForSearch,
 });
 

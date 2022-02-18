@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-
+import { profilePublicType } from "./types";
 const UPDATE_PROFILE_PIC_MUTATION = gql`
   mutation updateProfilePic($file: String!, $fileType: String!) {
     updateProfilePic(file: $file, fileType: $fileType) {
@@ -28,19 +28,7 @@ const GET_FOLLOWERS_QUERY = gql`
           _id
           userName
         }
-        followingCount
-        followersCount
-        isFollowedByUser
-        privatesCount
-        isPrivateByUser
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+        ${profilePublicType}
       }
     }
   }
@@ -55,19 +43,7 @@ const GET_FOLLOWING_QUERY = gql`
           _id
           userName
         }
-        followingCount
-        followersCount
-        privatesCount
-        isFollowedByUser
-        isPrivateByUser
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+        ${profilePublicType}
       }
     }
   }
@@ -82,19 +58,7 @@ const GET_PRIVATES_QUERY = gql`
           _id
           userName
         }
-        followingCount
-        followersCount
-        privatesCount
-        isFollowedByUser
-        isPrivateByUser
-        bio {
-          id
-          signedUrl
-        }
-        image {
-          id
-          signedUrl
-        }
+        ${profilePublicType}
       }
     }
   }

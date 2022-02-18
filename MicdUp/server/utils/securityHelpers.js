@@ -8,9 +8,8 @@ const checkIfIsInPrivateList = async (context, parent) => {
   }
   if (!context.postOwner || !context.profile.id) return -1;
   if (context.postOwner.id === context.profile.id) return 0;
-  const index = context.postOwner.privateList.findIndex((el) => {
-    el.toString() === context.profile.id;
-  });
-  return index;
+  console.log(context.postOwner);
+  const index = context.postOwner.privates.get(context.profile.id);
+  return index === "1" ? 1 : -1;
 };
 module.exports = { checkIfIsInPrivateList };
