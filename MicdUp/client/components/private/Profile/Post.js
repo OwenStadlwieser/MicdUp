@@ -47,7 +47,7 @@ export class Post extends Component {
         onPress={async () => {
           if (playingId === post.id && !isPause) {
             await this.props.pauseSound();
-          } else {
+          } else if (post.signedUrl) {
             await this.props.changeSound(post, post.signedUrl);
           }
         }}
@@ -105,14 +105,18 @@ export class Post extends Component {
           </View>
           <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
             <View style={styles.postPlayButton}>
-              <Like post={post} type={"Post"} />
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.showComments(index);
-                }}
-              >
-                <FontAwesome name="comment" size={24} color="#1A3561" />
-              </TouchableOpacity>
+              {(!post.privatePost || (post.privatePost && canViewPrivate)) && (
+                <Fragment>
+                  <Like post={post} type={"Post"} />
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.props.showComments(index);
+                    }}
+                  >
+                    <FontAwesome name="comment" size={24} color="#1A3561" />
+                  </TouchableOpacity>
+                </Fragment>
+              )}
             </View>
           </View>
         </Fragment>
