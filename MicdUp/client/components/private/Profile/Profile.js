@@ -73,14 +73,15 @@ export class Profile extends Component {
       prevLength: 0,
       showingListOfAccounts: false,
       listOfAccountsParams: {},
+      posts: [],
     };
     this.scrollView = null;
     this.mounted = true;
   }
 
   async handleScroll(event) {
-    const { posts, getUserPosts, currentProfile } = this.props;
-    const { loading, prevLength } = this.state;
+    const { getUserPosts, id } = this.props;
+    const { loading, prevLength, posts } = this.state;
     try {
       if (
         event.nativeEvent.contentOffset.y >
@@ -90,8 +91,12 @@ export class Profile extends Component {
       ) {
         this.mounted &&
           this.setState({ loading: true, prevLength: posts.length });
-        await getUserPosts(currentProfile.id, Math.round(posts.length / 20));
-        this.mounted && this.setState({ loading: false });
+        const postsNew = await getUserPosts(id, Math.round(posts.length / 20));
+        this.mounted &&
+          this.setState({
+            loading: false,
+            posts: [...this.state.posts, ...postsNew],
+          });
       }
     } catch (err) {
       console.log(err);
@@ -99,11 +104,11 @@ export class Profile extends Component {
   }
 
   async onSwipeDown(gestureState) {
-    const { getUserPosts, currentProfile } = this.props;
+    const { getUserPosts, currentProfile, id } = this.props;
     if (this.state.loading) return;
     this.mounted && this.setState({ loading: true });
-    await getUserPosts(currentProfile.id, 0);
-    this.mounted && this.setState({ loading: false });
+    const posts = await getUserPosts(id, 0);
+    this.mounted && this.setState({ loading: false, posts });
   }
 
   stopCurrentSound = async () => {
@@ -157,46 +162,17 @@ export class Profile extends Component {
   };
 
   componentDidMount = async () => {
-    const { getUserPosts, currentProfile, profile, posts } = this.props;
-    if (
-      ((profile && currentProfile && profile.id !== currentProfile.id) ||
-        (!posts && profile) ||
-        (posts.length === 0 && profile)) &&
-      !this.state.loading
-    ) {
-      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
-      if (!id) return;
-      this.mounted && this.setState({ loading: true });
-      await getUserPosts(id, 0);
-      this.mounted && this.setState({ loading: false });
-    } else if (
-      posts &&
-      currentProfile &&
-      posts.length > 0 &&
-      posts[0].owner.id !== currentProfile.id
-    ) {
-      this.mounted && this.setState({ loading: true, postsInvalid: true });
-      await getUserPosts(currentProfile.id, 0);
-      this.mounted && this.setState({ loading: false, postsInvalid: false });
+    const { getUserPosts, currentProfile, profile, cachedUserPosts, id } =
+      this.props;
+    if (!id) return;
+    let postsNew;
+    this.mounted && this.setState({ loading: true });
+    if (cachedUserPosts && cachedUserPosts.length > 0 && id === profile.id) {
+      postsNew = cachedUserPosts;
+    } else {
+      postsNew = await getUserPosts(id, 0);
     }
-  };
-
-  componentDidUpdate = async (prevProps) => {
-    const { getUserPosts, currentProfile, profile, posts } = this.props;
-
-    if (
-      !prevProps.profile &&
-      ((profile && currentProfile && profile.id !== currentProfile.id) ||
-        (!posts && profile) ||
-        (posts.length === 0 && profile)) &&
-      !this.state.loading
-    ) {
-      let id = currentProfile ? currentProfile.id : profile ? profile.id : null;
-      if (!id) return;
-      this.mounted && this.setState({ loading: true });
-      await getUserPosts(id, 0);
-      this.mounted && this.setState({ loading: false });
-    }
+    this.mounted && this.setState({ loading: false, posts: [...postsNew] });
   };
 
   hideSetting = () => {
@@ -231,15 +207,16 @@ export class Profile extends Component {
       isRecordingComment,
       showingListOfAccounts,
       listOfAccountsParams,
+      posts,
     } = this.state;
     const {
       userName,
       profile,
       currentProfile,
-      posts,
       postIndex,
       showingComments,
       backArrow,
+      id,
     } = this.props;
     if (!profile && !currentProfile) {
       return (
@@ -248,8 +225,7 @@ export class Profile extends Component {
         </View>
       );
     }
-    const isUserProfile =
-      profile && currentProfile ? profile.id === currentProfile.id : true;
+    const isUserProfile = profile && currentProfile ? profile.id === id : true;
     return (
       <View
         style={{
@@ -375,11 +351,7 @@ export class Profile extends Component {
                           listOfAccountsParams: {
                             title: "Followers",
                             getData: async function (skipMult) {
-                              console.log(currentProfile);
-                              const res = await getFollowersQuery(
-                                currentProfile.id,
-                                skipMult
-                              );
+                              const res = await getFollowersQuery(id, skipMult);
                               return res && res.followers ? res.followers : [];
                             },
                           },
@@ -400,10 +372,7 @@ export class Profile extends Component {
                           listOfAccountsParams: {
                             title: "Following",
                             getData: async function (skipMult) {
-                              const res = await getFollowingQuery(
-                                currentProfile.id,
-                                skipMult
-                              );
+                              const res = await getFollowingQuery(id, skipMult);
                               return res && res.following ? res.following : [];
                             },
                           },
@@ -451,7 +420,7 @@ export class Profile extends Component {
                   <View style={styles.foreignProfileButtons}>
                     <TouchableOpacity
                       onPress={async () => {
-                        await this.props.followProfile(currentProfile.id);
+                        await this.props.followProfile(id);
                       }}
                       style={styles.smallNextButton}
                     >
@@ -464,7 +433,7 @@ export class Profile extends Component {
                     <TouchableOpacity
                       onPress={async () => {
                         await this.props.addToPrivates(
-                          currentProfile.id,
+                          id,
                           currentProfile.isPrivateByUser
                         );
                       }}
@@ -480,7 +449,7 @@ export class Profile extends Component {
                       <Text
                         onPress={async () => {
                           await this.props.createOrOpenChat(
-                            [currentProfile.id, profile.id],
+                            [id, profile.id],
                             profile.id
                           );
                         }}
@@ -626,7 +595,7 @@ const listStyles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-  posts: state.auth.posts,
+  cachedUserPosts: state.auth.posts,
   user: state.auth.user,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,

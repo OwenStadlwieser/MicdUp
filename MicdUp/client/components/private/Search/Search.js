@@ -44,7 +44,7 @@ export class Search extends Component {
     this.mounted && this.setState({ term });
   };
   render() {
-    const { users, term, userName, tags, searchExecuted } = this.state;
+    const { users, term, userName, tags, searchExecuted, id } = this.state;
     const { searchViewingProfile } = this.props;
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
@@ -97,7 +97,11 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      this.mounted && this.setState({ userName: res.userName });
+                      this.mounted &&
+                        this.setState({
+                          userName: res.userName,
+                          id: res.profile.id,
+                        });
                       this.props.viewProfile(res.profile);
                       this.props.searchViewProfile(true);
                     }}
@@ -121,6 +125,7 @@ export class Search extends Component {
         ) : (
           searchViewingProfile && (
             <Profile
+              id={id}
               backArrow={true}
               backAction={(() => {
                 this.props.searchViewProfile(false);

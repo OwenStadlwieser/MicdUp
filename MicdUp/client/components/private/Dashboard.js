@@ -66,11 +66,14 @@ export class Dashboard extends Component {
           ) : mountedComponent === "Live" ? (
             <Live />
           ) : mountedComponent === "Profile" ? (
-            <Profile userName={user && user.userName ? user.userName : ""} />
+            <Profile
+              id={user && user.profile ? user.profile.id : ""}
+              userName={user && user.userName ? user.userName : ""}
+            />
           ) : mountedComponent === "Search" ? (
             <Search key={keyForSearch} />
           ) : mountedComponent === "Notifs" ? (
-            <NotificationView/>
+            <NotificationView />
           ) : (
             <Feed />
           )}

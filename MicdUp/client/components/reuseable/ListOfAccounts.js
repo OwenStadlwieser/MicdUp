@@ -70,7 +70,7 @@ export class ListOfAccounts extends Component {
   render() {
     const { action1, action2, swipeable, swipeAction } = this.props.params;
     const { isUserProfile } = this.props;
-    const { data, viewingProfile, userName } = this.state;
+    const { data, viewingProfile, userName, id } = this.state;
     if (viewingProfile)
       return (
         <View
@@ -88,6 +88,7 @@ export class ListOfAccounts extends Component {
               this.mounted && this.setState({ viewingProfile: false });
             }).bind(this)}
             userName={userName}
+            id={id}
           />
         </View>
       );
@@ -138,6 +139,7 @@ export class ListOfAccounts extends Component {
                     this.setState({
                       viewingProfile: true,
                       userName: data.item.user.userName,
+                      id: data.item.id,
                     });
                 }}
               >
