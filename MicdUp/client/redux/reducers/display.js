@@ -13,6 +13,9 @@ import {
   HIDE_NOTIF,
   SHOW_COMMENTS,
   HIDE_COMMENTS,
+  UPDATE_FOLLOW_COUNTS,
+  UPDATE_PRIVATE_COUNT,
+  UPDATE_PRIVATE_COUNT_FROM_LIST,
 } from "../types";
 
 const initialState = {
@@ -111,6 +114,31 @@ export default function (state = { ...initialState }, action) {
           ...state.viewingProfile,
           followersCount: payload.followersCount,
           isFollowedByUser: payload.isFollowedByUser,
+        },
+      };
+    case UPDATE_PRIVATE_COUNT:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          privatesCount: payload.privatesCount,
+          isPrivateByUser: payload.isPrivateByUser,
+        },
+      };
+    case UPDATE_FOLLOW_COUNTS:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          followingCount: payload.followingCount,
+        },
+      };
+    case UPDATE_PRIVATE_COUNT_FROM_LIST:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          privatesCount: payload.privatesCount,
         },
       };
     case VIEW_PROFILE_SEARCH:

@@ -23,6 +23,7 @@ const { Comment } = require("../../models/Comment");
 const { User } = require("../../models/User");
 const mongoose = require("mongoose");
 const { makeLikeNotification } = require("../../../utils/sendNotification");
+const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -251,7 +252,12 @@ const likePost = {
       );
       return post;
     });
-
+    const privatePermissionIndex = post.privatePost
+      ? await checkIfIsInPrivateList(context, post)
+      : 1;
+    if (privatePermissionIndex < 0) {
+      return post;
+    }
     if (post && index < 0) {
       post.likers.push(context.profile._id);
       await post.save();
@@ -334,6 +340,15 @@ const commentToPost = {
     if (!context.user.id) {
       throw new Error("Must be signed in to post");
     }
+    const post = await Post.findOne({
+      _id: postId,
+    });
+    const privatePermissionIndex = post.privatePost
+      ? await checkIfIsInPrivateList(context, post)
+      : 1;
+    if (privatePermissionIndex < 0) {
+      return {};
+    }
     try {
       speechToText = speechToText.map((speech) => JSON.parse(speech));
       speechToText = [].concat.apply([], speechToText);
@@ -410,9 +425,6 @@ const commentToPost = {
         await session.commitTransaction();
         return commentParent;
       } else {
-        const post = await Post.findOne({
-          _id: postId,
-        });
         if (!post) {
           throw new Error("post not found");
         }

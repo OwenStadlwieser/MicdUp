@@ -17,6 +17,7 @@ const {
   GraphQLFloat,
 } = graphql;
 const { getFile } = require("../utils/awsS3");
+const { checkIfIsInPrivateList } = require("../utils/securityHelpers");
 
 const UserPrivateType = new GraphQLObjectType({
   name: "UserPrivateType",
@@ -115,12 +116,40 @@ const ProfilePrivateType = new GraphQLObjectType({
         return Array.from(parent.followers.keys()).length;
       },
     },
+    privates: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(context.profile.privates.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
+      },
+    },
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
         if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
         return index === "1";
+      },
+    },
+    isPrivateByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
+        const index = context.profile.privates.get(parent.id);
+        return index === "1";
+      },
+    },
+    privatesCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.privates.keys()).length;
+      },
+    },
+    canViewPrivatesFromUser: {
+      type: GraphQLBoolean,
+      resolve() {
+        return true;
       },
     },
   }),
@@ -173,11 +202,49 @@ const ProfilePublicType = new GraphQLObjectType({
         return Array.from(parent.followers.keys()).length;
       },
     },
+    privatesCount: {
+      type: GraphQLInt,
+      resolve(parent) {
+        return Array.from(parent.privates.keys()).length;
+      },
+    },
+    followers: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(parent.followers.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
+      },
+    },
+    following: {
+      type: new GraphQLList(ProfilePublicType),
+      async resolve(parent, args, context, info) {
+        const skip = context.skipMult ? context.skipMult : 0;
+        const keys = Array.from(parent.following.keys());
+        return await Profile.find({ _id: { $in: keys } }).skip(skip);
+      },
+    },
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
         if (!context.profile || !context.profile.id) return false;
         const index = parent.followers.get(context.profile.id);
+        return index === "1";
+      },
+    },
+    isPrivateByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id) return false;
+        const index = context.profile.privates.get(parent.id);
+        return index === "1";
+      },
+    },
+    canViewPrivatesFromUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!parent || !parent.privates) return false;
+        const index = parent.privates.get(context.profile.id);
         return index === "1";
       },
     },
@@ -383,6 +450,16 @@ const PostType = new GraphQLObjectType({
           }),
         })
       ),
+      async resolve(parent, args, context, info) {
+        if (!parent.privatePost) {
+          return parent.speechToText;
+        }
+        const index = await checkIfIsInPrivateList(context, parent);
+        if (index > -1) {
+          return parent.speechToText;
+        }
+        return [];
+      },
     },
     nsfw: { type: GraphQLBoolean },
     allowRebuttal: { type: GraphQLBoolean },
@@ -390,7 +467,11 @@ const PostType = new GraphQLObjectType({
     privatePost: { type: GraphQLBoolean },
     signedUrl: {
       type: GraphQLString,
-      async resolve(parent) {
+      async resolve(parent, a, context, i) {
+        const index = parent.privatePost
+          ? await checkIfIsInPrivateList(context, parent)
+          : 1;
+        if (index < 0) return "";
         if (
           parent.signedUrl &&
           parent.lastFetched &&
@@ -413,19 +494,31 @@ const PostType = new GraphQLObjectType({
     },
     hashTags: {
       type: new GraphQLList(TagsType),
-      async resolve(parent) {
+      async resolve(parent, a, context, i) {
+        const index = parent.privatePost
+          ? await checkIfIsInPrivateList(context, parent)
+          : 1;
+        if (index < 0) return [];
         return await Tag.find({ _id: { $in: parent.hashTags } });
       },
     },
     likers: {
       type: new GraphQLList(ProfilePublicType),
-      async resolve(parent) {
+      async resolve(parent, a, context, i) {
+        const index = parent.privatePost
+          ? await checkIfIsInPrivateList(context, parent)
+          : 1;
+        if (index < 0) return [];
         return await Profile.find({ _id: { $in: parent.likers } });
       },
     },
     comments: {
       type: new GraphQLList(CommentType),
-      async resolve(parent) {
+      async resolve(parent, a, context, i) {
+        const index = parent.privatePost
+          ? await checkIfIsInPrivateList(context, parent)
+          : 1;
+        if (index < 0) return [];
         return await Comment.find({ _id: { $in: parent.comments } });
       },
     },
@@ -433,6 +526,12 @@ const PostType = new GraphQLObjectType({
       type: GraphQLInt,
       resolve(parent, args, context, info) {
         return parent.likers.length;
+      },
+    },
+    numComments: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return parent.comments.length;
       },
     },
     isLikedByUser: {

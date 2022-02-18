@@ -90,7 +90,44 @@ const followProfile = {
   },
 };
 
+const addToPrivates = {
+  type: ProfilePublicType,
+  args: {
+    profileId: { type: GraphQLID },
+  },
+  async resolve(parent, { profileId }, context) {
+    // FIXME: implement transaction
+    if (!context.user.id) {
+      throw new Error("Must be signed in to add to privates");
+    }
+    if (profileId.toString() === context.profile.id) {
+      throw new Error("Cannot add yourself to privates");
+    }
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const profile = context.profile;
+      const foreignProfile = await Profile.findById(profileId);
+      if (profile.privates.get(`${profileId}`)) {
+        profile.privates.delete(`${profileId}`);
+      } else {
+        profile.privates.set(`${profileId}`, "1");
+      }
+      await profile.save({ session });
+      await session.commitTransaction();
+      return foreignProfile;
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+      return {};
+    } finally {
+      session.endSession();
+    }
+  },
+};
+
 module.exports = {
   updateProfilePic,
   followProfile,
+  addToPrivates,
 };

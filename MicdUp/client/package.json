@@ -38,6 +38,7 @@
     "react-native-sound-level": "^1.1.5",
     "react-native-svg": "^12.1.1",
     "react-native-swipe-gestures": "^1.0.5",
+    "react-native-swipe-list-view": "^3.2.9",
     "react-native-swipeout": "^2.3.6",
     "react-native-text-size": "^4.0.0-rc.1",
     "react-native-web": "0.17.1",

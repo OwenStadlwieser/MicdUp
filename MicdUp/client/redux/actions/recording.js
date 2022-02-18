@@ -25,6 +25,7 @@ import {
 } from "../../apollo/private/recording";
 import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
+import store from "../index";
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
     type: ALTER_CLIPS,
@@ -146,17 +147,19 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
-    if (skipMult === 0) {
+    let { user } = store.getState().auth;
+    if (skipMult === 0 && user.profile.id === userId) {
       dispatch({
         type: SET_POSTS,
         payload: res.data.getUserPosts,
       });
-    } else {
+    } else if (user.profile.id === userId) {
       dispatch({
         type: ADD_POSTS,
         payload: res.data.getUserPosts,
       });
     }
+    console.log(res);
     return res.data.getUserPosts;
   } catch (err) {
     console.log(err);

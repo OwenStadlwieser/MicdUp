@@ -38,6 +38,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 // redux
+import { changeSound, pauseSound } from "../../redux/actions/sound";
 import { commentPost, getComments } from "../../redux/actions/recording";
 import {
   getReplies,
@@ -86,8 +87,10 @@ export class Comment extends Component {
 
   componentDidMount = async () => {
     const { post } = this.props;
+    this.mounted && this.setState({ loading: true });
     await this.props.getComments(post.id);
-    const interval = setInterval(() => {
+    this.mounted && this.setState({ loading: false });
+    setInterval(() => {
       const { v } = this.state;
       this.mounted &&
         this.state.recording &&
@@ -136,7 +139,7 @@ export class Comment extends Component {
   };
 
   handleMap(comment, i, index, parentId, parent) {
-    const { profile, post } = this.props;
+    const { profile, post, playingId, isPause } = this.props;
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -159,7 +162,14 @@ export class Comment extends Component {
           borderLeftWidth: 1,
         }}
       >
-        <View
+        <TouchableOpacity
+          onPress={async () => {
+            if (playingId === comment.id && !isPause) {
+              await this.props.pauseSound();
+            } else if (comment.signedUrl) {
+              await this.props.changeSound(comment, comment.signedUrl);
+            }
+          }}
           style={{
             paddingTop: height * 0.01,
             alignItems: "center",
@@ -171,7 +181,12 @@ export class Comment extends Component {
             left: index >= 12 ? -1 : 0,
             borderLeftWidth: index >= 12 ? 0 : 1,
             zIndex: index >= 12 ? 1 : 0,
-            backgroundColor: index >= 12 ? "white" : "transparent",
+            backgroundColor:
+              playingId === comment.id && !isPause && index >= 12
+                ? "#6FF6FF"
+                : index >= 12
+                ? "white"
+                : "transparent",
           }}
         >
           <View style={{ flex: 2 }}>
@@ -222,14 +237,6 @@ export class Comment extends Component {
                   postId={this.props.post.id}
                 />
               )}
-              {comment.signedUrl && (
-                <PlayButton
-                  containerStyle={{}}
-                  color={"#1A3561"}
-                  size={48}
-                  post={comment}
-                />
-              )}
               {!comment.isDeleted &&
                 (profile.id === post.owner.id ||
                   comment.owner.id === profile.id) && (
@@ -255,7 +262,7 @@ export class Comment extends Component {
               <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
         <View
           style={{
             zIndex: index >= 12 ? 1 : 0,
@@ -318,7 +325,7 @@ export class Comment extends Component {
   }
 
   render() {
-    const { post, isShowing } = this.props;
+    const { post } = this.props;
     const {
       v,
       text,
@@ -327,8 +334,8 @@ export class Comment extends Component {
       audioBlobs,
       replyingToName,
       parents,
+      loading,
     } = this.state;
-    console.log(post);
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -353,7 +360,7 @@ export class Comment extends Component {
                 return this.handleMap(comment, index, 0, null, null);
               })}
             </ScrollView>
-          ) : (
+          ) : !loading ? (
             <View
               style={{
                 flex: 1,
@@ -367,6 +374,14 @@ export class Comment extends Component {
                 Be the first to comment!
               </Text>
             </View>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            ></View>
           )}
         </View>
         <View style={styles.recordingContainerComments}>
@@ -457,6 +472,9 @@ export class Comment extends Component {
 
 const mapStateToProps = (state) => ({
   profile: state.auth.user.profile,
+  playingId:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+  isPause: state.sound.isPause,
 });
 
 export default connect(mapStateToProps, {
@@ -467,4 +485,6 @@ export default connect(mapStateToProps, {
   deleteComment,
   hideComments,
   getComments,
+  changeSound,
+  pauseSound,
 })(Comment);

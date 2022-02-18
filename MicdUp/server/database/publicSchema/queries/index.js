@@ -13,11 +13,14 @@ const {
 const { searchUsers } = require("./user");
 const { getReplies } = require("./comment");
 const { getFilters } = require("./filter");
+const { getFollowers, getFollowing } = require("./profile");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     login,
     forgotPassVerify,
+    getFollowers,
+    getFollowing,
     searchTags,
     randomPrompt,
     getUserPosts,

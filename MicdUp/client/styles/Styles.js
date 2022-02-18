@@ -20,6 +20,9 @@ const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
+const postWidth = width > 1000 ? width * 0.8 : width;
+const listItemHeight = height * 0.08;
+const listItemHeight2X = listItemHeight * 2;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -157,9 +160,8 @@ const styles = StyleSheet.create({
     fontSize: small,
   },
   profileText: {
-    paddingLeft: width * 0.075,
     width: width * 0.6,
-    textAlign: "left",
+    textAlign: "center",
     marginTop: 5,
     fontStyle: "italic",
     color: "#30F3FF",
@@ -384,8 +386,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   recordingPeopleContainer: {
-    paddingTop: height * 0.08,
-    height: height * 0.4,
+    flex: 3,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
   },
   postContainer: {
     height: postHeight,
-    width: width > 1000 ? width * 0.8 : width,
+    width: postWidth,
     borderRadius: 8,
     borderWidth: 2,
     marginBottom: postPadding,
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
   },
   higherPostContainer: {
     height: postHeight,
-    width: width > 1000 ? width * 0.8 : width,
+    width: postWidth,
     borderRadius: 8,
     borderWidth: 2,
     marginBottom: height * 0.02,
@@ -461,11 +462,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   recordingClipsContainer: {
-    height: height * 0.29,
+    flex: 4,
     width: width < 1000 ? width * 0.95 : width * 0.8,
   },
   recordingIconsContainer: {
-    height: height * 0.25,
+    flex: 3,
     width: width,
     flexDirection: "row",
   },
@@ -632,9 +633,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   smallNextButton: {
-    marginLeft: 30,
     height: width * 0.05,
-    width: width * 0.25,
+    flex: 1,
+    marginHorizontal: 10,
     minHeight: 50,
     maxHeight: 200,
     borderWidth: 1,
@@ -644,6 +645,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    textAlign: "center",
   },
   nextButtonBio: {
     height: width * 0.075,
@@ -684,7 +686,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   recordingSettingsOption: {
-    height: height * 0.08,
+    height: listItemHeight,
     width: width * 0.95,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -724,7 +726,7 @@ const styles = StyleSheet.create({
   },
   tagResultsContainer: {
     flex: 1,
-    marginTop: height * 0.1,
+    marginTop: height * 0.05,
     marginBottom: 20,
   },
   userResultsContainer: {
@@ -733,11 +735,11 @@ const styles = StyleSheet.create({
   foreignProfileButtons: {
     marginTop: height * 0.02,
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-evenly",
     width: width,
   },
   listItemContainer: {
-    height: height * 0.08,
+    height: listItemHeight,
     borderColor: "#1A3561",
     borderWidth: 2,
     borderStyle: "solid",
@@ -749,7 +751,7 @@ const styles = StyleSheet.create({
     width: width * 0.6,
   },
   listItemContainerUser: {
-    height: height * 0.08,
+    height: listItemHeight,
     borderColor: "#1A3561",
     borderWidth: 2,
     borderStyle: "solid",
@@ -759,6 +761,7 @@ const styles = StyleSheet.create({
     width,
     justifyContent: "flex-start",
     alignItems: "center",
+    borderRadius: 8,
   },
   listItemContainerChat: {
     height: height * 0.1,
@@ -794,4 +797,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles, postPadding, postHeight, filterHeight, largeIconFontSize };
+export {
+  styles,
+  postPadding,
+  postHeight,
+  filterHeight,
+  largeIconFontSize,
+  postWidth,
+  small,
+  medium,
+  large,
+  listItemHeight,
+  listItemHeight2X,
+};

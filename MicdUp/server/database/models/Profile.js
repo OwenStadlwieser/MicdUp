@@ -20,6 +20,11 @@ const ProfileSchema = new Schema({
   blocked: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  privates: {
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
+  },
   posts: {
     type: [mongoose.Schema.Types.ObjectId],
   },

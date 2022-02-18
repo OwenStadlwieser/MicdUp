@@ -3,6 +3,7 @@ title
 signedUrl
 likes
 isLikedByUser
+privatePost
 speechToText {
   word
   time
@@ -59,4 +60,21 @@ owner {
     signedUrl
   }
 }`;
-export { postType, commentType, chatType };
+
+const profilePublicType = `id
+  followingCount
+  followersCount
+  privatesCount
+  isFollowedByUser
+  isPrivateByUser
+  canViewPrivatesFromUser
+  bio {
+    id
+    signedUrl
+  }
+  image {
+    id
+    signedUrl
+  }
+`;
+export { postType, commentType, chatType, profilePublicType };

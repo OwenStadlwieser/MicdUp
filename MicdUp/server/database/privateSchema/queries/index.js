@@ -6,12 +6,14 @@ const graphql = require("graphql"); //use graphql package
 const { GraphQLObjectType, GraphQLID } = graphql;
 const { fetchChats, fetchChatMessages } = require("./chat");
 const { getUser } = require("../../privateSchema/queries/user");
+const { getPrivates } = require("./profile");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     fetchChatMessages,
     fetchChats,
     getUser,
+    getPrivates,
   }, //fields end here
 });
 

@@ -44,31 +44,33 @@ export class Search extends Component {
     this.mounted && this.setState({ term });
   };
   render() {
-    const { users, term, userName, tags, searchExecuted } = this.state;
+    const { users, term, userName, tags, searchExecuted, id } = this.state;
     const { searchViewingProfile } = this.props;
     return (
-      <View style={styles.pane}>
-        <SearchComponent
-          parentViewStyle={styles.parentViewStyleUsers}
-          searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-          inputStyle={styles.inputStyleUsers}
-          isForUser={true}
-          placeholder={"Search"}
-          setStateOnChange={true}
-          setStateOnChangeFunc={this.setSearchTerm.bind(this)}
-          setResOnChange={true}
-          setResOnChangeFunc={this.setUsersState.bind(this)}
-          searchFunction={this.props.searchUsers}
-          secondSearchFunction={this.props.searchTags}
-          secondSearch={true}
-          setSecondRes={this.setTagsState.bind(this)}
-          splitSearchTerm={true}
-          inputStyle={styles.textInputRecEdit}
-          placeHolderColor={"white"}
-          scrollable={true}
-          displayResults={false}
-          initValue={users ? users.toString() : ""}
-        />
+      <View style={[styles.paneUncentered, { alignItems: "center" }]}>
+        {!searchViewingProfile && (
+          <SearchComponent
+            parentViewStyle={{ zIndex: 2 }}
+            searchInputContainerStyle={styles.searchInputContainerStyleUsers}
+            inputStyle={styles.inputStyleUsers}
+            isForUser={true}
+            placeholder={"Search"}
+            setStateOnChange={true}
+            setStateOnChangeFunc={this.setSearchTerm.bind(this)}
+            setResOnChange={true}
+            setResOnChangeFunc={this.setUsersState.bind(this)}
+            searchFunction={this.props.searchUsers}
+            secondSearchFunction={this.props.searchTags}
+            secondSearch={true}
+            setSecondRes={this.setTagsState.bind(this)}
+            splitSearchTerm={true}
+            inputStyle={styles.textInputRecEdit}
+            placeHolderColor={"white"}
+            scrollable={true}
+            displayResults={false}
+            initValue={users ? users.toString() : ""}
+          />
+        )}
         {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
@@ -95,7 +97,11 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      this.mounted && this.setState({ userName: res.userName });
+                      this.mounted &&
+                        this.setState({
+                          userName: res.userName,
+                          id: res.profile.id,
+                        });
                       this.props.viewProfile(res.profile);
                       this.props.searchViewProfile(true);
                     }}
@@ -117,7 +123,16 @@ export class Search extends Component {
             </ScrollView>
           </View>
         ) : (
-          searchViewingProfile && <Profile userName={userName} />
+          searchViewingProfile && (
+            <Profile
+              id={id}
+              backArrow={true}
+              backAction={(() => {
+                this.props.searchViewProfile(false);
+              }).bind(this)}
+              userName={userName}
+            />
+          )
         )}
       </View>
     );
