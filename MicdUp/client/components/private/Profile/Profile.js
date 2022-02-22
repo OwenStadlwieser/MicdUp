@@ -357,7 +357,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile ? currentProfile.followersCount : 0}{" "}
                     Followers{"  "}
@@ -378,7 +378,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile
                       ? currentProfile.followingCount + " Following  "
@@ -401,7 +401,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile && currentProfile.privatesCount
                       ? currentProfile.privatesCount
