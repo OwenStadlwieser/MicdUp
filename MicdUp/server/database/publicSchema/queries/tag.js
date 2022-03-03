@@ -42,7 +42,6 @@ const randomPrompt = {
           $sample: { size: 1 },
         },
       ]);
-      console.log(res);
       return res[0];
     } catch (err) {
       console.log(err);

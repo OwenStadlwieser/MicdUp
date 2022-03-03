@@ -22,10 +22,14 @@ import {
   COMMENT_POST_MUTATION,
   GET_COMMENT_POST_QUERY,
   GET_RECORDINGS_FROM_TAG_QUERY,
+  ADD_LISTENER_LOGGED_IN_MUTATION,
+  ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
 } from "../../apollo/private/recording";
+import { ADD_LISTENER_MUTATION } from "../../apollo/private/recording";
 import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
 import store from "../index";
+
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
     type: ALTER_CLIPS,
@@ -46,6 +50,28 @@ export const updateTags = (payload) => (dispatch) => {
     payload,
   });
 };
+
+export const addListener = (postId, ipAddr, listenTime) => async (dispatch) => {
+  const res = await publicClient.mutate({
+    mutation: ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
+    variables: {
+      postId,
+      ipAddr,
+      listenTime,
+    },
+  });
+};
+
+export const addListenerAuthenticated =
+  (postId, listenTime) => async (dispatch) => {
+    const res = await privateClient.mutate({
+      mutation: ADD_LISTENER_LOGGED_IN_MUTATION,
+      variables: {
+        postId,
+        listenTime,
+      },
+    });
+  };
 
 export const uploadRecording =
   (
@@ -148,18 +174,17 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       return false;
     }
     let { user } = store.getState().auth;
-    if (skipMult === 0 && user.profile.id === userId) {
+    if (skipMult === 0 && user.profile && user.profile.id === userId) {
       dispatch({
         type: SET_POSTS,
         payload: res.data.getUserPosts,
       });
-    } else if (user.profile.id === userId) {
+    } else if (user.profile && user.profile.id === userId) {
       dispatch({
         type: ADD_POSTS,
         payload: res.data.getUserPosts,
       });
     }
-    console.log(res);
     return res.data.getUserPosts;
   } catch (err) {
     console.log(err);

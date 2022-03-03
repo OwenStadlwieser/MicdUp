@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
 // redux
+import { setIp } from "./redux/actions/auth";
 import { changeLogin, changeSignup } from "./redux/actions/display";
 // children
 import Dashboard from "./components/private/Dashboard";
@@ -15,10 +16,12 @@ import Feed from "./components/private/Feed/Feed";
 import Create from "./components/private/Create/Create";
 
 // helpers
+import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
 import NotificationBell from "./components/private/NotificationBell";
 
 import { Audio } from "expo-av";
+import Search from "./components/private/Search/Search";
 
 export class Root extends Component {
   constructor() {
@@ -37,6 +40,17 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
+    publicIP()
+      .then((ip) => {
+        console.log(ip);
+        this.props.setIp("1234");
+        // '47.122.71.234'
+      })
+      .catch((error) => {
+        console.log(error);
+        this.props.setIp("1234");
+        // 'Unable to get IP address.'
+      });
     const token = await getData("token");
     this.mounted && this.setState({ token });
     await Audio.setAudioModeAsync({
@@ -88,6 +102,13 @@ export class Root extends Component {
               </View>
               <Navbar />
             </View>
+          ) : mountedComponent === "Search" ? (
+            <View style={styles.containerPrivate}>
+              <View style={styles.contentContainer}>
+                <Search />
+              </View>
+              <Navbar />
+            </View>
           ) : showLogin ? (
             <Login />
           ) : showSignup ? (
@@ -122,9 +143,10 @@ export class Root extends Component {
       );
     else
       app = (
-        
         <View style={styles.rootContainer}>
-          <View><NotificationBell /></View>
+          <View>
+            <NotificationBell />
+          </View>
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -153,4 +175,5 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   changeSignup,
   changeLogin,
+  setIp,
 })(Root);

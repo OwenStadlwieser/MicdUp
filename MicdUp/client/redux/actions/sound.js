@@ -2,14 +2,21 @@ import { CHANGE_SOUND, SOUND_ENDED, SOUND_PAUSE, SET_TIME } from "../types";
 import { playSound } from "../../reuseableFunctions/helpers";
 import store from "../index";
 import { Audio } from "expo-av";
+import { addListenerAuthenticated, addListener } from "./recording";
 
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (sound, url, queue) => async (dispatch) => {
-  let { currentPlayingSound, currentPlaybackObject, currentIntervalId } =
+  let { currentPlayingSound, currentPlaybackObject, currentIntervalId, time } =
     store.getState().sound;
+  let { user, ipAddr } = store.getState().auth;
   sound.uri = url;
   if (currentPlayingSound && currentPlayingSound.uri !== url) {
+    if (user && currentPlayingSound.id && user._id) {
+      dispatch(addListenerAuthenticated(currentPlayingSound.id, time));
+    } else if (ipAddr && currentPlayingSound.id) {
+      dispatch(addListener(currentPlayingSound.id, ipAddr, time));
+    }
     await soundExpo.unloadAsync();
     clearInterval(currentIntervalId);
   } else if (currentPlayingSound) {
@@ -32,7 +39,22 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       status.didJustFinish ||
       status.durationMillis === status.positionMillis
     ) {
-      let { queue } = store.getState().sound;
+      let { queue, currentPlayingSound } = store.getState().sound;
+      let { user, ipAddr } = store.getState().auth;
+      console.log(currentPlayingSound.id, ipAddr);
+      if (user && currentPlayingSound.id && user._id) {
+        dispatch(
+          addListenerAuthenticated(
+            currentPlayingSound.id,
+            status.durationMillis
+          )
+        );
+      } else if (currentPlayingSound.id && ipAddr) {
+        console.log("here");
+        dispatch(
+          addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
+        );
+      }
       if (queue && queue.length > 0) {
         let newSound = queue.shift();
         await dispatch(changeSound(newSound, newSound.signedUrl, queue));

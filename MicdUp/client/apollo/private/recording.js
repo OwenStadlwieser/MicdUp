@@ -100,6 +100,23 @@ const GET_COMMENT_POST_QUERY = gql`
     }
   }
 `;
+
+const ADD_LISTENER_LOGGED_IN_MUTATION = gql`
+  mutation addListenerAuthenticated($postId: ID!, $listenTime: Float!) {
+    addListenerAuthenticated(postId: $postId, listenTime: $listenTime) {
+      ${postType}
+    }
+  }
+`;
+
+const ADD_LISTENER_NOT_LOGGED_IN_MUTATION = gql`
+  mutation addListener($postId: ID!, $ipAddr: String, $listenTime: Float!) {
+    addListener(postId: $postId, ipAddr: $ipAddr, listenTime: $listenTime) {
+      ${postType}
+    }
+  }
+`;
+
 const COMMENT_POST_MUTATION = (duplication) => {
   return gql`
     mutation commentToPost(
@@ -135,4 +152,6 @@ export {
   ADD_TAG_MUTATION,
   GET_COMMENT_POST_QUERY,
   GET_RECORDINGS_FROM_TAG_QUERY,
+  ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
+  ADD_LISTENER_LOGGED_IN_MUTATION,
 };
