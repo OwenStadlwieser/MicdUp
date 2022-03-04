@@ -1,10 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, StyleSheet, TouchableOpacity, Dimensions,Text } from "react-native";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  Text,
+} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { navigate } from "../../redux/actions/display";
-const { width,height} = Dimensions.get("window");
-
+import { styles } from "../../styles/Styles";
+const { width, height } = Dimensions.get("window");
 
 export class NotificationBell extends Component {
   constructor() {
@@ -18,48 +24,25 @@ export class NotificationBell extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {
-  };
+  componentDidMount = () => {};
 
   render() {
-    const {
-      navigate
-    } = this.props
-
+    const { navigate } = this.props;
+    console.log("rendeiring");
     return (
-
-    <View style={styles.bell}> 
-    
-        <TouchableOpacity style={styles.btn} onPress={() => navigate("Notifs")}>
-            <MaterialCommunityIcons name="bell" size={24} color="white" />
-        </TouchableOpacity>
-        </View>);
+      <MaterialCommunityIcons
+        style={[styles.toptopRightIcon, { zIndex: 50 }]}
+        onPress={() => navigate("Notifs")}
+        name="bell"
+        size={24}
+        color="white"
+      />
+    );
   }
 }
 
-const styles = StyleSheet.create({
-
-    bell : {
-        justifyContent: 'flex-end',
-        backgroundColor: 'blue',
-        // position: 'absolute',
-        top: 22,
-        zIndex: 10,
-        height: 50,
-        width,
-        flexDirection : 'row',
-        // overflow:'visible'
-        
-    },
-    btn : {
-        // position: "absolute",
-        right: width * 0.08,
-        top: height * 0.002,
-    }
-})
-
 const mapStateToProps = (state) => ({
-  mountedComponent : state.display.mountedComponent
+  mountedComponent: state.display.mountedComponent,
 });
 
-export default connect(mapStateToProps, {navigate})(NotificationBell);
+export default connect(mapStateToProps, { navigate })(NotificationBell);

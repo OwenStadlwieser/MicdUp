@@ -30,7 +30,16 @@ export class Search extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    const { currentProfile, searchViewingProfile } = this.props;
+    if (searchViewingProfile && currentProfile.id) {
+      this.mounted &&
+        this.setState({
+          id: currentProfile.id,
+          userName: currentProfile.user.userName,
+        });
+    }
+  };
 
   setUsersState = (users) => {
     this.mounted && this.setState({ users });
@@ -46,6 +55,7 @@ export class Search extends Component {
   render() {
     const { users, term, userName, tags, searchExecuted, id } = this.state;
     const { searchViewingProfile } = this.props;
+    console.log(id, 2);
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
         {!searchViewingProfile && (
@@ -125,6 +135,7 @@ export class Search extends Component {
         ) : (
           searchViewingProfile && (
             <Profile
+              key={id}
               id={id}
               backArrow={true}
               backAction={(() => {
@@ -141,6 +152,7 @@ export class Search extends Component {
 
 const mapStateToProps = (state) => ({
   searchViewingProfile: state.display.searchViewingProfile,
+  currentProfile: state.display.viewingProfile,
 });
 
 export default connect(mapStateToProps, {

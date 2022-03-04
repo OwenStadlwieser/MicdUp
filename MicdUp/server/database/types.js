@@ -243,7 +243,13 @@ const ProfilePublicType = new GraphQLObjectType({
     canViewPrivatesFromUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
-        if (!parent || !parent.privates) return false;
+        if (
+          !parent ||
+          !parent.privates ||
+          !context.profile ||
+          !context.profile.id
+        )
+          return false;
         const index = parent.privates.get(context.profile.id);
         return index === "1";
       },

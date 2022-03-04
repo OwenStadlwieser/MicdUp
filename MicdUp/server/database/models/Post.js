@@ -27,6 +27,16 @@ const postSchema = new Schema({
   comments: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  authenticatedListeners: {
+    type: mongoose.Schema.Types.Map,
+    of: mongoose.Schema.Types.Number,
+    default: new Map(),
+  },
+  nonAuthListeners: {
+    type: mongoose.Schema.Types.Map,
+    of: mongoose.Schema.Types.Number,
+    default: new Map(),
+  },
   likes: {
     type: Number,
   },

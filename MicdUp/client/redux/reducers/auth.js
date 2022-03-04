@@ -12,6 +12,7 @@ import {
   DELETE_POST,
   SET_SOCKET,
   ADD_POSTS,
+  SET_IP,
 } from "../types";
 
 const initialState = {
@@ -20,11 +21,17 @@ const initialState = {
   profile: {},
   posts: [],
   socket: {},
+  ipAddr: "",
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   switch (type) {
+    case SET_IP:
+      return {
+        ...state,
+        ipAddr: payload,
+      };
     case LOG_IN:
       return {
         ...state,

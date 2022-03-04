@@ -163,14 +163,19 @@ export class Profile extends Component {
 
   componentDidMount = async () => {
     const { getUserPosts, profile, cachedUserPosts, id } = this.props;
-    if (!id) return;
     let postsNew;
     this.mounted && this.setState({ loading: true });
-    if (cachedUserPosts && cachedUserPosts.length > 0 && id === profile.id) {
+    if (
+      cachedUserPosts &&
+      cachedUserPosts.length > 0 &&
+      id &&
+      id === profile.id
+    ) {
       postsNew = cachedUserPosts;
-    } else {
+    } else if (id) {
       postsNew = await getUserPosts(id, 0);
     }
+    console.log(postsNew);
     if (!postsNew) postsNew = [];
     this.mounted && this.setState({ loading: false, posts: [...postsNew] });
   };
@@ -357,7 +362,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile ? currentProfile.followersCount : 0}{" "}
                     Followers{"  "}
@@ -378,7 +383,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile
                       ? currentProfile.followingCount + " Following  "
@@ -401,7 +406,7 @@ export class Profile extends Component {
                           },
                         });
                     }}
-                    style={{ fontSize: small, fontStyle: "italic " }}
+                    style={{ fontSize: small, fontStyle: "italic" }}
                   >
                     {currentProfile && currentProfile.privatesCount
                       ? currentProfile.privatesCount
@@ -480,7 +485,7 @@ export class Profile extends Component {
                   postArray={posts}
                   index={data.index}
                   canViewPrivate={
-                    id === profile.id
+                    profile && id === profile.id
                       ? true
                       : currentProfile.canViewPrivatesFromUser
                   }

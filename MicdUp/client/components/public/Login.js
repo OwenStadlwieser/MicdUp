@@ -58,7 +58,7 @@ export class Login extends Component {
       : (login = (
           <KeyboardAvoidingView style={styles.container}>
             <AntDesign
-              style={styles.backArrow}
+              style={styles.topLeftIcon}
               name="leftcircle"
               size={24}
               color="white"

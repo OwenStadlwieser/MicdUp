@@ -233,6 +233,34 @@ const uploadBio = {
   },
 };
 
+const addListenerAuthenticated = {
+  type: PostType,
+  args: {
+    postId: { type: GraphQLID },
+    listenTime: { type: GraphQLFloat },
+  },
+  async resolve(parent, { postId, listenTime }, context) {
+    if (!context.user.id) {
+      throw new Error("Must be signed in to access this endpoint");
+    }
+    const post = await Post.findOne({
+      _id: postId,
+    });
+    if (!post) {
+      throw new Error("Post not found");
+    }
+    if (post.authenticatedListeners.get(`${context.profile._id}`)) {
+      const oldTime = post.authenticatedListeners.get(`${context.profile._id}`);
+      if (oldTime >= listenTime) return;
+      post.authenticatedListeners.set(`${context.profile._id}`, listenTime);
+      return post;
+    }
+    post.authenticatedListeners.set(`${context.profile._id}`, listenTime);
+    await post.save();
+    return post;
+  },
+};
+
 const likePost = {
   type: PostType,
   args: {
@@ -479,4 +507,5 @@ module.exports = {
   deletePost,
   commentToPost,
   ffmpegMergeAndUpload,
+  addListenerAuthenticated,
 };
