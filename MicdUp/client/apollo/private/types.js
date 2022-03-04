@@ -1,3 +1,20 @@
+const profilePublicType = `id
+followingCount
+followersCount
+privatesCount
+isFollowedByUser
+isPrivateByUser
+canViewPrivatesFromUser
+bio {
+  id
+  signedUrl
+}
+image {
+  id
+  signedUrl
+}
+`;
+
 const postType = `id
 title
 signedUrl
@@ -9,10 +26,10 @@ speechToText {
   time
 }
 owner {
-  id
-  image {
+  ${profilePublicType}
+  user {
     id
-    signedUrl
+    userName
   }
 }`;
 
@@ -50,31 +67,11 @@ speechToText {
   time
 }
 owner {
-  id
+  ${profilePublicType}
   user {
-    _id
-    userName
-  }
-  image {
     id
-    signedUrl
+    userName
   }
 }`;
 
-const profilePublicType = `id
-  followingCount
-  followersCount
-  privatesCount
-  isFollowedByUser
-  isPrivateByUser
-  canViewPrivatesFromUser
-  bio {
-    id
-    signedUrl
-  }
-  image {
-    id
-    signedUrl
-  }
-`;
 export { postType, commentType, chatType, profilePublicType };

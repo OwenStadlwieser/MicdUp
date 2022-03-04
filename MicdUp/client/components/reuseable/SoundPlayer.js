@@ -6,13 +6,17 @@ import {
   Dimensions,
   TouchableOpacity,
   TouchableHighlight,
+  Image,
 } from "react-native";
 import { Text, Title } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import { styles } from "../../styles/Styles";
 import ProgressBar from "./ProgressBar";
 // redux
+import { viewProfile, searchViewProfile } from "../../redux/actions/display";
 import { pauseSound, changeSound } from "../../redux/actions/sound";
+import { navigate } from "../../redux/actions/display";
+
 const { height, width } = Dimensions.get("screen");
 export class SoundPlayer extends Component {
   constructor() {
@@ -31,7 +35,8 @@ export class SoundPlayer extends Component {
 
   render() {
     const { showing } = this.state;
-    const { playingId, sound, isPause } = this.props;
+    const { playingId, sound, isPause, profile } = this.props;
+    console.log(sound && sound.owner);
     return showing ? (
       <TouchableOpacity
         onPress={() => {
@@ -46,8 +51,47 @@ export class SoundPlayer extends Component {
         >
           <Fragment>
             {sound && (
-              <Fragment>
-                <Title>{sound.title}</Title>
+              <View
+                style={{
+                  flexDirection: "column",
+                  width: width * 0.5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    if (profile && profile.id === sound.owner.id) {
+                      this.props.navigate("Profile");
+                      return;
+                    }
+                    this.props.navigate("Search");
+                    this.props.viewProfile(sound.owner);
+                    this.props.searchViewProfile(true);
+                  }}
+                >
+                  <Image
+                    source={
+                      sound.owner.image
+                        ? {
+                            uri: sound.owner.image.signedUrl,
+                          }
+                        : require("../../assets/no-profile-pic-icon-27.jpg")
+                    }
+                    style={styles.listItemProfileImg}
+                  />
+                  <Text style={styles.listItemTextUser}>
+                    {sound.owner.user.userName}
+                  </Text>
+                </TouchableOpacity>
+                <View>
+                  <Title>{sound.title}</Title>
+                </View>
                 {isPause ? (
                   <AntDesign
                     onPress={async () => {
@@ -56,6 +100,7 @@ export class SoundPlayer extends Component {
                     name="playcircleo"
                     size={24}
                     color="#1A3561"
+                    style={{ paddingBottom: 10 }}
                   />
                 ) : (
                   <AntDesign
@@ -65,6 +110,7 @@ export class SoundPlayer extends Component {
                     name="pausecircleo"
                     size={24}
                     color="1A3561"
+                    style={{ paddingBottom: 10 }}
                   />
                 )}
                 <ProgressBar
@@ -72,7 +118,7 @@ export class SoundPlayer extends Component {
                   height={10}
                   width={width * 0.5}
                 />
-              </Fragment>
+              </View>
             )}
           </Fragment>
         </TouchableHighlight>
@@ -97,8 +143,13 @@ const mapStateToProps = (state) => ({
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
   sound: state.sound.currentPlayingSound,
   isPause: state.sound.isPause,
+  profile: state.auth.user ? state.auth.user.profile : null,
 });
 
-export default connect(mapStateToProps, { pauseSound, changeSound })(
-  SoundPlayer
-);
+export default connect(mapStateToProps, {
+  pauseSound,
+  changeSound,
+  viewProfile,
+  searchViewProfile,
+  navigate,
+})(SoundPlayer);

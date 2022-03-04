@@ -172,7 +172,7 @@ export class Profile extends Component {
       id === profile.id
     ) {
       postsNew = cachedUserPosts;
-    } else {
+    } else if (id) {
       postsNew = await getUserPosts(id, 0);
     }
     console.log(postsNew);
