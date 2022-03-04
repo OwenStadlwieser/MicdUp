@@ -68,6 +68,7 @@ export class SoundPlayer extends Component {
                   onPress={() => {
                     if (profile && profile.id === sound.owner.id) {
                       this.props.navigate("Profile");
+                      this.mounted && this.setState({ showing: false });
                       return;
                     }
                     this.props.navigate("Search");
@@ -101,7 +102,7 @@ export class SoundPlayer extends Component {
                     name="playcircleo"
                     size={24}
                     color="#1A3561"
-                    style={{ paddingBottom: 10 }}
+                    style={{ paddingBottom: 30 }}
                   />
                 ) : (
                   <AntDesign
@@ -111,7 +112,7 @@ export class SoundPlayer extends Component {
                     name="pausecircleo"
                     size={24}
                     color="1A3561"
-                    style={{ paddingBottom: 10 }}
+                    style={{ paddingBottom: 30 }}
                   />
                 )}
                 <ProgressBar
