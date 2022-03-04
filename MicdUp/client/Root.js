@@ -14,7 +14,7 @@ import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 import Create from "./components/private/Create/Create";
-
+import SoundPlayer from "./components/reuseable/SoundPlayer";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -86,6 +86,7 @@ export class Root extends Component {
     if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>
+          <SoundPlayer />
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -144,9 +145,8 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
-          <View>
-            <NotificationBell />
-          </View>
+          <SoundPlayer />
+          <NotificationBell />
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text

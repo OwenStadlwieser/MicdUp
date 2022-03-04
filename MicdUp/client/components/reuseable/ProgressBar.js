@@ -17,14 +17,14 @@ export class ProgressBar extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { parentId, playingId, time, duration } = this.props;
+    const { parentId, playingId, time, duration, height, width } = this.props;
     if (!parentId || !playingId || !time || !duration || parentId !== playingId)
       return <View></View>;
     return (
       <View
         style={{
-          width: postWidth * (time / duration),
-          height: postHeight,
+          width: width * (time / duration),
+          height: height,
           bottom: 0,
           left: 0,
           position: "absolute",

@@ -78,7 +78,13 @@ export class Post extends Component {
               />
             )
           )}
-          {playingId === post.id && <ProgressBar parentId={post.id} />}
+          {playingId === post.id && (
+            <ProgressBar
+              height={postHeight}
+              width={postWidth}
+              parentId={post.id}
+            />
+          )}
           <View
             style={{
               justifyContent: "space-evenly",

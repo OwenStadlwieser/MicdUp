@@ -323,12 +323,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#1A3561",
   },
-  topRightIcon: {
-    position: "absolute",
-    right: width * 0.08,
-    top: height * 0.06,
-    zIndex: 2,
-  },
   modalContainer: {
     zIndex: 998,
     position: "absolute",
@@ -358,7 +352,24 @@ const styles = StyleSheet.create({
   topLeftIcon: {
     position: "absolute",
     left: width * 0.08,
-    top: height * 0.06,
+    top: height * 0.08,
+  },
+  toptopLeftIcon: {
+    position: "absolute",
+    left: width * 0.08,
+    top: height * 0.04,
+  },
+  topRightIcon: {
+    position: "absolute",
+    right: width * 0.08,
+    top: height * 0.08,
+    zIndex: 2,
+  },
+  toptopRightIcon: {
+    position: "absolute",
+    right: width * 0.08,
+    top: height * 0.04,
+    zIndex: 2,
   },
   largeIcon: {
     fontSize: xl,
