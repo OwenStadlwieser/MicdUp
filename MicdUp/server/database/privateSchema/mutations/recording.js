@@ -21,6 +21,7 @@ const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const { Comment } = require("../../models/Comment");
 const { User } = require("../../models/User");
+const { Profile } = require("../../models/Profile");
 const mongoose = require("mongoose");
 const { makeLikeNotification } = require("../../../utils/sendNotification");
 const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
@@ -272,6 +273,7 @@ const likePost = {
       throw new Error("Must be signed in to post");
     }
     let index = -1;
+    const profile = await Profile.findById(context.profile.id);
     const post = await Post.findOne({
       _id: postId,
     }).then((post) => {
@@ -286,24 +288,48 @@ const likePost = {
     if (privatePermissionIndex < 0) {
       return post;
     }
-    if (post && index < 0) {
-      post.likers.push(context.profile._id);
-      await post.save();
-      console.log("test");
-      makeLikeNotification(
-        await User.findOne(context.profile.user),
-        "post",
-        {},
-        post.owner
-      );
-      return post;
-    }
-    if (post && index > -1) {
-      post.likers.splice(index, 1);
-      await post.save();
-      console.log("test2");
-      // makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
-      return post;
+    try {
+      if (post && index < 0) {
+        post.likers.push(context.profile._id);
+        for (let i = 0; i < post.tags.length; i++) {
+          if (profile.likedTags.get(`${post.tags[i]}`)) {
+            profile.likedTags.set(
+              `${post.tags[i]}`,
+              profile.likedTags.get(`${post.tags[i]}`) + 1
+            );
+          } else {
+            profile.likedTags.set(`${post.tags[i]}`, 1);
+          }
+        }
+        await profile.save();
+        await post.save();
+        console.log("test");
+        makeLikeNotification(
+          await User.findOne(context.profile.user),
+          "post",
+          {},
+          post.owner
+        );
+        return post;
+      }
+      if (post && index > -1) {
+        for (let i = 0; i < post.tags.length; i++) {
+          if (profile.likedTags.get(`${post.tags[i]}`)) {
+            profile.likedTags.set(
+              `${post.tags[i]}`,
+              profile.likedTags.get(`${post.tags[i]}`) - 1
+            );
+          }
+        }
+        await profile.save();
+        post.likers.splice(index, 1);
+        await post.save();
+        console.log("test2");
+        // makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
+        return post;
+      }
+    } catch (err) {
+      console.log(err);
     }
   },
 };

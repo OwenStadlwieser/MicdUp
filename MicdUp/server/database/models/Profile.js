@@ -13,6 +13,11 @@ const ProfileSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  likedTags: {
+    type: mongoose.Schema.Types.Map,
+    of: Number,
+    default: new Map(),
+  },
   chats: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],

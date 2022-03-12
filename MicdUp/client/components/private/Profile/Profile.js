@@ -36,6 +36,7 @@ import {
   getUserPosts,
   getComments,
   deletePost,
+  clearPosts,
 } from "../../../redux/actions/recording";
 import {
   updateProfilePic,
@@ -80,8 +81,9 @@ export class Profile extends Component {
   }
 
   async handleScroll(event) {
-    const { getUserPosts, id } = this.props;
-    const { loading, prevLength, posts } = this.state;
+    const { getUserPosts, id, cachedPosts } = this.props;
+    const { loading, prevLength } = this.state;
+    const posts = cachedPosts[id];
     try {
       if (
         event.nativeEvent.contentOffset.y >
@@ -91,11 +93,10 @@ export class Profile extends Component {
       ) {
         this.mounted &&
           this.setState({ loading: true, prevLength: posts.length });
-        const postsNew = await getUserPosts(id, Math.round(posts.length / 20));
+        await getUserPosts(id, Math.round(posts.length / 20));
         this.mounted &&
           this.setState({
             loading: false,
-            posts: [...posts, ...postsNew],
           });
       }
     } catch (err) {
@@ -104,11 +105,12 @@ export class Profile extends Component {
   }
 
   async onSwipeDown(gestureState) {
-    const { getUserPosts, currentProfile, id } = this.props;
+    const { getUserPosts, id, clearPosts } = this.props;
     if (this.state.loading) return;
     this.mounted && this.setState({ loading: true });
-    const posts = await getUserPosts(id, 0);
-    this.mounted && this.setState({ loading: false, posts });
+    await clearPosts(id);
+    await getUserPosts(id, 0);
+    this.mounted && this.setState({ loading: false });
   }
 
   stopCurrentSound = async () => {
@@ -162,22 +164,14 @@ export class Profile extends Component {
   };
 
   componentDidMount = async () => {
-    const { getUserPosts, profile, cachedUserPosts, id } = this.props;
-    let postsNew;
+    const { getUserPosts, profile, cachedPosts, id } = this.props;
     this.mounted && this.setState({ loading: true });
-    if (
-      cachedUserPosts &&
-      cachedUserPosts.length > 0 &&
-      id &&
-      id === profile.id
-    ) {
-      postsNew = cachedUserPosts;
+    const posts = cachedPosts[id];
+    if (posts && posts.length > 0) {
     } else if (id) {
-      postsNew = await getUserPosts(id, 0);
+      await getUserPosts(id, 0);
     }
-    console.log(postsNew);
-    if (!postsNew) postsNew = [];
-    this.mounted && this.setState({ loading: false, posts: [...postsNew] });
+    this.mounted && this.setState({ loading: false });
   };
 
   hideSetting = () => {
@@ -212,7 +206,6 @@ export class Profile extends Component {
       isRecordingComment,
       showingListOfAccounts,
       listOfAccountsParams,
-      posts,
     } = this.state;
     const {
       userName,
@@ -222,6 +215,7 @@ export class Profile extends Component {
       showingComments,
       backArrow,
       id,
+      cachedPosts,
     } = this.props;
     if (!profile && !currentProfile) {
       return (
@@ -231,6 +225,7 @@ export class Profile extends Component {
       );
     }
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
+    const posts = cachedPosts[id];
     return (
       <View
         style={{
@@ -606,8 +601,8 @@ const listStyles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-  cachedUserPosts: state.auth.posts,
   user: state.auth.user,
+  cachedPosts: state.auth.posts,
   currentProfile: state.display.viewingProfile,
   profile: state.auth.user.profile,
   postIndex: state.display.postIndex,
@@ -625,4 +620,5 @@ export default connect(mapStateToProps, {
   getFollowingQuery,
   getPrivatesQuery,
   addToPrivates,
+  clearPosts,
 })(Profile);

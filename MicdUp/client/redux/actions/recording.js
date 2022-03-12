@@ -10,7 +10,7 @@ import {
   UPDATE_COMMENT_TO_POST,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
-  ADD_POSTS,
+  CLEAR_POSTS,
   UPDATE_CURRENT_RECORDINGS,
 } from "../types";
 import {
@@ -51,6 +51,12 @@ export const updateTags = (payload) => (dispatch) => {
   });
 };
 
+export const clearPosts = (payload) => (dispatch) => {
+  dispatch({
+    type: CLEAR_POSTS,
+    payload,
+  });
+};
 export const addListener = (postId, ipAddr, listenTime) => async (dispatch) => {
   const res = await publicClient.mutate({
     mutation: ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
@@ -173,18 +179,10 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
-    let { user } = store.getState().auth;
-    if (skipMult === 0 && user.profile && user.profile.id === userId) {
-      dispatch({
-        type: SET_POSTS,
-        payload: res.data.getUserPosts,
-      });
-    } else if (user.profile && user.profile.id === userId) {
-      dispatch({
-        type: ADD_POSTS,
-        payload: res.data.getUserPosts,
-      });
-    }
+    dispatch({
+      type: SET_POSTS,
+      payload: { posts: res.data.getUserPosts, userId },
+    });
     return res.data.getUserPosts;
   } catch (err) {
     console.log(err);

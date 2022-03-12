@@ -36,7 +36,10 @@ export class Like extends Component {
           <TouchableOpacity
             onPress={async () => {
               if (type === "Comment") {
-                const newComment = await this.props.likeComment(post.id);
+                const newComment = await this.props.likeComment(
+                  post.id,
+                  post.owner.id
+                );
                 this.props.updateCommentDisplay(
                   newComment,
                   this.props.parents,
