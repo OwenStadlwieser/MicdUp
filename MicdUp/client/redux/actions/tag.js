@@ -2,9 +2,22 @@ import { publicClient } from "../../apollo/client/index";
 import {
   GET_TAGS_QUERY,
   GET_RANDOM_PROMPT_QUERY,
+  GET_POPULAR_TAGS_QUERY,
 } from "../../apollo/private/tag";
 import { SET_USER, LOG_IN } from "../types";
 
+export const getPopularTags = () => async (dispatch) => {
+  try {
+    const res = await publicClient.query({
+      query: GET_POPULAR_TAGS_QUERY,
+      variables: {},
+      fetchPolicy: "no-cache",
+    });
+    return res.data.getPopularTags;
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const searchTags = (searchTerm) => async (dispatch) => {
   try {
     const res = await publicClient.query({

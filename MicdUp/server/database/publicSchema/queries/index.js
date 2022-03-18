@@ -4,7 +4,7 @@ const graphql = require("graphql"); //use graphql package
 */
 const { login, forgotPassVerify } = require("./auth");
 const { GraphQLObjectType, GraphQLID } = graphql;
-const { searchTags, randomPrompt } = require("./tag");
+const { searchTags, randomPrompt, getPopularTags } = require("./tag");
 const {
   getUserPosts,
   getComments,
@@ -29,6 +29,7 @@ const RootQuery = new GraphQLObjectType({
     getRecordingsFromTag,
     getFilters,
     searchUsers,
+    getPopularTags,
   }, //fields end here
 });
 

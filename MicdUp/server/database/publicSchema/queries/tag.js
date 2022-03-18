@@ -3,6 +3,30 @@ const { Prompt } = require("../../models/Prompt");
 const { TagsType, PromptsType } = require("../../types");
 const { GraphQLList, GraphQLString } = require("graphql");
 
+const getPopularTags = {
+  type: new GraphQLList(TagsType),
+  async resolve(parent, {}, context) {
+    try {
+      //TODO replace count with a 24hr count
+      const res = await Tag.aggregate([
+        {
+          $addFields: {
+            totalScore: {
+              $add: ["$hr24searches", { $divide: ["$count", 1000] }],
+            },
+          },
+        },
+        {
+          $sort: { totalScore: -1 },
+        },
+      ]).limit(20);
+      return res;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
+
 const searchTags = {
   type: new GraphQLList(TagsType),
   args: { searchTerm: { type: GraphQLString } },
@@ -52,4 +76,5 @@ const randomPrompt = {
 module.exports = {
   searchTags,
   randomPrompt,
+  getPopularTags,
 };

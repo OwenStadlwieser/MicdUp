@@ -1,6 +1,14 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { View, TouchableOpacity, Image, Text, ScrollView } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import { Title } from "react-native-paper";
 // users
 import { searchUsers } from "../../../redux/actions/user";
 import { searchTags } from "../../../redux/actions/tag";
@@ -10,8 +18,10 @@ import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
 import SearchComponent from "../../reuseable/SearchComponent";
 import Profile from "../Profile/Profile";
 import Feed from "../Feed/Feed";
+import PopularTags from "./PopularTags";
 // styles
 import { styles } from "../../../styles/Styles";
+const { height, width } = Dimensions.get("screen");
 
 export class Search extends Component {
   constructor() {
@@ -55,14 +65,13 @@ export class Search extends Component {
   render() {
     const { users, term, userName, tags, searchExecuted, id } = this.state;
     const { searchViewingProfile } = this.props;
-    console.log(id, 2);
+    console.log(term.length, 2);
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
         {!searchViewingProfile && (
           <SearchComponent
             parentViewStyle={{ zIndex: 2 }}
             searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-            inputStyle={styles.inputStyleUsers}
             isForUser={true}
             placeholder={"Search"}
             setStateOnChange={true}
@@ -80,6 +89,23 @@ export class Search extends Component {
             displayResults={false}
             initValue={users ? users.toString() : ""}
           />
+        )}
+        {term.length == 0 && (
+          <Fragment>
+            <Title
+              style={{
+                paddingTop: height * 0.1,
+                alignSelf: "baseline",
+                paddingLeft: 15,
+                fontStyle: "italic",
+                fontWeight: "700",
+                color: "white",
+              }}
+            >
+              Popular Tags
+            </Title>
+            <PopularTags />
+          </Fragment>
         )}
         {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
