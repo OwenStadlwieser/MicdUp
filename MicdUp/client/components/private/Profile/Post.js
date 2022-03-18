@@ -113,7 +113,12 @@ export class Post extends Component {
             <View style={styles.postPlayButton}>
               {(!post.privatePost || (post.privatePost && canViewPrivate)) && (
                 <Fragment>
-                  <Like post={post} type={"Post"} />
+                  <Like
+                    post={post}
+                    type={"Post"}
+                    postId={post.id}
+                    ownerId={post.owner.id}
+                  />
                   <TouchableOpacity
                     onPress={() => {
                       this.props.showComments(index);

@@ -114,15 +114,15 @@ export default function (state = { ...initialState }, action) {
         posts: { ...state.posts, [payload.owner.id]: posts },
       };
     case UPDATE_POST_COMMENTS:
-      const posts3 = [...state.posts[payload.owner.id]];
+      const posts3 = [...state.posts[payload.owner]];
       const post3Index = posts3.findIndex((post) => post.id === payload.id);
       posts3[post3Index].comments = payload.data;
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner.id]: posts3 },
+        posts: { ...state.posts, [payload.owner]: posts3 },
       };
     case UPDATE_COMMENT_TO_POST:
-      const posts4 = [...state.posts[payload.owner.id]];
+      const posts4 = [...state.posts[payload.owner]];
       let postIndex2 = posts4.findIndex((post) => post.id === payload.postId);
       let postTarget = posts4[postIndex2];
       let indicies = [];
@@ -140,7 +140,7 @@ export default function (state = { ...initialState }, action) {
         }
         return {
           ...state,
-          posts: { ...state.posts, [payload.owner.id]: posts4 },
+          posts: { ...state.posts, [payload.owner]: posts4 },
         };
       }
       indicies.push(
@@ -163,7 +163,7 @@ export default function (state = { ...initialState }, action) {
       posts4[postIndex2].comments = postTarget.comments;
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner.id]: posts4 },
+        posts: { ...state.posts, [payload.owner]: posts4 },
       };
     default:
       return state;

@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     flex: 10,
-    paddingTop: 15,
+    paddingTop: height * 0.125,
   },
   recordingContainerComments: {
     width,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   commentParent: {},
   commentOpenContainer: {
-    height: height * 0.85,
+    height: height * 0.9,
     backgroundColor: "white",
     borderWidth: 2,
     borderStyle: "solid",

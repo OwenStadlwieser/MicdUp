@@ -250,14 +250,14 @@ export const deletePost = (postId) => async (dispatch) => {
 };
 
 export const getComments =
-  (postId, skipMult = 0) =>
+  (post, skipMult = 0) =>
   async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
       const res = await publicClient.query({
         query: GET_COMMENT_POST_QUERY,
         variables: {
-          postId,
+          postId: post.id,
           skipMult,
         },
         fetchPolicy,
@@ -273,7 +273,11 @@ export const getComments =
       }
       dispatch({
         type: UPDATE_POST_COMMENTS,
-        payload: { data: res.data.getComments, id: postId },
+        payload: {
+          data: res.data.getComments,
+          id: post.id,
+          owner: post.owner.id,
+        },
       });
       return res.data.getComments;
     } catch (err) {
@@ -281,14 +285,14 @@ export const getComments =
     }
   };
 export const commentPost =
-  (postId, replyingTo, files, fileTypes, text, speechToText, parents) =>
+  (post, replyingTo, files, fileTypes, text, speechToText, parents) =>
   async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
       const res = await privateClient.mutate({
         mutation: COMMENT_POST_MUTATION(3),
         variables: {
-          postId,
+          postId: post.id,
           replyingTo,
           files,
           fileTypes,
@@ -306,9 +310,15 @@ export const commentPost =
         );
         return false;
       }
+      console.log("commented");
       dispatch({
         type: UPDATE_COMMENT_TO_POST,
-        payload: { comment: res.data.commentToPost, parents, postId },
+        payload: {
+          comment: res.data.commentToPost,
+          parents,
+          owner: post.owner.id,
+          postId: post.id,
+        },
       });
       return res.data.commentToPost;
     } catch (err) {

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // components
 import {
@@ -88,7 +88,7 @@ export class Comment extends Component {
   componentDidMount = async () => {
     const { post } = this.props;
     this.mounted && this.setState({ loading: true });
-    await this.props.getComments(post.id);
+    await this.props.getComments(post);
     this.mounted && this.setState({ loading: false });
     setInterval(() => {
       const { v } = this.state;
@@ -149,92 +149,144 @@ export class Comment extends Component {
       comment.parents = [parentId];
     }
     return (
-      <View
-        /*
+      <Fragment key={comment.id}>
+        <View
+          /*
         onHoldDown remove id from dictionary  
       */
-        key={comment.id}
-        style={{
-          paddingLeft: index > 0 && index < 12 ? 10 : 0,
-          right: index >= 12 ? 10 : 0,
-          borderLeftColor: "#1A3561",
-          borderStyle: "solid",
-          borderLeftWidth: 1,
-        }}
-      >
-        <TouchableOpacity
-          onPress={async () => {
-            if (playingId === comment.id && !isPause) {
-              await this.props.pauseSound();
-            } else if (comment.signedUrl) {
-              await this.props.changeSound(comment, comment.signedUrl);
-            }
-          }}
           style={{
-            paddingTop: height * 0.01,
-            alignItems: "center",
-            justifyContent: "space-evenly",
-            paddingHorizontal: 15,
-            flexDirection: "row",
+            paddingLeft: index > 0 && index < 12 ? index * 10 : 0,
+            right: index >= 12 ? 10 : 0,
             borderLeftColor: "#1A3561",
             borderStyle: "solid",
-            left: index >= 12 ? -1 : 0,
-            borderLeftWidth: index >= 12 ? 0 : 1,
-            zIndex: index >= 12 ? 1 : 0,
-            backgroundColor:
-              playingId === comment.id && !isPause && index >= 12
-                ? "#6FF6FF"
-                : index >= 12
-                ? "white"
-                : "transparent",
+            borderLeftWidth: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 5,
           }}
         >
-          <View style={{ flex: 2 }}>
-            <Text style={styles.blackText}>
-              @
-              {comment && comment.owner && comment.owner.user
-                ? comment.owner.user.userName
-                : ""}
-            </Text>
-            <TouchableHighlight
-              style={[
-                styles.commentImgContainer,
-                {
-                  borderColor: "#30F3FF",
-                  borderWidth: 1,
-                },
-              ]}
+          <TouchableOpacity
+            onPress={async () => {
+              if (playingId === comment.id && !isPause) {
+                await this.props.pauseSound();
+              } else if (comment.signedUrl) {
+                await this.props.changeSound(comment, comment.signedUrl);
+              }
+            }}
+            style={{
+              paddingTop: height * 0.01,
+              justifyContent: "space-evenly",
+              paddingHorizontal: 15,
+              borderLeftColor: "#1A3561",
+              borderStyle: "solid",
+              left: index >= 12 ? -1 : 0,
+              borderLeftWidth: index >= 12 ? 0 : 1,
+              zIndex: index >= 12 ? 1 : 0,
+              flex: 9,
+              backgroundColor:
+                playingId === comment.id && !isPause && index >= 12
+                  ? "#6FF6FF"
+                  : index >= 12
+                  ? "white"
+                  : "transparent",
+            }}
+          >
+            <View style={{ flexDirection: "column" }}>
+              <View style={{ flex: 2 }}>
+                <Text style={styles.blackText}>
+                  @
+                  {comment && comment.owner && comment.owner.user
+                    ? comment.owner.user.userName
+                    : ""}
+                </Text>
+                <TouchableHighlight
+                  style={[
+                    styles.commentImgContainer,
+                    {
+                      borderColor: "#30F3FF",
+                      borderWidth: 1,
+                    },
+                  ]}
+                >
+                  <Image
+                    source={
+                      comment && comment.owner && comment.owner.image
+                        ? {
+                            uri: comment.owner.image.signedUrl,
+                          }
+                        : require("../../assets/no-profile-pic-icon-27.jpg")
+                    }
+                    style={styles.commentImg}
+                  />
+                </TouchableHighlight>
+              </View>
+              <View
+                style={{ flex: 7, position: "relative", overflow: "hidden" }}
+              >
+                {comment.speechToText && comment.speechToText[0] && (
+                  <SpeechToText
+                    containerStyle={[{ flexDirection: "row" }]}
+                    fontSize={24}
+                    post={comment}
+                    textStyle={{}}
+                  />
+                )}
+              </View>
+            </View>
+            <View
+              style={{
+                zIndex: index >= 12 ? 1 : 0,
+                backgroundColor: index >= 12 ? "white" : "transparent",
+                left: index >= 12 ? -1 : 0,
+                flexDirection: "row",
+                paddingTop: 5,
+                flexWrap: "nowrap",
+              }}
             >
-              <Image
-                source={
-                  comment && comment.owner && comment.owner.image
-                    ? {
-                        uri: comment.owner.image.signedUrl,
-                      }
-                    : require("../../assets/no-profile-pic-icon-27.jpg")
-                }
-                style={styles.commentImg}
-              />
-            </TouchableHighlight>
-          </View>
-          <View style={{ flex: 7, position: "relative", overflow: "hidden" }}>
-            {comment.speechToText && comment.speechToText[0] && (
-              <SpeechToText
-                containerStyle={[{ flexDirection: "row" }]}
-                fontSize={24}
-                post={comment}
-                textStyle={{}}
-              />
-            )}
-          </View>
+              <TouchableHighlight
+                onPress={async () => {
+                  this.mounted &&
+                    this.setState({
+                      parents: comment.parents,
+                      replyingTo: comment.id,
+                      replyingToName: `@${comment.owner.user.userName}`,
+                    });
+                }}
+                style={styles.replyActionsContainer}
+              >
+                <Text style={styles.replyActionsText}>Reply</Text>
+              </TouchableHighlight>
+              {index !== 0 && comment.repliesLength > 0 && (
+                <TouchableHighlight
+                  onPress={async () => {
+                    const replies = await this.props.getReplies(comment.id);
+                    /*
+                  replies: Comment
+                  replies.allReplies: [Comment]
+                  add replies id and all its children to showing dictionary
+                */
+                    this.props.updateCommentDisplay(
+                      replies,
+                      comment.parents,
+                      post
+                    );
+                  }}
+                  style={styles.replyActionsContainer}
+                >
+                  <Text style={styles.replyActionsText}>Show more replies</Text>
+                </TouchableHighlight>
+              )}
+            </View>
+          </TouchableOpacity>
           {comment.signedUrl || comment.text ? (
-            <View style={{ flex: 1, alignItems: "center" }}>
+            <View style={{ flex: 1, alignItems: "center", paddingRight: 10 }}>
               {comment.signedUrl && (
                 <Like
                   post={comment}
                   type={"Comment"}
                   parents={comment.parents}
-                  postId={this.props.post.id}
+                  postId={post.id}
+                  ownerId={post.owner.id}
                 />
               )}
               {!comment.isDeleted &&
@@ -248,7 +300,7 @@ export class Comment extends Component {
                       this.props.updateCommentDisplay(
                         newComment,
                         comment.parents,
-                        this.props.post.id
+                        post
                       );
                     }}
                     name="scissors"
@@ -262,53 +314,8 @@ export class Comment extends Component {
               <Text>{comment.isDeleted ? "Deleted" : comment.text}</Text>
             </View>
           )}
-        </TouchableOpacity>
-        <View
-          style={{
-            zIndex: index >= 12 ? 1 : 0,
-            backgroundColor: index >= 12 ? "white" : "transparent",
-            left: index >= 12 ? -1 : 0,
-            flexDirection: "row",
-            borderLeftColor: "#1A3561",
-            borderStyle: "solid",
-            borderLeftWidth: index >= 12 ? 0 : 1,
-            paddingTop: 5,
-          }}
-        >
-          <TouchableHighlight
-            onPress={async () => {
-              this.mounted &&
-                this.setState({
-                  parents: comment.parents,
-                  replyingTo: comment.id,
-                  replyingToName: `@${comment.owner.user.userName}`,
-                });
-            }}
-            style={styles.replyActionsContainer}
-          >
-            <Text style={styles.replyActionsText}>Reply</Text>
-          </TouchableHighlight>
-          {index !== 0 && comment.repliesLength > 0 && (
-            <TouchableHighlight
-              onPress={async () => {
-                const replies = await this.props.getReplies(comment.id);
-                /*
-                  replies: Comment
-                  replies.allReplies: [Comment]
-                  add replies id and all its children to showing dictionary
-                */
-                this.props.updateCommentDisplay(
-                  replies,
-                  comment.parents,
-                  this.props.post.id
-                );
-              }}
-              style={styles.replyActionsContainer}
-            >
-              <Text style={styles.replyActionsText}>Show more replies</Text>
-            </TouchableHighlight>
-          )}
         </View>
+
         {
           /*
             check comment id is in showing dictionary
@@ -320,7 +327,7 @@ export class Comment extends Component {
               return this.handleMap(child, i, index + 1, comment.id, comment);
             })
         }
-      </View>
+      </Fragment>
     );
   }
 
@@ -342,7 +349,7 @@ export class Comment extends Component {
         style={styles.commentOpenContainer}
       >
         <AntDesign
-          style={[styles.topLeftIcon, { zIndex: 4 }, { top: 10 }]}
+          style={[styles.topLeftIcon, { zIndex: 4 }]}
           name="leftcircle"
           size={24}
           color="#1A3561"
@@ -449,8 +456,8 @@ export class Comment extends Component {
                   } else {
                     console.log("error with blob");
                   }
-                  const res = await this.props.commentPost(
-                    post.id,
+                  await this.props.commentPost(
+                    post,
                     replyingTo,
                     base64Url,
                     fileType,

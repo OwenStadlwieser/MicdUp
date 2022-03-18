@@ -274,7 +274,12 @@ export class Chat extends Component {
                 {chat.signedUrl && (
                   <View style={{ flex: 2 }}>
                     {chat.signedUrl && (
-                      <Like type={"Chat"} postId={chat.id} post={chat} />
+                      <Like
+                        type={"Chat"}
+                        postId={chat.id}
+                        ownerId={chat.owner.id}
+                        post={chat}
+                      />
                     )}
                     {chat.owner.id === profile.id && (
                       <Feather

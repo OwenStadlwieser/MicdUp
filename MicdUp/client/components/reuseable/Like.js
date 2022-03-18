@@ -23,7 +23,7 @@ export class Like extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { post, type } = this.props;
+    const { post, type, postId, ownerId } = this.props;
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -43,7 +43,7 @@ export class Like extends Component {
                 this.props.updateCommentDisplay(
                   newComment,
                   this.props.parents,
-                  this.props.postId
+                  { id: postId, owner: { id: ownerId } }
                 );
               } else if (type === "Post") this.props.likePost(post.id);
             }}
