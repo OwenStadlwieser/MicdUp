@@ -39,7 +39,6 @@ export const getReplies = (commentId) => async (dispatch) => {
 export const updateCommentDisplay =
   (comment, parents, post) => async (dispatch) => {
     try {
-      console.log("here", post.id);
       dispatch({
         type: UPDATE_COMMENT_TO_POST,
         payload: { comment, parents, postId: post.id, owner: post.owner.id },

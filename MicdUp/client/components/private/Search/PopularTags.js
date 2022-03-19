@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { View, Text, Dimensions } from "react-native";
 import { SnapList, SnapItem } from "react-snaplist-carousel";
 import { getPopularTags } from "../../../redux/actions/tag";
+
 const { height, width } = Dimensions.get("screen");
 export class DefaultComponent extends Component {
   constructor() {
