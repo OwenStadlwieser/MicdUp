@@ -6,6 +6,9 @@ import { viewProfile } from "../../redux/actions/display";
 import { navigate } from "../../redux/actions/display";
 // styles
 import { styles } from "../../styles/Styles";
+// icons
+import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export class NavBar extends Component {
   constructor() {
@@ -35,7 +38,9 @@ export class NavBar extends Component {
             this.props.navigate("Feed");
           }}
         >
-          <Text style={styles.navbarText}>Feed</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome name="feed" size={24} color="black" />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -47,7 +52,9 @@ export class NavBar extends Component {
             this.props.navigate("Search");
           }}
         >
-          <Text style={styles.navbarText}>Search</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome name="search" size={24} color="black" />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -59,7 +66,9 @@ export class NavBar extends Component {
             this.props.navigate("Create");
           }}
         >
-          <Text style={styles.navbarText}>Create</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome5 name="record-vinyl" size={36} color="red" />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -71,7 +80,9 @@ export class NavBar extends Component {
             this.props.navigate("Dms");
           }}
         >
-          <Text style={styles.navbarText}>Chat</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome name="users" size={24} color="black" />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -84,7 +95,9 @@ export class NavBar extends Component {
             this.props.navigate("Profile");
           }}
         >
-          <Text style={styles.navbarText}>Profile</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome name="user" size={24} color="black" />
+          </Text>
         </TouchableOpacity>
       </View>
     );
