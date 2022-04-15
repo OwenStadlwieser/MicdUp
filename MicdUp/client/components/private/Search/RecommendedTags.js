@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Text, Dimensions } from "react-native";
 import { SnapList, SnapItem } from "react-snaplist-carousel";
-import { getPopularTags } from "../../../redux/actions/tag";
+import { getRecommendedTags } from "../../../redux/actions/tag";
 
 const { height, width } = Dimensions.get("screen");
-export class PopularTags extends Component {
+export class RecommendedTags extends Component {
   constructor() {
     super();
     this.state = {
@@ -20,14 +20,19 @@ export class PopularTags extends Component {
 
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
-    const tags = await this.props.getPopularTags();
+    const tags = await this.props.getRecommendedTags();
     console.log(tags);
     this.mounted && this.setState({ loading: false, tags });
   };
 
   render() {
     const { tags } = this.state;
-
+    const settings = {
+      dots: false,
+      slidesToShow: 2,
+      slidesToScroll: 2,
+      variableWidth: true,
+    };
     return (
       <SnapList style={{ height: height * 0.15, flex: "initial" }}>
         {tags &&
@@ -61,4 +66,6 @@ export class PopularTags extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { getPopularTags })(PopularTags);
+export default connect(mapStateToProps, { getRecommendedTags })(
+  RecommendedTags
+);

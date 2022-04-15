@@ -285,6 +285,7 @@ const likePost = {
     const privatePermissionIndex = post.privatePost
       ? await checkIfIsInPrivateList(context, post)
       : 1;
+    // does not have permission to like this post
     if (privatePermissionIndex < 0) {
       return post;
     }

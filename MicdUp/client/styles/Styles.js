@@ -40,6 +40,13 @@ const styles = StyleSheet.create({
     flex: 10,
     paddingTop: height * 0.125,
   },
+  searchTags: {
+    display: "flex",
+    flexDirection: "column",
+    width,
+    flex: 1,
+    justifyContent: "space-evenly",
+  },
   recordingContainerComments: {
     width,
     flex: 1,

@@ -32,4 +32,18 @@ const GET_POPULAR_TAGS_QUERY = gql`
   }
 `;
 
-export { GET_TAGS_QUERY, GET_RANDOM_PROMPT_QUERY, GET_POPULAR_TAGS_QUERY };
+const GET_RECOMMENDED_TAGS = gql`
+  query getRecommendedTags {
+    getRecommendedTags {
+      _id
+      title
+    }
+  }
+`;
+
+export {
+  GET_TAGS_QUERY,
+  GET_RANDOM_PROMPT_QUERY,
+  GET_POPULAR_TAGS_QUERY,
+  GET_RECOMMENDED_TAGS,
+};

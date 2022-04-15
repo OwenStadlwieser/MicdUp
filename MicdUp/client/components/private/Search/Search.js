@@ -19,6 +19,7 @@ import SearchComponent from "../../reuseable/SearchComponent";
 import Profile from "../Profile/Profile";
 import Feed from "../Feed/Feed";
 import PopularTags from "./PopularTags";
+import RecommendedTags from "./RecommendedTags";
 // styles
 import { styles } from "../../../styles/Styles";
 const { height, width } = Dimensions.get("screen");
@@ -91,21 +92,36 @@ export class Search extends Component {
           />
         )}
         {term.length == 0 && (
-          <Fragment>
-            <Title
-              style={{
-                paddingTop: height * 0.1,
-                alignSelf: "baseline",
-                paddingLeft: 15,
-                fontStyle: "italic",
-                fontWeight: "700",
-                color: "white",
-              }}
-            >
-              Popular Tags
-            </Title>
-            <PopularTags />
-          </Fragment>
+          <View style={styles.searchTags}>
+            <View>
+              <Title
+                style={{
+                  alignSelf: "baseline",
+                  paddingLeft: 15,
+                  fontStyle: "italic",
+                  fontWeight: "700",
+                  color: "white",
+                }}
+              >
+                Popular Topics
+              </Title>
+              <PopularTags />
+            </View>
+            <View>
+              <Title
+                style={{
+                  alignSelf: "baseline",
+                  paddingLeft: 15,
+                  fontStyle: "italic",
+                  fontWeight: "700",
+                  color: "white",
+                }}
+              >
+                Recommmended Topics
+              </Title>
+              <RecommendedTags />
+            </View>
+          </View>
         )}
         {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
