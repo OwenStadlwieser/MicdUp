@@ -114,13 +114,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: "black",
     width: width * 0.6,
-    height: 40,
     borderRadius: 10,
     marginTop: height * 0.05,
     position: "relative",
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: "black",
     fontStyle: "italic",
   },
   forgotPassButton: {

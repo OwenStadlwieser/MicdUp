@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Text, View, TouchableOpacity, Platform } from "react-native";
+import { Button } from "react-native-paper";
 import React, { Component, useEffect } from "react";
 import { connect } from "react-redux";
 // styles
@@ -117,24 +118,22 @@ export class Root extends Component {
           ) : (
             <View style={styles.containerPrivate}>
               <View style={styles.contentContainer}>
-                <TouchableOpacity
+                <Button
                   style={styles.button}
                   onPress={() => {
                     this.props.changeLogin(true);
                   }}
-                  accessibilityLabel="Login"
                 >
-                  <Text style={styles.text}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                  Login
+                </Button>
+                <Button
                   style={styles.button}
                   onPress={() => {
                     this.props.changeSignup(true);
                   }}
-                  accessibilityLabel="Sign Up"
                 >
-                  <Text style={styles.text}>Sign Up</Text>
-                </TouchableOpacity>
+                  Sign Up
+                </Button>
                 <StatusBar style="auto" />
               </View>
               <Navbar />

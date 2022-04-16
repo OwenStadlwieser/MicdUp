@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { styles } from "../../styles/Styles";
+import { Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 // redux
 import { changeLogin } from "../../redux/actions/display";
@@ -89,13 +90,12 @@ export class Login extends Component {
                 Forgot Password
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={async () => await this.login()}
+            <Button
               style={styles.button}
-              accessibilityLabel="Login"
+              onPress={async () => await this.login()}
             >
-              <Text style={styles.text}>Login</Text>
-            </TouchableOpacity>
+              Login
+            </Button>
           </KeyboardAvoidingView>
         ));
     return login;

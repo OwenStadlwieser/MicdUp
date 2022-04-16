@@ -18,6 +18,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
+import { Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import DatePicker from "react-native-datepicker";
 
@@ -173,15 +174,9 @@ export class Signup extends Component {
           />
         )}
 
-        <TouchableOpacity
-          onPress={async () => {
-            await this.signup();
-          }}
-          style={styles.button}
-          accessibilityLabel="Signup"
-        >
-          <Text style={styles.text}>Sign Up</Text>
-        </TouchableOpacity>
+        <Button style={styles.button} onPress={async () => await this.signup()}>
+          Signup
+        </Button>
       </KeyboardAvoidingView>
     );
   }
