@@ -64,7 +64,7 @@ export class PopularTags extends Component {
                 }}
                 underlayColor="#6FF6FF"
                 onPress={() => {
-                  this.props.setSelectedTag(tag.id);
+                  this.props.setSelectedTag(tag._id);
                 }}
               >
                 <Text>{tag.title}</Text>

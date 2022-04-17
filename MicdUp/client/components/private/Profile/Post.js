@@ -16,7 +16,6 @@ import { styles, postWidth, postHeight } from "../../../styles/Styles";
 //icons
 import { FontAwesome } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
 //redux
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { showComments } from "../../../redux/actions/display";

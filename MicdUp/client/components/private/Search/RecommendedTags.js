@@ -64,7 +64,8 @@ export class RecommendedTags extends Component {
                 }}
                 underlayColor="#6FF6FF"
                 onPress={() => {
-                  this.props.setSelectedTag(tag.id);
+                  console.log(tag);
+                  this.props.setSelectedTag(tag._id);
                 }}
               >
                 <Text>{tag.title}</Text>
