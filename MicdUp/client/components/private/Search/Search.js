@@ -72,7 +72,7 @@ export class Search extends Component {
       this.state;
     const { searchViewingProfile } = this.props;
     if (searchExecuted) {
-      return <Feed fromSearch={true} tag={tagId} />;
+      return <Feed key={"search"} fromSearch={true} tag={tagId} />;
     }
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>

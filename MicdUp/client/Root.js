@@ -107,7 +107,7 @@ export class Root extends Component {
           {mountedComponent === "Feed" ? (
             <View style={styles.containerPrivate}>
               <View style={styles.contentContainer}>
-                <Feed />
+                <Feed key={"notloggedin"} />
               </View>
               <Navbar />
             </View>

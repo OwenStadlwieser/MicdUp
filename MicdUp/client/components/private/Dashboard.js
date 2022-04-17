@@ -62,7 +62,7 @@ export class Dashboard extends Component {
       <View style={styles.containerPrivate}>
         <View style={styles.contentContainer}>
           {mountedComponent === "Feed" ? (
-            <Feed />
+            <Feed key={"dashboard"} />
           ) : mountedComponent === "Create" ? (
             <Create />
           ) : mountedComponent === "Dms" ? (
