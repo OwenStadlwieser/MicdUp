@@ -9,6 +9,7 @@ import { styles } from "./styles/Styles";
 import { setIp } from "./redux/actions/auth";
 import { changeLogin, changeSignup } from "./redux/actions/display";
 // children
+import Comment from "./components/reuseable/Comment";
 import Dashboard from "./components/private/Dashboard";
 import Navbar from "./components/private/Navbar";
 import Login from "./components/public/Login";
@@ -82,6 +83,10 @@ export class Root extends Component {
       loggedIn,
       mountedComponent,
       loading,
+      showingComments,
+      cachedPosts,
+      currentKey,
+      postIndex,
     } = this.props;
     let app;
     const { width, height } = Dimensions.get("window");
@@ -146,6 +151,13 @@ export class Root extends Component {
               <Navbar />
             </View>
           )}
+          {showingComments && (
+            <Comment
+              containerStyle={{}}
+              color={"#1A3561"}
+              post={cachedPosts[currentKey][postIndex]}
+            />
+          )}
         </View>
       );
     else
@@ -168,6 +180,13 @@ export class Root extends Component {
             </View>
           )}
           <Dashboard></Dashboard>
+          {showingComments && (
+            <Comment
+              containerStyle={{}}
+              color={"#1A3561"}
+              post={cachedPosts[currentKey][postIndex]}
+            />
+          )}
         </View>
       );
     return app;
@@ -183,6 +202,10 @@ const mapStateToProps = (state) => ({
   messageState: state.display.messageState,
   mountedComponent: state.display.mountedComponent,
   loading: state.display.loading,
+  showingComments: state.display.showingComments,
+  postIndex: state.display.postIndex,
+  cachedPosts: state.auth.posts,
+  currentKey: state.auth.currentKey,
 });
 export default connect(mapStateToProps, {
   changeSignup,

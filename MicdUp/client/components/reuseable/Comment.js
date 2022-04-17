@@ -97,22 +97,13 @@ export class Comment extends Component {
     }, 1000);
   };
 
-  componentDidUpdate = async (prevProps) => {
-    const { isRecordingComment } = this.props;
-    if (!isRecordingComment && prevProps.isRecordingComment) {
-      await this.stopRecordingComment();
-    }
-  };
-
   startRecordingComment = async () => {
-    this.props.setRecording(true);
     const recording = await startRecording(Voice, () => {});
     this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecordingComment = async () => {
     const { recording, results } = this.state;
-    this.props.setRecording(false);
     console.log("Stopping recording..");
     if (!recording) {
       Platform.OS !== "web" && Voice.stop();

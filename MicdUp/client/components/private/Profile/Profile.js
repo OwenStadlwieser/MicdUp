@@ -216,7 +216,6 @@ export class Profile extends Component {
       userName,
       profile,
       currentProfile,
-      postIndex,
       showingComments,
       backArrow,
       id,
@@ -284,23 +283,6 @@ export class Profile extends Component {
               <View style={styles.refresh}>
                 <Text style={styles.nextButtonText}>Loading</Text>
               </View>
-            )}
-            {showingComments && (
-              <Comment
-                isUserProfile={isUserProfile}
-                containerStyle={{}}
-                color={"#1A3561"}
-                currentPlayingId={playingId}
-                post={posts[postIndex]}
-                setRecording={((val) => {
-                  this.mounted &&
-                    this.setState({
-                      recording: val,
-                      isRecordingComment: true,
-                    });
-                }).bind(this)}
-                isRecordingComment={isRecordingComment}
-              />
             )}
             <GestureRecognizer
               onSwipeDown={(state) => this.onSwipeDown(state)}
@@ -478,7 +460,6 @@ export class Profile extends Component {
               useNativeDriver={false}
               renderItem={(data, rowMap) => (
                 <Post
-                  isRecordingComment={isRecordingComment}
                   isUserProfile={isUserProfile}
                   key={data.item.id}
                   post={data.item}
@@ -566,7 +547,6 @@ const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
   user: state.auth.user,
   profile: state.auth.user.profile,
-  postIndex: state.display.postIndex,
   showingComments: state.display.showingComments,
 });
 

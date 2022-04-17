@@ -46,6 +46,7 @@ export default function (state = { ...initialState }, action) {
         mountedComponent: payload,
         keyForSearch: Math.random(),
         searchViewingProfile: false,
+        showingComments: false,
       };
     case ADD_LOADING:
       copy = { ...state.loadingMap };
