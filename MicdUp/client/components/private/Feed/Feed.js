@@ -11,11 +11,7 @@ import Post from "../Profile/Post";
 // redux
 import { navigate } from "../../../redux/actions/display";
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
-import {
-  addLoading,
-  removeLoading,
-  setCurrentKey,
-} from "../../../redux/actions/display";
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
 import {
   getFollowingFeed,
@@ -38,26 +34,24 @@ export class Feed extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    const { fromSearch, tag, profile } = this.props;
+    const { fromSearch, tag, loggedIn } = this.props;
+    console.log(loggedIn);
     if (fromSearch && tag) {
       this.mounted && this.setState({ tag: { ...tag } });
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
-      this.props.setCurrentKey(tag._id);
       await this.props.getRecordingsFromTag(tag._id);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
-    } else if (!fromSearch && profile) {
+    } else if (!fromSearch && loggedIn) {
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
-      this.props.setCurrentKey("FOLLOWINGFEED");
       await this.props.getFollowingFeed(0);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
-    } else if (!profile) {
+    } else if (!loggedIn) {
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
-      this.props.setCurrentKey("NOTLOGGEDINFEED");
       await this.props.getNotLoggedInFeed(0);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
@@ -68,13 +62,13 @@ export class Feed extends Component {
 
   render() {
     const { height, width } = Dimensions.get("window");
-    const { fromSearch, profile, cachedPosts } = this.props;
+    const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
     const { isRecordingComment, loading, tag, following } = this.state;
     const postsToView = fromSearch
       ? tag
         ? cachedPosts[tag._id]
         : []
-      : !profile
+      : !loggedIn
       ? cachedPosts["NOTLOGGEDINFEED"]
       : following
       ? cachedPosts["FOLLOWINGFEED"]
@@ -107,6 +101,7 @@ export class Feed extends Component {
             />
             <Appbar.Content title={tag.title} subtitle="Topic" />
             <Appbar.Action
+              color="red"
               icon={
                 !tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"
               }
@@ -140,7 +135,6 @@ export class Feed extends Component {
                   })
                 }
                 onPress={async () => {
-                  this.props.setCurrentKey("FOLLOWINGFEED");
                   if (
                     following ||
                     !cachedPosts["FOLLOWINGFEED"] ||
@@ -163,7 +157,6 @@ export class Feed extends Component {
                   { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
                 }
                 onPress={async () => {
-                  this.props.setCurrentKey("TOPICSFEED");
                   if (
                     !following ||
                     !cachedPosts["TOPICSFEED"] ||
@@ -245,6 +238,7 @@ export class Feed extends Component {
 const mapStateToProps = (state) => ({
   user: state.auth.user,
   profile: state.auth.user.profile,
+  loggedIn: state.auth.loggedIn,
   cachedPosts: state.auth.posts,
 });
 
@@ -257,5 +251,4 @@ export default connect(mapStateToProps, {
   getFollowingFeed,
   getNotLoggedInFeed,
   getTopicsFeed,
-  setCurrentKey,
 })(Feed);

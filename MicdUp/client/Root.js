@@ -90,7 +90,6 @@ export class Root extends Component {
     } = this.props;
     let app;
     const { width, height } = Dimensions.get("window");
-
     if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>

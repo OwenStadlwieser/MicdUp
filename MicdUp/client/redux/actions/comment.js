@@ -11,6 +11,7 @@ import {
 } from "../types";
 import { showMessage } from "./display";
 import { publicClient, privateClient } from "../../apollo/client";
+import { checkIfLoggedIn } from "./recording";
 export const getReplies = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
@@ -50,6 +51,15 @@ export const updateCommentDisplay =
 
 export const likeComment = (commentId) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: LIKE_COMMENT_MUTATION(3),
@@ -75,6 +85,15 @@ export const likeComment = (commentId) => async (dispatch) => {
 
 export const deleteComment = (commentId) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: DELETE_COMMENT_MUTATION(3),

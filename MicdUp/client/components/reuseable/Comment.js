@@ -130,6 +130,7 @@ export class Comment extends Component {
 
   handleMap(comment, i, index, parentId, parent) {
     const { profile, post, playingId, isPause } = this.props;
+    console.log(comment, post);
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -280,8 +281,8 @@ export class Comment extends Component {
                 />
               )}
               {!comment.isDeleted &&
-                (profile.id === post.owner.id ||
-                  comment.owner.id === profile.id) && (
+                ((profile && profile.id === post.owner.id) ||
+                  (profile && comment.owner.id === profile.id)) && (
                   <Feather
                     onPress={async () => {
                       const newComment = await this.props.deleteComment(

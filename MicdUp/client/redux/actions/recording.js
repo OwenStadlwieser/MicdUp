@@ -30,6 +30,14 @@ import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
 import store from "../index";
 
+export function checkIfLoggedIn() {
+  let { loggedIn } = store.getState().auth;
+  if (loggedIn) {
+    return true;
+  } else {
+    return false;
+  }
+}
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
     type: ALTER_CLIPS,
@@ -93,6 +101,15 @@ export const uploadRecording =
   ) =>
   async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       const res = await privateClient.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
@@ -132,6 +149,15 @@ export const uploadRecording =
 export const uploadBio =
   (files, fileTypes, speechToText) => async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       const res = await privateClient.mutate({
         mutation: UPLOAD_BIO_MUTATION,
         variables: {
@@ -191,6 +217,15 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
 
 export const likePost = (postId) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: LIKE_POST_MUTATION,
@@ -220,6 +255,15 @@ export const likePost = (postId) => async (dispatch) => {
 
 export const deletePost = (postId) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: DELETE_POST_MUTATION,
@@ -281,6 +325,7 @@ export const getComments =
       });
       return res.data.getComments;
     } catch (err) {
+      console.log(post, "here");
       console.log(err);
     }
   };
@@ -288,6 +333,15 @@ export const commentPost =
   (post, replyingTo, files, fileTypes, text, speechToText, parents) =>
   async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       let fetchPolicy = "no-cache";
       const res = await privateClient.mutate({
         mutation: COMMENT_POST_MUTATION(3),

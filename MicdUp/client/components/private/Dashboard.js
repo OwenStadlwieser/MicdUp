@@ -62,7 +62,7 @@ export class Dashboard extends Component {
       <View style={styles.containerPrivate}>
         <View style={styles.contentContainer}>
           {mountedComponent === "Feed" ? (
-            <Feed key={"dashboard"} />
+            <Feed key={this.props.loggedIn} />
           ) : mountedComponent === "Create" ? (
             <Create />
           ) : mountedComponent === "Dms" ? (
@@ -92,6 +92,7 @@ export class Dashboard extends Component {
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
   user: state.auth.user,
+  loggedIn: state.auth.loggedIn,
   profile: state.auth.user.profile,
   keyForSearch: state.display.keyForSearch,
 });
