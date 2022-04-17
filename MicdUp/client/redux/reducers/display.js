@@ -8,7 +8,6 @@ import {
   SET_BIO,
   VIEW_PROFILE_SEARCH,
   UPDATE_FOLLOWER_COUNT,
-  UPDATE_CURRENT_RECORDINGS,
   RECEIVE_NOTIF,
   HIDE_NOTIF,
   SHOW_COMMENTS,
@@ -30,10 +29,6 @@ const initialState = {
   viewingProfile: {},
   keyForSearch: Math.random(),
   searchViewingProfile: false,
-  viewingPosts: [],
-  followingPosts: [],
-  followingTopicPosts: [],
-  notLoggedInPosts: [],
   receiveNotif: false,
   showingComments: false,
   postIndex: -1,
@@ -51,11 +46,6 @@ export default function (state = { ...initialState }, action) {
         mountedComponent: payload,
         keyForSearch: Math.random(),
         searchViewingProfile: false,
-      };
-    case UPDATE_CURRENT_RECORDINGS:
-      return {
-        ...state,
-        viewingPosts: payload,
       };
     case ADD_LOADING:
       copy = { ...state.loadingMap };

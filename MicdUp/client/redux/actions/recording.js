@@ -348,9 +348,17 @@ export const getRecordingsFromTag =
         );
         return false;
       }
+      if (skipMult == 0) {
+        dispatch({
+          type: CLEAR_POSTS,
+        });
+      }
       dispatch({
-        type: UPDATE_CURRENT_RECORDINGS,
-        payload: res.data.getRecordingsFromTag,
+        type: SET_POSTS,
+        payload: {
+          posts: res.data.getRecordingsFromTag,
+          userId: searchTag,
+        },
       });
       return res.data.getRecordingsFromTag;
     } catch (err) {

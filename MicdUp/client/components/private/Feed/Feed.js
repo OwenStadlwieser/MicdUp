@@ -43,6 +43,7 @@ export class Feed extends Component {
       this.mounted && this.setState({ tag: { ...tag } });
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
+      this.props.setCurrentKey(tag._id);
       await this.props.getRecordingsFromTag(tag._id);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
@@ -67,10 +68,12 @@ export class Feed extends Component {
 
   render() {
     const { height, width } = Dimensions.get("window");
-    const { posts, fromSearch, profile, cachedPosts } = this.props;
+    const { fromSearch, profile, cachedPosts } = this.props;
     const { isRecordingComment, loading, tag, following } = this.state;
     const postsToView = fromSearch
-      ? posts
+      ? tag
+        ? cachedPosts[tag._id]
+        : []
       : !profile
       ? cachedPosts["NOTLOGGEDINFEED"]
       : following
@@ -136,7 +139,6 @@ export class Feed extends Component {
                 }
                 onPress={async () => {
                   this.props.setCurrentKey("FOLLOWINGFEED");
-
                   if (
                     following ||
                     !cachedPosts["FOLLOWINGFEED"] ||
@@ -239,7 +241,6 @@ export class Feed extends Component {
 const mapStateToProps = (state) => ({
   user: state.auth.user,
   profile: state.auth.user.profile,
-  posts: state.display.viewingPosts,
   cachedPosts: state.auth.posts,
 });
 
