@@ -50,7 +50,7 @@ export class SoundPlayer extends Component {
           style={[styles.modalMainContainer, { padding: 20 }]}
         >
           <Fragment>
-            {sound && (
+            {sound && sound.owner && (
               <View
                 style={{
                   flexDirection: "column",

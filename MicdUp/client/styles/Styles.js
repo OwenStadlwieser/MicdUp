@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   settingsOptionsContainer: {
     width,
-    marginTop: height * 0.1,
+    marginTop: height * 0.125,
     height: height * 0.8,
   },
   settingsOption: {
