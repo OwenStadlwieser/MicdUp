@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const { Profile } = require("../../models/Profile");
+const { Tag } = require("../../models/Tag");
 const { File } = require("../../models/File");
 const { GraphQLString, GraphQLID } = require("graphql");
-const { FileType, ProfilePublicType, MessageType } = require("../../types");
+const { FileType, ProfilePublicType, TagsType } = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
 
 const updateProfilePic = {
@@ -90,6 +91,47 @@ const followProfile = {
   },
 };
 
+const followTopic = {
+  type: TagsType,
+  args: {
+    tagId: { type: GraphQLID },
+  },
+  async resolve(parent, { tagId }, context) {
+    // FIXME: implement transaction
+    if (!context.user.id) {
+      throw new Error("Must be signed in to follow");
+    }
+
+    let returnObject = {};
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const profile = context.profile;
+      const foreignTag = await Tag.findById(tagId);
+      if (foreignTag.followers.get(`${profile._id}`)) {
+        foreignTag.followers.delete(`${profile._id}`);
+        profile.followingTopics.delete(`${foreignTag._id}`);
+      } else {
+        foreignTag.followers.set(`${profile._id}`, "1");
+        profile.followingTopics.set(`${foreignTag._id}`, "1");
+        returnObject = { message: "followed", success: true };
+      }
+      await profile.save({ session });
+      await foreignTag.save({ session });
+      await session.commitTransaction();
+      console.log(foreignTag);
+      return foreignTag;
+    } catch (err) {
+      await session.abortTransaction();
+      console.log(err);
+      return { message: "Not Followed", success: false };
+    } finally {
+      session.endSession();
+    }
+  },
+};
+
 const addToPrivates = {
   type: ProfilePublicType,
   args: {
@@ -130,4 +172,5 @@ module.exports = {
   updateProfilePic,
   followProfile,
   addToPrivates,
+  followTopic,
 };

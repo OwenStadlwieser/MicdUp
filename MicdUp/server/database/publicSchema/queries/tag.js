@@ -42,7 +42,6 @@ const getRecommendedTags = {
           ]);
           if (
             res.findIndex((el) => {
-              console.log(el);
               return (el._id.toString() === randomTag._id) < 0;
             })
           ) {
@@ -94,7 +93,6 @@ const getRecommendedTags = {
           ]);
           if (
             res.findIndex((el) => {
-              console.log(el);
               return el._id.toString() === randomTag._id;
             }) < 0
           ) {

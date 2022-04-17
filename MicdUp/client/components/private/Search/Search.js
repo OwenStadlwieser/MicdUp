@@ -21,7 +21,6 @@ import PopularTags from "./PopularTags";
 import RecommendedTags from "./RecommendedTags";
 // styles
 import { styles } from "../../../styles/Styles";
-const { height, width } = Dimensions.get("screen");
 
 export class Search extends Component {
   constructor() {
@@ -33,7 +32,7 @@ export class Search extends Component {
       term: "",
       userName: "",
       searchExecuted: false,
-      tagId: "",
+      tag: null,
     };
 
     this.mounted = true;
@@ -64,15 +63,15 @@ export class Search extends Component {
     this.mounted && this.setState({ term });
   };
 
-  setSelectedTag = (tagId) => {
-    this.mounted && this.setState({ searchExecuted: true, tagId });
+  setSelectedTag = (tag) => {
+    console.log(tag);
+    this.mounted && this.setState({ searchExecuted: true, tag });
   };
   render() {
-    const { users, term, userName, tags, searchExecuted, id, tagId } =
-      this.state;
+    const { users, term, userName, tags, searchExecuted, id, tag } = this.state;
     const { searchViewingProfile } = this.props;
     if (searchExecuted) {
-      return <Feed key={"search"} fromSearch={true} tag={tagId} />;
+      return <Feed key={"search"} fromSearch={true} tag={tag} />;
     }
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>

@@ -15,6 +15,11 @@ image {
 }
 `;
 
+const tagType = `_id
+title
+count
+isFollowedByUser`;
+
 const postType = `id
 title
 signedUrl
@@ -74,4 +79,4 @@ owner {
   }
 }`;
 
-export { postType, commentType, chatType, profilePublicType };
+export { postType, commentType, chatType, profilePublicType, tagType };

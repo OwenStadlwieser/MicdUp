@@ -127,7 +127,9 @@ const ProfilePrivateType = new GraphQLObjectType({
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
-        if (!context.profile || !context.profile.id) return false;
+        if (!context.profile || !context.profile.id || !parent.followers)
+          return false;
+
         const index = parent.followers.get(context.profile.id);
         return index === "1";
       },
@@ -227,7 +229,9 @@ const ProfilePublicType = new GraphQLObjectType({
     isFollowedByUser: {
       type: GraphQLBoolean,
       resolve(parent, args, context, info) {
-        if (!context.profile || !context.profile.id) return false;
+        if (!context.profile || !context.profile.id || !parent.followers)
+          return false;
+
         const index = parent.followers.get(context.profile.id);
         return index === "1";
       },
@@ -784,6 +788,19 @@ const TagsType = new GraphQLObjectType({
       type: new GraphQLList(PostType),
       async resolve(parent) {
         return await Post.find({ _id: { $in: parent.posts } });
+      },
+    },
+    isFollowedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (!context.profile || !context.profile.id || !parent.followers)
+          return false;
+        if (parent.followers instanceof Map) {
+          const index = parent.followers.get(context.profile.id);
+          return index === "1";
+        }
+        const index = parent.followers[context.profile.id];
+        return index === "1";
       },
     },
   }),

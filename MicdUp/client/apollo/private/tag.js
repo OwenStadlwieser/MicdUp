@@ -1,11 +1,9 @@
 import { gql } from "@apollo/client";
-
+import { tagType } from "./types";
 const GET_TAGS_QUERY = gql`
   query searchTags($searchTerm: String!) {
     searchTags(searchTerm: $searchTerm) {
-      _id
-      title
-      count
+      ${tagType}
     }
   }
 `;
@@ -16,8 +14,7 @@ const GET_RANDOM_PROMPT_QUERY = gql`
       _id
       prompt
       tag {
-        _id
-        title
+        ${tagType}
       }
     }
   }
@@ -26,8 +23,7 @@ const GET_RANDOM_PROMPT_QUERY = gql`
 const GET_POPULAR_TAGS_QUERY = gql`
   query getPopularTags {
     getPopularTags {
-      _id
-      title
+      ${tagType}
     }
   }
 `;
@@ -35,8 +31,15 @@ const GET_POPULAR_TAGS_QUERY = gql`
 const GET_RECOMMENDED_TAGS = gql`
   query getRecommendedTags {
     getRecommendedTags {
-      _id
-      title
+      ${tagType}
+    }
+  }
+`;
+
+const FOLLOW_TAG_MUTATION = gql`
+  mutation followTopic($tagId: ID!) {
+    followTopic(tagId: $tagId) {
+      ${tagType}
     }
   }
 `;
@@ -46,4 +49,5 @@ export {
   GET_RANDOM_PROMPT_QUERY,
   GET_POPULAR_TAGS_QUERY,
   GET_RECOMMENDED_TAGS,
+  FOLLOW_TAG_MUTATION,
 };

@@ -28,6 +28,11 @@ const tagsSchema = new Schema({
     type: Number,
     default: 0,
   },
+  followers: {
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
+  },
 });
 
 const Tag = mongoose.model("tag", tagsSchema);

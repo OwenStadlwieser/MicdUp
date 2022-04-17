@@ -8,6 +8,11 @@ const ProfileSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  followingTopics: {
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
+  },
   followers: {
     type: mongoose.Schema.Types.Map,
     of: String,
