@@ -87,6 +87,8 @@ export class Feed extends Component {
           justifyContent: "flex-start",
           top: height * 0.1,
           left: 0,
+          height: height * 0.8,
+          overflow: "scroll",
         }}
       >
         {tag ? (
@@ -191,7 +193,9 @@ export class Feed extends Component {
           <View
             style={[
               styles.paneUncentered,
-              { overflow: "scroll", position: "relative" },
+              {
+                position: "relative",
+              },
             ]}
           >
             <SwipeListView
