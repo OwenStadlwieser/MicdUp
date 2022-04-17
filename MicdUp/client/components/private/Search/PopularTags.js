@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Text, Dimensions } from "react-native";
+// components
+import { View, Text, Dimensions, TouchableHighlight } from "react-native";
 import { SnapList, SnapItem } from "react-snaplist-carousel";
+import CircleSnail from "react-native-progress/CircleSnail";
+// redux
 import { getPopularTags } from "../../../redux/actions/tag";
 
 const { height, width } = Dimensions.get("screen");
@@ -21,15 +24,25 @@ export class PopularTags extends Component {
   componentDidMount = async () => {
     this.mounted && this.setState({ loading: true });
     const tags = await this.props.getPopularTags();
-    console.log(tags);
     this.mounted && this.setState({ loading: false, tags });
   };
 
   render() {
-    const { tags } = this.state;
+    const { tags, loading } = this.state;
 
     return (
       <SnapList style={{ height: height * 0.15, flex: "initial" }}>
+        {loading && (
+          <View
+            style={{
+              position: "absolute",
+              top: height * 0.075,
+              left: width * 0.5,
+            }}
+          >
+            <CircleSnail color={["white", "#1A3561", "#6FF6FF"]} />
+          </View>
+        )}
         {tags &&
           tags.map((tag, index) => (
             <SnapItem
@@ -38,7 +51,7 @@ export class PopularTags extends Component {
               snapAlign="center"
               key={index}
             >
-              <View
+              <TouchableHighlight
                 style={{
                   backgroundColor: "white",
                   borderRadius: 20,
@@ -49,9 +62,13 @@ export class PopularTags extends Component {
                   shadowRadius: 5,
                   paddingHorizontal: 10,
                 }}
+                underlayColor="#6FF6FF"
+                onPress={() => {
+                  this.props.setSelectedTag(tag.id);
+                }}
               >
                 <Text>{tag.title}</Text>
-              </View>
+              </TouchableHighlight>
             </SnapItem>
           ))}
       </SnapList>
@@ -61,4 +78,6 @@ export class PopularTags extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { getPopularTags })(PopularTags);
+export default connect(mapStateToProps, {
+  getPopularTags,
+})(PopularTags);

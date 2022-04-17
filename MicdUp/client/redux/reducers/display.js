@@ -16,6 +16,8 @@ import {
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
   UPDATE_PRIVATE_COUNT_FROM_LIST,
+  REMOVE_LOADING,
+  ADD_LOADING,
 } from "../types";
 
 const initialState = {
@@ -28,14 +30,17 @@ const initialState = {
   viewingProfile: {},
   keyForSearch: Math.random(),
   searchViewingProfile: false,
-  viewingPostsSearch: [],
+  viewingPosts: [],
   receiveNotif: false,
   showingComments: false,
   postIndex: -1,
+  loading: false,
+  loadingMap: {},
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
+  let copy;
   switch (type) {
     case NAVIGATE:
       return {
@@ -47,7 +52,23 @@ export default function (state = { ...initialState }, action) {
     case UPDATE_CURRENT_RECORDINGS:
       return {
         ...state,
-        viewingPostsSearch: payload,
+        viewingPosts: payload,
+      };
+    case ADD_LOADING:
+      copy = { ...state.loadingMap };
+      copy[payload] = true;
+      return {
+        ...state,
+        loadingMap: copy,
+        loading: Object.keys(copy).length > 0,
+      };
+    case REMOVE_LOADING:
+      copy = { ...state.loadingMap };
+      delete copy[payload];
+      return {
+        ...state,
+        loadingMap: copy,
+        loading: Object.keys(copy).length > 0,
       };
     case SHOW_COMMENTS:
       return {

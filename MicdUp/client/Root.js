@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View, TouchableOpacity, Platform } from "react-native";
+import { Text, View, Dimensions } from "react-native";
 import { Button } from "react-native-paper";
 import React, { Component, useEffect } from "react";
 import { connect } from "react-redux";
@@ -14,8 +14,8 @@ import Navbar from "./components/private/Navbar";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
-import Create from "./components/private/Create/Create";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
+import CircleSnail from "react-native-progress/CircleSnail";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -28,7 +28,6 @@ export class Root extends Component {
   constructor() {
     super();
     this.state = {
-      loading: false,
       token: "",
       loggedIn: false,
     };
@@ -82,11 +81,19 @@ export class Root extends Component {
       messageState,
       loggedIn,
       mountedComponent,
+      loading,
     } = this.props;
     let app;
+    const { width, height } = Dimensions.get("window");
+
     if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
+            </View>
+          )}
           <SoundPlayer />
           {displayMessage && (
             <View style={styles.messageContainer}>
@@ -144,6 +151,11 @@ export class Root extends Component {
     else
       app = (
         <View style={styles.rootContainer}>
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
+            </View>
+          )}
           <SoundPlayer />
           <NotificationBell />
           {displayMessage && (
@@ -170,6 +182,7 @@ const mapStateToProps = (state) => ({
   currentMessage: state.display.currentMessage,
   messageState: state.display.messageState,
   mountedComponent: state.display.mountedComponent,
+  loading: state.display.loading,
 });
 export default connect(mapStateToProps, {
   changeSignup,

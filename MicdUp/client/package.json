@@ -34,6 +34,7 @@
     "react-native-drag-sort": "^2.4.4",
     "react-native-modal": "^13.0.0",
     "react-native-paper": "^4.11.1",
+    "react-native-progress": "^5.0.0",
     "react-native-public-ip": "^1.0.2",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-sound-level": "^1.1.5",

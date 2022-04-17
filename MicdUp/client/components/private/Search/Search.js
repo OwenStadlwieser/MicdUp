@@ -12,7 +12,6 @@ import { Title } from "react-native-paper";
 // users
 import { searchUsers } from "../../../redux/actions/user";
 import { searchTags } from "../../../redux/actions/tag";
-import { getRecordingsFromTag } from "../../../redux/actions/recording";
 import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
 // components
 import SearchComponent from "../../reuseable/SearchComponent";
@@ -34,6 +33,7 @@ export class Search extends Component {
       term: "",
       userName: "",
       searchExecuted: false,
+      tagId: "",
     };
 
     this.mounted = true;
@@ -63,10 +63,17 @@ export class Search extends Component {
   setSearchTerm = (term) => {
     this.mounted && this.setState({ term });
   };
+
+  setSelectedTag = (tagId) => {
+    this.mounted && this.setState({ searchExecuted: true, tagId });
+  };
   render() {
-    const { users, term, userName, tags, searchExecuted, id } = this.state;
+    const { users, term, userName, tags, searchExecuted, id, tagId } =
+      this.state;
     const { searchViewingProfile } = this.props;
-    console.log(term.length, 2);
+    if (searchExecuted) {
+      return <Feed fromSearch={true} tag={tagId} />;
+    }
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
         {!searchViewingProfile && (
@@ -105,7 +112,7 @@ export class Search extends Component {
               >
                 Popular Topics
               </Title>
-              <PopularTags />
+              <PopularTags setSelectedTag={this.setSelectedTag.bind(this)} />
             </View>
             <View>
               <Title
@@ -119,11 +126,12 @@ export class Search extends Component {
               >
                 Recommmended Topics
               </Title>
-              <RecommendedTags />
+              <RecommendedTags
+                setSelectedTag={this.setSelectedTag.bind(this)}
+              />
             </View>
           </View>
         )}
-        {searchExecuted && <Feed fromSearch={true} />}
         {term.length > 0 && !searchViewingProfile ? (
           <View style={styles.searchResultsContainer}>
             <ScrollView style={styles.tagResultsContainer}>
@@ -133,8 +141,7 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={async () => {
-                      await this.props.getRecordingsFromTag(res._id, 0);
-                      this.mounted && this.setState({ searchExecuted: true });
+                      this.setSelectedTag(res._id);
                     }}
                     style={styles.listItemContainerUser}
                   >
@@ -202,5 +209,4 @@ export default connect(mapStateToProps, {
   viewProfile,
   searchViewProfile,
   searchTags,
-  getRecordingsFromTag,
 })(Search);

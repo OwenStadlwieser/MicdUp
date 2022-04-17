@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 // components
 import {
   View,
-  KeyboardAvoidingView,
   TextInput,
   Text,
   TouchableOpacity,
@@ -13,9 +12,9 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import PlayButton from "./PlayButton";
 import Like from "./Like";
 import SpeechToText from "./SpeechToText";
+import CircleSnail from "react-native-progress/CircleSnail";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -388,7 +387,11 @@ export class Comment extends Component {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            ></View>
+            >
+              {loading && (
+                <CircleSnail color={["white", "#1A3561", "#6FF6FF"]} />
+              )}
+            </View>
           )}
         </View>
         <View style={styles.recordingContainerComments}>

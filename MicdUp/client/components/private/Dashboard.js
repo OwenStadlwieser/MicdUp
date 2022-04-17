@@ -5,6 +5,7 @@ import { Text, View } from "react-native";
 import { getUserQuery } from "../../redux/actions/user";
 import { logout, setSocket } from "../../redux/actions/auth";
 import { chatRecieved } from "../../redux/actions/chat";
+import { addLoading, removeLoading } from "../../redux/actions/display";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -14,7 +15,7 @@ import Profile from "./Profile/Profile";
 import Search from "./Search/Search";
 import Navbar from "./Navbar";
 // helpers
-import { removeItemValue, getData } from "../../reuseableFunctions/helpers";
+import { getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
 //styles
 import { styles } from "../../styles/Styles";
@@ -30,10 +31,13 @@ export class Dashboard extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("Dashboard");
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
-    this.mounted && this.setState({ loading: true });
+    this.props.addLoading("Dashboard");
     const { chatRecieved } = this.props;
     await this.props.getUserQuery();
     const { user } = this.props;
@@ -49,7 +53,7 @@ export class Dashboard extends Component {
       });
       this.props.setSocket(socket);
     }
-    this.mounted && this.setState({ loading: false });
+    this.props.removeLoading("Dashboard");
   };
 
   render() {
@@ -97,4 +101,6 @@ export default connect(mapStateToProps, {
   logout,
   setSocket,
   chatRecieved,
+  addLoading,
+  removeLoading,
 })(Dashboard);

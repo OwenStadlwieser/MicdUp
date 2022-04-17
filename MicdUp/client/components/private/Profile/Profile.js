@@ -21,6 +21,7 @@ import {
   postHeight,
   largeIconFontSize,
   small,
+  listStyles,
 } from "../../../styles/Styles";
 // children
 import Settings from "./Settings";
@@ -31,6 +32,7 @@ import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualiza
 import Comment from "../../reuseable/Comment";
 import { SwipeListView } from "react-native-swipe-list-view";
 import ListOfAccounts from "../../reuseable/ListOfAccounts";
+import GestureRecognizer from "react-native-swipe-gestures";
 // redux
 import {
   getUserPosts,
@@ -47,7 +49,7 @@ import {
   addToPrivates,
 } from "../../../redux/actions/profile";
 import { createOrOpenChat } from "../../../redux/actions/chat";
-import GestureRecognizer from "react-native-swipe-gestures";
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 // audio
 import {
   startRecording,
@@ -91,13 +93,10 @@ export class Profile extends Component {
         !loading &&
         prevLength !== posts.length
       ) {
-        this.mounted &&
-          this.setState({ loading: true, prevLength: posts.length });
+        this.props.addLoading("Profile");
+        this.mounted && this.setState({ prevLength: posts.length });
         await getUserPosts(id, Math.round(posts.length / 20));
-        this.mounted &&
-          this.setState({
-            loading: false,
-          });
+        this.props.removeLoading("Profile");
       }
     } catch (err) {
       console.log(err);
@@ -107,10 +106,10 @@ export class Profile extends Component {
   async onSwipeDown(gestureState) {
     const { getUserPosts, id, clearPosts } = this.props;
     if (this.state.loading) return;
-    this.mounted && this.setState({ loading: true });
+    this.props.addLoading("Profile");
     await clearPosts(id);
     await getUserPosts(id, 0);
-    this.mounted && this.setState({ loading: false });
+    this.props.removeLoading("Profile");
   }
 
   stopCurrentSound = async () => {
@@ -161,17 +160,18 @@ export class Profile extends Component {
   componentWillUnmount = async () => {
     await this.stopRecordingBio();
     this.mounted = false;
+    this.props.removeLoading("Profile");
   };
 
   componentDidMount = async () => {
     const { getUserPosts, profile, cachedPosts, id } = this.props;
-    this.mounted && this.setState({ loading: true });
+    this.props.addLoading("Profile");
     const posts = cachedPosts[id];
     if (posts && posts.length > 0) {
     } else if (id) {
       await getUserPosts(id, 0);
     }
-    this.mounted && this.setState({ loading: false });
+    this.props.removeLoading("Profile");
   };
 
   hideSetting = () => {
@@ -556,54 +556,10 @@ export class Profile extends Component {
   }
 }
 
-const listStyles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    flex: 1,
-  },
-  backTextWhite: {
-    color: "#FFF",
-  },
-  rowFront: {
-    alignItems: "center",
-    backgroundColor: "#CCC",
-    borderBottomColor: "black",
-    borderBottomWidth: 1,
-    justifyContent: "center",
-    height: 50,
-  },
-  rowBack: {
-    alignItems: "center",
-    backgroundColor: "transparent",
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingLeft: 15,
-    right: 0,
-    width,
-  },
-  backRightBtn: {
-    alignItems: "center",
-    bottom: 0,
-    justifyContent: "center",
-    position: "absolute",
-    top: 0,
-    width: 75,
-    borderWidth: 2,
-    zIndex: -1,
-  },
-  backRightBtnRight: {
-    backgroundColor: "white",
-    right: 0,
-    height: postHeight,
-    borderRadius: 8,
-  },
-});
-
 const mapStateToProps = (state) => ({
-  user: state.auth.user,
   cachedPosts: state.auth.posts,
   currentProfile: state.display.viewingProfile,
+  user: state.auth.user,
   profile: state.auth.user.profile,
   postIndex: state.display.postIndex,
   showingComments: state.display.showingComments,
@@ -621,4 +577,6 @@ export default connect(mapStateToProps, {
   getPrivatesQuery,
   addToPrivates,
   clearPosts,
+  addLoading,
+  removeLoading,
 })(Profile);

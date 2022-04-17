@@ -809,6 +809,59 @@ const styles = StyleSheet.create({
   deletePromptButton: {
     marginHorizontal: 8,
   },
+  loadingContainer: {
+    height,
+    width: width * 0.3,
+    left: width * 0.35,
+    position: "absolute",
+    justifyContent: "center",
+    zIndex: 67,
+    alignItems: "center",
+  },
+});
+
+const listStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    flex: 1,
+  },
+  backTextWhite: {
+    color: "#FFF",
+  },
+  rowFront: {
+    alignItems: "center",
+    backgroundColor: "#CCC",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    height: 50,
+  },
+  rowBack: {
+    alignItems: "center",
+    backgroundColor: "transparent",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 15,
+    right: 0,
+    width,
+  },
+  backRightBtn: {
+    alignItems: "center",
+    bottom: 0,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    width: 75,
+    borderWidth: 2,
+    zIndex: -1,
+  },
+  backRightBtnRight: {
+    backgroundColor: "white",
+    right: 0,
+    height: postHeight,
+    borderRadius: 8,
+  },
 });
 
 export {
@@ -823,4 +876,5 @@ export {
   large,
   listItemHeight,
   listItemHeight2X,
+  listStyles,
 };

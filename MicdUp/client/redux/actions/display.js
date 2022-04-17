@@ -10,7 +10,23 @@ import {
   HIDE_NOTIF,
   SHOW_COMMENTS,
   HIDE_COMMENTS,
+  ADD_LOADING,
+  REMOVE_LOADING,
 } from "../types";
+
+export const addLoading = (payload) => (dispatch) => {
+  dispatch({
+    type: ADD_LOADING,
+    payload,
+  });
+};
+
+export const removeLoading = (payload) => (dispatch) => {
+  dispatch({
+    type: REMOVE_LOADING,
+    payload,
+  });
+};
 
 export const receiveNotif = (payload) => (dispatch) => {
   dispatch({
