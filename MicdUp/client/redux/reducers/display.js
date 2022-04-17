@@ -18,6 +18,12 @@ import {
   UPDATE_PRIVATE_COUNT_FROM_LIST,
   REMOVE_LOADING,
   ADD_LOADING,
+  SET_FOLLOWING_FEED,
+  APPEND_FOLLOWING_FEED,
+  SET_NOT_LOGGED_IN_FEED,
+  APPEND_NOT_LOGGED_IN_FEED,
+  SET_TOPICS_FEED,
+  APPEND_TOPICS_FEED,
 } from "../types";
 
 const initialState = {
@@ -31,6 +37,9 @@ const initialState = {
   keyForSearch: Math.random(),
   searchViewingProfile: false,
   viewingPosts: [],
+  followingPosts: [],
+  followingTopicPosts: [],
+  notLoggedInPosts: [],
   receiveNotif: false,
   showingComments: false,
   postIndex: -1,
@@ -42,6 +51,36 @@ export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   let copy;
   switch (type) {
+    case SET_FOLLOWING_FEED:
+      return {
+        ...state,
+        followingPosts: [...payload],
+      };
+    case APPEND_FOLLOWING_FEED:
+      return {
+        ...state,
+        followingPosts: [...state.followingPosts, ...payload],
+      };
+    case SET_TOPICS_FEED:
+      return {
+        ...state,
+        followingTopicPosts: [...payload],
+      };
+    case APPEND_TOPICS_FEED:
+      return {
+        ...state,
+        followingTopicPosts: [...state.followingTopicPosts, ...payload],
+      };
+    case SET_NOT_LOGGED_IN_FEED:
+      return {
+        ...state,
+        notLoggedInPosts: [...payload],
+      };
+    case APPEND_NOT_LOGGED_IN_FEED:
+      return {
+        ...state,
+        notLoggedInPosts: [...state.notLoggedInPosts, ...payload],
+      };
     case NAVIGATE:
       return {
         ...state,

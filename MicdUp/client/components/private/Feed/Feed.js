@@ -5,7 +5,7 @@ import { Entypo } from "@expo/vector-icons";
 // styles
 import { listStyles, styles } from "../../../styles/Styles";
 // components
-import { Appbar } from "react-native-paper";
+import { Appbar, Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
 // redux
@@ -13,6 +13,11 @@ import { navigate } from "../../../redux/actions/display";
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
 import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
+import {
+  getFollowingFeed,
+  getNotLoggedInFeed,
+  getTopicsFeed,
+} from "../../../redux/actions/feed";
 
 export class Feed extends Component {
   constructor() {
@@ -20,6 +25,7 @@ export class Feed extends Component {
     this.state = {
       loading: false,
       tag: null,
+      following: true,
     };
 
     this.mounted = true;
@@ -28,12 +34,24 @@ export class Feed extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    const { fromSearch, tag } = this.props;
+    const { fromSearch, tag, profile } = this.props;
     if (fromSearch && tag) {
       this.mounted && this.setState({ tag: { ...tag } });
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
       await this.props.getRecordingsFromTag(tag._id);
+      this.mounted && this.setState({ loading: false });
+      this.props.removeLoading("Feed");
+    } else if (!fromSearch && profile) {
+      this.props.addLoading("Feed");
+      this.mounted && this.setState({ loading: true });
+      await this.props.getFollowingFeed(0);
+      this.mounted && this.setState({ loading: false });
+      this.props.removeLoading("Feed");
+    } else if (!profile) {
+      this.props.addLoading("Feed");
+      this.mounted && this.setState({ loading: true });
+      await this.props.getNotLoggedInFeed(0);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
     }
@@ -43,8 +61,22 @@ export class Feed extends Component {
 
   render() {
     const { height, width } = Dimensions.get("window");
-    const { posts } = this.props;
-    const { isRecordingComment, loading, tag } = this.state;
+    const {
+      posts,
+      fromSearch,
+      followingPosts,
+      profile,
+      followingTopicPosts,
+      notLoggedInPosts,
+    } = this.props;
+    const { isRecordingComment, loading, tag, following } = this.state;
+    const postsToView = fromSearch
+      ? posts
+      : !profile
+      ? notLoggedInPosts
+      : following
+      ? followingPosts
+      : followingTopicPosts;
     return (
       <View
         style={{
@@ -52,9 +84,10 @@ export class Feed extends Component {
           display: "flex",
           justifyContent: "flex-start",
           top: height * 0.1,
+          left: 0,
         }}
       >
-        {tag && (
+        {tag ? (
           <Appbar.Header
             style={{
               backgroundColor: "white",
@@ -76,56 +109,117 @@ export class Feed extends Component {
               onPress={async () => {
                 this.props.addLoading("Feed");
                 const newTag = await this.props.followTag(tag._id);
-                console.log(newTag);
                 this.mounted && this.setState({ tag: newTag });
                 this.props.removeLoading("Feed");
               }}
             />
           </Appbar.Header>
+        ) : (
+          profile && (
+            <View
+              style={{
+                width,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Title
+                style={
+                  (styles.nextButtonText,
+                  {
+                    color: following ? "#6FF6FF" : "white",
+                    paddingRight: 10,
+                    borderRightColor: "white",
+                    borderRightWidth: 2,
+                  })
+                }
+                onPress={async () => {
+                  if (following || followingPosts.length == 0) {
+                    this.props.addLoading("Feed");
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getFollowingFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                    this.props.removeLoading("Feed");
+                  }
+                  this.mounted && this.setState({ following: true });
+                }}
+              >
+                FOLLOWING
+              </Title>
+              <Title
+                style={
+                  (styles.nextButtonText,
+                  { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
+                }
+                onPress={async () => {
+                  if (!following || followingTopicPosts.length == 0) {
+                    this.props.addLoading("Feed");
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getTopicsFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                    this.props.removeLoading("Feed");
+                  }
+                  this.mounted && this.setState({ following: false });
+                }}
+              >
+                TOPICS
+              </Title>
+            </View>
+          )
         )}
-        {!loading && posts.length == 0 ? (
-          <Text style={[styles.nextButtonText, { color: "white" }]}>
+        {!loading && postsToView.length == 0 ? (
+          <Text
+            style={[styles.nextButtonText, { color: "white", paddingTop: 20 }]}
+          >
             No posts found
           </Text>
         ) : (
-          <SwipeListView
-            data={posts}
-            disableRightSwipe
-            disableLeftSwipe={false}
-            onScroll={this.handleScroll.bind(this)}
-            scrollEventThrottle={50}
-            style={{ marginTop: 40 }}
-            useNativeDriver={false}
-            renderItem={(data, rowMap) => (
-              <Post
-                isRecordingComment={isRecordingComment}
-                key={data.item.id}
-                post={data.item}
-                postArray={posts}
-                index={data.index}
-                canViewPrivate={true}
-                higherUp={false}
-              />
-            )}
-            renderHiddenItem={(data, rowMap) => {
-              return (
-                <View style={listStyles.rowBack}>
-                  <TouchableOpacity
-                    style={[
-                      listStyles.backRightBtn,
-                      listStyles.backRightBtnRight,
-                    ]}
-                    onPress={async () => {
-                      await this.props.deletePost(data.item.id);
-                    }}
-                  >
-                    <Entypo name="trash" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
-              );
-            }}
-            rightOpenValue={-75}
-          />
+          <View
+            style={[
+              styles.paneUncentered,
+              { overflow: "scroll", position: "relative" },
+            ]}
+          >
+            <SwipeListView
+              data={postsToView}
+              disableRightSwipe
+              disableLeftSwipe={false}
+              onScroll={this.handleScroll.bind(this)}
+              scrollEventThrottle={50}
+              useNativeDriver={false}
+              renderItem={(data, rowMap) => (
+                <Post
+                  isRecordingComment={isRecordingComment}
+                  key={data.item.id}
+                  post={data.item}
+                  postArray={postsToView}
+                  index={data.index}
+                  canViewPrivate={true}
+                  higherUp={false}
+                />
+              )}
+              renderHiddenItem={(data, rowMap) => {
+                return (
+                  <View style={listStyles.rowBack}>
+                    <TouchableOpacity
+                      style={[
+                        listStyles.backRightBtn,
+                        listStyles.backRightBtnRight,
+                      ]}
+                      onPress={async () => {
+                        await this.props.deletePost(data.item.id);
+                      }}
+                    >
+                      <Entypo name="trash" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
+              rightOpenValue={-75}
+            />
+          </View>
         )}
       </View>
     );
@@ -136,6 +230,9 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   profile: state.auth.user.profile,
   posts: state.display.viewingPosts,
+  followingPosts: state.display.followingPosts,
+  notLoggedInPosts: state.display.notLoggedInPosts,
+  followingTopicPosts: state.display.followingTopicPosts,
 });
 
 export default connect(mapStateToProps, {
@@ -144,4 +241,7 @@ export default connect(mapStateToProps, {
   removeLoading,
   navigate,
   followTag,
+  getFollowingFeed,
+  getNotLoggedInFeed,
+  getTopicsFeed,
 })(Feed);

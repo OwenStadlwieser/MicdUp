@@ -14,6 +14,7 @@ const {
   getUserPosts,
   getComments,
   getRecordingsFromTag,
+  getNotLoggedInFeed,
 } = require("./recording");
 const { searchUsers } = require("./user");
 const { getReplies } = require("./comment");
@@ -36,6 +37,7 @@ const RootQuery = new GraphQLObjectType({
     searchUsers,
     getPopularTags,
     getRecommendedTags,
+    getNotLoggedInFeed,
   }, //fields end here
 });
 

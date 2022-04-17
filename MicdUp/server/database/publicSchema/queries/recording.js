@@ -84,8 +84,36 @@ const getComments = {
   },
 };
 
+const getNotLoggedInFeed = {
+  type: new GraphQLList(PostType),
+  args: { skipMult: { type: GraphQLInt } },
+  async resolve(parent, { skipMult }, context) {
+    try {
+      const size = 20;
+      const posts = await Post.aggregate([
+        {
+          $addFields: {
+            likers_count: {
+              $size: { $ifNull: ["$likers", []] },
+            },
+          },
+        },
+        {
+          $sort: { likers_count: -1 },
+        },
+      ])
+        .skip(size * skipMult)
+        .limit(size);
+      return posts;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
+
 module.exports = {
   getUserPosts,
   getComments,
   getRecordingsFromTag,
+  getNotLoggedInFeed,
 };
