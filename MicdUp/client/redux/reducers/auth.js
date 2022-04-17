@@ -13,6 +13,7 @@ import {
   SET_SOCKET,
   CLEAR_POSTS,
   SET_IP,
+  SET_CURRENT_KEY,
 } from "../types";
 
 const initialState = {
@@ -22,6 +23,7 @@ const initialState = {
   posts: {},
   socket: {},
   ipAddr: "",
+  currentKey: "",
 };
 
 export default function (state = { ...initialState }, action) {
@@ -46,6 +48,11 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         socket: payload,
+      };
+    case SET_CURRENT_KEY:
+      return {
+        ...state,
+        currentKey: payload,
       };
     case LOG_OUT:
       return {
@@ -81,48 +88,47 @@ export default function (state = { ...initialState }, action) {
         },
       };
     case SET_POSTS:
-      let newPosts = state.posts[payload.userId];
+      let newPosts = state.posts[state.currentKey];
       newPosts = newPosts
         ? [...newPosts, ...payload.posts]
         : [...payload.posts];
-      console.log(newPosts);
       return {
         ...state,
-        posts: { ...state.posts, [payload.userId]: newPosts },
+        posts: { ...state.posts, [state.currentKey]: newPosts },
       };
     case CLEAR_POSTS:
-      delete state.posts[payload];
+      delete state.posts[state.currentKey];
       return {
         ...state,
       };
     case DELETE_POST:
-      let postsToDelete = [...state.posts[payload.owner.id]];
+      let postsToDelete = [...state.posts[state.currentKey]];
       const postDelIndex = postsToDelete.findIndex(
         (post) => post.id === payload.id
       );
       postsToDelete.splice(postDelIndex, 1);
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner.id]: postsToDelete },
+        posts: { ...state.posts, [state.currentKey]: postsToDelete },
       };
     case UPDATE_POST:
-      const posts = [...state.posts[payload.owner.id]];
+      const posts = [...state.posts[state.currentKey]];
       const postIndex = posts.findIndex((post) => post.id === payload.id);
       posts[postIndex] = payload;
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner.id]: posts },
+        posts: { ...state.posts, [state.currentKey]: posts },
       };
     case UPDATE_POST_COMMENTS:
-      const posts3 = [...state.posts[payload.owner]];
+      const posts3 = [...state.posts[state.currentKey]];
       const post3Index = posts3.findIndex((post) => post.id === payload.id);
       posts3[post3Index].comments = payload.data;
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner]: posts3 },
+        posts: { ...state.posts, [state.currentKey]: posts3 },
       };
     case UPDATE_COMMENT_TO_POST:
-      const posts4 = [...state.posts[payload.owner]];
+      const posts4 = [...state.posts[state.currentKey]];
       let postIndex2 = posts4.findIndex((post) => post.id === payload.postId);
       let postTarget = posts4[postIndex2];
       let indicies = [];
@@ -140,7 +146,7 @@ export default function (state = { ...initialState }, action) {
         }
         return {
           ...state,
-          posts: { ...state.posts, [payload.owner]: posts4 },
+          posts: { ...state.posts, [state.currentKey]: posts4 },
         };
       }
       indicies.push(
@@ -163,7 +169,7 @@ export default function (state = { ...initialState }, action) {
       posts4[postIndex2].comments = postTarget.comments;
       return {
         ...state,
-        posts: { ...state.posts, [payload.owner]: posts4 },
+        posts: { ...state.posts, [state.currentKey]: posts4 },
       };
     default:
       return state;

@@ -11,7 +11,11 @@ import Post from "../Profile/Post";
 // redux
 import { navigate } from "../../../redux/actions/display";
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
-import { addLoading, removeLoading } from "../../../redux/actions/display";
+import {
+  addLoading,
+  removeLoading,
+  setCurrentKey,
+} from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
 import {
   getFollowingFeed,
@@ -45,12 +49,14 @@ export class Feed extends Component {
     } else if (!fromSearch && profile) {
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
+      this.props.setCurrentKey("FOLLOWINGFEED");
       await this.props.getFollowingFeed(0);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
     } else if (!profile) {
       this.props.addLoading("Feed");
       this.mounted && this.setState({ loading: true });
+      this.props.setCurrentKey("NOTLOGGEDINFEED");
       await this.props.getNotLoggedInFeed(0);
       this.mounted && this.setState({ loading: false });
       this.props.removeLoading("Feed");
@@ -61,22 +67,15 @@ export class Feed extends Component {
 
   render() {
     const { height, width } = Dimensions.get("window");
-    const {
-      posts,
-      fromSearch,
-      followingPosts,
-      profile,
-      followingTopicPosts,
-      notLoggedInPosts,
-    } = this.props;
+    const { posts, fromSearch, profile, cachedPosts } = this.props;
     const { isRecordingComment, loading, tag, following } = this.state;
     const postsToView = fromSearch
       ? posts
       : !profile
-      ? notLoggedInPosts
+      ? cachedPosts["NOTLOGGEDINFEED"]
       : following
-      ? followingPosts
-      : followingTopicPosts;
+      ? cachedPosts["FOLLOWINGFEED"]
+      : cachedPosts["TOPICSFEED"];
     return (
       <View
         style={{
@@ -136,7 +135,13 @@ export class Feed extends Component {
                   })
                 }
                 onPress={async () => {
-                  if (following || followingPosts.length == 0) {
+                  this.props.setCurrentKey("FOLLOWINGFEED");
+
+                  if (
+                    following ||
+                    !cachedPosts["FOLLOWINGFEED"] ||
+                    cachedPosts["FOLLOWINGFEED"].length == 0
+                  ) {
                     this.props.addLoading("Feed");
                     this.mounted && this.setState({ loading: true });
                     await this.props.getFollowingFeed(0);
@@ -154,7 +159,12 @@ export class Feed extends Component {
                   { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
                 }
                 onPress={async () => {
-                  if (!following || followingTopicPosts.length == 0) {
+                  this.props.setCurrentKey("TOPICSFEED");
+                  if (
+                    !following ||
+                    !cachedPosts["TOPICSFEED"] ||
+                    cachedPosts["TOPICSFEED"].length == 0
+                  ) {
                     this.props.addLoading("Feed");
                     this.mounted && this.setState({ loading: true });
                     await this.props.getTopicsFeed(0);
@@ -169,7 +179,7 @@ export class Feed extends Component {
             </View>
           )
         )}
-        {!loading && postsToView.length == 0 ? (
+        {!loading && (!postsToView || postsToView.length == 0) ? (
           <Text
             style={[styles.nextButtonText, { color: "white", paddingTop: 20 }]}
           >
@@ -230,9 +240,7 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   profile: state.auth.user.profile,
   posts: state.display.viewingPosts,
-  followingPosts: state.display.followingPosts,
-  notLoggedInPosts: state.display.notLoggedInPosts,
-  followingTopicPosts: state.display.followingTopicPosts,
+  cachedPosts: state.auth.posts,
 });
 
 export default connect(mapStateToProps, {
@@ -244,4 +252,5 @@ export default connect(mapStateToProps, {
   getFollowingFeed,
   getNotLoggedInFeed,
   getTopicsFeed,
+  setCurrentKey,
 })(Feed);

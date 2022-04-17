@@ -12,7 +12,15 @@ import {
   HIDE_COMMENTS,
   ADD_LOADING,
   REMOVE_LOADING,
+  SET_CURRENT_KEY,
 } from "../types";
+
+export const setCurrentKey = (payload) => (dispatch) => {
+  dispatch({
+    type: SET_CURRENT_KEY,
+    payload,
+  });
+};
 
 export const addLoading = (payload) => (dispatch) => {
   dispatch({

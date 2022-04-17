@@ -49,7 +49,11 @@ import {
   addToPrivates,
 } from "../../../redux/actions/profile";
 import { createOrOpenChat } from "../../../redux/actions/chat";
-import { addLoading, removeLoading } from "../../../redux/actions/display";
+import {
+  addLoading,
+  removeLoading,
+  setCurrentKey,
+} from "../../../redux/actions/display";
 // audio
 import {
   startRecording,
@@ -166,6 +170,7 @@ export class Profile extends Component {
   componentDidMount = async () => {
     const { getUserPosts, profile, cachedPosts, id } = this.props;
     this.props.addLoading("Profile");
+    this.props.setCurrentKey(id);
     const posts = cachedPosts[id];
     if (posts && posts.length > 0) {
     } else if (id) {
@@ -579,4 +584,5 @@ export default connect(mapStateToProps, {
   clearPosts,
   addLoading,
   removeLoading,
+  setCurrentKey,
 })(Profile);

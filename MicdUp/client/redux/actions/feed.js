@@ -4,16 +4,8 @@ import {
   GET_TOPICS_FEED,
 } from "../../apollo/private/feed";
 import { privateClient, publicClient } from "../../apollo/client/index";
-import {
-  SET_FOLLOWING_FEED,
-  APPEND_FOLLOWING_FEED,
-  SET_NOT_LOGGED_IN_FEED,
-  APPEND_NOT_LOGGED_IN_FEED,
-  SET_TOPICS_FEED,
-  APPEND_TOPICS_FEED,
-} from "../types";
 import { showMessage } from "./display";
-
+import { SET_POSTS, CLEAR_POSTS } from "../types";
 export const getFollowingFeed = (skipMult) => async (dispatch) => {
   try {
     const res = await privateClient.query({
@@ -26,17 +18,18 @@ export const getFollowingFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    if (skipMult == 0 && res.data.getFollowingFeed) {
+    if (skipMult == 0) {
       dispatch({
-        type: SET_FOLLOWING_FEED,
-        payload: res.data.getFollowingFeed,
-      });
-    } else if (res.data.getFollowingFeed) {
-      dispatch({
-        type: APPEND_FOLLOWING_FEED,
-        payload: res.data.getFollowingFeed,
+        type: CLEAR_POSTS,
       });
     }
+    dispatch({
+      type: SET_POSTS,
+      payload: {
+        posts: res.data.getFollowingFeed,
+        userId: "FOLLOWINGFEED",
+      },
+    });
     return res.data.getFollowingFeed;
   } catch (err) {
     console.log(err);
@@ -55,17 +48,18 @@ export const getTopicsFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    if (skipMult == 0 && res.data.getFollowingTopicsFeed) {
+    if (skipMult == 0) {
       dispatch({
-        type: SET_TOPICS_FEED,
-        payload: res.data.getFollowingTopicsFeed,
-      });
-    } else if (res.data.getFollowingTopicsFeed) {
-      dispatch({
-        type: APPEND_TOPICS_FEED,
-        payload: res.data.getFollowingTopicsFeed,
+        type: CLEAR_POSTS,
       });
     }
+    dispatch({
+      type: SET_POSTS,
+      payload: {
+        posts: res.data.getFollowingTopicsFeed,
+        userId: "TOPICSFEED",
+      },
+    });
     return res.data.getTopicsgetFollowingTopicsFeedFeed;
   } catch (err) {
     console.log(err);
@@ -84,17 +78,18 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    if (skipMult == 0 && res.data.getNotLoggedInFeed) {
+    if (skipMult == 0) {
       dispatch({
-        type: SET_NOT_LOGGED_IN_FEED,
-        payload: res.data.getNotLoggedInFeed,
-      });
-    } else if (res.data.getNotLoggedInFeed) {
-      dispatch({
-        type: APPEND_NOT_LOGGED_IN_FEED,
-        payload: res.data.getNotLoggedInFeed,
+        type: CLEAR_POSTS,
       });
     }
+    dispatch({
+      type: SET_POSTS,
+      payload: {
+        posts: res.data.getNotLoggedInFeed,
+        userId: "NOTLOGGEDINFEED",
+      },
+    });
     return res.data.getNotLoggedInFeed;
   } catch (err) {
     console.log(err);
