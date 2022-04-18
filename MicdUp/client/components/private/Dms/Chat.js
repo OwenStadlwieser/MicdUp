@@ -28,6 +28,7 @@ import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 // audio
 import Voice from "@react-native-voice/voice";
 // redux
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
 import {
@@ -68,6 +69,7 @@ export class Chat extends Component {
   }
 
   startRecordingChat = async () => {
+    this.props.addLoading("CHAT");
     if (Platform.OS !== "web") {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording, startTime: Date.now() });
@@ -75,6 +77,7 @@ export class Chat extends Component {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording, startTime: Date.now() });
     }
+    this.props.removeLoading("CHAT");
   };
 
   stopRecording = async () => {
@@ -82,6 +85,7 @@ export class Chat extends Component {
     if (!recording) {
       return;
     }
+    this.props.addLoading("CHAT");
     let uri;
     if (Platform.OS !== "web") {
       uri = await stopRecording(recording, Voice);
@@ -99,10 +103,12 @@ export class Chat extends Component {
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
+    this.props.removeLoading("CHAT");
     console.log("Recording stopped and stored at", uri);
   };
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("CHAT");
     await this.stopRecording();
     Voice.stop();
     this.mounted = false;
@@ -171,11 +177,6 @@ export class Chat extends Component {
           />
           <Appbar.Action icon="dots-vertical" onPress={this.handleMore} />
         </Appbar.Header>
-        {loading && (
-          <View style={styles.refresh}>
-            <Text style={styles.nextButtonText}>Loading</Text>
-          </View>
-        )}
         <ScrollView
           ref={(view) => {
             this.scrollView = view;
@@ -195,12 +196,14 @@ export class Chat extends Component {
                   fetching: true,
                   lastFetched: Math.floor(activeChats.length / 20),
                 });
+              this.props.addLoading("CHAT");
               await this.props.viewMoreChats(
                 { id: activeChatId, members: activeChatMembers },
                 activeChats && activeChats.length > 0
                   ? Math.floor(activeChats.length / 20)
                   : 0
               );
+              this.props.removeLoading("CHAT");
               this.mounted &&
                 this.setState({ loading: false, fetching: false });
             }
@@ -221,11 +224,13 @@ export class Chat extends Component {
                   },
                 ]}
                 onPress={async () => {
+                  this.props.addLoading("CHAT");
                   if (playingId === chat.id && !isPause) {
                     await this.props.pauseSound();
                   } else if (chat.signedUrl) {
                     await this.props.changeSound(chat, chat.signedUrl);
                   }
+                  this.props.removeLoading("CHAT");
                 }}
               >
                 <View style={{ flex: 3 }}>
@@ -416,4 +421,6 @@ export default connect(mapStateToProps, {
   viewMoreChats,
   changeSound,
   pauseSound,
+  addLoading,
+  removeLoading,
 })(Chat);

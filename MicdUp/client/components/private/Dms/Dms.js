@@ -13,6 +13,7 @@ import { Button } from "react-native-paper";
 // helpers
 import { io } from "socket.io-client";
 // redux
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { createOrOpenChat } from "../../../redux/actions/chat";
 import { viewChats, viewMoreChats } from "../../../redux/actions/chat";
 import { searchUsers } from "../../../redux/actions/user";
@@ -47,11 +48,16 @@ export class Dms extends Component {
     this.mounted && this.setState({ term });
   };
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("DMS");
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
     const { activeChatId, socket } = this.props;
+    this.props.addLoading("DMS");
     if (!activeChatId) await this.props.viewChats(0);
+    this.props.removeLoading("DMS");
   };
 
   render() {
@@ -73,7 +79,7 @@ export class Dms extends Component {
           <SearchComponent
             parentViewStyle={{ zIndex: 2 }}
             searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-            inputStyle={styles.inputStyleUsers}
+            inputStyle={styles.textInputRecEdit}
             isForUser={true}
             placeholder={"Find Friends"}
             setStateOnChange={true}
@@ -82,7 +88,6 @@ export class Dms extends Component {
             setResOnChangeFunc={this.setUsersState.bind(this)}
             searchFunction={this.props.searchUsers}
             splitSearchTerm={true}
-            inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
             scrollable={true}
             onFocus={() =>
@@ -163,10 +168,12 @@ export class Dms extends Component {
                 icon="creation"
                 mode="contained"
                 onPress={async () => {
+                  this.props.addLoading("DMS");
                   await this.props.createOrOpenChat(
                     [...userNames.map((user) => user.profile.id), profile.id],
                     profile.id
                   );
+                  this.props.removeLoading("DMS");
                 }}
               >
                 Create Chat
@@ -182,8 +189,10 @@ export class Dms extends Component {
                 <TouchableOpacity
                   key={index}
                   onPress={async () => {
+                    this.props.addLoading("DMS");
                     await this.props.viewMoreChats(chat, 0);
                     this.mounted && this.setState({ showingChat: true });
+                    this.props.removeLoading("DMS");
                   }}
                   style={styles.listItemContainerChat}
                 >
@@ -229,4 +238,6 @@ export default connect(mapStateToProps, {
   viewMoreChats,
   searchUsers,
   createOrOpenChat,
+  addLoading,
+  removeLoading,
 })(Dms);
