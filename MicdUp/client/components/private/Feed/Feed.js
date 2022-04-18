@@ -122,6 +122,7 @@ export class Feed extends Component {
           >
             <Appbar.BackAction
               onPress={() => {
+                console.log("Back action");
                 this.props.navigate("Search");
               }}
             />

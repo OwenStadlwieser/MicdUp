@@ -134,7 +134,7 @@ export class Post extends Component {
                   </Text>
                 </TouchableOpacity>
               )}
-              <Text style={[styles.postTitle, { fontWeight: "700" }]}>
+              <Text style={styles.postTitle}>
                 {post.title ? post.title : "Untitled"}
               </Text>
             </View>

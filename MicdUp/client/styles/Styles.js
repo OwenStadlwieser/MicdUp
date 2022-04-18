@@ -471,9 +471,9 @@ const styles = StyleSheet.create({
     fontSize: large,
   },
   postTitle: {
-    flex: 1,
     fontStyle: "italic",
     fontSize: width > 1000 ? medium : large,
+    fontWeight: "700",
   },
   textAndPlayButtonContainer: {
     flexDirection: "row",

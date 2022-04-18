@@ -87,6 +87,7 @@ export class Root extends Component {
       cachedPosts,
       currentKey,
       postIndex,
+      keyForSearch,
     } = this.props;
     let app;
     const { width, height } = Dimensions.get("window");
@@ -118,7 +119,7 @@ export class Root extends Component {
           ) : mountedComponent === "Search" ? (
             <View style={styles.containerPrivate}>
               <View style={styles.contentContainer}>
-                <Search />
+                <Search key={keyForSearch} />
               </View>
               <Navbar />
             </View>
@@ -205,6 +206,7 @@ const mapStateToProps = (state) => ({
   postIndex: state.display.postIndex,
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,
+  keyForSearch: state.display.keyForSearch,
 });
 export default connect(mapStateToProps, {
   changeSignup,
