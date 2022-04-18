@@ -46,6 +46,7 @@ import {
   deleteComment,
 } from "../../redux/actions/comment";
 import { hideComments } from "../../redux/actions/display";
+import { addLoading, removeLoading } from "../../redux/actions/display";
 
 const { height } = Dimensions.get("window");
 export class Comment extends Component {
@@ -80,6 +81,7 @@ export class Comment extends Component {
   };
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("COMMENT");
     await this.stopRecordingComment();
     this.mounted = false;
   };
@@ -98,7 +100,9 @@ export class Comment extends Component {
   };
 
   startRecordingComment = async () => {
+    this.props.addLoading("COMMENT");
     const recording = await startRecording(Voice, () => {});
+    this.props.removeLoading("COMMENT");
     this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
@@ -110,11 +114,13 @@ export class Comment extends Component {
       return;
     }
     let uri;
+    this.props.addLoading("COMMENT");
     if (Platform.OS !== "web") {
       uri = await stopRecording(recording, Voice);
     } else {
       uri = await stopRecording(recording);
     }
+    this.props.removeLoading("COMMENT");
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
       this.setState({
@@ -250,7 +256,10 @@ export class Comment extends Component {
               {index !== 0 && comment.repliesLength > 0 && (
                 <TouchableHighlight
                   onPress={async () => {
+                    this.props.addLoading("COMMENT");
                     const replies = await this.props.getReplies(comment.id);
+                    this.props.removeLoading("COMMENT");
+
                     /*
                   replies: Comment
                   replies.allReplies: [Comment]
@@ -285,9 +294,11 @@ export class Comment extends Component {
                   (profile && comment.owner.id === profile.id)) && (
                   <Feather
                     onPress={async () => {
+                      this.props.addLoading("COMMENT");
                       const newComment = await this.props.deleteComment(
                         comment.id
                       );
+                      this.props.removeLoading("COMMENT");
                       this.props.updateCommentDisplay(
                         newComment,
                         comment.parents,
@@ -444,6 +455,7 @@ export class Comment extends Component {
               <TouchableOpacity
                 onPress={async () => {
                   const { results } = this.state;
+                  this.props.addLoading("COMMENT");
                   let fileType;
                   const base64Url = await soundBlobToBase64(audioBlobs.uri);
                   if (base64Url != null) {
@@ -460,6 +472,7 @@ export class Comment extends Component {
                     [JSON.stringify(results)],
                     parents
                   );
+                  this.props.removeLoading("COMMENT");
                 }}
               >
                 <FontAwesome name="send" size={24} color="black" />
@@ -489,4 +502,6 @@ export default connect(mapStateToProps, {
   getComments,
   changeSound,
   pauseSound,
+  addLoading,
+  removeLoading,
 })(Comment);

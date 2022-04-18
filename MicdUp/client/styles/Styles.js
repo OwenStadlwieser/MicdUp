@@ -17,7 +17,7 @@ const small = normalize(15);
 const medium = normalize(17);
 const large = normalize(20);
 const xl = normalize(24);
-const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
+const postHeight = width > 1000 ? height * 0.28 : height * 0.18;
 const postPadding = height * 0.02;
 const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
@@ -433,6 +433,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: "row",
     position: "relative",
+    paddingVertical: 10,
+    overflow: "scroll",
   },
   higherPostContainer: {
     height: postHeight,

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   TouchableHighlight,
+  Image,
 } from "react-native";
 import ProgressBar from "../../reuseable/ProgressBar";
 // styles
@@ -18,7 +19,12 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 //redux
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
-import { showComments } from "../../../redux/actions/display";
+import {
+  showComments,
+  viewProfile,
+  searchViewProfile,
+  navigate,
+} from "../../../redux/actions/display";
 
 export class Post extends Component {
   constructor() {
@@ -39,7 +45,8 @@ export class Post extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { post, index, playingId, isPause, canViewPrivate } = this.props;
+    const { post, index, playingId, isPause, canViewPrivate, profile } =
+      this.props;
     return (
       <TouchableHighlight
         onPress={async () => {
@@ -90,14 +97,45 @@ export class Post extends Component {
               overflow: "hidden",
             }}
           >
-            <Text
-              style={[
-                styles.postTitle,
-                { flexWrap: "nowrap", paddingTop: 10, fontWeight: "700" },
-              ]}
-            >
-              {post.title ? post.title : "Untitled"}
-            </Text>
+            <View>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  if (profile && profile.id === post.owner.id) {
+                    this.props.navigate("Profile");
+                    this.mounted && this.setState({ showing: false });
+                    return;
+                  }
+                  this.props.navigate("Search");
+                  this.props.viewProfile(post.owner);
+                  this.props.searchViewProfile(true);
+                  this.mounted && this.setState({ showing: false });
+                }}
+              >
+                <Image
+                  source={
+                    post.owner.image
+                      ? {
+                          uri: post.owner.image.signedUrl,
+                        }
+                      : require("../../../assets/no-profile-pic-icon-27.jpg")
+                  }
+                  style={styles.listItemProfileImg}
+                />
+                <Text
+                  style={[styles.listItemTextUser, { fontStyle: "italic" }]}
+                >
+                  @{post.owner.user.userName}
+                </Text>
+              </TouchableOpacity>
+              <Text style={[styles.postTitle, { fontWeight: "700" }]}>
+                {post.title ? post.title : "Untitled"}
+              </Text>
+            </View>
             <SpeechToText
               containerStyle={[
                 { flexDirection: "row", flexWrap: "nowrap", flex: 1 },
@@ -139,10 +177,14 @@ const mapStateToProps = (state) => ({
   playingId:
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
   isPause: state.sound.isPause,
+  profile: state.auth.user.profile,
 });
 
 export default connect(mapStateToProps, {
   changeSound,
   pauseSound,
   showComments,
+  viewProfile,
+  searchViewProfile,
+  navigate,
 })(Post);

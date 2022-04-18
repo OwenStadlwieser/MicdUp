@@ -13,9 +13,12 @@ import { AntDesign } from "@expo/vector-icons";
 import { styles } from "../../styles/Styles";
 import ProgressBar from "./ProgressBar";
 // redux
-import { viewProfile, searchViewProfile } from "../../redux/actions/display";
+import {
+  viewProfile,
+  searchViewProfile,
+  navigate,
+} from "../../redux/actions/display";
 import { pauseSound, changeSound } from "../../redux/actions/sound";
-import { navigate } from "../../redux/actions/display";
 
 const { height, width } = Dimensions.get("screen");
 export class SoundPlayer extends Component {
