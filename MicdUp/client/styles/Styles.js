@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     overflow: "scroll",
   },
   tagTitle: {
-    fontWeight: 700,
+    fontWeight: "700",
     fontStyle: "italic",
     fontSize: large,
   },

@@ -97,7 +97,7 @@ export class SearchComponent extends Component {
       <View style={parentViewStyle}>
         <View style={searchInputContainerStyle}>
           <TextInput
-            returnKeyType="Add"
+            returnKeyType="done"
             ref={(input) => {
               this.nameInput = input;
             }}
