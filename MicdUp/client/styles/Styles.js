@@ -422,6 +422,16 @@ const styles = StyleSheet.create({
     height: height * 0.05,
     zIndex: 99,
   },
+  deleteItemContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    minHeight: 0,
+    paddingBottom: 20,
+    maxHeight: height * 0.2,
+    overflow: "scroll",
+  },
   postContainer: {
     height: postHeight,
     width: postWidth,

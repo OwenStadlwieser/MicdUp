@@ -41,7 +41,6 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
     ) {
       let { queue, currentPlayingSound } = store.getState().sound;
       let { user, ipAddr } = store.getState().auth;
-      console.log(currentPlayingSound.id, ipAddr);
       if (user && currentPlayingSound.id && user._id) {
         dispatch(
           addListenerAuthenticated(
@@ -50,7 +49,6 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
           )
         );
       } else if (currentPlayingSound.id && ipAddr) {
-        console.log("here");
         dispatch(
           addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
         );

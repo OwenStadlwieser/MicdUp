@@ -11,7 +11,7 @@ import {
   UPDATE_POST_COMMENTS,
   DELETE_POST,
   CLEAR_POSTS,
-  UPDATE_CURRENT_RECORDINGS,
+  DELETE_TAG,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
@@ -29,7 +29,7 @@ import { ADD_LISTENER_MUTATION } from "../../apollo/private/recording";
 import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
 import store from "../index";
-
+import { setCurrentKey } from "./display";
 export function checkIfLoggedIn() {
   let { loggedIn } = store.getState().auth;
   if (loggedIn) {
@@ -52,6 +52,12 @@ export const updateTitle = (payload) => (dispatch) => {
   });
 };
 
+export const deleteTag = (payload) => (dispatch) => {
+  dispatch({
+    type: DELETE_TAG,
+    payload,
+  });
+};
 export const updateTags = (payload) => (dispatch) => {
   dispatch({
     type: UPDATE_TAGS,
@@ -325,7 +331,6 @@ export const getComments =
       });
       return res.data.getComments;
     } catch (err) {
-      console.log(post, "here");
       console.log(err);
     }
   };
@@ -364,7 +369,6 @@ export const commentPost =
         );
         return false;
       }
-      console.log("commented");
       dispatch({
         type: UPDATE_COMMENT_TO_POST,
         payload: {
@@ -402,6 +406,8 @@ export const getRecordingsFromTag =
         );
         return false;
       }
+      console.log(searchTag, res.data.getRecordingsFromTag);
+      dispatch(setCurrentKey(searchTag));
       if (skipMult == 0) {
         dispatch({
           type: CLEAR_POSTS,

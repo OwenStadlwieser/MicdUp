@@ -17,10 +17,17 @@ import { AntDesign } from "@expo/vector-icons";
 // styles
 import { styles } from "../../../styles/Styles";
 // redux
-import { updateTags, uploadRecording } from "../../../redux/actions/recording";
+import {
+  updateTags,
+  uploadRecording,
+  deleteTag,
+} from "../../../redux/actions/recording";
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { searchTags, randomTag } from "../../../redux/actions/tag";
 // helpers
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
+import DeleteableItem from "../../reuseable/DeleteableItem";
+
 const { height, width } = Dimensions.get("window");
 export class SubmitRecording extends Component {
   constructor() {
@@ -33,12 +40,16 @@ export class SubmitRecording extends Component {
       privatePost: false,
       tagsArray: [],
       showResults: false,
+      inputTerm: "",
     };
 
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("SUBMITRECORDING");
+    this.mounted = false;
+  };
 
   componentDidMount = () => {
     const { tags } = this.props;
@@ -46,12 +57,13 @@ export class SubmitRecording extends Component {
   };
 
   setTagsState = (tags) => {
-    this.props.updateTags(tags);
-    this.mounted && this.setState({ tags, inputTerm: tags });
+    this.mounted && this.setState({ inputTerm: tags });
   };
+
   setTagsArrayState = (tags) => {
     this.mounted && this.setState({ tagsArray: tags });
   };
+
   handleClickOutside = () => {
     this.mounted && this.setState({ showResults: false });
   };
@@ -70,7 +82,6 @@ export class SubmitRecording extends Component {
       clip.signedUrl = clip.uri;
       return clip;
     });
-    console.log(inputTerm);
     return (
       <TouchableWithoutFeedback onPress={this.handleClickOutside}>
         <View style={styles.paneSpaceEvenly}>
@@ -87,15 +98,18 @@ export class SubmitRecording extends Component {
             <SearchComponent
               parentViewStyle={{ zIndex: 2 }}
               searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-              inputStyle={styles.inputStyleUsers}
               placeholder={"Tags"}
               setStateOnChange={true}
               setStateOnChangeFunc={this.setTagsState.bind(this)}
+              confirmOnSubmit={true}
+              confirmOnSubmitFunc={(tag) => {
+                this.props.updateTags(tag);
+              }}
               inputTerm={inputTerm}
-              setResOnChange={true}
-              setResOnChangeFunc={this.setTagsArrayState.bind(this)}
               searchFunction={this.props.searchTags}
               splitSearchTerm={true}
+              setResOnChange={true}
+              setResOnChangeFunc={this.setTagsArrayState.bind(this)}
               inputStyle={styles.textInputRecEdit}
               placeHolderColor={"white"}
               initValue={tags ? tags.toString() : ""}
@@ -125,20 +139,10 @@ export class SubmitRecording extends Component {
                     <TouchableOpacity
                       key={index}
                       onPress={async () => {
-                        const { inputTerm } = this.state;
-                        console.log("here");
-                        const pieces = inputTerm.split(/[\s,]+/);
-                        let newTerm = "";
-                        for (let i = 0; i < pieces.length - 1; i++) {
-                          newTerm.trim();
-                          newTerm =
-                            i !== 0 ? newTerm + " " + pieces[i] : pieces[i];
-                        }
-                        if (newTerm) newTerm = newTerm + " ";
-                        console.log(res.title);
+                        this.props.updateTags(res.title);
                         this.mounted &&
                           this.setState({
-                            inputTerm: newTerm + res.title + " ",
+                            inputTerm: "",
                           });
                       }}
                       style={[
@@ -151,6 +155,20 @@ export class SubmitRecording extends Component {
                   ))}
               </ScrollView>
             </View>
+          </View>
+          <View style={[styles.deleteItemContainer]}>
+            {tags.map((res, index) => (
+              <DeleteableItem
+                item={{ title: res }}
+                style={{ margin: 3 }}
+                color={"white"}
+                title={"title"}
+                key={index}
+                onDelete={() => {
+                  this.props.deleteTag(index);
+                }}
+              />
+            ))}
           </View>
           <ScrollView
             style={styles.recordingSettings}
@@ -228,6 +246,7 @@ export class SubmitRecording extends Component {
                 let files = [];
                 let fileTypes = [];
                 let clipResults = [];
+                this.props.addLoading("SUBMITRECORDING");
                 for (let i = 0; i < clips.length; i++) {
                   const base64Url = await soundBlobToBase64(clips[i].uri);
                   if (base64Url != null) {
@@ -239,21 +258,19 @@ export class SubmitRecording extends Component {
                     console.log("error with blob");
                   }
                 }
-                let tagsArray = [""];
-                try {
-                  tagsArray = tags.split("/[s,]+/");
-                } catch (err) {}
+
                 await this.props.uploadRecording(
                   files,
                   fileTypes,
                   title,
-                  tagsArray,
+                  tags,
                   nsfw,
                   allowRebuttal,
                   allowStitch,
                   privatePost,
                   clipResults
                 );
+                this.props.removeLoading("SUBMITRECORDING");
               }}
               style={styles.nextButton}
             >
@@ -278,4 +295,7 @@ export default connect(mapStateToProps, {
   updateTags,
   uploadRecording,
   searchTags,
+  deleteTag,
+  addLoading,
+  removeLoading,
 })(SubmitRecording);

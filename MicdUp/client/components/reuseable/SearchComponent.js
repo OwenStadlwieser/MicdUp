@@ -57,21 +57,21 @@ export class SearchComponent extends Component {
     }
   }, 300);
 
+  onSubmitFunc = (e) => {
+    const { searchTerm } = this.state;
+    if (this.props.confirmOnSubmit) {
+      this.props.confirmOnSubmitFunc(searchTerm);
+    }
+  };
+
   onPressFunc = (res) => {
     let searchTerm;
     const { inputTerm } = this.props;
     if (!inputTerm) searchTerm = this.state.searchTerm;
     else searchTerm = inputTerm;
-    const pieces = searchTerm.split(/[\s,]+/);
-    let newTerm = "";
-    for (let i = 0; i < pieces.length - 1; i++) {
-      newTerm.trim();
-      newTerm = i !== 0 ? newTerm + " " + pieces[i] : pieces[i];
-    }
-    if (newTerm) newTerm = newTerm + " ";
-    this.mounted && this.setState({ searchTerm: newTerm + res.title + " " });
+    this.mounted && this.setState({ searchTerm: "" });
     if (this.props.setStateOnChange) {
-      this.props.setStateOnChangeFunc(newTerm + res.title + " ");
+      this.props.setStateOnChangeFunc(res.title);
     }
     this.nameInput && this.nameInput.focus();
   };
@@ -97,6 +97,7 @@ export class SearchComponent extends Component {
       <View style={parentViewStyle}>
         <View style={searchInputContainerStyle}>
           <TextInput
+            returnKeyType="Add"
             ref={(input) => {
               this.nameInput = input;
             }}
@@ -106,6 +107,7 @@ export class SearchComponent extends Component {
                 this.props.onFocus();
               }
             }}
+            onSubmitEditing={this.onSubmitFunc.bind(this)}
             placeholder={this.props.placeholder}
             onChangeText={(searchTerm) => {
               if (this.props.onFocus) {

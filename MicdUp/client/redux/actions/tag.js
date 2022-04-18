@@ -75,7 +75,6 @@ export const followTag = (tagId) => async (dispatch) => {
       );
       return false;
     }
-    console.log(res);
     return res.data.followTopic;
   } catch (err) {
     console.log(err);

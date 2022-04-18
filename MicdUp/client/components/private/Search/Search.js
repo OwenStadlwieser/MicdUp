@@ -64,7 +64,6 @@ export class Search extends Component {
   };
 
   setSelectedTag = (tag) => {
-    console.log(tag);
     this.mounted && this.setState({ searchExecuted: true, tag });
   };
   render() {
@@ -140,7 +139,7 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={async () => {
-                      this.setSelectedTag(res._id);
+                      this.setSelectedTag(res);
                     }}
                     style={styles.listItemContainerUser}
                   >

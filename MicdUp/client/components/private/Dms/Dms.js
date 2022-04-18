@@ -133,16 +133,7 @@ export class Dms extends Component {
           )}
         </View>
         {userNames && userNames.length > 0 && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              minHeight: 0,
-              paddingBottom: 20,
-            }}
-          >
+          <View style={styles.deleteItemContainer}>
             {userNames.map((user, index) => (
               <DeleteableItem
                 item={user}
@@ -155,7 +146,6 @@ export class Dms extends Component {
                   const index = currentNames.findIndex((user2) => {
                     return user.userName === user2.userName;
                   });
-                  console.log(index);
                   currentNames.splice(index, 1);
                   this.mounted && this.setState({ userNames: currentNames });
                 }}
