@@ -97,7 +97,7 @@ export class Search extends Component {
             initValue={users ? users.toString() : ""}
           />
         )}
-        {term.length == 0 && (
+        {term.length == 0 && !searchViewingProfile && (
           <View style={styles.searchTags}>
             <View>
               <Title
