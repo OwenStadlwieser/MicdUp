@@ -432,6 +432,11 @@ const styles = StyleSheet.create({
     maxHeight: height * 0.2,
     overflow: "scroll",
   },
+  tagTitle: {
+    fontWeight: 700,
+    fontStyle: "italic",
+    fontSize: large,
+  },
   postContainer: {
     height: postHeight,
     width: postWidth,

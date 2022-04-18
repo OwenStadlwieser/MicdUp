@@ -6,6 +6,7 @@ import { SnapList, SnapItem } from "react-snaplist-carousel";
 import CircleSnail from "react-native-progress/CircleSnail";
 // redux
 import { getPopularTags } from "../../../redux/actions/tag";
+import { styles } from "../../../styles/Styles";
 
 const { height, width } = Dimensions.get("screen");
 export class PopularTags extends Component {
@@ -67,7 +68,7 @@ export class PopularTags extends Component {
                   this.props.setSelectedTag(tag);
                 }}
               >
-                <Text>{tag.title}</Text>
+                <Text style={styles.tagTitle}>{tag.title}</Text>
               </TouchableHighlight>
             </SnapItem>
           ))}

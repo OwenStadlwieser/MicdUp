@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 // styles
-import { listStyles, styles } from "../../../styles/Styles";
+import { listStyles, styles, postHeight } from "../../../styles/Styles";
 // components
 import { Appbar, Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -19,12 +19,14 @@ import {
   getTopicsFeed,
 } from "../../../redux/actions/feed";
 
+const { height, width } = Dimensions.get("window");
 export class Feed extends Component {
   constructor() {
     super();
     this.state = {
       loading: false,
       tag: null,
+      prevLength: 0,
       following: true,
     };
 
@@ -33,35 +35,59 @@ export class Feed extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = async () => {
+  getData = async (skipMult) => {
     const { fromSearch, tag, loggedIn } = this.props;
-    console.log(loggedIn);
+    this.props.addLoading("Feed");
+    this.mounted && this.setState({ loading: true });
     if (fromSearch && tag) {
       this.mounted && this.setState({ tag: { ...tag } });
-      this.props.addLoading("Feed");
-      this.mounted && this.setState({ loading: true });
-      await this.props.getRecordingsFromTag(tag._id);
-      this.mounted && this.setState({ loading: false });
-      this.props.removeLoading("Feed");
+      await this.props.getRecordingsFromTag(tag._id, skipMult);
     } else if (!fromSearch && loggedIn) {
-      this.props.addLoading("Feed");
-      this.mounted && this.setState({ loading: true });
-      await this.props.getFollowingFeed(0);
-      this.mounted && this.setState({ loading: false });
-      this.props.removeLoading("Feed");
+      await this.props.getFollowingFeed(skipMult);
     } else if (!loggedIn) {
-      this.props.addLoading("Feed");
-      this.mounted && this.setState({ loading: true });
-      await this.props.getNotLoggedInFeed(0);
-      this.mounted && this.setState({ loading: false });
-      this.props.removeLoading("Feed");
+      await this.props.getNotLoggedInFeed(skipMult);
     }
+    this.mounted && this.setState({ loading: false });
+    this.props.removeLoading("Feed");
+  };
+  componentDidMount = async () => {
+    await this.getData(0);
   };
 
-  async handleScroll(event) {}
+  async handleScroll(event) {
+    const { fromSearch, loggedIn, cachedPosts } = this.props;
+    const { loading, tag, prevLength, following } = this.state;
+    const postsToView = fromSearch
+      ? tag
+        ? cachedPosts[tag._id]
+        : []
+      : !loggedIn
+      ? cachedPosts["NOTLOGGEDINFEED"]
+      : following
+      ? cachedPosts["FOLLOWINGFEED"]
+      : cachedPosts["TOPICSFEED"];
+    try {
+      console.log(
+        event.nativeEvent.contentOffset.y >
+          postsToView.length * postHeight - height
+      );
+      console.log(!loading);
+      console.log(prevLength, postsToView.length);
+      if (
+        event.nativeEvent.contentOffset.y >
+          postsToView.length * postHeight - height &&
+        !loading &&
+        prevLength !== postsToView.length
+      ) {
+        this.mounted && this.setState({ prevLength: postsToView.length });
+        await this.getData(Math.round(postsToView.length / 20));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   render() {
-    const { height, width } = Dimensions.get("window");
     const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
     const { isRecordingComment, loading, tag, following } = this.state;
     const postsToView = fromSearch

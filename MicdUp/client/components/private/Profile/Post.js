@@ -98,40 +98,42 @@ export class Post extends Component {
             }}
           >
             <View>
-              <TouchableOpacity
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-                onPress={() => {
-                  if (profile && profile.id === post.owner.id) {
-                    this.props.navigate("Profile");
+              {post.owner && (
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    if (profile && profile.id === post.owner.id) {
+                      this.props.navigate("Profile");
+                      this.mounted && this.setState({ showing: false });
+                      return;
+                    }
+                    this.props.navigate("Search");
+                    this.props.viewProfile(post.owner);
+                    this.props.searchViewProfile(true);
                     this.mounted && this.setState({ showing: false });
-                    return;
-                  }
-                  this.props.navigate("Search");
-                  this.props.viewProfile(post.owner);
-                  this.props.searchViewProfile(true);
-                  this.mounted && this.setState({ showing: false });
-                }}
-              >
-                <Image
-                  source={
-                    post.owner.image
-                      ? {
-                          uri: post.owner.image.signedUrl,
-                        }
-                      : require("../../../assets/no-profile-pic-icon-27.jpg")
-                  }
-                  style={styles.listItemProfileImg}
-                />
-                <Text
-                  style={[styles.listItemTextUser, { fontStyle: "italic" }]}
+                  }}
                 >
-                  @{post.owner.user.userName}
-                </Text>
-              </TouchableOpacity>
+                  <Image
+                    source={
+                      post.owner.image
+                        ? {
+                            uri: post.owner.image.signedUrl,
+                          }
+                        : require("../../../assets/no-profile-pic-icon-27.jpg")
+                    }
+                    style={styles.listItemProfileImg}
+                  />
+                  <Text
+                    style={[styles.listItemTextUser, { fontStyle: "italic" }]}
+                  >
+                    @{post.owner.user.userName}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <Text style={[styles.postTitle, { fontWeight: "700" }]}>
                 {post.title ? post.title : "Untitled"}
               </Text>
@@ -147,23 +149,24 @@ export class Post extends Component {
           </View>
           <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
             <View style={styles.postPlayButton}>
-              {(!post.privatePost || (post.privatePost && canViewPrivate)) && (
-                <Fragment>
-                  <Like
-                    post={post}
-                    type={"Post"}
-                    postId={post.id}
-                    ownerId={post.owner.id}
-                  />
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.props.showComments(index);
-                    }}
-                  >
-                    <FontAwesome name="comment" size={24} color="#1A3561" />
-                  </TouchableOpacity>
-                </Fragment>
-              )}
+              {(!post.privatePost || (post.privatePost && canViewPrivate)) &&
+                post.owner && (
+                  <Fragment>
+                    <Like
+                      post={post}
+                      type={"Post"}
+                      postId={post.id}
+                      ownerId={post.owner.id}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.props.showComments(index);
+                      }}
+                    >
+                      <FontAwesome name="comment" size={24} color="#1A3561" />
+                    </TouchableOpacity>
+                  </Fragment>
+                )}
             </View>
           </View>
         </Fragment>
