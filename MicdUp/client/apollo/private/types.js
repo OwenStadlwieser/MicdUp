@@ -36,6 +36,9 @@ owner {
     id
     userName
   }
+}
+tags {
+  ${tagType}
 }`;
 
 const chatType = `id

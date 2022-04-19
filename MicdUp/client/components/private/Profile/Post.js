@@ -10,7 +10,9 @@ import {
   TouchableWithoutFeedback,
   TouchableHighlight,
   Image,
+  ScrollView,
 } from "react-native";
+import { ScrollView as GestureHandlerScrollView } from "react-native-gesture-handler";
 import ProgressBar from "../../reuseable/ProgressBar";
 // styles
 import { styles, postWidth, postHeight } from "../../../styles/Styles";
@@ -25,6 +27,7 @@ import {
   searchViewProfile,
   navigate,
 } from "../../../redux/actions/display";
+import DeleteableItem from "../../reuseable/DeleteableItem";
 
 export class Post extends Component {
   constructor() {
@@ -137,6 +140,33 @@ export class Post extends Component {
               <Text style={styles.postTitle}>
                 {post.title ? post.title : "Untitled"}
               </Text>
+              {post.tags && post.tags.length > 0 && (
+                <GestureHandlerScrollView
+                  horizontal={true}
+                  onTouchEnd={() => {
+                    this.props.setOuterScroll(true);
+                  }}
+                  onTouchStart={() => {
+                    this.props.setOuterScroll(false);
+                  }}
+                >
+                  <Fragment>
+                    {post.tags.map((tag, index) => (
+                      <DeleteableItem
+                        item={tag}
+                        style={{ margin: 3 }}
+                        color={"white"}
+                        title={"title"}
+                        key={index}
+                        onDelete={() => {
+                          this.props.deleteTag(index);
+                        }}
+                        icon={"tag-multiple"}
+                      />
+                    ))}
+                  </Fragment>
+                </GestureHandlerScrollView>
+              )}
             </View>
             <SpeechToText
               containerStyle={[

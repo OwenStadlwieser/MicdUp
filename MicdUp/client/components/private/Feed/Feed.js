@@ -28,6 +28,7 @@ export class Feed extends Component {
       tag: null,
       prevLength: 0,
       following: true,
+      outerScrollEnabled: true,
     };
 
     this.mounted = true;
@@ -49,6 +50,10 @@ export class Feed extends Component {
     }
     this.mounted && this.setState({ loading: false });
     this.props.removeLoading("Feed");
+  };
+
+  setOuterScroll = (setTo) => {
+    this.mounted && this.setState({ outerScrollEnabled: setTo });
   };
   componentDidMount = async () => {
     await this.getData(0);
@@ -89,7 +94,8 @@ export class Feed extends Component {
 
   render() {
     const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
-    const { isRecordingComment, loading, tag, following } = this.state;
+    const { isRecordingComment, loading, tag, following, outerScrollEnabled } =
+      this.state;
     const postsToView = fromSearch
       ? tag
         ? cachedPosts[tag._id]
@@ -221,12 +227,15 @@ export class Feed extends Component {
             <SwipeListView
               data={postsToView}
               disableRightSwipe
-              disableLeftSwipe={false}
+              disableLeftSwipe={!outerScrollEnabled}
               onScroll={this.handleScroll.bind(this)}
               scrollEventThrottle={50}
               useNativeDriver={false}
+              scrollEnabled={outerScrollEnabled}
+              nestedScrollEnabled={false}
               renderItem={(data, rowMap) => (
                 <Post
+                  setOuterScroll={this.setOuterScroll.bind(this)}
                   isRecordingComment={isRecordingComment}
                   key={data.item.id}
                   post={data.item}

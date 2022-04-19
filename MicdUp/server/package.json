@@ -33,6 +33,7 @@
     "node-ffprobe-installer": "^1.2.3",
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
+    "react-native-gesture-handler": "^2.4.0",
     "react-native-swipe-gestures": "^1.0.5",
     "react-native-swipeout": "^2.3.6",
     "socket.io": "^4.4.1",

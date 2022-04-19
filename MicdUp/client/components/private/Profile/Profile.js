@@ -81,10 +81,15 @@ export class Profile extends Component {
       showingListOfAccounts: false,
       listOfAccountsParams: {},
       posts: [],
+      outerScrollEnabled: true,
     };
     this.scrollView = null;
     this.mounted = true;
   }
+
+  setOuterScroll = (setTo) => {
+    this.mounted && this.setState({ outerScrollEnabled: setTo });
+  };
 
   async handleScroll(event) {
     const { getUserPosts, id, cachedPosts } = this.props;
@@ -208,7 +213,7 @@ export class Profile extends Component {
       playingId,
       loading,
       selectImage,
-      isRecordingComment,
+      outerScrollEnabled,
       showingListOfAccounts,
       listOfAccountsParams,
     } = this.state;
@@ -453,17 +458,19 @@ export class Profile extends Component {
             <SwipeListView
               data={posts}
               disableRightSwipe
-              disableLeftSwipe={!isUserProfile}
+              disableLeftSwipe={!isUserProfile || !outerScrollEnabled}
               onScroll={this.handleScroll.bind(this)}
               scrollEventThrottle={50}
               ref={(view) => (this.scrollView = view)}
               useNativeDriver={false}
+              scrollEnabled={outerScrollEnabled}
               renderItem={(data, rowMap) => (
                 <Post
                   isUserProfile={isUserProfile}
                   key={data.item.id}
                   post={data.item}
                   postArray={posts}
+                  setOuterScroll={this.setOuterScroll.bind(this)}
                   index={data.index}
                   canViewPrivate={
                     profile && id === profile.id

@@ -443,6 +443,12 @@ const PostType = new GraphQLObjectType({
         return parent._id;
       },
     },
+    tags: {
+      type: new GraphQLList(TagsType),
+      async resolve(parent) {
+        return await Tag.find({ _id: { $in: parent.tags } });
+      },
+    },
     title: { type: GraphQLString },
     owner: {
       type: ProfilePublicType,
