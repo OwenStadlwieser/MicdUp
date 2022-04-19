@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   View,
@@ -53,8 +53,17 @@ export class Dms extends Component {
     this.mounted = false;
   };
 
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.activeChatId && !this.props.activeChatId) {
+      this.mounted && this.setState({ users: "" });
+      this.props.addLoading("DMS");
+      if (!this.props.activeChatId) await this.props.viewChats(0);
+      this.props.removeLoading("DMS");
+    }
+  };
+
   componentDidMount = async () => {
-    const { activeChatId, socket } = this.props;
+    const { activeChatId } = this.props;
     this.props.addLoading("DMS");
     if (!activeChatId) await this.props.viewChats(0);
     this.props.removeLoading("DMS");
@@ -106,12 +115,15 @@ export class Dms extends Component {
                 zIndex: 2,
                 height: height * 0.3,
               }}
-              results={users.map((user) => {
-                user.image = user.profile.image
-                  ? user.profile.image.signedUrl
-                  : false;
-                return user;
-              })}
+              results={
+                users &&
+                users.map((user) => {
+                  user.image = user.profile.image
+                    ? user.profile.image.signedUrl
+                    : false;
+                  return user;
+                })
+              }
               image={true}
               title={"userName"}
               onBlur={() => {
@@ -171,43 +183,41 @@ export class Dms extends Component {
             )}
           </View>
         )}
-        <View style={{ zIndex: 1 }}>
-          <ScrollView style={{}}>
-            {chats &&
-              chats.length > 0 &&
-              chats.map((chat, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={async () => {
-                    this.props.addLoading("DMS");
-                    await this.props.viewMoreChats(chat, 0);
-                    this.mounted && this.setState({ showingChat: true });
-                    this.props.removeLoading("DMS");
-                  }}
-                  style={styles.listItemContainerChat}
-                >
-                  {chat &&
-                    chat.members &&
-                    chat.members.length > 0 &&
-                    chat.members.map((member, index) => (
-                      <View key={index} style={styles.messageMember}>
-                        <Image
-                          source={
-                            member && member.image
-                              ? { uri: member.image.signedUrl }
-                              : require("../../../assets/no-profile-pic-icon-27.jpg")
-                          }
-                          style={styles.commentImg}
-                        />
-                        <Text style={styles.listItemTextUser}>
-                          {member.user.userName}
-                        </Text>
-                      </View>
-                    ))}
-                </TouchableOpacity>
-              ))}
-          </ScrollView>
-        </View>
+        <ScrollView style={{ zIndex: 1 }}>
+          {chats &&
+            chats.length > 0 &&
+            chats.map((chat, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={async () => {
+                  this.props.addLoading("DMS");
+                  await this.props.viewMoreChats(chat, 0);
+                  this.mounted && this.setState({ showingChat: true });
+                  this.props.removeLoading("DMS");
+                }}
+                style={styles.listItemContainerChat}
+              >
+                {chat &&
+                  chat.members &&
+                  chat.members.length > 0 &&
+                  chat.members.map((member, index) => (
+                    <View key={index} style={styles.messageMember}>
+                      <Image
+                        source={
+                          member && member.image
+                            ? { uri: member.image.signedUrl }
+                            : require("../../../assets/no-profile-pic-icon-27.jpg")
+                        }
+                        style={styles.commentImg}
+                      />
+                      <Text style={styles.listItemTextUser}>
+                        {member.user.userName}
+                      </Text>
+                    </View>
+                  ))}
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
       </TouchableOpacity>
     );
     return app;
