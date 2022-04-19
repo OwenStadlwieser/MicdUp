@@ -15,10 +15,10 @@ import {
 import Like from "./Like";
 import SpeechToText from "./SpeechToText";
 import CircleSnail from "react-native-progress/CircleSnail";
+import RecordingControls from "./RecordingControls";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
-import { soundBlobToBase64 } from "../../reuseableFunctions/helpers";
 import {
   startRecording,
   stopRecording,
@@ -30,10 +30,6 @@ import {
 } from "../../reuseableFunctions/helpers";
 import Voice from "@react-native-voice/voice";
 // icons
-import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 // redux
@@ -80,6 +76,32 @@ export class Comment extends Component {
     this.mounted && this.setState({ results: e.value });
   };
 
+  onSend = async (base64Url, fileType, results) => {
+    const { post } = this.props;
+    const { text, parents, replyingTo } = this.state;
+    this.props.addLoading("COMMENT");
+    await this.props.commentPost(
+      post,
+      replyingTo,
+      base64Url,
+      fileType,
+      text,
+      [JSON.stringify(results)],
+      parents
+    );
+    this.props.removeLoading("COMMENT");
+  };
+
+  backButtonAction = () => {
+    this.mounted &&
+      this.setState({
+        audioBlobs: false,
+        replyingTo: "",
+        text: "",
+        replyingToName: "",
+        parents: null,
+      });
+  };
   componentWillUnmount = async () => {
     this.props.removeLoading("COMMENT");
     await this.stopRecordingComment();
@@ -136,7 +158,6 @@ export class Comment extends Component {
 
   handleMap(comment, i, index, parentId, parent) {
     const { profile, post, playingId, isPause } = this.props;
-    console.log(comment, post);
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -335,16 +356,7 @@ export class Comment extends Component {
 
   render() {
     const { post } = this.props;
-    const {
-      v,
-      text,
-      replyingTo,
-      recording,
-      audioBlobs,
-      replyingToName,
-      parents,
-      loading,
-    } = this.state;
+    const { replyingToName, loading } = this.state;
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -397,89 +409,11 @@ export class Comment extends Component {
             </View>
           )}
         </View>
-        <View style={styles.recordingContainerComments}>
-          <TextInput
-            value={replyingToName ? replyingToName : ""}
-            onChangeText={(e) => {
-              this.mounted && this.setState({ text });
-            }}
-            style={styles.textInputComments}
-          ></TextInput>
-          <View style={styles.iconContainerComments}>
-            {!(!audioBlobs && !replyingTo && !text) && (
-              <Feather
-                style={styles.recordingMicIconComments}
-                name="delete"
-                size={24}
-                color="black"
-                onPress={() => {
-                  this.mounted &&
-                    this.setState({
-                      audioBlobs: false,
-                      replyingTo: "",
-                      text: "",
-                      replyingToName: "",
-                      parents: null,
-                    });
-                }}
-              />
-            )}
-            {!recording ? (
-              <MaterialCommunityIcons
-                onPress={this.startRecordingComment}
-                name="microphone-plus"
-                size={75}
-                color="red"
-                style={styles.recordingMicIconComments}
-              />
-            ) : (
-              Platform.OS === "web" && (
-                <FontAwesome5
-                  onPress={this.stopRecordingComment}
-                  style={styles.currentRecordingIconComments}
-                  name="record-vinyl"
-                  size={24}
-                  color={this.colors[v]}
-                />
-              )
-            )}
-            <TouchableOpacity onPress={async () => {}}>
-              <Entypo
-                style={styles.recordingMicIconComments}
-                name="emoji-happy"
-                size={24}
-                color="black"
-              />
-            </TouchableOpacity>
-            {(text || audioBlobs) && (
-              <TouchableOpacity
-                onPress={async () => {
-                  const { results } = this.state;
-                  this.props.addLoading("COMMENT");
-                  let fileType;
-                  const base64Url = await soundBlobToBase64(audioBlobs.uri);
-                  if (base64Url != null) {
-                    fileType = audioBlobs.type;
-                  } else {
-                    console.log("error with blob");
-                  }
-                  await this.props.commentPost(
-                    post,
-                    replyingTo,
-                    base64Url,
-                    fileType,
-                    text,
-                    [JSON.stringify(results)],
-                    parents
-                  );
-                  this.props.removeLoading("COMMENT");
-                }}
-              >
-                <FontAwesome name="send" size={24} color="black" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
+        <RecordingControls
+          backButtonAction={this.backButtonAction.bind(this)}
+          onSend={this.onSend.bind(this)}
+          replyingToName={replyingToName}
+        />
       </View>
     );
   }

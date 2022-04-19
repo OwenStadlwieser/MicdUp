@@ -20,11 +20,7 @@ import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualiza
 import { styles, largeIconFontSize } from "../../../styles/Styles";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-// helpers
-import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 // audio
 import Voice from "@react-native-voice/voice";
 // redux
@@ -32,13 +28,10 @@ import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
 import {
-  startRecording,
-  stopRecording,
-} from "../../../reuseableFunctions/recording";
-import {
   onSpeechResults,
   onSpeechStart,
 } from "../../../reuseableFunctions/helpers";
+import RecordingControls from "../../reuseable/RecordingControls";
 const { width, height } = Dimensions.get("window");
 
 const barWidth = 5;
@@ -51,7 +44,6 @@ export class Chat extends Component {
       loading: false,
       recording: false,
       audioBlobs: false,
-      v: 0,
       fetching: false,
       lastFetched: 0,
       soundLevels: [],
@@ -64,49 +56,28 @@ export class Chat extends Component {
       console.log(err);
     }
     this.scrollView = null;
-    this.colors = ["white", "red"];
     this.mounted = true;
   }
 
-  startRecordingChat = async () => {
-    this.props.addLoading("CHAT");
-    if (Platform.OS !== "web") {
-      const recording = await startRecording(Voice, () => {});
-      this.mounted && this.setState({ recording, startTime: Date.now() });
-    } else {
-      const recording = await startRecording(Voice, () => {});
-      this.mounted && this.setState({ recording, startTime: Date.now() });
-    }
-    this.props.removeLoading("CHAT");
-  };
-
-  stopRecording = async () => {
-    const { recording, results } = this.state;
-    if (!recording) {
-      return;
-    }
-    this.props.addLoading("CHAT");
-    let uri;
-    if (Platform.OS !== "web") {
-      uri = await stopRecording(recording, Voice);
-    } else {
-      uri = await stopRecording(recording);
-    }
-    const finalDuration = recording._finalDurationMillis;
+  backButtonAction = () => {
     this.mounted &&
       this.setState({
-        recording: false,
-        audioBlobs: {
-          uri,
-          finalDuration,
-          results,
-          type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-        },
+        replyingTo: "",
+        text: "",
+        replyingToName: "",
+        parents: null,
       });
-    this.props.removeLoading("CHAT");
-    console.log("Recording stopped and stored at", uri);
   };
 
+  onSend = (base64Url, fileType, results) => {
+    const { activeChatId, socket } = this.props;
+    socket.emit("new message", {
+      messageData: base64Url,
+      chatId: activeChatId,
+      fileType,
+      speechToText: results,
+    });
+  };
   componentWillUnmount = async () => {
     this.props.removeLoading("CHAT");
     await this.stopRecording();
@@ -115,12 +86,6 @@ export class Chat extends Component {
   };
 
   componentDidMount = () => {
-    const interval = setInterval(() => {
-      const { v } = this.state;
-      this.mounted &&
-        this.state.recording &&
-        this.setState({ v: v === 1 ? 0 : v + 1 });
-    }, 1000);
     this.scrollView && this.scrollView.scrollToEnd({ animated: true });
   };
 
@@ -148,9 +113,8 @@ export class Chat extends Component {
       userName,
       playingId,
       isPause,
-      playingUri,
     } = this.props;
-    const { recording, audioBlobs, v } = this.state;
+    const { recording } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -300,99 +264,10 @@ export class Chat extends Component {
               </TouchableOpacity>
             ))}
         </ScrollView>
-        <View style={styles.recordingContainerComments}>
-          <View style={styles.iconContainerComments}>
-            {audioBlobs && (
-              <Feather
-                style={styles.recordingMicIconComments}
-                name="delete"
-                size={24}
-                color="black"
-                onPress={() => {
-                  this.mounted &&
-                    this.setState({
-                      audioBlobs: false,
-                      replyingTo: "",
-                      text: "",
-                      replyingToName: "",
-                      parents: null,
-                    });
-                }}
-              />
-            )}
-            {audioBlobs ? (
-              playingUri === audioBlobs.uri && !isPause ? (
-                <MaterialCommunityIcons
-                  onPress={async () => {
-                    this.props.addLoading("CHAT");
-                    await this.props.pauseSound();
-                    this.props.removeLoading("CHAT");
-                  }}
-                  name="pause-circle"
-                  size={75}
-                  color="#6FF6FF"
-                  style={styles.recordingMicIconComments}
-                />
-              ) : (
-                <MaterialCommunityIcons
-                  onPress={async () => {
-                    this.props.addLoading("CHAT");
-
-                    await this.props.changeSound(audioBlobs, audioBlobs.uri);
-                    this.props.removeLoading("CHAT");
-                  }}
-                  name="play-circle"
-                  size={75}
-                  color="#6FF6FF"
-                  style={styles.recordingMicIconComments}
-                />
-              )
-            ) : !recording ? (
-              <MaterialCommunityIcons
-                onPress={this.startRecordingChat}
-                name="microphone-plus"
-                size={75}
-                color="red"
-                style={styles.recordingMicIconComments}
-              />
-            ) : (
-              recording &&
-              Platform.OS === "web" && (
-                <FontAwesome5
-                  onPress={this.stopRecording}
-                  style={styles.currentRecordingIconComments}
-                  name="record-vinyl"
-                  size={24}
-                  color={this.colors[v]}
-                />
-              )
-            )}
-            {audioBlobs && (
-              <TouchableOpacity
-                onPress={async () => {
-                  let fileType;
-                  const { socket, activeChatId } = this.props;
-                  const { results } = this.state;
-                  const base64Url = await soundBlobToBase64(audioBlobs.uri);
-                  if (base64Url != null) {
-                    fileType = audioBlobs.type;
-                    socket.emit("new message", {
-                      messageData: base64Url,
-                      chatId: activeChatId,
-                      fileType,
-                      speechToText: results,
-                    });
-                  } else {
-                    console.log("error with blob");
-                  }
-                  //  send message
-                }}
-              >
-                <FontAwesome name="send" size={24} color="black" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
+        <RecordingControls
+          backButtonAction={this.backButtonAction.bind(this)}
+          onSend={this.onSend.bind(this)}
+        />
         {recording && Platform.OS !== "web" && (
           <AudioRecordingVisualization
             recording={recording}
@@ -441,8 +316,6 @@ const mapStateToProps = (state) => ({
   socket: state.auth.socket,
   playingId:
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
-  playingUri:
-    state.sound.currentPlayingSound && state.sound.currentPlayingSound.uri,
   isPause: state.sound.isPause,
 });
 
