@@ -70,23 +70,6 @@ export class Post extends Component {
         underlayColor="#6FF6FF"
       >
         <Fragment>
-          {post.privatePost && canViewPrivate ? (
-            <Entypo
-              name="lock-open"
-              size={24}
-              color="black"
-              style={{ position: "absolute", top: 0, left: 0 }}
-            />
-          ) : (
-            post.privatePost && (
-              <Entypo
-                name="lock"
-                size={24}
-                color="black"
-                style={{ position: "absolute", top: 0, left: 0 }}
-              />
-            )
-          )}
           {playingId === post.id && (
             <ProgressBar
               height={postHeight}
@@ -181,6 +164,13 @@ export class Post extends Component {
           </View>
           <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
             <View style={styles.postPlayButton}>
+              {post.privatePost && canViewPrivate ? (
+                <Entypo name="lock-open" size={24} color="black" />
+              ) : (
+                post.privatePost && (
+                  <Entypo name="lock" size={48} color="black" />
+                )
+              )}
               {(!post.privatePost || (post.privatePost && canViewPrivate)) &&
                 post.owner && (
                   <Fragment>

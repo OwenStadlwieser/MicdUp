@@ -99,6 +99,7 @@ export class Feed extends Component {
       : following
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
+    console.log(postsToView);
     return (
       <View
         style={{
@@ -234,7 +235,11 @@ export class Feed extends Component {
                   post={data.item}
                   postArray={postsToView}
                   index={data.index}
-                  canViewPrivate={true}
+                  canViewPrivate={
+                    data.item.owner
+                      ? data.item.owner.canViewPrivatesFromUser
+                      : false
+                  }
                   higherUp={false}
                 />
               )}
