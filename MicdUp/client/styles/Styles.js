@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderTopWidth: 1,
     marginTop: 10,
+    backgroundColor: "white",
   },
   chatPane: {
     height: height * 0.9,

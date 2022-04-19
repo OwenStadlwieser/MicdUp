@@ -41,7 +41,7 @@ exports = module.exports = function (io) {
       socket.on("new message", async function (data) {
         const { messageData, chatId, fileType, speechToText } = data;
         socket.profileId = userIds[socket.id];
-
+        console.log("new message");
         if (!socket.profileId) {
           throw new Error("must be logged in");
         }
@@ -122,6 +122,7 @@ exports = module.exports = function (io) {
           returnMessage.owner.user = {};
           returnMessage.owner.user._id = user._id;
           returnMessage.owner.user.userName = user.userName;
+          console.log(chatId, returnMessage);
           io.to(chatId).emit("new message", returnMessage, chat._id);
         } catch (err) {
           console.log(err);

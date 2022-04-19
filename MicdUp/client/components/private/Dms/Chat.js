@@ -148,8 +148,9 @@ export class Chat extends Component {
       userName,
       playingId,
       isPause,
+      playingUri,
     } = this.props;
-    const { recording, audioBlobs, v, loading } = this.state;
+    const { recording, audioBlobs, v } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -319,7 +320,34 @@ export class Chat extends Component {
                 }}
               />
             )}
-            {!recording ? (
+            {audioBlobs ? (
+              playingUri === audioBlobs.uri && !isPause ? (
+                <MaterialCommunityIcons
+                  onPress={async () => {
+                    this.props.addLoading("CHAT");
+                    await this.props.pauseSound();
+                    this.props.removeLoading("CHAT");
+                  }}
+                  name="pause-circle"
+                  size={75}
+                  color="#6FF6FF"
+                  style={styles.recordingMicIconComments}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  onPress={async () => {
+                    this.props.addLoading("CHAT");
+
+                    await this.props.changeSound(audioBlobs, audioBlobs.uri);
+                    this.props.removeLoading("CHAT");
+                  }}
+                  name="play-circle"
+                  size={75}
+                  color="#6FF6FF"
+                  style={styles.recordingMicIconComments}
+                />
+              )
+            ) : !recording ? (
               <MaterialCommunityIcons
                 onPress={this.startRecordingChat}
                 name="microphone-plus"
@@ -413,6 +441,8 @@ const mapStateToProps = (state) => ({
   socket: state.auth.socket,
   playingId:
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
+  playingUri:
+    state.sound.currentPlayingSound && state.sound.currentPlayingSound.uri,
   isPause: state.sound.isPause,
 });
 
