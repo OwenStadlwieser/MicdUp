@@ -68,9 +68,13 @@ export class Search extends Component {
   };
   render() {
     const { users, term, userName, tags, searchExecuted, id, tag } = this.state;
-    const { searchViewingProfile } = this.props;
+    const { searchViewingProfile, searchViewingTag, tagFromSearch } =
+      this.props;
+    console.log(searchViewingTag);
     if (searchExecuted) {
       return <Feed key={"search"} fromSearch={true} tag={tag} />;
+    } else if (searchViewingTag) {
+      return <Feed key={"search"} fromSearch={true} tag={tagFromSearch} />;
     }
     return (
       <View style={[styles.paneUncentered, { alignItems: "center" }]}>
@@ -199,6 +203,8 @@ export class Search extends Component {
 
 const mapStateToProps = (state) => ({
   searchViewingProfile: state.display.searchViewingProfile,
+  searchViewingTag: state.display.searchViewingTag,
+  tagFromSearch: state.display.tagFromSearch,
   currentProfile: state.display.viewingProfile,
 });
 

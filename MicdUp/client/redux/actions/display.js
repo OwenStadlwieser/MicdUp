@@ -13,6 +13,7 @@ import {
   ADD_LOADING,
   REMOVE_LOADING,
   SET_CURRENT_KEY,
+  VIEW_TAG_SEARCH,
 } from "../types";
 
 export const setCurrentKey = (payload) => (dispatch) => {
@@ -104,6 +105,13 @@ export const viewProfile = (payload) => (dispatch) => {
 export const searchViewProfile = (payload) => (dispatch) => {
   dispatch({
     type: VIEW_PROFILE_SEARCH,
+    payload,
+  });
+};
+
+export const searchViewTag = (payload) => (dispatch) => {
+  dispatch({
+    type: VIEW_TAG_SEARCH,
     payload,
   });
 };

@@ -17,6 +17,7 @@ import {
   UPDATE_PRIVATE_COUNT_FROM_LIST,
   REMOVE_LOADING,
   ADD_LOADING,
+  VIEW_TAG_SEARCH,
 } from "../types";
 
 const initialState = {
@@ -34,12 +35,20 @@ const initialState = {
   postIndex: -1,
   loading: false,
   loadingMap: {},
+  tagFromSearch: {},
+  searchViewingTag: false,
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   let copy;
   switch (type) {
+    case VIEW_TAG_SEARCH:
+      return {
+        ...state,
+        searchViewingTag: true,
+        tagFromSearch: payload,
+      };
     case NAVIGATE:
       return {
         ...state,
@@ -47,6 +56,8 @@ export default function (state = { ...initialState }, action) {
         keyForSearch: Math.random(),
         searchViewingProfile: false,
         showingComments: false,
+        searchViewingTag: false,
+        tagFromSearch: {},
       };
     case ADD_LOADING:
       copy = { ...state.loadingMap };

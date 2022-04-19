@@ -72,12 +72,6 @@ export class Feed extends Component {
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
     try {
-      console.log(
-        event.nativeEvent.contentOffset.y >
-          postsToView.length * postHeight - height
-      );
-      console.log(!loading);
-      console.log(prevLength, postsToView.length);
       if (
         event.nativeEvent.contentOffset.y >
           postsToView.length * postHeight - height &&
@@ -128,7 +122,6 @@ export class Feed extends Component {
           >
             <Appbar.BackAction
               onPress={() => {
-                console.log("Back action");
                 this.props.navigate("Search");
               }}
             />

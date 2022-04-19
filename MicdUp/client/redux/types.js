@@ -50,3 +50,4 @@ export const ADD_LOADING = "ADD_LOADING";
 export const REMOVE_LOADING = "REMOVE_LOADING";
 export const SET_CURRENT_KEY = "SET_CURRENT_KEY";
 export const DELETE_TAG = "DELETE_TAG";
+export const VIEW_TAG_SEARCH = "VIEW_TAG_SEARCH";

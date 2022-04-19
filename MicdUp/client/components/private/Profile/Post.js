@@ -26,6 +26,7 @@ import {
   viewProfile,
   searchViewProfile,
   navigate,
+  searchViewTag,
 } from "../../../redux/actions/display";
 import DeleteableItem from "../../reuseable/DeleteableItem";
 
@@ -159,7 +160,8 @@ export class Post extends Component {
                         title={"title"}
                         key={index}
                         onDelete={() => {
-                          this.props.deleteTag(index);
+                          this.props.navigate("Search");
+                          this.props.searchViewTag(tag);
                         }}
                         icon={"tag-multiple"}
                       />
@@ -220,4 +222,5 @@ export default connect(mapStateToProps, {
   viewProfile,
   searchViewProfile,
   navigate,
+  searchViewTag,
 })(Post);
