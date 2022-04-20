@@ -226,6 +226,8 @@ export class Profile extends Component {
       id,
       cachedPosts,
     } = this.props;
+    const isUserProfile = profile && currentProfile ? profile.id === id : true;
+    const posts = cachedPosts[id];
     if (!profile && !currentProfile) {
       return (
         <View>
@@ -244,8 +246,7 @@ export class Profile extends Component {
         />
       );
     }
-    const isUserProfile = profile && currentProfile ? profile.id === id : true;
-    const posts = cachedPosts[id];
+
     return (
       <View
         style={{
