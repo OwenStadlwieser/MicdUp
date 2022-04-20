@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Text, TouchableOpacity, Dimensions, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import { Entypo } from "@expo/vector-icons";
 // styles
 import { listStyles, styles, postHeight } from "../../../styles/Styles";
@@ -88,8 +94,14 @@ export class Feed extends Component {
 
   render() {
     const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
-    const { isRecordingComment, loading, tag, following, outerScrollEnabled, refreshing} =
-      this.state;
+    const {
+      isRecordingComment,
+      loading,
+      tag,
+      following,
+      outerScrollEnabled,
+      refreshing,
+    } = this.state;
     const postsToView = fromSearch
       ? tag
         ? cachedPosts[tag._id]
@@ -102,13 +114,11 @@ export class Feed extends Component {
     return (
       <View
         style={{
-          position: "absolute",
           display: "flex",
           justifyContent: "flex-start",
-          top: height * 0.1,
-          left: 0,
-          height: height * 0.8,
+          marginTop: height * 0.1,
           overflow: "scroll",
+          flex: 1,
         }}
       >
         {tag ? (
@@ -230,9 +240,9 @@ export class Feed extends Component {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={async () => {
-                    this.mounted && this.setState({ refreshing: true })
-                    await this.getData(0)
-                    this.mounted && this.setState({ refreshing: false })
+                    this.mounted && this.setState({ refreshing: true });
+                    await this.getData(0);
+                    this.mounted && this.setState({ refreshing: false });
                   }}
                 />
               }
