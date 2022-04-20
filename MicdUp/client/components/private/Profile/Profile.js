@@ -7,8 +7,8 @@ import {
   Text,
   TouchableHighlight,
   Platform,
-  StyleSheet,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 // icons
 import { Ionicons } from "@expo/vector-icons";
@@ -29,7 +29,6 @@ import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
-import Comment from "../../reuseable/Comment";
 import { SwipeListView } from "react-native-swipe-list-view";
 import ListOfAccounts from "../../reuseable/ListOfAccounts";
 import GestureRecognizer from "react-native-swipe-gestures";
@@ -82,6 +81,7 @@ export class Profile extends Component {
       listOfAccountsParams: {},
       posts: [],
       outerScrollEnabled: true,
+      refreshing: false,
     };
     this.scrollView = null;
     this.mounted = true;
@@ -172,16 +172,23 @@ export class Profile extends Component {
     this.props.removeLoading("Profile");
   };
 
-  componentDidMount = async () => {
-    const { getUserPosts, profile, cachedPosts, id } = this.props;
+  getPosts = async () => {
+    const { getUserPosts, cachedPosts, id } = this.props;
+    console.log("getting posts");
     this.props.addLoading("Profile");
     this.props.setCurrentKey(id);
+    this.mounted && this.setState({ refreshing: true });
     const posts = cachedPosts[id];
     if (posts && posts.length > 0) {
     } else if (id) {
       await getUserPosts(id, 0);
     }
     this.props.removeLoading("Profile");
+    this.mounted && this.setState({ refreshing: false });
+  };
+
+  componentDidMount = async () => {
+    await this.getPosts();
   };
 
   hideSetting = () => {
@@ -216,6 +223,7 @@ export class Profile extends Component {
       outerScrollEnabled,
       showingListOfAccounts,
       listOfAccountsParams,
+      refreshing,
     } = this.state;
     const {
       userName,
@@ -467,6 +475,12 @@ export class Profile extends Component {
               ref={(view) => (this.scrollView = view)}
               useNativeDriver={false}
               scrollEnabled={outerScrollEnabled}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={this.getPosts.bind(this)}
+                />
+              }
               renderItem={(data, rowMap) => (
                 <Post
                   isUserProfile={isUserProfile}
