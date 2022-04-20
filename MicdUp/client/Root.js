@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View, Dimensions } from "react-native";
+import { Text, View, Dimensions, SafeAreaView } from "react-native";
 import { Button } from "react-native-paper";
 import React, { Component, Fragment, useEffect } from "react";
 import { connect } from "react-redux";
@@ -17,10 +17,10 @@ import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
 import CircleSnail from "react-native-progress/CircleSnail";
+import NotificationBell from "./components/private/NotificationBell";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
-import NotificationBell from "./components/private/NotificationBell";
 
 import { Audio } from "expo-av";
 import Search from "./components/private/Search/Search";
@@ -93,13 +93,13 @@ export class Root extends Component {
     let app;
     if (!loggedIn && !token)
       app = (
-        <View style={styles.rootContainer}>
+        <SafeAreaView style={styles.rootContainer}>
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
-          {showHeader && <SoundPlayer />}
+          { showHeader && (<SoundPlayer /> )}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -158,11 +158,11 @@ export class Root extends Component {
               post={cachedPosts[currentKey][postIndex]}
             />
           )}
-        </View>
+        </SafeAreaView>
       );
     else
       app = (
-        <View style={styles.rootContainer}>
+        <SafeAreaView style={styles.rootContainer}>
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
@@ -170,7 +170,8 @@ export class Root extends Component {
           )}
           {showHeader && (
             <Fragment>
-              <SoundPlayer /> <NotificationBell />
+              <SoundPlayer /> 
+              <NotificationBell />
             </Fragment>
           )}
           {displayMessage && (
@@ -190,7 +191,7 @@ export class Root extends Component {
               post={cachedPosts[currentKey][postIndex]}
             />
           )}
-        </View>
+        </SafeAreaView>
       );
     return app;
   }

@@ -8,6 +8,7 @@ import {
   Text,
   Dimensions,
   TouchableWithoutFeedback,
+  RefreshControl
 } from "react-native";
 import { Button } from "react-native-paper";
 // helpers
@@ -71,7 +72,7 @@ export class Dms extends Component {
 
   render() {
     const { chats, showingChat, activeChatId, profile } = this.props;
-    const { users, userNames, showDropDown } = this.state;
+    const { users, userNames, showDropDown, refreshing } = this.state;
     const app = activeChatId ? (
       <View style={styles.pane}>
         <Chat />
@@ -183,7 +184,18 @@ export class Dms extends Component {
             )}
           </View>
         )}
-        <ScrollView style={{ zIndex: 1 }}>
+        <ScrollView       
+        refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                this.mounted && this.setState({ refreshing: true })
+                await this.props.viewChats(0)
+                this.mounted && this.setState({ refreshing: false })
+              }}
+            />
+          } 
+        style={{ zIndex: 1 }}>
           {chats &&
             chats.length > 0 &&
             chats.map((chat, index) => (

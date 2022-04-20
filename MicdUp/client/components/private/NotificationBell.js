@@ -28,15 +28,15 @@ export class NotificationBell extends Component {
 
   render() {
     const { navigate } = this.props;
-    console.log("rendeiring");
     return (
-      <MaterialCommunityIcons
-        style={[styles.toptopRightIcon, { zIndex: 50 }]}
-        onPress={() => navigate("Notifs")}
-        name="bell"
-        size={24}
-        color="white"
-      />
+      <Text style={[styles.toptopRightIcon, { zIndex: 50 }]}>
+        <MaterialCommunityIcons
+          onPress={() => navigate("Notifs")}
+          name="bell"
+          size={24}
+          color="white"
+        />
+      </Text>
     );
   }
 }

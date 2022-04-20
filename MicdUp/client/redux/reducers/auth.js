@@ -126,9 +126,9 @@ export default function (state = { ...initialState }, action) {
         },
       };
     case SET_POSTS:
-      let newPosts = state.posts[state.currentKey];
-      newPosts = newPosts
-        ? [...newPosts, ...payload.posts]
+      let oldPosts = state.posts[state.currentKey];
+      let newPosts = oldPosts && payload.skipMult != 0
+        ? [...oldPosts, ...payload.posts]
         : [...payload.posts];
       return {
         ...state,

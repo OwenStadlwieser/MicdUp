@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, RefreshControl } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 // styles
 import { listStyles, styles, postHeight } from "../../../styles/Styles";
@@ -88,7 +88,7 @@ export class Feed extends Component {
 
   render() {
     const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
-    const { isRecordingComment, loading, tag, following, outerScrollEnabled } =
+    const { isRecordingComment, loading, tag, following, outerScrollEnabled, refreshing} =
       this.state;
     const postsToView = fromSearch
       ? tag
@@ -99,7 +99,6 @@ export class Feed extends Component {
       : following
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
-    console.log(postsToView);
     return (
       <View
         style={{
@@ -227,6 +226,16 @@ export class Feed extends Component {
               useNativeDriver={false}
               scrollEnabled={outerScrollEnabled}
               nestedScrollEnabled={false}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={async () => {
+                    this.mounted && this.setState({ refreshing: true })
+                    await this.getData(0)
+                    this.mounted && this.setState({ refreshing: false })
+                  }}
+                />
+              }
               renderItem={(data, rowMap) => (
                 <Post
                   setOuterScroll={this.setOuterScroll.bind(this)}

@@ -211,6 +211,11 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
+    if (skipMult == 0) {
+      dispatch({
+        type: CLEAR_POSTS,
+      });
+    }
     dispatch({
       type: SET_POSTS,
       payload: { posts: res.data.getUserPosts, userId },
@@ -406,7 +411,6 @@ export const getRecordingsFromTag =
         );
         return false;
       }
-      console.log(searchTag, res.data.getRecordingsFromTag);
       dispatch(setCurrentKey(searchTag));
       if (skipMult == 0) {
         dispatch({
@@ -417,7 +421,7 @@ export const getRecordingsFromTag =
         type: SET_POSTS,
         payload: {
           posts: res.data.getRecordingsFromTag,
-          userId: searchTag,
+          userId: searchTag 
         },
       });
       return res.data.getRecordingsFromTag;

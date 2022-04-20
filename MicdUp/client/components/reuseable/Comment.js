@@ -11,6 +11,7 @@ import {
   Image,
   ScrollView,
   Dimensions,
+  RefreshControl
 } from "react-native";
 import Like from "./Like";
 import SpeechToText from "./SpeechToText";
@@ -356,7 +357,7 @@ export class Comment extends Component {
 
   render() {
     const { post } = this.props;
-    const { replyingToName, loading } = this.state;
+    const { replyingToName, loading, refreshing } = this.state;
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -376,6 +377,16 @@ export class Comment extends Component {
             <ScrollView
               ref={(scrollView) => (this.scrollView = scrollView)}
               scrollEnabled={true}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={async () => {
+                    this.mounted && this.setState({ refreshing: true })
+                    await this.props.getComments(post);                    
+                    this.mounted && this.setState({ refreshing: false })
+                  }}
+                />
+              } 
             >
               {post.comments.map((comment, index) => {
                 return this.handleMap(comment, index, 0, null, null);

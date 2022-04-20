@@ -172,18 +172,20 @@ export class Profile extends Component {
     this.props.removeLoading("Profile");
   };
 
-  getPosts = async () => {
+  getPosts = async (fromRefresh = false) => {
     const { getUserPosts, cachedPosts, id } = this.props;
     console.log("getting posts");
-    this.props.addLoading("Profile");
     this.props.setCurrentKey(id);
     this.mounted && this.setState({ refreshing: true });
     const posts = cachedPosts[id];
-    if (posts && posts.length > 0) {
-    } else if (id) {
+    if (posts && posts.length > 0 && fromRefresh) {
       await getUserPosts(id, 0);
+    } else if (posts && posts.length > 0) {
+    } else if (id) {
+      this.props.addLoading("Profile");
+      await getUserPosts(id, 0);
+      this.props.removeLoading("Profile");
     }
-    this.props.removeLoading("Profile");
     this.mounted && this.setState({ refreshing: false });
   };
 
@@ -478,7 +480,9 @@ export class Profile extends Component {
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
-                  onRefresh={this.getPosts.bind(this)}
+                  onRefresh={() => {
+                    this.getPosts(true)
+                  }}
                 />
               }
               renderItem={(data, rowMap) => (
