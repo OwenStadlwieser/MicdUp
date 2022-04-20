@@ -47,6 +47,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-evenly",
   },
+  appBarHeader: {
+    width,
+    height: height * 0.1,
+    zIndex: 51,
+  },
   recordingContainerComments: {
     width,
     flex: 1,

@@ -18,6 +18,7 @@ import {
   REMOVE_LOADING,
   ADD_LOADING,
   VIEW_TAG_SEARCH,
+  SHOW_HEADER,
 } from "../types";
 
 const initialState = {
@@ -37,12 +38,18 @@ const initialState = {
   loadingMap: {},
   tagFromSearch: {},
   searchViewingTag: false,
+  showHeader: true,
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   let copy;
   switch (type) {
+    case SHOW_HEADER:
+      return {
+        ...state,
+        showHeader: payload,
+      };
     case VIEW_TAG_SEARCH:
       return {
         ...state,

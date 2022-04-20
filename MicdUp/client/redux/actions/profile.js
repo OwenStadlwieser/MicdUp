@@ -36,11 +36,10 @@ export const followProfile =
         );
         return false;
       }
-      followingFromProfile &&
-        dispatch({
-          type: UPDATE_FOLLOWER_COUNT,
-          payload: { ...res.data.followProfile },
-        });
+      dispatch({
+        type: UPDATE_FOLLOWER_COUNT,
+        payload: { ...res.data.followProfile },
+      });
       return res.data.followProfile;
     } catch (err) {
       console.log(err);
@@ -213,11 +212,10 @@ export const addToPrivates =
             message: `${res.data.addToPrivates.user.userName} can no longer see your private posts`,
           })
         );
-      addingFromProfile &&
-        dispatch({
-          type: UPDATE_PRIVATE_COUNT,
-          payload: { ...res.data.addToPrivates },
-        });
+      dispatch({
+        type: UPDATE_PRIVATE_COUNT,
+        payload: { ...res.data.addToPrivates },
+      });
       return res.data.addToPrivates;
     } catch (err) {
       console.log(err);

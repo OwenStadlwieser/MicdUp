@@ -14,6 +14,7 @@ import {
   REMOVE_LOADING,
   SET_CURRENT_KEY,
   VIEW_TAG_SEARCH,
+  SHOW_HEADER,
 } from "../types";
 
 export const setCurrentKey = (payload) => (dispatch) => {
@@ -88,6 +89,12 @@ export const showMessage = (payload) => (dispatch) => {
   }, 3000);
 };
 
+export const showHeader = (payload) => (dispatch) => {
+  dispatch({
+    type: SHOW_HEADER,
+    payload,
+  });
+};
 export const navigate = (payload) => (dispatch) => {
   dispatch({
     type: NAVIGATE,

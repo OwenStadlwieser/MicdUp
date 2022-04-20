@@ -20,7 +20,7 @@ import {
   addToPrivates,
   updatePrivateCounts,
 } from "../../redux/actions/profile";
-import { viewProfile } from "../../redux/actions/display";
+import { viewProfile, showHeader } from "../../redux/actions/display";
 // children
 import Profile from "../private/Profile/Profile";
 const { height, width } = Dimensions.get("window");
@@ -37,10 +37,14 @@ export class ListOfAccounts extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.showHeader(true);
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
     const { getData } = this.props.params;
+    this.props.showHeader(false);
     this.mounted && this.setState({ loading: true });
     const res = await getData(0);
     this.mounted && this.setState({ loading: false, data: res });
@@ -103,12 +107,12 @@ export class ListOfAccounts extends Component {
         }}
       >
         <Appbar.Header
-          style={{
-            backgroundColor: "#1A3561",
-            width,
-            height: height * 0.1,
-            zIndex: 2,
-          }}
+          style={[
+            styles.appBarHeader,
+            {
+              backgroundColor: "#1A3561",
+            },
+          ]}
         >
           <Appbar.BackAction
             onPress={() => {
@@ -286,4 +290,5 @@ export default connect(mapStateToProps, {
   viewProfile,
   addToPrivates,
   updatePrivateCounts,
+  showHeader,
 })(ListOfAccounts);

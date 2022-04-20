@@ -14,6 +14,8 @@ import {
   CLEAR_POSTS,
   SET_IP,
   SET_CURRENT_KEY,
+  UPDATE_FOLLOWER_COUNT,
+  UPDATE_PRIVATE_COUNT,
 } from "../types";
 
 const initialState = {
@@ -48,6 +50,42 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         socket: payload,
+      };
+    case UPDATE_FOLLOWER_COUNT:
+      let currentCount = state.user.profile.followingCount;
+      let change = 0;
+      if (payload.isFollowedByUser) {
+        change = 1;
+      } else {
+        change = -1;
+      }
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            followingCount: currentCount + change,
+          },
+        },
+      };
+    case UPDATE_PRIVATE_COUNT:
+      currentCount = state.user.profile.privatesCount;
+      let change_private = 0;
+      if (payload.isPrivateByUser) {
+        change_private = 1;
+      } else {
+        change_private = -1;
+      }
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            privatesCount: currentCount + change_private,
+          },
+        },
       };
     case SET_CURRENT_KEY:
       return {

@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { View, Platform, TouchableOpacity } from "react-native";
+import { View, Platform, TouchableOpacity, Text } from "react-native";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -33,7 +33,10 @@ export class RecordingControls extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = async () => {
+    await this.stopRecording();
+    this.mounted = false;
+  };
 
   componentDidMount = () => {
     setInterval(() => {
@@ -45,7 +48,8 @@ export class RecordingControls extends Component {
   };
 
   startRecordingChat = async () => {
-    this.props.addLoading("CHAT");
+    this.props.addLoading("CONTROLS");
+    this.props.onRecordingStart();
     if (Platform.OS !== "web") {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording, startTime: Date.now() });
@@ -53,7 +57,7 @@ export class RecordingControls extends Component {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording, startTime: Date.now() });
     }
-    this.props.removeLoading("CHAT");
+    this.props.removeLoading("CONTROLS");
   };
 
   stopRecording = async () => {
@@ -61,7 +65,7 @@ export class RecordingControls extends Component {
     if (!recording) {
       return;
     }
-    this.props.addLoading("CHAT");
+    this.props.addLoading("CONTROLS");
     let uri;
     if (Platform.OS !== "web") {
       uri = await stopRecording(recording, Voice);
@@ -79,17 +83,24 @@ export class RecordingControls extends Component {
           type: Platform.OS === "web" ? "audio/webm" : ".m4a",
         },
       });
-    this.props.removeLoading("CHAT");
+    this.props.removeLoading("CONTROLS");
     console.log("Recording stopped and stored at", uri);
   };
 
   render() {
     const { audioBlobs, recording, v } = this.state;
-    const { playingUri, isPause } = this.props;
+    const { playingUri, isPause, replyingToName } = this.props;
     return (
       <View style={styles.recordingContainerComments}>
+        {replyingToName ? (
+          <Text style={{ position: "absolute", left: 0, top: 0 }}>
+            {`Reply to ${replyingToName}`}
+          </Text>
+        ) : (
+          <Fragment />
+        )}
         <View style={styles.iconContainerComments}>
-          {audioBlobs && (
+          {audioBlobs || replyingToName ? (
             <Feather
               style={styles.recordingMicIconComments}
               name="delete"
@@ -103,14 +114,16 @@ export class RecordingControls extends Component {
                   });
               }}
             />
+          ) : (
+            <Fragment />
           )}
           {audioBlobs ? (
             playingUri === audioBlobs.uri && !isPause ? (
               <MaterialCommunityIcons
                 onPress={async () => {
-                  this.props.addLoading("CHAT");
+                  this.props.addLoading("CONTROLS");
                   await this.props.pauseSound();
-                  this.props.removeLoading("CHAT");
+                  this.props.removeLoading("CONTROLS");
                 }}
                 name="pause-circle"
                 size={75}
@@ -120,9 +133,9 @@ export class RecordingControls extends Component {
             ) : (
               <MaterialCommunityIcons
                 onPress={async () => {
-                  this.props.addLoading("CHAT");
+                  this.props.addLoading("CONTROLS");
                   await this.props.changeSound(audioBlobs, audioBlobs.uri);
-                  this.props.removeLoading("CHAT");
+                  this.props.removeLoading("CONTROLS");
                 }}
                 name="play-circle"
                 size={75}

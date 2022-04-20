@@ -39,7 +39,6 @@ export class SoundPlayer extends Component {
   render() {
     const { showing } = this.state;
     const { playingId, sound, isPause, profile } = this.props;
-    console.log(sound && sound.owner);
     return showing ? (
       <TouchableOpacity
         onPress={() => {

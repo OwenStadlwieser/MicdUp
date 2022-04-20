@@ -114,12 +114,12 @@ export class Feed extends Component {
       >
         {tag ? (
           <Appbar.Header
-            style={{
-              backgroundColor: "white",
-              width,
-              height: height * 0.1,
-              zIndex: 2,
-            }}
+            style={[
+              styles.appBarHeader,
+              {
+                backgroundColor: "white",
+              },
+            ]}
           >
             <Appbar.BackAction
               onPress={() => {

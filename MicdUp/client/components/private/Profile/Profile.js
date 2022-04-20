@@ -233,6 +233,17 @@ export class Profile extends Component {
         </View>
       );
     }
+    if (showingListOfAccounts) {
+      return (
+        <ListOfAccounts
+          hideList={() => {
+            this.mounted && this.setState({ showingListOfAccounts: false });
+          }}
+          isUserProfile={isUserProfile}
+          params={listOfAccountsParams}
+        />
+      );
+    }
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
     const posts = cachedPosts[id];
     return (
@@ -246,15 +257,6 @@ export class Profile extends Component {
           <ImagePicker
             setHidden={this.setHidden.bind(this)}
             setImage={this.setImage.bind(this)}
-          />
-        )}
-        {showingListOfAccounts && (
-          <ListOfAccounts
-            hideList={() => {
-              this.mounted && this.setState({ showingListOfAccounts: false });
-            }}
-            isUserProfile={isUserProfile}
-            params={listOfAccountsParams}
           />
         )}
         {!settingsShown && isUserProfile && !showingComments && (

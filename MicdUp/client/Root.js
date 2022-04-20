@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { Text, View, Dimensions } from "react-native";
 import { Button } from "react-native-paper";
-import React, { Component, useEffect } from "react";
+import React, { Component, Fragment, useEffect } from "react";
 import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
@@ -88,9 +88,9 @@ export class Root extends Component {
       currentKey,
       postIndex,
       keyForSearch,
+      showHeader,
     } = this.props;
     let app;
-    const { width, height } = Dimensions.get("window");
     if (!loggedIn && !token)
       app = (
         <View style={styles.rootContainer}>
@@ -99,7 +99,7 @@ export class Root extends Component {
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
-          <SoundPlayer />
+          {showHeader && <SoundPlayer />}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -168,8 +168,11 @@ export class Root extends Component {
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
-          <SoundPlayer />
-          <NotificationBell />
+          {showHeader && (
+            <Fragment>
+              <SoundPlayer /> <NotificationBell />
+            </Fragment>
+          )}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -180,7 +183,7 @@ export class Root extends Component {
             </View>
           )}
           <Dashboard></Dashboard>
-          {showingComments && (
+          {showingComments && cachedPosts[currentKey] && (
             <Comment
               containerStyle={{}}
               color={"#1A3561"}
@@ -207,6 +210,7 @@ const mapStateToProps = (state) => ({
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,
   keyForSearch: state.display.keyForSearch,
+  showHeader: state.display.showHeader,
 });
 export default connect(mapStateToProps, {
   changeSignup,

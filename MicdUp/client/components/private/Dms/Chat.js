@@ -24,7 +24,11 @@ import { Feather } from "@expo/vector-icons";
 // audio
 import Voice from "@react-native-voice/voice";
 // redux
-import { addLoading, removeLoading } from "../../../redux/actions/display";
+import {
+  addLoading,
+  removeLoading,
+  showHeader,
+} from "../../../redux/actions/display";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
 import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
 import {
@@ -32,6 +36,9 @@ import {
   onSpeechStart,
 } from "../../../reuseableFunctions/helpers";
 import RecordingControls from "../../reuseable/RecordingControls";
+// reuseable
+import { stopRecording } from "../../../reuseableFunctions/recording";
+
 const { width, height } = Dimensions.get("window");
 
 const barWidth = 5;
@@ -69,6 +76,33 @@ export class Chat extends Component {
       });
   };
 
+  stopRecording = async () => {
+    const { recording, results } = this.state;
+    if (!recording) {
+      return;
+    }
+    this.props.addLoading("CHAT");
+    let uri;
+    if (Platform.OS !== "web") {
+      uri = await stopRecording(recording, Voice);
+    } else {
+      uri = await stopRecording(recording);
+    }
+    const finalDuration = recording._finalDurationMillis;
+    this.mounted &&
+      this.setState({
+        recording: false,
+        audioBlobs: {
+          uri,
+          finalDuration,
+          results,
+          type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+        },
+      });
+    this.props.removeLoading("CHAT");
+    console.log("Recording stopped and stored at", uri);
+  };
+
   onSend = (base64Url, fileType, results) => {
     const { activeChatId, socket } = this.props;
     socket.emit("new message", {
@@ -79,6 +113,7 @@ export class Chat extends Component {
     });
   };
   componentWillUnmount = async () => {
+    this.props.showHeader(true);
     this.props.removeLoading("CHAT");
     await this.stopRecording();
     Voice.stop();
@@ -86,6 +121,7 @@ export class Chat extends Component {
   };
 
   componentDidMount = () => {
+    this.props.showHeader(false);
     this.scrollView && this.scrollView.scrollToEnd({ animated: true });
   };
 
@@ -118,14 +154,14 @@ export class Chat extends Component {
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
-          style={{
-            position: "absolute",
-            top: 0,
-            backgroundColor: "white",
-            width,
-            height: height * 0.1,
-            zIndex: 2,
-          }}
+          style={[
+            styles.appBarHeader,
+            {
+              position: "absolute",
+              top: 0,
+              backgroundColor: "white",
+            },
+          ]}
         >
           <Appbar.BackAction
             onPress={() => {
@@ -265,6 +301,9 @@ export class Chat extends Component {
             ))}
         </ScrollView>
         <RecordingControls
+          onRecordingStart={(() => {
+            this.mounted && this.setState({ recording: true });
+          }).bind(this)}
           backButtonAction={this.backButtonAction.bind(this)}
           onSend={this.onSend.bind(this)}
         />
@@ -326,4 +365,5 @@ export default connect(mapStateToProps, {
   pauseSound,
   addLoading,
   removeLoading,
+  showHeader,
 })(Chat);

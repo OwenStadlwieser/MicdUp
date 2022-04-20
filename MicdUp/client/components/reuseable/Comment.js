@@ -413,6 +413,9 @@ export class Comment extends Component {
           backButtonAction={this.backButtonAction.bind(this)}
           onSend={this.onSend.bind(this)}
           replyingToName={replyingToName}
+          onRecordingStart={(() => {
+            this.mounted && this.setState({ recording: true });
+          }).bind(this)}
         />
       </View>
     );
