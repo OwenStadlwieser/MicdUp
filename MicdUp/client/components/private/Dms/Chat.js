@@ -178,11 +178,12 @@ export class Chat extends Component {
           />
           <Appbar.Action icon="dots-vertical" onPress={this.handleMore} />
         </Appbar.Header>
+        <View style={styles.messagesParentContainer}>
         <ScrollView
           ref={(view) => {
             this.scrollView = view;
           }}
-          style={styles.messagesContainer}
+          contentContainerStyle={styles.messagesContainer}
           scrollEventThrottle={16}
           onScroll={async (event) => {
             const { activeChatId, activeChatMembers } = this.props;
@@ -300,6 +301,7 @@ export class Chat extends Component {
               </TouchableOpacity>
             ))}
         </ScrollView>
+        </View>
         <RecordingControls
           onRecordingStart={(() => {
             this.mounted && this.setState({ recording: true });

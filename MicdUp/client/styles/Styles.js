@@ -588,11 +588,13 @@ const styles = StyleSheet.create({
     width: height * 0.15,
     borderRadius: height * 0.15,
   },
-  messagesContainer: {
-    flexDirection: "column",
-    flex: 12,
+  messagesParentContainer: {
     marginTop: height * 0.1,
     paddingTop: height * 0.03,
+    paddingBottom: height * 0.08,
+  },
+  messagesContainer: {
+    flexDirection: "column",
   },
   userChat: {
     left: 0,
