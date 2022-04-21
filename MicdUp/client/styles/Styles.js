@@ -19,6 +19,7 @@ const large = normalize(20);
 const xl = normalize(24);
 const postHeight = width > 1000 ? height * 0.35 : height * 0.23;
 const postPadding = height * 0.02;
+const chatWidth = width * 0.8;
 const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
 const listItemHeight = height * 0.08;
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
   },
   chatPane: {
     height: height * 0.825,
-    display: 'flex'
+    display: "flex",
   },
   recordingContainerChat: {
     width,
@@ -599,23 +600,19 @@ const styles = StyleSheet.create({
   userChat: {
     left: 0,
     backgroundColor: "white",
-    width: width * 0.6,
-    flexDirection: "row",
+    width: chatWidth,
+    flexDirection: "column",
     borderRadius: 8,
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
     alignItems: "center",
     marginTop: 20,
     marginLeft: width * 0.05,
   },
   foreignChat: {
-    marginLeft: width * 0.35,
+    marginLeft: width * 0.15,
     backgroundColor: "gray",
-    width: width * 0.6,
-    flexDirection: "row",
+    width: chatWidth,
+    flexDirection: "column",
     borderRadius: 8,
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
     alignItems: "center",
     marginTop: 20,
   },
@@ -898,4 +895,5 @@ export {
   listItemHeight,
   listItemHeight2X,
   listStyles,
+  chatWidth,
 };

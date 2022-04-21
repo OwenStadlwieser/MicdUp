@@ -22,7 +22,7 @@ const filterSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: getCurrentTime(),
+    default: Date.now,
   },
   searches: {
     type: Number,

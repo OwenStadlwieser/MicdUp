@@ -8,6 +8,7 @@ dotenv.config({ path: `${__dirname}/../config.env` });
 const { Tag } = require("../database/models/Tag");
 const { Prompt } = require("../database/models/Prompt");
 const mongoose = require("mongoose");
+const { getCurrentTime } = require("../server/reusableFunctions/helpers");
 let db = process.env.DATABASE.replace("<DB_PASSWORD>", process.env.DB_PASSWORD);
 db = db.replace("<DB_USERNAME>", process.env.DB_USERNAME);
 mongoose
@@ -54,7 +55,10 @@ mongoose
             .replace(/[^a-z0-9]/gim, "")
             .replace(/\s+/g, "")
             .replace(/[0-9]/g, "");
-          const tag = new Tag({ title: stringValue });
+          const tag = new Tag({
+            title: stringValue,
+            dateCreated: getCurrentTime(),
+          });
           let prompts = await page.$x(`//ul[${i + 1}]/li`);
           if (prompts.length === 0) {
             i = i + 1;

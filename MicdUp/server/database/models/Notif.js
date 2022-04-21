@@ -30,7 +30,7 @@ const notifSchema = new Schema(
     },
     dateCreated: {
       type: Date,
-      default: getCurrentTime(),
+      default: Date.now,
     },
   },
   options

@@ -25,6 +25,7 @@ const { Profile } = require("../../models/Profile");
 const mongoose = require("mongoose");
 const { makeLikeNotification } = require("../../../utils/sendNotification");
 const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -78,6 +79,7 @@ const createRecording = {
       privatePost,
       fileExtension: ".mp4",
       speechToText,
+      dateCreated: getCurrentTime(),
     });
     // prep files for combine
     try {
@@ -123,7 +125,7 @@ const createRecording = {
         if (!tags[i]) continue;
         let tag = await Tag.findOne({ title: tags[i] });
         if (!tag) {
-          tag = new Tag({ title: tags[i] });
+          tag = new Tag({ title: tags[i], dateCreated: getCurrentTime() });
         }
         tag.count = tag.count + 1;
         tag.posts.push(post._id);
@@ -172,6 +174,7 @@ const uploadBio = {
       owner: context.profile.id,
       fileExtension: ".mp4",
       speechToText,
+      dateCreated: getCurrentTime(),
     });
     try {
       var fileType = fileTypes.replace("audio/", "");
@@ -419,6 +422,7 @@ const commentToPost = {
         owner: context.profile.id,
         fileExtension: ".mp4",
         speechToText,
+        dateCreated: getCurrentTime(),
       });
       var fileNames = [];
       var command = ffmpeg();

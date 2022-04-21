@@ -18,7 +18,7 @@ const promptsSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: getCurrentTime(),
+    default: Date.now,
   },
 });
 

@@ -47,7 +47,7 @@ const UserSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: getCurrentTime(),
+    default: Date.now,
   },
   profile: {
     type: mongoose.Schema.Types.ObjectId,

@@ -30,6 +30,7 @@ const createUser = {
         email,
         password,
         dob,
+        dateCreated: getCurrentTime(),
       });
       const newProfile = new Profile({});
       newUser.profile = newProfile._id;

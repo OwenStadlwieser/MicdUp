@@ -22,7 +22,7 @@ const fileSchema = new Schema(
     },
     dateCreated: {
       type: Date,
-      default: getCurrentTime(),
+      default: Date.now,
     },
     speechToText: [
       {

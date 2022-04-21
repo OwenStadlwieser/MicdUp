@@ -46,7 +46,7 @@ const commentSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: getCurrentTime(),
+    default: Date.now,
   },
   isDeleted: {
     type: Boolean,

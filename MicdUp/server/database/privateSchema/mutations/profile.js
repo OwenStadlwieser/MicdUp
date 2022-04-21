@@ -5,7 +5,7 @@ const { File } = require("../../models/File");
 const { GraphQLString, GraphQLID } = require("graphql");
 const { FileType, ProfilePublicType, TagsType } = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
-
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 const updateProfilePic = {
   type: FileType,
   args: {
@@ -33,6 +33,7 @@ const updateProfilePic = {
       const fileObject = new File({
         owner: context.profile.id,
         fileExtension: fileType,
+        dateCreated: getCurrentTime(),
       });
       await uploadFileFromBase64(file, `${fileObject._id}${fileType}`);
       profile.image = fileObject._id;

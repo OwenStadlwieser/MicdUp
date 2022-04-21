@@ -19,7 +19,7 @@ const tagsSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: getCurrentTime(),
+    default: Date.now,
   },
   searches: {
     type: Number,

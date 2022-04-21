@@ -61,6 +61,7 @@ exports = module.exports = function (io) {
           owner: socket.profileId,
           speechToText,
           fileExtension: ".mp4",
+          dateCreated: getCurrentTime(),
         });
 
         var fileTypeFixed = fileType.replace("audio/", "");
@@ -116,7 +117,7 @@ exports = module.exports = function (io) {
           await session.commitTransaction();
           let returnMessage = {};
           returnMessage.id = message._id;
-          returnMessage.dateCreated = message.dateCreated;
+          returnMessage.dateCreated = Math.floor(message.dateCreated.getTime());
           returnMessage.signedUrl = message.signedUrl;
           returnMessage.owner = {};
           returnMessage.owner.id = profileDoc._id;
