@@ -92,21 +92,16 @@ export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching chat failed" })
       );
     }
-    if (skipMult == 0) {
-      dispatch({
-        type: SET_CHATS,
-        payload: res.data.fetchChatMessages,
-      });
-    } else {
-      dispatch({
-        type: ADD_CHATS,
-        payload: {
-          activeChats: res.data.fetchChatMessages,
-          activeChatId: chat.id,
-          activeChatMembers: chat.members,
-        },
-      });
-    }
+
+    dispatch({
+      type: ADD_CHATS,
+      payload: {
+        activeChats: res.data.fetchChatMessages,
+        activeChatId: chat.id,
+        activeChatMembers: chat.members,
+      },
+    });
+    
     return res.data.fetchChatMessages;
   } catch (err) {
     console.log(err);
