@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   topLeftIcon: {
     position: "absolute",
     left: width * 0.08,
-    top: height * 0.08 + 24,
+    top: height * 0.08,
   },
   toptopLeftIcon: {
     position: "absolute",
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   topRightIcon: {
     position: "absolute",
     right: width * 0.08,
-    top: height * 0.08 + 24,
+    top: height * 0.08,
     zIndex: 2,
   },
   toptopRightIcon: {
