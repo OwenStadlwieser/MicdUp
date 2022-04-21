@@ -157,7 +157,9 @@ export class Chat extends Component {
           }}
           onContentSizeChange={() => { 
             const { lastFetched } = this.state;
-            !lastFetched && this.scrollView.scrollToEnd({ animated: true })}}
+            !lastFetched && this.scrollView.scrollToEnd({ animated: true })
+            }
+          }
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -242,6 +244,9 @@ export class Chat extends Component {
                       style={styles.commentImg}
                     />
                   </TouchableHighlight>
+                  <Text>
+                  {new Date(chat.dateCreated).toString()}
+                  </Text>
                 </View>
                 <View
                   style={{ flex: 7, position: "relative", overflow: "hidden" }}

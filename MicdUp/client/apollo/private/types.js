@@ -26,6 +26,7 @@ signedUrl
 likes
 isLikedByUser
 privatePost
+dateCreated
 speechToText {
   word
   time
@@ -53,6 +54,7 @@ owner {
     userName
   }
 }
+dateCreated
 isLikedByUser
 likersCount
 seenBy
@@ -70,6 +72,7 @@ text
 likes
 isLikedByUser
 repliesLength
+dateCreated
 speechToText {
   word
   time
