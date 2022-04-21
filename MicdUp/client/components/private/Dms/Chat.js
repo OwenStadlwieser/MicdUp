@@ -155,6 +155,9 @@ export class Chat extends Component {
           ref={(view) => {
             this.scrollView = view;
           }}
+          onContentSizeChange={() => { 
+            const { lastFetched } = this.state;
+            !lastFetched && this.scrollView.scrollToEnd({ animated: true })}}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
