@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const UserSchema = new Schema({
@@ -46,7 +47,7 @@ const UserSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: Date.now,
+    default: getCurrentTime(),
   },
   profile: {
     type: mongoose.Schema.Types.ObjectId,
@@ -55,11 +56,11 @@ const UserSchema = new Schema({
   },
   emailVerified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   pushTokens: {
     type: mongoose.Schema.Types.Array,
-  }
+  },
 });
 
 UserSchema.methods.getPasswordResetToken = async function () {
@@ -70,7 +71,7 @@ UserSchema.methods.getPasswordResetToken = async function () {
     user = await User.find({ resetPasswordToken: resetToken });
   }
   this.resetPasswordToken = resetToken;
-  this.resetPasswordCreatedAt = Date.now();
+  this.resetPasswordCreatedAt = getCurrentTime();
   return resetToken;
 };
 
@@ -82,7 +83,7 @@ UserSchema.methods.getVerifiedEmailToken = async function () {
     user = await User.find({ verifyEmailToken: emailToken });
   }
   this.verifyEmailToken = emailToken;
-  this.verifyEmailCreatedAt = Date.now();
+  this.verifyEmailCreatedAt = getCurrentTime();
   return emailToken;
 };
 

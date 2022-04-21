@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const tagsSchema = new Schema({
@@ -18,7 +19,7 @@ const tagsSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: Date.now,
+    default: getCurrentTime(),
   },
   searches: {
     type: Number,

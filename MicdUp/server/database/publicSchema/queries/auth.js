@@ -3,6 +3,7 @@ const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 
 const login = {
   type: MessageType,
@@ -69,7 +70,7 @@ const forgotPassVerify = {
         message: "Invalid code",
       };
     }
-    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
+    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > getCurrentTime()) {
       return {
         success: false,
         message: "Token has expired",

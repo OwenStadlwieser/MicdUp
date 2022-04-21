@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const promptsSchema = new Schema({
@@ -17,7 +18,7 @@ const promptsSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: Date.now,
+    default: getCurrentTime(),
   },
 });
 

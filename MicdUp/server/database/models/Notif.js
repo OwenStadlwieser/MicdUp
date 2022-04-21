@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const options = { discriminatorKey: "kind" };
@@ -10,16 +11,16 @@ const notifSchema = new Schema(
       required: true,
     },
     receiver: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
     text: {
       type: String,
       required: true,
     },
     image: {
-        type:mongoose.Schema.Types.ObjectId,
-        required: false,
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
     },
     signedUrl: {
       type: String,
@@ -29,11 +30,10 @@ const notifSchema = new Schema(
     },
     dateCreated: {
       type: Date,
-      default: Date.now,
+      default: getCurrentTime(),
     },
   },
   options
 );
-
 
 module.exports = { notifSchema };

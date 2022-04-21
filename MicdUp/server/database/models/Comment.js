@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 const Schema = mongoose.Schema;
-
 // Create Schema
 const commentSchema = new Schema({
   owner: {
@@ -46,7 +46,7 @@ const commentSchema = new Schema({
   },
   dateCreated: {
     type: Date,
-    default: Date.now,
+    default: getCurrentTime(),
   },
   isDeleted: {
     type: Boolean,

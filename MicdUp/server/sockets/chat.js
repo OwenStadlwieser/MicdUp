@@ -4,8 +4,10 @@ const { Profile } = require("../database/models/Profile");
 const { Chat } = require("../database/models/Chat");
 const { User } = require("../database/models/User");
 const { Message, File } = require("../database/models/File");
+const { getCurrentTime } = require("../reusableFunctions/helpers");
 const fs = require("fs");
 var path = require("path");
+
 const {
   uploadFileFromBase64,
   getSignedUrl,
@@ -97,12 +99,12 @@ exports = module.exports = function (io) {
             if (
               image.signedUrl &&
               image.lastFetched &&
-              image.lastFetched + 60 * 30 < Date.now()
+              image.lastFetched + 60 * 30 < getCurrentTime()
             ) {
               image.signedUrl = image.signedUrl;
             } else {
               image.signedUrl = await getFile(image._id + image.fileExtension);
-              image.lastFetched = Date.now();
+              image.lastFetched = getCurrentTime();
               await image.save({ session });
             }
           }

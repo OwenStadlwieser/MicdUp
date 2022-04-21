@@ -286,19 +286,21 @@ const CommentWithoutReplyType = new GraphQLObjectType({
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {
+        var d1 = new Date();
+        d1.toUTCString();
         if (!parent.fileExtension) {
           return "";
         }
         if (
           parent.signedUrl &&
           parent.lastFetched &&
-          parent.lastFetched + 60 * 30 < Date.now()
+          parent.lastFetched + 60 * 30 < Math.floor(d1.getTime() / 1000)
         ) {
           return parent.signedUrl;
         }
         const post = await Comment.findById(parent._id);
         post.signedUrl = await getFile(parent._id + parent.fileExtension);
-        post.lastFetched = Date.now();
+        post.lastFetched = Math.floor(d1.getTime() / 1000);
         await post.save();
         return post.signedUrl;
       },
@@ -385,19 +387,21 @@ const CommentType = new GraphQLObjectType({
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {
+        var d1 = new Date();
+        d1.toUTCString();
         if (!parent.fileExtension) {
           return "";
         }
         if (
           parent.signedUrl &&
           parent.lastFetched &&
-          parent.lastFetched + 60 * 30 < Date.now()
+          parent.lastFetched + 60 * 30 < Math.floor(d1.getTime() / 1000)
         ) {
           return parent.signedUrl;
         }
         const post = await Comment.findById(parent._id);
         post.signedUrl = await getFile(parent._id + parent.fileExtension);
-        post.lastFetched = Date.now();
+        post.lastFetched = Math.floor(d1.getTime() / 1000);
         await post.save();
         return post.signedUrl;
       },
@@ -484,6 +488,8 @@ const PostType = new GraphQLObjectType({
     signedUrl: {
       type: GraphQLString,
       async resolve(parent, a, context, i) {
+        var d1 = new Date();
+        d1.toUTCString();
         const index = parent.privatePost
           ? await checkIfIsInPrivateList(context, parent)
           : 1;
@@ -491,13 +497,13 @@ const PostType = new GraphQLObjectType({
         if (
           parent.signedUrl &&
           parent.lastFetched &&
-          parent.lastFetched + 60 * 30 < Date.now()
+          parent.lastFetched + 60 * 30 < Math.floor(d1.getTime() / 1000)
         ) {
           return parent.signedUrl;
         }
         const post = await Post.findById(parent._id);
         post.signedUrl = await getFile(parent._id + parent.fileExtension);
-        post.lastFetched = Date.now();
+        post.lastFetched = Math.floor(d1.getTime() / 1000);
         await post.save();
         return post.signedUrl;
       },
@@ -637,16 +643,18 @@ const ChatMessageType = new GraphQLObjectType({
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {
+        var d1 = new Date();
+        d1.toUTCString();
         if (
           parent.signedUrl &&
           parent.lastFetched &&
-          parent.lastFetched + 60 * 30 < Date.now()
+          parent.lastFetched + 60 * 30 < Math.floor(d1.getTime() / 1000)
         ) {
           return parent.signedUrl;
         }
         const file = await File.findById(parent._id);
         file.signedUrl = await getFile(parent._id + parent.fileExtension);
-        file.lastFetched = Date.now();
+        file.lastFetched = Math.floor(d1.getTime() / 1000);
         await file.save();
         return file.signedUrl;
       },
@@ -736,16 +744,18 @@ const FileType = new GraphQLObjectType({
     signedUrl: {
       type: GraphQLString,
       async resolve(parent) {
+        var d1 = new Date();
+        d1.toUTCString();
         if (
           parent.signedUrl &&
           parent.lastFetched &&
-          parent.lastFetched + 60 * 30 < Date.now()
+          parent.lastFetched + 60 * 30 < Math.floor(d1.getTime() / 1000)
         ) {
           return parent.signedUrl;
         }
         const file = await File.findById(parent._id);
         file.signedUrl = await getFile(parent._id + parent.fileExtension);
-        file.lastFetched = Date.now();
+        file.lastFetched = Math.floor(d1.getTime() / 1000);
         await file.save();
         return file.signedUrl;
       },

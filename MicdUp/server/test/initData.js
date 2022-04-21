@@ -1,4 +1,5 @@
 const { User } = require("../database/models/User");
+const { getCurrentTime } = require("../reusableFunctions/helpers");
 
 const initUsers = async (options) => {
   await User.create({
@@ -6,21 +7,21 @@ const initUsers = async (options) => {
     phone: "1111111111",
     email: "TestUser1@gmail.com",
     password: "Test1234!",
-    dob: Date.now(),
+    dob: getCurrentTime(),
   });
   await User.create({
     userName: "user2",
     phone: "2222222222",
     email: "TestUser2@gmail.com",
     password: "Test1234!",
-    dob: Date.now(),
+    dob: getCurrentTime(),
   });
   await User.create({
     userName: "user3",
     phone: "2222222223",
     email: "TestUser3@gmail.com",
     password: "Test1234!",
-    dob: Date.now(),
+    dob: getCurrentTime(),
   });
 };
 

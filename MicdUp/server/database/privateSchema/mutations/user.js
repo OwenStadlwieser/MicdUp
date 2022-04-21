@@ -6,6 +6,7 @@ const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const { sendEmail } = require("../../../utils/sendEmail");
 const bcrypt = require("bcryptjs");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 
 const verifyEmail = {
   type: MessageType,
@@ -81,7 +82,7 @@ const setEmailVerified = {
         message: "Invalid code",
       };
     }
-    if (user.verifyEmailCreatedAt + 1000 * 60 * 10 > Date.now()) {
+    if (user.verifyEmailCreatedAt + 1000 * 60 * 10 > getCurrentTime()) {
       return {
         success: false,
         message: "Email Verification Token has expired",
