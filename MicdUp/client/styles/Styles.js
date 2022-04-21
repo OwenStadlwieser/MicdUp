@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   chatPane: {
-    height: height * 0.9,
+    height: height * 0.825,
     display: 'flex'
   },
   recordingContainerChat: {
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   messagesParentContainer: {
     marginTop: height * 0.1,
     paddingTop: height * 0.03,
-    paddingBottom: height * 0.08,
+    flex: 6,
   },
   messagesContainer: {
     flexDirection: "column",
