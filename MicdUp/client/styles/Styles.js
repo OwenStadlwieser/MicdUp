@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   },
   chatPane: {
     height: height * 0.9,
+    display: 'flex'
   },
   recordingContainerChat: {
     width,
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flexDirection: "column",
-    height: height * 0.6,
+    flex: 12,
     marginTop: height * 0.1,
     paddingTop: height * 0.03,
   },

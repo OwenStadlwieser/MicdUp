@@ -314,33 +314,6 @@ export class Chat extends Component {
             barMargin={barMargin}
           />
         )}
-        {recording && Platform.OS !== "web" && (
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 50,
-              position: "absolute",
-              bottom: height * 0.08,
-              width,
-              left: 0,
-              opacity: 1.0,
-              zIndex: 6,
-            }}
-          >
-            <FontAwesome5
-              onPress={() => {
-                this.stopRecording();
-              }}
-              style={{
-                fontSize: largeIconFontSize,
-                opacity: 1.0,
-              }}
-              name="record-vinyl"
-              color={"red"}
-            />
-          </View>
-        )}
       </View>
     );
   }
