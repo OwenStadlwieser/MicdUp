@@ -11,7 +11,7 @@ import {
   Image,
   ScrollView,
   Dimensions,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import Like from "./Like";
 import SpeechToText from "./SpeechToText";
@@ -42,7 +42,7 @@ import {
   updateComments,
   deleteComment,
 } from "../../redux/actions/comment";
-import { hideComments } from "../../redux/actions/display";
+import { hideComments, showHeader } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 
 const { height } = Dimensions.get("window");
@@ -104,6 +104,7 @@ export class Comment extends Component {
       });
   };
   componentWillUnmount = async () => {
+    this.props.showHeader(true);
     this.props.removeLoading("COMMENT");
     await this.stopRecordingComment();
     this.mounted = false;
@@ -111,6 +112,7 @@ export class Comment extends Component {
 
   componentDidMount = async () => {
     const { post } = this.props;
+    this.props.showHeader(false);
     this.mounted && this.setState({ loading: true });
     await this.props.getComments(post);
     this.mounted && this.setState({ loading: false });
@@ -381,12 +383,12 @@ export class Comment extends Component {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={async () => {
-                    this.mounted && this.setState({ refreshing: true })
-                    await this.props.getComments(post);                    
-                    this.mounted && this.setState({ refreshing: false })
+                    this.mounted && this.setState({ refreshing: true });
+                    await this.props.getComments(post);
+                    this.mounted && this.setState({ refreshing: false });
                   }}
                 />
-              } 
+              }
             >
               {post.comments.map((comment, index) => {
                 return this.handleMap(comment, index, 0, null, null);
@@ -452,4 +454,5 @@ export default connect(mapStateToProps, {
   pauseSound,
   addLoading,
   removeLoading,
+  showHeader,
 })(Comment);
