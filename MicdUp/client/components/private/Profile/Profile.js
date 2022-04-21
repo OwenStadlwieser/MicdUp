@@ -270,10 +270,10 @@ export class Profile extends Component {
             setImage={this.setImage.bind(this)}
           />
         )}
-        {!settingsShown && isUserProfile && !showingComments && (
+        {!settingsShown && !showingComments && (
           <Ionicons
             onPress={() => {
-              this.mounted && this.setState({ settingsShown: true });
+              isUserProfile ? this.mounted && this.setState({ settingsShown: true }) : this.mounted && this.setState({ blockUser: true })
             }}
             name="settings-outline"
             size={24}

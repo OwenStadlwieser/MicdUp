@@ -24,6 +24,7 @@ const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
 const listItemHeight = height * 0.08;
 const listItemHeight2X = listItemHeight * 2;
+const contentPaneHeight = height * 0.875;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   chatPane: {
-    height: height * 0.825,
+    height: contentPaneHeight,
     display: "flex",
   },
   recordingContainerChat: {
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   },
   commentParent: {},
   commentOpenContainer: {
-    height: height * 0.9,
+    height: contentPaneHeight,
     backgroundColor: "white",
     borderWidth: 2,
     borderStyle: "solid",
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1A3561",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1A3561",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
     justifyContent: "space-evenly",
     alignItems: "center",
   },
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1A3561",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
   },
   profileHeader: {
     width,
