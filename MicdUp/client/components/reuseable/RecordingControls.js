@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { View, Platform, TouchableOpacity, Text } from "react-native";
+import { View, Platform, TouchableOpacity, Text, Dimensions } from "react-native";
+// children 
+import AudioRecordingVisualization from './AudioRecordingVisualization'
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -13,12 +15,16 @@ import {
   stopRecording,
 } from "../../reuseableFunctions/recording";
 // styles
-import { styles } from "../../styles/Styles";
+import { styles, largeIconFontSize } from "../../styles/Styles";
 // redux
 import { addLoading, removeLoading } from "../../redux/actions/display";
 import { changeSound, pauseSound } from "../../redux/actions/sound";
 // audio
 import Voice from "@react-native-voice/voice";
+
+const { width, height } = Dimensions.get("window");
+const barWidth = 5;
+const barMargin = 1;
 
 export class RecordingControls extends Component {
   constructor() {
@@ -91,6 +97,7 @@ export class RecordingControls extends Component {
     const { audioBlobs, recording, v } = this.state;
     const { playingUri, isPause, replyingToName } = this.props;
     return (
+      <Fragment>
       <View style={styles.recordingContainerComments}>
         {replyingToName ? (
           <Text style={{ position: "absolute", left: 0, top: 0 }}>
@@ -183,6 +190,41 @@ export class RecordingControls extends Component {
           )}
         </View>
       </View>
+              {recording && Platform.OS !== "web" && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 50,
+              position: "absolute",
+              bottom: height * 0.08,
+              width,
+              left: 0,
+              opacity: 1.0,
+              zIndex: 51,
+            }}
+          >
+            <FontAwesome5
+              onPress={() => {
+                this.stopRecording();
+              }}
+              style={{
+                fontSize: largeIconFontSize,
+                opacity: 1.0,
+              }}
+              name="record-vinyl"
+              color={"red"}
+            />
+          </View>
+        )}
+        {recording && Platform.OS !== "web" && (
+          <AudioRecordingVisualization
+            recording={recording}
+            barWidth={barWidth}
+            barMargin={barMargin}
+          />
+        )}
+      </Fragment>
     );
   }
 }

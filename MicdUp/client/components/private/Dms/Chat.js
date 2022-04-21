@@ -12,10 +12,10 @@ import {
   TouchableHighlight,
   Text,
   Image,
+  RefreshControl
 } from "react-native";
 import SpeechToText from "../../reuseable/SpeechToText";
 import { Appbar } from "react-native-paper";
-import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 //styles
 import { styles, largeIconFontSize } from "../../../styles/Styles";
 // icons
@@ -41,8 +41,6 @@ import { stopRecording } from "../../../reuseableFunctions/recording";
 
 const { width, height } = Dimensions.get("window");
 
-const barWidth = 5;
-const barMargin = 1;
 
 export class Chat extends Component {
   constructor() {
@@ -76,32 +74,6 @@ export class Chat extends Component {
       });
   };
 
-  stopRecording = async () => {
-    const { recording, results } = this.state;
-    if (!recording) {
-      return;
-    }
-    this.props.addLoading("CHAT");
-    let uri;
-    if (Platform.OS !== "web") {
-      uri = await stopRecording(recording, Voice);
-    } else {
-      uri = await stopRecording(recording);
-    }
-    const finalDuration = recording._finalDurationMillis;
-    this.mounted &&
-      this.setState({
-        recording: false,
-        audioBlobs: {
-          uri,
-          finalDuration,
-          results,
-          type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-        },
-      });
-    this.props.removeLoading("CHAT");
-    console.log("Recording stopped and stored at", uri);
-  };
 
   onSend = (base64Url, fileType, results) => {
     const { activeChatId, socket } = this.props;
@@ -150,7 +122,7 @@ export class Chat extends Component {
       playingId,
       isPause,
     } = this.props;
-    const { recording } = this.state;
+    const { recording, refreshing } = this.state;
     return (
       <View style={styles.chatPane}>
         <Appbar.Header
@@ -183,33 +155,35 @@ export class Chat extends Component {
           ref={(view) => {
             this.scrollView = view;
           }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                this.mounted && this.setState({ refreshing: true })
+                const { activeChatId, activeChatMembers } = this.props;
+                const { lastFetched } = this.state;
+                this.mounted &&
+                  this.setState({
+                    loading: true,
+                    fetching: true,
+                    lastFetched: Math.floor(activeChats.length / 20),
+                  });
+                this.props.addLoading("CHAT");
+                await this.props.viewMoreChats(
+                  { id: activeChatId, members: activeChatMembers },
+                  activeChats && activeChats.length > 0
+                    ? Math.floor(activeChats.length / 20)
+                    : 0
+                );
+                this.props.removeLoading("CHAT");
+                this.mounted &&
+                  this.setState({ loading: false, fetching: false });
+                  this.mounted && this.setState({ refreshing: false })
+                }}
+            />
+          } 
           contentContainerStyle={styles.messagesContainer}
           scrollEventThrottle={16}
-          onScroll={async (event) => {
-            const { activeChatId, activeChatMembers } = this.props;
-            const { lastFetched } = this.state;
-            if (
-              event.nativeEvent.contentOffset.y === 0 &&
-              Math.floor(activeChats.length / 20) > lastFetched
-            ) {
-              this.mounted &&
-                this.setState({
-                  loading: true,
-                  fetching: true,
-                  lastFetched: Math.floor(activeChats.length / 20),
-                });
-              this.props.addLoading("CHAT");
-              await this.props.viewMoreChats(
-                { id: activeChatId, members: activeChatMembers },
-                activeChats && activeChats.length > 0
-                  ? Math.floor(activeChats.length / 20)
-                  : 0
-              );
-              this.props.removeLoading("CHAT");
-              this.mounted &&
-                this.setState({ loading: false, fetching: false });
-            }
-          }}
         >
           {activeChats &&
             activeChats.length > 0 &&
@@ -309,13 +283,6 @@ export class Chat extends Component {
           backButtonAction={this.backButtonAction.bind(this)}
           onSend={this.onSend.bind(this)}
         />
-        {recording && Platform.OS !== "web" && (
-          <AudioRecordingVisualization
-            recording={recording}
-            barWidth={barWidth}
-            barMargin={barMargin}
-          />
-        )}
       </View>
     );
   }
