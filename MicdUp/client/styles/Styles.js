@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderTopWidth: 1,
     borderTopColor: "#1A3561",
-    height: height * 0.1,
+    height: height * 0.125,
   },
   modalContainer: {
     zIndex: 998,

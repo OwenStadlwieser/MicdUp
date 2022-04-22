@@ -1,4 +1,4 @@
-import React, { Component, Fragment} from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import { Text, View, Dimensions } from "react-native";
 // redux
@@ -78,21 +78,25 @@ export class Dashboard extends Component {
             style={{ width }}
             theme={MyTheme}
             ref={navigationRef}
+            screenOptions={{headerShown: false}}
           >
             <Stack.Navigator initialRouteName={mountedComponent}>
               <Stack.Screen
                 name="Feed"
                 component={Feed}
                 key={this.props.loggedIn}
+                options={{headerShown: false}}
               />
               <Stack.Screen
                 name="Search"
                 key={keyForSearch}
                 component={Search}
+                options={{headerShown: false}}
               />
-              <Stack.Screen name="Create" component={Create} />
-              <Stack.Screen name="Dms" component={Dms} />
+              <Stack.Screen options={{headerShown: false}} name="Create" component={Create} />
+              <Stack.Screen options={{headerShown: false}} name="Dms" component={Dms} />
               <Stack.Screen
+                options={{headerShown: false}}
                 name="Profile"
                 component={Profile}
                 key={profile ? profile.id : "notloggedin"}
@@ -100,7 +104,8 @@ export class Dashboard extends Component {
                 userName={user && user.userName ? user.userName : ""}
               />
               <Stack.Screen
-                name="NotificationView"
+                name="Notifs"
+                options={{headerShown: false}}
                 component={NotificationView}
               />
             </Stack.Navigator>
