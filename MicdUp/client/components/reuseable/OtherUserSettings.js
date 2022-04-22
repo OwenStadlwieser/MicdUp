@@ -8,7 +8,10 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
-import { Button } from 'react-native-paper';
+import { Button } from "react-native-paper";
+// redux
+import { addLoading, removeLoading } from "../../redux/actions/display";
+import { blockProfile } from "../../redux/actions/profile";
 // icons
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -20,6 +23,7 @@ export class OtherUserSetttings extends Component {
     super();
     this.state = {
       loading: false,
+      blocking: true,
     };
 
     this.mounted = true;
@@ -34,6 +38,7 @@ export class OtherUserSetttings extends Component {
   };
 
   render() {
+    const { blocking } = this.state;
     return (
       <TouchableOpacity
         onPress={() => {
@@ -43,11 +48,13 @@ export class OtherUserSetttings extends Component {
       >
         <TouchableOpacity onPress={() => {}} style={styles.modalMainContainer}>
           <Button
+            color="red"
+            style={[styles.button, { width: "auto", marginTop: 0 }]}
             onPress={() => {
-              this.props.blockUser(this.props.user._id);
+              this.props.blockProfile(this.props.currentProfile.id, blocking);
             }}
           >
-            Block {this.props.user.userName}
+            Block {this.props.userName}
           </Button>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -57,4 +64,8 @@ export class OtherUserSetttings extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, {})(OtherUserSetttings);
+export default connect(mapStateToProps, {
+  addLoading,
+  removeLoading,
+  blockProfile,
+})(OtherUserSetttings);

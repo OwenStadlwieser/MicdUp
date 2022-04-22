@@ -9,16 +9,32 @@ const {
   GraphQLID,
   GraphQLInt,
 } = require("graphql");
+const { getFilteredResults } = require("../../../utils/securityHelpers");
 const getUserPosts = {
   type: new GraphQLList(PostType),
   args: { userId: { type: GraphQLID }, skipMult: { type: GraphQLInt } },
   async resolve(parent, { userId, skipMult }, context) {
     try {
       const size = 20;
-      const posts = await Post.find({ owner: userId })
+      let blocked = [];
+      let blockedBy = [];
+      if (context.profile) {
+        blocked = [...context.profile.blockedMap.keys()];
+        blockedBy = [...context.profile.blockedByMap.keys()];
+      }
+      const posts = await Post.find({
+        $and: [
+          {
+            owner: userId,
+          },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
+      })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
+      console.log(posts);
       return posts;
     } catch (err) {
       console.log(err);
@@ -35,10 +51,14 @@ const getRecordingsFromTag = {
       const tag = await Tag.findByIdAndUpdate(searchTag, {
         $inc: { searches: 1, hr24searches: 1 },
       });
+      let blocked = [];
+      let blockedBy = [];
       if (context.profile) {
         await Profile.findByIdAndUpdate(context.profile.id, {
           $push: { searchedTags: tag._id },
         });
+        blocked = [...context.profile.blockedMap.keys()];
+        blockedBy = [...context.profile.blockedByMap.keys()];
       }
       if (!tag || !tag.posts || tag.posts.length === 0) {
         return [];
@@ -46,6 +66,8 @@ const getRecordingsFromTag = {
       const posts = await Post.aggregate([
         {
           $match: { _id: { $in: tag.posts } },
+          owner: { $nin: blocked },
+          owner: { $nin: blockedBy },
         },
         {
           $addFields: {
@@ -71,12 +93,27 @@ const getComments = {
   args: { postId: { type: GraphQLID }, skipMult: { type: GraphQLInt } },
   async resolve(parent, { postId, skipMult }, context) {
     try {
+      let blocked = [];
+      let blockedBy = [];
+      if (context.profile) {
+        console.log(context.profile);
+        blocked = [...context.profile.blockedMap.keys()];
+        blockedBy = [...context.profile.blockedByMap.keys()];
+      }
+      console.log(blocked, blockedBy);
       const size = 60;
       const post = await Post.findById(postId);
-      const comments = await Comment.find({ _id: { $in: post.comments } })
+      const comments = await Comment.find({
+        $and: [
+          { _id: { $in: post.comments } },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
+      })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
+      console.log(comments);
       return comments;
     } catch (err) {
       console.log(err);

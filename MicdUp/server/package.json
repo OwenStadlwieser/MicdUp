@@ -1,47 +1,47 @@
 {
-  "name": "micdup",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
-    "testserver": "nodemon test/testServer.js",
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "react-native"
-  },
-  "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "aws-sdk": "^2.1048.0",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.19.1",
-    "connect-mongo": "^4.6.0",
-    "cors": "^2.8.5",
-    "dotenv": "^10.0.0",
-    "expo-server-sdk": "^3.6.0",
-    "express": "^4.17.2",
-    "express-graphql": "^0.12.0",
-    "express-session": "^1.17.2",
-    "ffmpeg-static": "^4.4.0",
-    "ffprobe-static": "^3.0.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "graphql": "^16.2.0",
-    "http": "^0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.1.4",
-    "node-cron": "^3.0.0",
-    "node-ffprobe-installer": "^1.2.3",
-    "nodemailer": "^6.7.2",
-    "nodemon": "^2.0.15",
-    "react-native-gesture-handler": "^2.4.0",
-    "react-native-swipe-gestures": "^1.0.5",
-    "react-native-swipeout": "^2.3.6",
-    "socket.io": "^4.4.1",
-    "yarn": "^1.22.17"
-  },
-  "devDependencies": {
-    "puppeteer-extra": "^3.2.3",
-    "puppeteer-extra-plugin-adblocker": "^2.12.0",
-    "puppeteer-extra-plugin-stealth": "^2.9.0"
-  }
+    "name": "micdup",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "node server.js",
+        "server": "nodemon server.js",
+        "testserver": "nodemon test/testServer.js",
+        "test": "jest"
+    },
+    "jest": {
+        "preset": "react-native"
+    },
+    "dependencies": {
+        "@ffmpeg-installer/ffmpeg": "^1.1.0",
+        "async_hooks": "^1.0.0",
+        "aws-sdk": "^2.1048.0",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.19.1",
+        "connect-mongo": "^4.6.0",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0",
+        "expo-server-sdk": "^3.6.0",
+        "express": "^4.17.2",
+        "express-graphql": "^0.12.0",
+        "express-http-context": "^1.2.4",
+        "express-session": "^1.17.2",
+        "ffmpeg-static": "^4.4.0",
+        "ffprobe-static": "^3.0.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "graphql": "^16.2.0",
+        "http": "^0.0.1-security",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^6.1.4",
+        "node-cron": "^3.0.0",
+        "node-ffprobe-installer": "^1.2.3",
+        "nodemailer": "^6.7.2",
+        "nodemon": "^2.0.15",
+        "request-context": "^2.0.0",
+        "socket.io": "^4.4.1",
+        "yarn": "^1.22.17"
+    },
+    "devDependencies": {
+        "puppeteer-extra": "^3.2.3",
+        "puppeteer-extra-plugin-adblocker": "^2.12.0",
+        "puppeteer-extra-plugin-stealth": "^2.9.0"
+    }
 }

@@ -218,7 +218,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
     }
     dispatch({
       type: SET_POSTS,
-      payload: { posts: res.data.getUserPosts, userId },
+      payload: { posts: res.data.getUserPosts.filter((el) => el), userId },
     });
     return res.data.getUserPosts;
   } catch (err) {
@@ -420,8 +420,8 @@ export const getRecordingsFromTag =
       dispatch({
         type: SET_POSTS,
         payload: {
-          posts: res.data.getRecordingsFromTag,
-          userId: searchTag 
+          posts: res.data.getRecordingsFromTag.filter((el) => el),
+          userId: searchTag,
         },
       });
       return res.data.getRecordingsFromTag;

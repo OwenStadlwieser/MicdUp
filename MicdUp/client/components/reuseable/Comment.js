@@ -390,9 +390,11 @@ export class Comment extends Component {
                 />
               }
             >
-              {post.comments.map((comment, index) => {
-                return this.handleMap(comment, index, 0, null, null);
-              })}
+              {post.comments
+                .filter((el) => el)
+                .map((comment, index) => {
+                  return this.handleMap(comment, index, 0, null, null);
+                })}
             </ScrollView>
           ) : !loading ? (
             <View

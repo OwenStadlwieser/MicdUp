@@ -122,7 +122,7 @@ export class ListOfAccounts extends Component {
           <Appbar.Content title={this.props.params.title} />
         </Appbar.Header>
         <SwipeListView
-          data={data}
+          data={data.filter((el) => el)}
           disableRightSwipe
           disableLeftSwipe={!swipeable}
           onScroll={this.handleScroll.bind(this)}

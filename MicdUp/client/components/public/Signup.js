@@ -1,8 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { changeSignup, showMessage } from "../../redux/actions/display";
+// redux
+import {
+  changeSignup,
+  showMessage,
+  showHeader,
+} from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
+// styles
 import { styles } from "../../styles/Styles";
+//helpers
 import {
   validateUsername,
   validateEmail,
@@ -38,13 +45,18 @@ export class Signup extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.showHeader(true);
+    this.mounted = false;
+  };
 
   onChange = (name, text) => {
     this.mounted && this.setState({ [name]: text });
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.props.showHeader(false);
+  };
 
   async signup() {
     const { email, phone, password, user, date } = this.state;
@@ -188,4 +200,5 @@ export default connect(mapStateToProps, {
   changeSignup,
   register,
   showMessage,
+  showHeader,
 })(Signup);

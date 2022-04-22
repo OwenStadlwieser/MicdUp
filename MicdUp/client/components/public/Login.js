@@ -11,7 +11,7 @@ import { styles } from "../../styles/Styles";
 import { Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 // redux
-import { changeLogin } from "../../redux/actions/display";
+import { changeLogin, showHeader } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
 // components
 import ForgotPassword from "./ForgotPassword";
@@ -30,10 +30,13 @@ export class Login extends Component {
   }
 
   componentWillUnmount = () => {
+    this.props.showHeader(true);
     this.mounted = false;
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.props.showHeader(false);
+  };
 
   login = async () => {
     const { authenticator, password } = this.state;
@@ -104,4 +107,6 @@ export class Login extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { changeLogin, login })(Login);
+export default connect(mapStateToProps, { changeLogin, login, showHeader })(
+  Login
+);

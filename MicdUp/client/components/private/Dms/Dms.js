@@ -8,7 +8,7 @@ import {
   Text,
   Dimensions,
   TouchableWithoutFeedback,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import { Button } from "react-native-paper";
 // helpers
@@ -73,6 +73,7 @@ export class Dms extends Component {
   render() {
     const { chats, showingChat, activeChatId, profile } = this.props;
     const { users, userNames, showDropDown, refreshing } = this.state;
+    console.log(chats);
     const app = activeChatId ? (
       <View style={styles.pane}>
         <Chat />
@@ -184,18 +185,19 @@ export class Dms extends Component {
             )}
           </View>
         )}
-        <ScrollView       
-        refreshControl={
+        <ScrollView
+          refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={async () => {
-                this.mounted && this.setState({ refreshing: true })
-                await this.props.viewChats(0)
-                this.mounted && this.setState({ refreshing: false })
+                this.mounted && this.setState({ refreshing: true });
+                await this.props.viewChats(0);
+                this.mounted && this.setState({ refreshing: false });
               }}
             />
-          } 
-        style={{ zIndex: 1 }}>
+          }
+          style={{ zIndex: 1 }}
+        >
           {chats &&
             chats.length > 0 &&
             chats.map((chat, index) => (
@@ -212,21 +214,23 @@ export class Dms extends Component {
                 {chat &&
                   chat.members &&
                   chat.members.length > 0 &&
-                  chat.members.map((member, index) => (
-                    <View key={index} style={styles.messageMember}>
-                      <Image
-                        source={
-                          member && member.image
-                            ? { uri: member.image.signedUrl }
-                            : require("../../../assets/no-profile-pic-icon-27.jpg")
-                        }
-                        style={styles.commentImg}
-                      />
-                      <Text style={styles.listItemTextUser}>
-                        {member.user.userName}
-                      </Text>
-                    </View>
-                  ))}
+                  chat.members
+                    .filter((member) => member)
+                    .map((member, index) => (
+                      <View key={index} style={styles.messageMember}>
+                        <Image
+                          source={
+                            member && member.image
+                              ? { uri: member.image.signedUrl }
+                              : require("../../../assets/no-profile-pic-icon-27.jpg")
+                          }
+                          style={styles.commentImg}
+                        />
+                        <Text style={styles.listItemTextUser}>
+                          {member.user.userName}
+                        </Text>
+                      </View>
+                    ))}
               </TouchableOpacity>
             ))}
         </ScrollView>

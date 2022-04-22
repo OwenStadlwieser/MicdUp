@@ -9,6 +9,15 @@ const UPDATE_PROFILE_PIC_MUTATION = gql`
   }
 `;
 
+const BLOCK_PROFILE_MUTATION = gql`
+  mutation blockProfile($profileId: ID!, $blocking: Boolean!) {
+    blockProfile(profileId: $profileId, blocking: $blocking) {
+      success
+      message
+    }
+  }
+`;
+
 const FOLLOW_PROFILE_MUTATION = gql`
   mutation followProfile($profileId: ID!) {
     followProfile(profileId: $profileId) {
@@ -83,4 +92,5 @@ export {
   GET_PRIVATES_QUERY,
   GET_FOLLOWING_QUERY,
   ADD_TO_PRIVATES_MUTATION,
+  BLOCK_PROFILE_MUTATION,
 };

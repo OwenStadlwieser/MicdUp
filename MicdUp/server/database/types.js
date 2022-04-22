@@ -17,7 +17,11 @@ const {
   GraphQLFloat,
 } = graphql;
 const { getFile } = require("../utils/awsS3");
-const { checkIfIsInPrivateList } = require("../utils/securityHelpers");
+const {
+  checkIfIsInPrivateList,
+  checkIfBlocked,
+  profileCheckForBlocked,
+} = require("../utils/securityHelpers");
 
 const UserPrivateType = new GraphQLObjectType({
   name: "UserPrivateType",
@@ -25,7 +29,7 @@ const UserPrivateType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id;
       },
     },
@@ -36,13 +40,13 @@ const UserPrivateType = new GraphQLObjectType({
     dateCreated: { type: GraphQLFloat },
     profile: {
       type: ProfilePrivateType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.profile);
       },
     },
     type: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.__t;
       },
     },
@@ -55,14 +59,14 @@ const UserPublicType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id;
       },
     },
     userName: { type: GraphQLString },
     profile: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.profile);
       },
     },
@@ -74,45 +78,48 @@ const ProfilePrivateType = new GraphQLObjectType({
   fields: () => ({
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.id;
       },
     },
+    blocked: {
+      type: new GraphQLList(GraphQLID),
+    },
     posts: {
       type: new GraphQLList(PostType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Post.find({ _id: { $in: parent.posts } });
       },
     },
     bio: {
       type: FileType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.bio });
         return res;
       },
     },
     image: {
       type: FileType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.image });
         return res;
       },
     },
     user: {
       type: UserPrivateType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await User.findById(parent.user);
       },
     },
     followingCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return Array.from(parent.following.keys()).length;
       },
     },
     followersCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return Array.from(parent.followers.keys()).length;
       },
     },
@@ -144,7 +151,7 @@ const ProfilePrivateType = new GraphQLObjectType({
     },
     privatesCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return Array.from(parent.privates.keys()).length;
       },
     },
@@ -162,51 +169,74 @@ const ProfilePublicType = new GraphQLObjectType({
   fields: () => ({
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.id;
       },
     },
     posts: {
       type: new GraphQLList(PostType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return [];
+        }
         return await Post.find({ _id: { $in: parent.posts } });
       },
     },
     bio: {
       type: FileType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.bio });
+        console.log(profileCheckForBlocked(context, parent), 123424);
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return null;
+        }
         return res;
       },
     },
     image: {
       type: FileType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.image });
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return null;
+        }
         return res;
       },
     },
     user: {
       type: UserPublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
+        if (profileCheckForBlocked(context, parent) < 0) {
+          console.log(profileCheckForBlocked(context, parent));
+          return null;
+        }
         return await User.findById(parent.user);
       },
     },
     followingCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return 0;
+        }
         return Array.from(parent.following.keys()).length;
       },
     },
     followersCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return 0;
+        }
         return Array.from(parent.followers.keys()).length;
       },
     },
     privatesCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return 0;
+        }
         return Array.from(parent.privates.keys()).length;
       },
     },
@@ -215,6 +245,9 @@ const ProfilePublicType = new GraphQLObjectType({
       async resolve(parent, args, context, info) {
         const skip = context.skipMult ? context.skipMult : 0;
         const keys = Array.from(parent.followers.keys());
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return [];
+        }
         return await Profile.find({ _id: { $in: keys } }).skip(skip);
       },
     },
@@ -223,6 +256,9 @@ const ProfilePublicType = new GraphQLObjectType({
       async resolve(parent, args, context, info) {
         const skip = context.skipMult ? context.skipMult : 0;
         const keys = Array.from(parent.following.keys());
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return [];
+        }
         return await Profile.find({ _id: { $in: keys } }).skip(skip);
       },
     },
@@ -254,6 +290,9 @@ const ProfilePublicType = new GraphQLObjectType({
           !context.profile.id
         )
           return false;
+        if (profileCheckForBlocked(context, parent) < 0) {
+          return false;
+        }
         const index = parent.privates.get(context.profile.id);
         return index === "1";
       },
@@ -267,7 +306,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
     id: { type: GraphQLID },
     owner: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.owner);
       },
     },
@@ -285,7 +324,7 @@ const CommentWithoutReplyType = new GraphQLObjectType({
     text: { type: GraphQLString },
     signedUrl: {
       type: GraphQLString,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         var d1 = new Date();
         d1.toUTCString();
         if (!parent.fileExtension) {
@@ -307,13 +346,13 @@ const CommentWithoutReplyType = new GraphQLObjectType({
     },
     filePath: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id + parent.fileExtension;
       },
     },
     likers: {
       type: new GraphQLList(ProfilePublicType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.find({ _id: { $in: parent.likers } });
       },
     },
@@ -343,7 +382,7 @@ const CommentType = new GraphQLObjectType({
     id: { type: GraphQLID },
     owner: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.owner);
       },
     },
@@ -361,7 +400,7 @@ const CommentType = new GraphQLObjectType({
     isDeleted: { type: GraphQLBoolean },
     replies: {
       type: new GraphQLList(CommentWithoutReplyType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await Comment.find({ _id: { $in: parent.replies } }).sort({
           dateCreated: -1,
         });
@@ -370,15 +409,29 @@ const CommentType = new GraphQLObjectType({
     },
     allReplies: {
       type: new GraphQLList(CommentType),
-      async resolve(parent) {
-        return await Comment.find({ _id: { $in: parent.replies } }).sort({
+      async resolve(parent, args, context, info) {
+        let blocked = [];
+        let blockedBy = [];
+        if (context.profile) {
+          blocked = [...context.profile.blockedMap.keys()];
+          blockedBy = [...context.profile.blockedByMap.keys()];
+        }
+        return await Comment.find({
+          $and: [
+            {
+              _id: { $in: parent.replies },
+            },
+            { owner: { $nin: blocked } },
+            { owner: { $nin: blockedBy } },
+          ],
+        }).sort({
           dateCreated: -1,
         });
       },
     },
     repliesLength: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.replies.length;
       },
     },
@@ -386,7 +439,7 @@ const CommentType = new GraphQLObjectType({
     text: { type: GraphQLString },
     signedUrl: {
       type: GraphQLString,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         var d1 = new Date();
         d1.toUTCString();
         if (!parent.fileExtension) {
@@ -408,13 +461,13 @@ const CommentType = new GraphQLObjectType({
     },
     filePath: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id + parent.fileExtension;
       },
     },
     likers: {
       type: new GraphQLList(ProfilePublicType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.find({ _id: { $in: parent.likers } });
       },
     },
@@ -443,20 +496,20 @@ const PostType = new GraphQLObjectType({
   fields: () => ({
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id;
       },
     },
     tags: {
       type: new GraphQLList(TagsType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Tag.find({ _id: { $in: parent.tags } });
       },
     },
     title: { type: GraphQLString },
     owner: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.owner);
       },
     },
@@ -471,9 +524,6 @@ const PostType = new GraphQLObjectType({
         })
       ),
       async resolve(parent, args, context, info) {
-        if (!parent.privatePost) {
-          return parent.speechToText;
-        }
         const index = await checkIfIsInPrivateList(context, parent);
         if (index > -1) {
           return parent.speechToText;
@@ -490,9 +540,7 @@ const PostType = new GraphQLObjectType({
       async resolve(parent, a, context, i) {
         var d1 = new Date();
         d1.toUTCString();
-        const index = parent.privatePost
-          ? await checkIfIsInPrivateList(context, parent)
-          : 1;
+        const index = await checkIfIsInPrivateList(context, parent);
         if (index < 0) return "";
         if (
           parent.signedUrl &&
@@ -510,16 +558,14 @@ const PostType = new GraphQLObjectType({
     },
     filePath: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id + parent.fileExtension;
       },
     },
     hashTags: {
       type: new GraphQLList(TagsType),
       async resolve(parent, a, context, i) {
-        const index = parent.privatePost
-          ? await checkIfIsInPrivateList(context, parent)
-          : 1;
+        const index = await checkIfIsInPrivateList(context, parent);
         if (index < 0) return [];
         return await Tag.find({ _id: { $in: parent.hashTags } });
       },
@@ -527,9 +573,7 @@ const PostType = new GraphQLObjectType({
     likers: {
       type: new GraphQLList(ProfilePublicType),
       async resolve(parent, a, context, i) {
-        const index = parent.privatePost
-          ? await checkIfIsInPrivateList(context, parent)
-          : 1;
+        const index = await checkIfIsInPrivateList(context, parent);
         if (index < 0) return [];
         return await Profile.find({ _id: { $in: parent.likers } });
       },
@@ -537,11 +581,23 @@ const PostType = new GraphQLObjectType({
     comments: {
       type: new GraphQLList(CommentType),
       async resolve(parent, a, context, i) {
-        const index = parent.privatePost
-          ? await checkIfIsInPrivateList(context, parent)
-          : 1;
+        console.log("hereee");
+        let blocked = [];
+        let blockedBy = [];
+        if (context.profile) {
+          blocked = [...context.profile.blockedMap.keys()];
+          blockedBy = [...context.profile.blockedByMap.keys()];
+        }
+        console.log(blocked, blockedBy);
+        const index = await checkIfIsInPrivateList(context, parent);
         if (index < 0) return [];
-        return await Comment.find({ _id: { $in: parent.comments } });
+        return await Comment.find({
+          $and: [
+            { _id: { $in: parent.comments } },
+            { owner: { $nin: blocked } },
+            { owner: { $nin: blockedBy } },
+          ],
+        });
       },
     },
     likes: {
@@ -576,19 +632,19 @@ const ChatType = new GraphQLObjectType({
     id: { type: GraphQLID },
     creator: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.creator);
       },
     },
     members: {
       type: new GraphQLList(ProfilePublicType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.find({ _id: { $in: parent.members } });
       },
     },
     chatMessages: {
       type: new GraphQLList(ChatMessageType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const size = 20;
         const skipMult = 0;
         return await Chat.find({ _id: { $in: parent.messages } })
@@ -606,7 +662,7 @@ const ChatMessageType = new GraphQLObjectType({
     id: { type: GraphQLID },
     owner: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.owner);
       },
     },
@@ -636,13 +692,13 @@ const ChatMessageType = new GraphQLObjectType({
     },
     likersCount: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return Array.from(parent.likers.keys()).length;
       },
     },
     signedUrl: {
       type: GraphQLString,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         var d1 = new Date();
         d1.toUTCString();
         if (
@@ -661,7 +717,7 @@ const ChatMessageType = new GraphQLObjectType({
     },
     filePath: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id + parent.fileExtension;
       },
     },
@@ -677,7 +733,7 @@ const FilterType = new GraphQLObjectType({
   fields: () => ({
     id: {
       type: GraphQLID,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id;
       },
     },
@@ -689,13 +745,13 @@ const FilterType = new GraphQLObjectType({
     },
     posts: {
       type: new GraphQLList(PostType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Post.find({ _id: { $in: parent.posts } });
       },
     },
     image: {
       type: FileType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.image });
         return res;
       },
@@ -726,7 +782,7 @@ const FileType = new GraphQLObjectType({
     id: { type: GraphQLID },
     owner: {
       type: ProfilePublicType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Profile.findById(parent.owner);
       },
     },
@@ -743,7 +799,7 @@ const FileType = new GraphQLObjectType({
     },
     signedUrl: {
       type: GraphQLString,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         var d1 = new Date();
         d1.toUTCString();
         if (
@@ -762,7 +818,7 @@ const FileType = new GraphQLObjectType({
     },
     filePath: {
       type: GraphQLString,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent._id + parent.fileExtension;
       },
     },
@@ -796,13 +852,13 @@ const TagsType = new GraphQLObjectType({
     title: { type: GraphQLString },
     count: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.posts.length;
       },
     },
     posts: {
       type: new GraphQLList(PostType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Post.find({ _id: { $in: parent.posts } });
       },
     },
@@ -829,19 +885,19 @@ const PromptsType = new GraphQLObjectType({
     prompt: { type: GraphQLString },
     tag: {
       type: TagsType,
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Tag.findById(parent.tag);
       },
     },
     count: {
       type: GraphQLInt,
-      resolve(parent) {
+      resolve(parent, args, context, info) {
         return parent.posts.length;
       },
     },
     posts: {
       type: new GraphQLList(PostType),
-      async resolve(parent) {
+      async resolve(parent, args, context, info) {
         return await Post.find({ _id: { $in: parent.posts } });
       },
     },

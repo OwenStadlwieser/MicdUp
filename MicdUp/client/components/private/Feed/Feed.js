@@ -228,7 +228,7 @@ export class Feed extends Component {
             ]}
           >
             <SwipeListView
-              data={postsToView}
+              data={postsToView ? postsToView.filter((n) => n) : []}
               disableRightSwipe
               disableLeftSwipe={!outerScrollEnabled}
               onScroll={this.handleScroll.bind(this)}

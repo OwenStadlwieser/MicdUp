@@ -14,8 +14,35 @@ import {
   GET_PRIVATES_QUERY,
   ADD_TO_PRIVATES_MUTATION,
   GET_FOLLOWING_QUERY,
+  BLOCK_PROFILE_MUTATION,
 } from "../../apollo/private/profile";
 
+export const blockProfile = (profileId, blocking) => async (dispatch) => {
+  const res = await privateClient.mutate({
+    mutation: BLOCK_PROFILE_MUTATION,
+    variables: {
+      profileId,
+      blocking,
+    },
+    fetchPolicy: "no-cache",
+  });
+  if (!res.data || !res.data.blockProfile) {
+    dispatch(
+      showMessage({
+        success: false,
+        message: "Something went wrong. Please contact support.",
+      })
+    );
+    return !blocking;
+  }
+  dispatch(
+    showMessage({
+      success: res.data.blockProfile.success,
+      message: res.data.blockProfile.message,
+    })
+  );
+  return blocking;
+};
 export const followProfile =
   (profileId, followingFromProfile = true) =>
   async (dispatch) => {

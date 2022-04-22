@@ -2,8 +2,13 @@ const mongoose = require("mongoose");
 const { Profile } = require("../../models/Profile");
 const { Tag } = require("../../models/Tag");
 const { File } = require("../../models/File");
-const { GraphQLString, GraphQLID } = require("graphql");
-const { FileType, ProfilePublicType, TagsType } = require("../../types");
+const { GraphQLString, GraphQLID, GraphQLBoolean } = require("graphql");
+const {
+  FileType,
+  ProfilePublicType,
+  TagsType,
+  MessageType,
+} = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
 const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 const updateProfilePic = {
@@ -68,7 +73,13 @@ const followProfile = {
     session.startTransaction();
     try {
       const profile = context.profile;
-      const foreignProfile = await Profile.findById(profileId);
+      const foreignProfile = await Profile.findOne({
+        _id: profileId,
+        $not: { blockedBy: { $all: [context.profile.id] } },
+      });
+      if (!foreignProfile) {
+        throw new Error("No owner");
+      }
       if (foreignProfile.followers.get(`${profile._id}`)) {
         foreignProfile.followers.delete(`${profile._id}`);
         profile.following.delete(`${foreignProfile._id}`);
@@ -133,6 +144,51 @@ const followTopic = {
   },
 };
 
+const blockProfile = {
+  type: MessageType,
+  args: {
+    profileId: { type: GraphQLID },
+    blocking: { type: GraphQLBoolean },
+  },
+  async resolve(parent, { profileId, blocking }, context) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const profile = context.profile;
+      let returnObject = {};
+      if (profile.id === profileId.toString()) {
+        returnObject.success = false;
+        returnObject.message = "Cannot block self";
+      }
+      if (blocking) {
+        profile.blockedMap.set(`${profileId}`, "1");
+        profile.following.delete(`${profileId}`);
+        profile.privates.delete(`${profileId}`);
+        const foreignProfile = await Profile.findById(profileId);
+        foreignProfile.blockedByMap.set(`${profile.id}`, "1");
+        foreignProfile.followers.delete(`${profile.id}`);
+        foreignProfile.following.delete(`${profile.id}`);
+        foreignProfile.privates.delete(`${profile.id}`);
+        await profile.save({ session });
+        await foreignProfile.save({ session });
+        returnObject.success = true;
+        returnObject.message = "Blocked";
+      } else {
+        foreignProfile.delete.set(`${profile.id}`);
+        profile.blockedMap.delete(`${profileId}`);
+        await profile.save();
+        returnObject.success = true;
+        returnObject.message = "Unblocked";
+      }
+      await session.commitTransaction();
+      return returnObject;
+    } catch (err) {
+      await session.abortTransaction();
+    }
+    session.endSession();
+  },
+};
+
 const addToPrivates = {
   type: ProfilePublicType,
   args: {
@@ -174,4 +230,5 @@ module.exports = {
   followProfile,
   addToPrivates,
   followTopic,
+  blockProfile,
 };

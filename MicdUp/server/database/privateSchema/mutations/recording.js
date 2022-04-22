@@ -285,9 +285,17 @@ const likePost = {
       );
       return post;
     });
-    const privatePermissionIndex = post.privatePost
-      ? await checkIfIsInPrivateList(context, post)
-      : 1;
+    const privatePermissionIndex = await checkIfIsInPrivateList(
+      context,
+      parent
+    );
+    const owner = await Profile.findOne({
+      _id: post.owner,
+      $not: { blockedBy: { $all: [context.profile.id] } },
+    });
+    if (!owner) {
+      throw new Error("No owner");
+    }
     // does not have permission to like this post
     if (privatePermissionIndex < 0) {
       return post;
@@ -401,9 +409,17 @@ const commentToPost = {
     const post = await Post.findOne({
       _id: postId,
     });
-    const privatePermissionIndex = post.privatePost
-      ? await checkIfIsInPrivateList(context, post)
-      : 1;
+    const owner = await Profile.findOne({
+      _id: post.owner,
+      $not: { blockedBy: { $all: [context.profile.id] } },
+    });
+    if (!owner) {
+      throw new Error("No owner");
+    }
+    const privatePermissionIndex = await checkIfIsInPrivateList(
+      context,
+      parent
+    );
     if (privatePermissionIndex < 0) {
       return {};
     }

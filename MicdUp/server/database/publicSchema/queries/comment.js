@@ -19,7 +19,19 @@ const getReplies = {
   args: { commentId: { type: GraphQLID } },
   async resolve(parent, { commentId }, context) {
     try {
-      return await Comment.findById(commentId);
+      let blockedBy = [];
+      let blocked = [];
+      if (context.profile) {
+        blocked = [...context.profile.blockedMap.keys()];
+        blockedBy = [...context.profile.blockedByMap.keys()];
+      }
+      return await Comment.find({
+        $and: [
+          { _id: commentId },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
+      });
     } catch (err) {}
   },
 };

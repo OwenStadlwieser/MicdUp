@@ -31,13 +31,22 @@ const getFollowingFeed = {
       ) {
         return;
       }
+      console.log(context.profile.blockedMap);
+      let blocked = [...context.profile.blockedMap.keys()];
+      let blockedBy = [...context.profile.blockedByMap.keys()];
       let following = context.profile.following.keys();
-      return await Post.find({
-        owner: { $in: Array.from(following) },
+      let res = await Post.find({
+        $and: [
+          { owner: { $in: Array.from(following) } },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
       })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
+      console.log(res, blocked);
+      return res;
     } catch (err) {
       console.log(err);
     }
@@ -57,9 +66,15 @@ const getFollowingTopicsFeed = {
       ) {
         return;
       }
+      let blocked = [...context.profile.blockedMap.keys()];
+      let blockedBy = [...context.profile.blockedByMap.keys()];
       let following = context.profile.followingTopics.keys();
       return await Post.find({
-        tags: { $in: Array.from(following) },
+        $and: [
+          { owner: { $in: Array.from(following) } },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
       })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)

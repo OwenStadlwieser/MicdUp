@@ -28,7 +28,7 @@ export const getFollowingFeed = (skipMult) => async (dispatch) => {
     dispatch({
       type: SET_POSTS,
       payload: {
-        posts: res.data.getFollowingFeed,
+        posts: res.data.getFollowingFeed.filter((el) => el),
         userId: "FOLLOWINGFEED",
       },
     });
@@ -59,11 +59,11 @@ export const getTopicsFeed = (skipMult) => async (dispatch) => {
     dispatch({
       type: SET_POSTS,
       payload: {
-        posts: res.data.getFollowingTopicsFeed,
+        posts: res.data.getFollowingTopicsFeed.filter((el) => el),
         userId: "TOPICSFEED",
       },
     });
-    return res.data.getTopicsgetFollowingTopicsFeedFeed;
+    return res.data.getFollowingTopicsFeed;
   } catch (err) {
     console.log(err);
   }
@@ -91,7 +91,7 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
     dispatch({
       type: SET_POSTS,
       payload: {
-        posts: res.data.getNotLoggedInFeed,
+        posts: res.data.getNotLoggedInFeed.filter((el) => el),
         userId: "NOTLOGGEDINFEED",
       },
     });

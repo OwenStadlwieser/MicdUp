@@ -1,7 +1,7 @@
 const { User } = require("../../models/User");
 const { UserPublicType } = require("../../types");
 const { GraphQLList, GraphQLString, GraphQLInt } = require("graphql");
-
+const { getFilteredResults } = require("../../../utils/securityHelpers");
 const searchUsers = {
   type: new GraphQLList(UserPublicType),
   args: { searchTerm: { type: GraphQLString }, skipMult: { type: GraphQLInt } },
@@ -36,6 +36,7 @@ const searchUsers = {
       ])
         .skip(size * skipMult)
         .limit(size);
+
       return res;
     } catch (err) {
       console.log(err);

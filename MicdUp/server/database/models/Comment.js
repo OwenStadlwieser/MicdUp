@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { getCurrentTime } = require("../../reusableFunctions/helpers");
 const Schema = mongoose.Schema;
+const { getFilteredResults } = require("../../utils/securityHelpers");
 // Create Schema
 const commentSchema = new Schema({
   owner: {
@@ -63,6 +64,10 @@ const commentSchema = new Schema({
     },
   ],
 });
+
+// commentSchema.post("find", async function (result) {
+//   return await getFilteredResults(result);
+// });
 
 commentSchema.pre("save", async function (next) {
   if (this.isModified("isDeleted") && this.isDeleted) {

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   TouchableOpacity,
@@ -32,6 +32,7 @@ import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualiza
 import { SwipeListView } from "react-native-swipe-list-view";
 import ListOfAccounts from "../../reuseable/ListOfAccounts";
 import GestureRecognizer from "react-native-swipe-gestures";
+import OtherUserSettings from "../../reuseable/OtherUserSettings";
 // redux
 import {
   getUserPosts,
@@ -226,6 +227,7 @@ export class Profile extends Component {
       showingListOfAccounts,
       listOfAccountsParams,
       refreshing,
+      otherUserSettings,
     } = this.state;
     const {
       userName,
@@ -256,7 +258,17 @@ export class Profile extends Component {
         />
       );
     }
-
+    if (otherUserSettings) {
+      return (
+        <OtherUserSettings
+          currentProfile={currentProfile}
+          userName={userName}
+          setHidden={() => {
+            this.mounted && this.setState({ otherUserSettings: false });
+          }}
+        ></OtherUserSettings>
+      );
+    }
     return (
       <View
         style={{
@@ -273,7 +285,9 @@ export class Profile extends Component {
         {!settingsShown && !showingComments && (
           <Ionicons
             onPress={() => {
-              isUserProfile ? this.mounted && this.setState({ settingsShown: true }) : this.mounted && this.setState({ blockUser: true })
+              isUserProfile
+                ? this.mounted && this.setState({ settingsShown: true })
+                : this.mounted && this.setState({ otherUserSettings: true });
             }}
             name="settings-outline"
             size={24}
@@ -469,7 +483,7 @@ export class Profile extends Component {
               </View>
             </GestureRecognizer>
             <SwipeListView
-              data={posts}
+              data={posts ? posts.filter((i) => i) : []}
               disableRightSwipe
               disableLeftSwipe={!isUserProfile || !outerScrollEnabled}
               onScroll={this.handleScroll.bind(this)}
@@ -481,7 +495,7 @@ export class Profile extends Component {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={() => {
-                    this.getPosts(true)
+                    this.getPosts(true);
                   }}
                 />
               }

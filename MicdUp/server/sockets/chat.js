@@ -125,8 +125,14 @@ exports = module.exports = function (io) {
           returnMessage.owner.user = {};
           returnMessage.owner.user._id = user._id;
           returnMessage.owner.user.userName = user.userName;
-          console.log(chatId, returnMessage);
-          io.to(chatId).emit("new message", returnMessage, chat._id);
+          let blocked_member = false;
+          for (member in chat.members) {
+            if (profileDoc.blockedMap.get(`${member}`)) {
+              blocked_member = true;
+            }
+          }
+          !blocked_member &&
+            io.to(chatId).emit("new message", returnMessage, chat._id);
         } catch (err) {
           console.log(err);
           await session.abortTransaction();
