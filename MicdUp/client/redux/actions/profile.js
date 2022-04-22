@@ -4,6 +4,7 @@ import {
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
   UPDATE_PRIVATE_COUNT_FROM_LIST,
+  CURRENT_PROFILE_BLOCKED,
 } from "../types";
 import { privateClient, publicClient } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -34,6 +35,12 @@ export const blockProfile = (profileId, blocking) => async (dispatch) => {
       })
     );
     return !blocking;
+  }
+  if (res.data.blockProfile.success) {
+    dispatch({
+      type: CURRENT_PROFILE_BLOCKED,
+      payload: blocking,
+    });
   }
   dispatch(
     showMessage({

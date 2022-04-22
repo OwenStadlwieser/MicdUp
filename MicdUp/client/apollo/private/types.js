@@ -13,6 +13,7 @@ image {
   id
   signedUrl
 }
+isBlockedByUser
 `;
 
 const tagType = `_id

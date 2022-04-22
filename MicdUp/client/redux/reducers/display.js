@@ -19,6 +19,7 @@ import {
   ADD_LOADING,
   VIEW_TAG_SEARCH,
   SHOW_HEADER,
+  CURRENT_PROFILE_BLOCKED,
 } from "../types";
 
 const initialState = {
@@ -112,6 +113,14 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         showSignup: payload,
+      };
+    case CURRENT_PROFILE_BLOCKED:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          isBlockedByUser: payload,
+        },
       };
     case DISPLAY_MESSAGE:
       return {

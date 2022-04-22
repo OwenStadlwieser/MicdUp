@@ -82,6 +82,12 @@ const ProfilePrivateType = new GraphQLObjectType({
         return parent.id;
       },
     },
+    isBlockedByUser: {
+      type: GraphQLBoolean,
+      resolve() {
+        return false;
+      },
+    },
     blocked: {
       type: new GraphQLList(GraphQLID),
     },
@@ -186,7 +192,6 @@ const ProfilePublicType = new GraphQLObjectType({
       type: FileType,
       async resolve(parent, args, context, info) {
         const res = await File.findOne({ _id: parent.bio });
-        console.log(profileCheckForBlocked(context, parent), 123424);
         if (profileCheckForBlocked(context, parent) < 0) {
           return null;
         }
@@ -207,7 +212,6 @@ const ProfilePublicType = new GraphQLObjectType({
       type: UserPublicType,
       async resolve(parent, args, context, info) {
         if (profileCheckForBlocked(context, parent) < 0) {
-          console.log(profileCheckForBlocked(context, parent));
           return null;
         }
         return await User.findById(parent.user);
@@ -229,6 +233,21 @@ const ProfilePublicType = new GraphQLObjectType({
           return 0;
         }
         return Array.from(parent.followers.keys()).length;
+      },
+    },
+    isBlockedByUser: {
+      type: GraphQLBoolean,
+      resolve(parent, args, context, info) {
+        if (context.profile) {
+          let blocked = [...context.profile.blockedMap.keys()];
+          console.log(blocked, parent.id);
+          return (
+            blocked.findIndex(
+              (blockedmember) => blockedmember.toString() === parent.id
+            ) > -1
+          );
+        }
+        return false;
       },
     },
     privatesCount: {

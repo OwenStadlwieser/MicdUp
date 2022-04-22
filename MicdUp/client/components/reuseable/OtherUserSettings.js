@@ -29,7 +29,10 @@ export class OtherUserSetttings extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("OTHERSETTING");
+    this.mounted = false;
+  };
 
   componentDidMount = () => {};
 
@@ -38,7 +41,6 @@ export class OtherUserSetttings extends Component {
   };
 
   render() {
-    const { blocking } = this.state;
     return (
       <TouchableOpacity
         onPress={() => {
@@ -50,11 +52,17 @@ export class OtherUserSetttings extends Component {
           <Button
             color="red"
             style={[styles.button, { width: "auto", marginTop: 0 }]}
-            onPress={() => {
-              this.props.blockProfile(this.props.currentProfile.id, blocking);
+            onPress={async () => {
+              this.props.addLoading("OTHERSETTING");
+              await this.props.blockProfile(
+                this.props.currentProfile.id,
+                !this.props.currentProfile.isBlockedByUser
+              );
+              this.props.removeLoading("OTHERSETTING");
             }}
           >
-            Block {this.props.userName}
+            {this.props.currentProfile.isBlockedByUser ? "Unblock" : "Block"}{" "}
+            {this.props.userName}
           </Button>
         </TouchableOpacity>
       </TouchableOpacity>

@@ -160,11 +160,11 @@ const blockProfile = {
         returnObject.success = false;
         returnObject.message = "Cannot block self";
       }
+      const foreignProfile = await Profile.findById(profileId);
       if (blocking) {
         profile.blockedMap.set(`${profileId}`, "1");
         profile.following.delete(`${profileId}`);
         profile.privates.delete(`${profileId}`);
-        const foreignProfile = await Profile.findById(profileId);
         foreignProfile.blockedByMap.set(`${profile.id}`, "1");
         foreignProfile.followers.delete(`${profile.id}`);
         foreignProfile.following.delete(`${profile.id}`);
@@ -174,7 +174,7 @@ const blockProfile = {
         returnObject.success = true;
         returnObject.message = "Blocked";
       } else {
-        foreignProfile.delete.set(`${profile.id}`);
+        foreignProfile.blockedByMap.delete(`${profile.id}`);
         profile.blockedMap.delete(`${profileId}`);
         await profile.save();
         returnObject.success = true;
