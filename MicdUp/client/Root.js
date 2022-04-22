@@ -148,9 +148,11 @@ export class Root extends Component {
                 component={LoginManager}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen  
-              initialParams={{ post: cachedPosts[currentKey][postIndex] }} 
-              name="Comment" component={Comment} />
+              <Stack.Screen
+                initialParams={{ post: cachedPosts[currentKey][postIndex] }}
+                name="Comment"
+                component={Comment}
+              />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
             </Stack.Navigator>
@@ -181,6 +183,7 @@ export class Root extends Component {
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
+          <Dashboard></Dashboard>
           {showHeader && (
             <Fragment>
               <SoundPlayer />
