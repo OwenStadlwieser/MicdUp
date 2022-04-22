@@ -25,6 +25,7 @@ const postWidth = width > 1000 ? width * 0.8 : width;
 const listItemHeight = height * 0.08;
 const listItemHeight2X = listItemHeight * 2;
 const contentPaneHeight = height * 0.875;
+const contentPaneWithHeaderHeight = height * 0.8;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -40,7 +41,6 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     flex: 10,
-    paddingTop: height * 0.125,
   },
   searchTags: {
     display: "flex",
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   commentParent: {},
   commentOpenContainer: {
-    height: contentPaneHeight,
+    height: contentPaneWithHeaderHeight,
     backgroundColor: "white",
     borderWidth: 2,
     borderStyle: "solid",
