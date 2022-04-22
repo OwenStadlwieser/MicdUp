@@ -19,9 +19,7 @@ import {
 
 import { createNavigationContainerRef } from "@react-navigation/native";
 export const navigationRef = createNavigationContainerRef();
-navigationRef.addListener("transitionStart", (e) => (dispatch) => {
-  console.log(e);
-});
+
 export const setCurrentKey = (payload) => (dispatch) => {
   dispatch({
     type: SET_CURRENT_KEY,
@@ -90,7 +88,6 @@ export const showHeader = (payload) => (dispatch) => {
 };
 export const navigate = (payload) => (dispatch) => {
   if (navigationRef.isReady()) {
-    console.log(payload);
     navigationRef.navigate(payload);
   }
   dispatch({

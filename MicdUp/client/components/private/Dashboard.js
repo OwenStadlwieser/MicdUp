@@ -87,7 +87,9 @@ export class Dashboard extends Component {
             screenListeners={{
               state: (e) => {
                 // Do something with the state
-                this.props.navigateStateChanged(e.data);
+                this.props.navigateStateChanged(
+                  e.data.state.routeNames[e.data.state.index]
+                );
               },
             }}
             initialRouteName={mountedComponent}

@@ -27,6 +27,7 @@ export class NavBar extends Component {
 
   render() {
     const { mountedComponent } = this.props;
+    console.log(mountedComponent);
     return (
       <View style={styles.navbar}>
         <TouchableOpacity
