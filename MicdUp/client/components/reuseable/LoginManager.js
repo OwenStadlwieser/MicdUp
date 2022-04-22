@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Button } from "react-native-paper";
+// redux
 import { navigate } from "../../redux/actions/display";
-
+// styles
+import { styles } from "../../styles/Styles";
 export class LoginManager extends Component {
   constructor() {
     super();
@@ -39,7 +43,6 @@ export class LoginManager extends Component {
           </Button>
           <StatusBar style="auto" />
         </View>
-        <Navbar />
       </View>
     );
   }

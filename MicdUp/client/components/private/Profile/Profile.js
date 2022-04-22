@@ -93,8 +93,11 @@ export class Profile extends Component {
   };
 
   async handleScroll(event) {
-    const { getUserPosts, id, cachedPosts } = this.props;
+    const { getUserPosts, cachedPosts } = this.props;
     const { loading, prevLength } = this.state;
+    const { id } = this.props.route.params
+      ? this.props.route.params
+      : this.props;
     const posts = cachedPosts[id];
     try {
       if (
@@ -114,7 +117,10 @@ export class Profile extends Component {
   }
 
   async onSwipeDown(gestureState) {
-    const { getUserPosts, id, clearPosts } = this.props;
+    const { getUserPosts, clearPosts } = this.props;
+    const { id } = this.props.route.params
+      ? this.props.route.params
+      : this.props;
     if (this.state.loading) return;
     this.props.addLoading("Profile");
     await clearPosts(id);
@@ -174,8 +180,10 @@ export class Profile extends Component {
   };
 
   getPosts = async (fromRefresh = false) => {
-    const { getUserPosts, cachedPosts, id } = this.props;
-    console.log("getting posts");
+    const { getUserPosts, cachedPosts } = this.props;
+    const { id } = this.props.route.params
+      ? this.props.route.params
+      : this.props;
     this.props.setCurrentKey(id);
     this.mounted && this.setState({ refreshing: true });
     const posts = cachedPosts[id];
@@ -229,20 +237,16 @@ export class Profile extends Component {
       refreshing,
       otherUserSettings,
     } = this.state;
-    const {
-      userName,
-      profile,
-      currentProfile,
-      showingComments,
-      backArrow,
-      id,
-      cachedPosts,
-    } = this.props;
+    const { profile, currentProfile, showingComments, backArrow, cachedPosts } =
+      this.props;
+    const { userName, id } = this.props.route.params
+      ? this.props.route.params
+      : this.props;
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
     const posts = cachedPosts[id];
     if (!profile && !currentProfile) {
       return (
-        <View>
+        <View key={this.props.route.params.key}>
           <Text>Loading</Text>
         </View>
       );
@@ -250,6 +254,7 @@ export class Profile extends Component {
     if (showingListOfAccounts) {
       return (
         <ListOfAccounts
+          key={this.props.route.params.key}
           hideList={() => {
             this.mounted && this.setState({ showingListOfAccounts: false });
           }}
@@ -261,6 +266,7 @@ export class Profile extends Component {
     if (otherUserSettings) {
       return (
         <OtherUserSettings
+          key={this.props.route.params.key}
           currentProfile={currentProfile}
           userName={userName}
           setHidden={() => {
@@ -275,6 +281,7 @@ export class Profile extends Component {
           flex: 1,
           backgroundColor: this.state.backgroundColor,
         }}
+        key={this.props.route.params.key}
       >
         {selectImage && (
           <ImagePicker

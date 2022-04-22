@@ -75,6 +75,7 @@ export class Dashboard extends Component {
 
   render() {
     const { mountedComponent, user, keyForSearch, profile } = this.props;
+
     return (
       <Fragment>
         <NavigationContainer
@@ -87,6 +88,8 @@ export class Dashboard extends Component {
             screenListeners={{
               state: (e) => {
                 // Do something with the state
+                console.log(e.data);
+
                 this.props.navigateStateChanged(
                   e.data.state.routeNames[e.data.state.index]
                 );
@@ -97,12 +100,12 @@ export class Dashboard extends Component {
             <Stack.Screen
               name="Feed"
               component={Feed}
-              key={this.props.loggedIn}
+              initialParams={{ key: this.props.loggedIn }}
               options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Search"
-              key={keyForSearch}
+              initialParams={{ key: keyForSearch }}
               component={Search}
               options={{ headerShown: false }}
             />
@@ -120,9 +123,11 @@ export class Dashboard extends Component {
               options={{ headerShown: false }}
               name="Profile"
               component={Profile}
-              key={profile ? profile.id : "notloggedin"}
-              id={profile ? profile.id : ""}
-              userName={user && user.userName ? user.userName : ""}
+              initialParams={{
+                userName: user && user.userName ? user.userName : "",
+                id: profile ? profile.id : "",
+                key: profile ? profile.id : "notloggedin",
+              }}
             />
             <Stack.Screen
               name="Notifs"

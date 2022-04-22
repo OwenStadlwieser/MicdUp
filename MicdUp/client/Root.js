@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { Text, View, Dimensions, SafeAreaView } from "react-native";
 import { Button } from "react-native-paper";
 import React, { Component, Fragment, useEffect } from "react";
@@ -114,6 +113,7 @@ export class Root extends Component {
               screenListeners={{
                 state: (e) => {
                   // Do something with the state
+                  console.log(e.data);
                   this.props.navigateStateChanged(
                     e.data.state.routeNames[e.data.state.index]
                   );
@@ -124,12 +124,12 @@ export class Root extends Component {
               <Stack.Screen
                 name="Feed"
                 component={Feed}
-                key={this.props.loggedIn}
+                initialParams={{ key: this.props.loggedIn }}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="Search"
-                key={keyForSearch}
+                initialParams={{ key: keyForSearch }}
                 component={Search}
                 options={{ headerShown: false }}
               />
@@ -152,6 +152,7 @@ export class Root extends Component {
               <Stack.Screen name="Signup" component={Signup} />
             </Stack.Navigator>
           </NavigationContainer>
+          <Navbar />
           {showingComments && (
             <Comment
               containerStyle={{}}

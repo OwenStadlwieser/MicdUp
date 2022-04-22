@@ -11,7 +11,7 @@ import { styles } from "../../styles/Styles";
 import { Button } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 // redux
-import { changeLogin, showHeader } from "../../redux/actions/display";
+import { showHeader } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
 // components
 import ForgotPassword from "./ForgotPassword";
@@ -61,15 +61,6 @@ export class Login extends Component {
         ))
       : (login = (
           <KeyboardAvoidingView style={styles.container}>
-            <AntDesign
-              style={styles.topLeftIcon}
-              name="leftcircle"
-              size={24}
-              color="white"
-              onPress={() => {
-                this.props.changeLogin(false);
-              }}
-            />
             <TextInput
               style={styles.textInput}
               value={authenticator}
@@ -107,6 +98,4 @@ export class Login extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { changeLogin, login, showHeader })(
-  Login
-);
+export default connect(mapStateToProps, { login, showHeader })(Login);

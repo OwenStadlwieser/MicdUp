@@ -1,11 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 // redux
-import {
-  changeSignup,
-  showMessage,
-  showHeader,
-} from "../../redux/actions/display";
+import { showMessage, showHeader } from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
 // styles
 import { styles } from "../../styles/Styles";
@@ -72,15 +68,6 @@ export class Signup extends Component {
     const { email, phone, password, date, user } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
-        <AntDesign
-          style={styles.backArrow}
-          name="leftcircle"
-          size={24}
-          color="white"
-          onPress={() => {
-            this.props.changeSignup(false);
-          }}
-        />
         <TextInput
           value={user}
           style={
@@ -197,7 +184,6 @@ export class Signup extends Component {
 const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, {
-  changeSignup,
   register,
   showMessage,
   showHeader,

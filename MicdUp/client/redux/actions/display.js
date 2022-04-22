@@ -97,10 +97,12 @@ export const navigate = (payload) => (dispatch) => {
 };
 
 export const navigateStateChanged = (payload) => (dispatch) => {
-  dispatch({
-    type: NAVIGATE,
-    payload,
-  });
+  if (navigationRef.isReady()) {
+    dispatch({
+      type: NAVIGATE,
+      payload: navigationRef.current.getCurrentRoute().name,
+    });
+  }
 };
 
 export const viewProfile = (payload) => (dispatch) => {

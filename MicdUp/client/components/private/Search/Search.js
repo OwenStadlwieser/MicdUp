@@ -70,14 +70,16 @@ export class Search extends Component {
     const { users, term, userName, tags, searchExecuted, id, tag } = this.state;
     const { searchViewingProfile, searchViewingTag, tagFromSearch } =
       this.props;
-    console.log(searchViewingTag);
     if (searchExecuted) {
       return <Feed key={"search"} fromSearch={true} tag={tag} />;
     } else if (searchViewingTag) {
       return <Feed key={"search"} fromSearch={true} tag={tagFromSearch} />;
     }
     return (
-      <View style={[styles.paneUncentered, { alignItems: "center" }]}>
+      <View
+        key={this.props.route.params.key}
+        style={[styles.paneUncentered, { alignItems: "center" }]}
+      >
         {!searchViewingProfile && (
           <SearchComponent
             parentViewStyle={{ zIndex: 2 }}

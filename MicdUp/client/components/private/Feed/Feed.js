@@ -111,6 +111,7 @@ export class Feed extends Component {
       : following
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
+    console.log(this.props.route);
     return (
       <View
         style={{
@@ -120,6 +121,7 @@ export class Feed extends Component {
           overflow: "scroll",
           flex: 1,
         }}
+        key={this.props.route.params ? this.props.route.params.key : ""}
       >
         {tag ? (
           <Appbar.Header
