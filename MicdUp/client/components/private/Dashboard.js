@@ -74,7 +74,15 @@ export class Dashboard extends Component {
   };
 
   render() {
-    const { mountedComponent, user, keyForSearch, profile } = this.props;
+    const {
+      mountedComponent,
+      user,
+      keyForSearch,
+      profile,
+      cachedPosts,
+      currentKey,
+      postIndex,
+    } = this.props;
 
     return (
       <Fragment>
@@ -83,13 +91,13 @@ export class Dashboard extends Component {
           theme={MyTheme}
           ref={navigationRef}
           screenOptions={{ headerShown: false }}
+          gestureResponseDista
         >
           <Stack.Navigator
             screenListeners={{
               state: (e) => {
                 // Do something with the state
                 console.log(e.data);
-
                 this.props.navigateStateChanged(
                   e.data.state.routeNames[e.data.state.index]
                 );
@@ -113,6 +121,15 @@ export class Dashboard extends Component {
               options={{ headerShown: false }}
               name="Create"
               component={Create}
+            />
+            <Stack.Screen
+              initialParams={{
+                post: cachedPosts[currentKey]
+                  ? cachedPosts[currentKey][postIndex]
+                  : {},
+              }}
+              name="Comment"
+              component={Comment}
             />
             <Stack.Screen
               options={{ headerShown: false }}
@@ -149,6 +166,9 @@ const mapStateToProps = (state) => ({
   loggedIn: state.auth.loggedIn,
   profile: state.auth.user.profile,
   keyForSearch: state.display.keyForSearch,
+  postIndex: state.display.postIndex,
+  cachedPosts: state.auth.posts,
+  currentKey: state.auth.currentKey,
 });
 
 export default connect(mapStateToProps, {

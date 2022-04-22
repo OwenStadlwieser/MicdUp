@@ -85,15 +85,12 @@ export class Root extends Component {
   render() {
     const { token } = this.state;
     const {
-      showLogin,
-      showSignup,
       displayMessage,
       currentMessage,
       messageState,
       loggedIn,
       mountedComponent,
       loading,
-      showingComments,
       cachedPosts,
       currentKey,
       postIndex,
@@ -101,6 +98,7 @@ export class Root extends Component {
       showHeader,
     } = this.props;
     let app;
+
     if (!loggedIn && !token)
       app = (
         <Fragment>
@@ -149,7 +147,7 @@ export class Root extends Component {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                initialParams={{ post: cachedPosts[currentKey][postIndex] }}
+                initialParams={{}}
                 name="Comment"
                 component={Comment}
               />
@@ -214,7 +212,6 @@ const mapStateToProps = (state) => ({
   messageState: state.display.messageState,
   mountedComponent: state.display.mountedComponent,
   loading: state.display.loading,
-  showingComments: state.display.showingComments,
   postIndex: state.display.postIndex,
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,

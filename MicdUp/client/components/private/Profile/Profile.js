@@ -237,8 +237,7 @@ export class Profile extends Component {
       refreshing,
       otherUserSettings,
     } = this.state;
-    const { profile, currentProfile, showingComments, backArrow, cachedPosts } =
-      this.props;
+    const { profile, currentProfile, backArrow, cachedPosts } = this.props;
     const { userName, id } = this.props.route.params
       ? this.props.route.params
       : this.props;
@@ -289,7 +288,7 @@ export class Profile extends Component {
             setImage={this.setImage.bind(this)}
           />
         )}
-        {!settingsShown && !showingComments && (
+        {!settingsShown && (
           <Ionicons
             onPress={() => {
               isUserProfile
@@ -596,7 +595,6 @@ const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
   user: state.auth.user,
   profile: state.auth.user.profile,
-  showingComments: state.display.showingComments,
 });
 
 export default connect(mapStateToProps, {

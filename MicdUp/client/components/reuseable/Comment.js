@@ -42,7 +42,7 @@ import {
   updateComments,
   deleteComment,
 } from "../../redux/actions/comment";
-import { hideComments, showHeader } from "../../redux/actions/display";
+import { showHeader } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 
 const { height } = Dimensions.get("window");
@@ -78,7 +78,10 @@ export class Comment extends Component {
   };
 
   onSend = async (base64Url, fileType, results) => {
-    const { post } = this.props;
+    const { postIndex, cachedPosts, currentKey } = this.props;
+    const post = cachedPosts[currentKey]
+      ? cachedPosts[currentKey][postIndex]
+      : null;
     const { text, parents, replyingTo } = this.state;
     this.props.addLoading("COMMENT");
     await this.props.commentPost(
@@ -111,7 +114,10 @@ export class Comment extends Component {
   };
 
   componentDidMount = async () => {
-    const { post } = this.props;
+    const { postIndex, cachedPosts, currentKey } = this.props;
+    const post = cachedPosts[currentKey]
+      ? cachedPosts[currentKey][postIndex]
+      : null;
     this.props.showHeader(false);
     this.mounted && this.setState({ loading: true });
     await this.props.getComments(post);
@@ -160,7 +166,11 @@ export class Comment extends Component {
   };
 
   handleMap(comment, i, index, parentId, parent) {
-    const { profile, post, playingId, isPause } = this.props;
+    const { profile, playingId, isPause } = this.props;
+    const { postIndex, cachedPosts, currentKey } = this.props;
+    const post = cachedPosts[currentKey]
+      ? cachedPosts[currentKey][postIndex]
+      : null;
     if (comment.allReplies && comment.allReplies.length > 0) {
       comment.replies = comment.allReplies;
     }
@@ -358,22 +368,29 @@ export class Comment extends Component {
   }
 
   render() {
-    const { post } = this.props;
     const { replyingToName, loading, refreshing } = this.state;
+    const { postIndex, cachedPosts, currentKey } = this.props;
+    const post = cachedPosts[currentKey]
+      ? cachedPosts[currentKey][postIndex]
+      : null;
+    if (!post) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {loading && <CircleSnail color={["white", "#1A3561", "#6FF6FF"]} />}
+        </View>
+      );
+    }
     return (
       <View
         onStartShouldSetResponder={(event) => true}
         style={styles.commentOpenContainer}
       >
-        <AntDesign
-          style={[styles.topLeftIcon, { zIndex: 4 }]}
-          name="leftcircle"
-          size={24}
-          color="#1A3561"
-          onPress={() => {
-            this.props.hideComments();
-          }}
-        />
         <View style={styles.commentsContainer}>
           {post.comments && post.comments.length > 0 ? (
             <ScrollView
@@ -442,6 +459,9 @@ const mapStateToProps = (state) => ({
   playingId:
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
   isPause: state.sound.isPause,
+  postIndex: state.display.postIndex,
+  cachedPosts: state.auth.posts,
+  currentKey: state.auth.currentKey,
 });
 
 export default connect(mapStateToProps, {
@@ -450,7 +470,6 @@ export default connect(mapStateToProps, {
   updateCommentDisplay,
   updateComments,
   deleteComment,
-  hideComments,
   getComments,
   changeSound,
   pauseSound,

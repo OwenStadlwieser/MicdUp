@@ -11,7 +11,6 @@ import {
   RECEIVE_NOTIF,
   HIDE_NOTIF,
   SHOW_COMMENTS,
-  HIDE_COMMENTS,
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
   UPDATE_PRIVATE_COUNT_FROM_LIST,
@@ -33,7 +32,6 @@ const initialState = {
   keyForSearch: Math.random(),
   searchViewingProfile: false,
   receiveNotif: false,
-  showingComments: false,
   postIndex: -1,
   loading: false,
   loadingMap: {},
@@ -63,7 +61,6 @@ export default function (state = { ...initialState }, action) {
         mountedComponent: payload,
         keyForSearch: Math.random(),
         searchViewingProfile: false,
-        showingComments: false,
         searchViewingTag: false,
         tagFromSearch: {},
       };
@@ -87,12 +84,6 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         postIndex: payload,
-        showingComments: true,
-      };
-    case HIDE_COMMENTS:
-      return {
-        ...state,
-        showingComments: false,
       };
     case RECEIVE_NOTIF:
       return {

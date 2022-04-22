@@ -9,7 +9,6 @@ import {
   RECEIVE_NOTIF,
   HIDE_NOTIF,
   SHOW_COMMENTS,
-  HIDE_COMMENTS,
   ADD_LOADING,
   REMOVE_LOADING,
   SET_CURRENT_KEY,
@@ -49,15 +48,12 @@ export const receiveNotif = (payload) => (dispatch) => {
 };
 
 export const showComments = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("Comment");
+  }
   dispatch({
     type: SHOW_COMMENTS,
     payload,
-  });
-};
-
-export const hideComments = () => (dispatch) => {
-  dispatch({
-    type: HIDE_COMMENTS,
   });
 };
 
