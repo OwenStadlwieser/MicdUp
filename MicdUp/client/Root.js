@@ -148,18 +148,14 @@ export class Root extends Component {
                 component={LoginManager}
                 options={{ headerShown: false }}
               />
+              <Stack.Screen  
+              initialParams={{ post: cachedPosts[currentKey][postIndex] }} 
+              name="Comment" component={Comment} />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
             </Stack.Navigator>
           </NavigationContainer>
           <Navbar />
-          {showingComments && (
-            <Comment
-              containerStyle={{}}
-              color={"#1A3561"}
-              post={cachedPosts[currentKey][postIndex]}
-            />
-          )}
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
@@ -199,14 +195,6 @@ export class Root extends Component {
                 {currentMessage}
               </Text>
             </View>
-          )}
-          <Dashboard></Dashboard>
-          {showingComments && cachedPosts[currentKey] && (
-            <Comment
-              containerStyle={{}}
-              color={"#1A3561"}
-              post={cachedPosts[currentKey][postIndex]}
-            />
           )}
         </Fragment>
       );
