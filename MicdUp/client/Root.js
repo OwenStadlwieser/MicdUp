@@ -162,7 +162,7 @@ export class Root extends Component {
       );
     else
       app = (
-        <SafeAreaView style={styles.rootContainer}>
+        <Fragment>
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
@@ -191,7 +191,7 @@ export class Root extends Component {
               post={cachedPosts[currentKey][postIndex]}
             />
           )}
-        </SafeAreaView>
+        </Fragment>
       );
     return app;
   }

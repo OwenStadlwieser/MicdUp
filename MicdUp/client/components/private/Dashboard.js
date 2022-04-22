@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment} from "react";
 import { connect } from "react-redux";
 import { Text, View, Dimensions } from "react-native";
 // redux
@@ -73,8 +73,7 @@ export class Dashboard extends Component {
   render() {
     const { mountedComponent, user, keyForSearch, profile } = this.props;
     return (
-      <View style={styles.containerPrivate}>
-        <View style={styles.contentContainer}>
+      <Fragment>
           <NavigationContainer
             style={{ width }}
             theme={MyTheme}
@@ -106,9 +105,9 @@ export class Dashboard extends Component {
               />
             </Stack.Navigator>
           </NavigationContainer>
-        </View>
+
         <Navbar />
-      </View>
+      </Fragment>
     );
   }
 }
