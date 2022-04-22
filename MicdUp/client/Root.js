@@ -99,7 +99,7 @@ export class Root extends Component {
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
-          { showHeader && (<SoundPlayer /> )}
+          {showHeader && <SoundPlayer />}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -162,7 +162,7 @@ export class Root extends Component {
       );
     else
       app = (
-        <Fragment>
+        <View style={{ display: "grid", gridTemplateRows: "9fr 1fr" }}>
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
@@ -170,7 +170,7 @@ export class Root extends Component {
           )}
           {showHeader && (
             <Fragment>
-              <SoundPlayer /> 
+              <SoundPlayer />
               <NotificationBell />
             </Fragment>
           )}
@@ -191,7 +191,7 @@ export class Root extends Component {
               post={cachedPosts[currentKey][postIndex]}
             />
           )}
-        </Fragment>
+        </View>
       );
     return app;
   }
