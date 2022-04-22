@@ -14,7 +14,7 @@ import {
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
 import Feed from "./Feed/Feed";
-import Live from "./Live/Live";
+import Comment from "../reuseable/Comment";
 import Profile from "./Profile/Profile";
 import Search from "./Search/Search";
 import Navbar from "./Navbar";
