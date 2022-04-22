@@ -211,9 +211,6 @@ const ProfilePublicType = new GraphQLObjectType({
     user: {
       type: UserPublicType,
       async resolve(parent, args, context, info) {
-        if (profileCheckForBlocked(context, parent) < 0) {
-          return null;
-        }
         return await User.findById(parent.user);
       },
     },
