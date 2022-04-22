@@ -7,8 +7,9 @@ import { connect } from "react-redux";
 import { styles } from "./styles/Styles";
 // redux
 import { setIp } from "./redux/actions/auth";
-import { changeLogin, changeSignup } from "./redux/actions/display";
+import { navigationRef, navigateStateChanged } from "./redux/actions/display";
 // children
+import LoginManager from "./components/reuseable/LoginManager";
 import Comment from "./components/reuseable/Comment";
 import Dashboard from "./components/private/Dashboard";
 import Navbar from "./components/private/Navbar";
@@ -21,9 +22,19 @@ import NotificationBell from "./components/private/NotificationBell";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
-
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import Search from "./components/private/Search/Search";
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#1A3561",
+  },
+};
+const Stack = createStackNavigator();
 
 export class Root extends Component {
   constructor() {
@@ -93,7 +104,59 @@ export class Root extends Component {
     let app;
     if (!loggedIn && !token)
       app = (
-        <SafeAreaView style={styles.rootContainer}>
+        <Fragment>
+          <NavigationContainer
+            theme={MyTheme}
+            ref={navigationRef}
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Navigator
+              screenListeners={{
+                state: (e) => {
+                  // Do something with the state
+                  this.props.navigateStateChanged(e.data);
+                },
+              }}
+              initialRouteName={mountedComponent}
+            >
+              <Stack.Screen
+                name="Feed"
+                component={Feed}
+                key={this.props.loggedIn}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Search"
+                key={keyForSearch}
+                component={Search}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Create"
+                component={LoginManager}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Dms"
+                component={LoginManager}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={LoginManager}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Signup" component={Signup} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          {showingComments && (
+            <Comment
+              containerStyle={{}}
+              color={"#1A3561"}
+              post={cachedPosts[currentKey][postIndex]}
+            />
+          )}
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
@@ -109,56 +172,7 @@ export class Root extends Component {
               </Text>
             </View>
           )}
-          {mountedComponent === "Feed" ? (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <Feed key={"notloggedin"} />
-              </View>
-              <Navbar />
-            </View>
-          ) : mountedComponent === "Search" ? (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <Search key={keyForSearch} />
-              </View>
-              <Navbar />
-            </View>
-          ) : showLogin ? (
-            <Login />
-          ) : showSignup ? (
-            <Signup />
-          ) : (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <Button
-                  style={styles.button}
-                  onPress={() => {
-                    this.props.changeLogin(true);
-                  }}
-                >
-                  Login
-                </Button>
-                <Button
-                  style={styles.button}
-                  onPress={() => {
-                    this.props.changeSignup(true);
-                  }}
-                >
-                  Sign Up
-                </Button>
-                <StatusBar style="auto" />
-              </View>
-              <Navbar />
-            </View>
-          )}
-          {showingComments && (
-            <Comment
-              containerStyle={{}}
-              color={"#1A3561"}
-              post={cachedPosts[currentKey][postIndex]}
-            />
-          )}
-        </SafeAreaView>
+        </Fragment>
       );
     else
       app = (
@@ -214,7 +228,6 @@ const mapStateToProps = (state) => ({
   showHeader: state.display.showHeader,
 });
 export default connect(mapStateToProps, {
-  changeSignup,
-  changeLogin,
   setIp,
+  navigateStateChanged,
 })(Root);

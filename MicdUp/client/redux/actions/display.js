@@ -19,7 +19,9 @@ import {
 
 import { createNavigationContainerRef } from "@react-navigation/native";
 export const navigationRef = createNavigationContainerRef();
-
+navigationRef.addListener("transitionStart", (e) => (dispatch) => {
+  console.log(e);
+});
 export const setCurrentKey = (payload) => (dispatch) => {
   dispatch({
     type: SET_CURRENT_KEY,
@@ -68,18 +70,6 @@ export const hideNotif = (payload) => (dispatch) => {
   });
 };
 
-export const changeLogin = (payload) => (dispatch) => {
-  dispatch({
-    type: CHANGE_LOGIN,
-    payload,
-  });
-};
-export const changeSignup = (payload) => (dispatch) => {
-  dispatch({
-    type: CHANGE_SIGNUP,
-    payload,
-  });
-};
 export const showMessage = (payload) => (dispatch) => {
   dispatch({
     type: DISPLAY_MESSAGE,
@@ -103,6 +93,13 @@ export const navigate = (payload) => (dispatch) => {
     console.log(payload);
     navigationRef.navigate(payload);
   }
+  dispatch({
+    type: NAVIGATE,
+    payload,
+  });
+};
+
+export const navigateStateChanged = (payload) => (dispatch) => {
   dispatch({
     type: NAVIGATE,
     payload,

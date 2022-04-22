@@ -6,6 +6,10 @@ import { getUserQuery } from "../../redux/actions/user";
 import { logout, setSocket } from "../../redux/actions/auth";
 import { chatRecieved } from "../../redux/actions/chat";
 import { addLoading, removeLoading } from "../../redux/actions/display";
+import {
+  navigationRef,
+  navigateStateChanged,
+} from "../../redux/actions/display";
 // children
 import Create from "./Create/Create";
 import Dms from "./Dms/Dms";
@@ -22,7 +26,6 @@ import { styles } from "../../styles/Styles";
 import NotificationView from "./Notifs/NotificationView";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
-import { navigationRef } from "../../redux/actions/display";
 
 const { width, height } = Dimensions.get("window");
 
@@ -74,42 +77,58 @@ export class Dashboard extends Component {
     const { mountedComponent, user, keyForSearch, profile } = this.props;
     return (
       <Fragment>
-          <NavigationContainer
-            style={{ width }}
-            theme={MyTheme}
-            ref={navigationRef}
-            screenOptions={{headerShown: false}}
+        <NavigationContainer
+          style={{ width }}
+          theme={MyTheme}
+          ref={navigationRef}
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Navigator
+            screenListeners={{
+              state: (e) => {
+                // Do something with the state
+                this.props.navigateStateChanged(e.data);
+              },
+            }}
+            initialRouteName={mountedComponent}
           >
-            <Stack.Navigator initialRouteName={mountedComponent}>
-              <Stack.Screen
-                name="Feed"
-                component={Feed}
-                key={this.props.loggedIn}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Search"
-                key={keyForSearch}
-                component={Search}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen options={{headerShown: false}} name="Create" component={Create} />
-              <Stack.Screen options={{headerShown: false}} name="Dms" component={Dms} />
-              <Stack.Screen
-                options={{headerShown: false}}
-                name="Profile"
-                component={Profile}
-                key={profile ? profile.id : "notloggedin"}
-                id={profile ? profile.id : ""}
-                userName={user && user.userName ? user.userName : ""}
-              />
-              <Stack.Screen
-                name="Notifs"
-                options={{headerShown: false}}
-                component={NotificationView}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
+            <Stack.Screen
+              name="Feed"
+              component={Feed}
+              key={this.props.loggedIn}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Search"
+              key={keyForSearch}
+              component={Search}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Create"
+              component={Create}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Dms"
+              component={Dms}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Profile"
+              component={Profile}
+              key={profile ? profile.id : "notloggedin"}
+              id={profile ? profile.id : ""}
+              userName={user && user.userName ? user.userName : ""}
+            />
+            <Stack.Screen
+              name="Notifs"
+              options={{ headerShown: false }}
+              component={NotificationView}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
 
         <Navbar />
       </Fragment>
@@ -132,4 +151,5 @@ export default connect(mapStateToProps, {
   chatRecieved,
   addLoading,
   removeLoading,
+  navigateStateChanged,
 })(Dashboard);
