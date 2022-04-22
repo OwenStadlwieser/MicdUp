@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { getCurrentTime } = require("../../reusableFunctions/helpers");
-const { getFilteredResults } = require("../../utils/securityHelpers");
 
 // Create Schema
 const options = { discriminatorKey: "kind" };
@@ -38,11 +37,6 @@ const fileSchema = new Schema(
   },
   options
 );
-
-// fileSchema.post("find", async function (result) {
-//   let res = await getFilteredResults(result, true);
-//   return res;
-// });
 
 const File = mongoose.model("file", fileSchema);
 const Message = File.discriminator(

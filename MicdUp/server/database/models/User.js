@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const Schema = mongoose.Schema;
 const { getCurrentTime } = require("../../reusableFunctions/helpers");
-const { getFilteredResults } = require("../../utils/securityHelpers");
 
 // Create Schema
 const UserSchema = new Schema({
@@ -152,10 +151,6 @@ UserSchema.pre("save", async function (next) {
   }
   next();
 });
-
-// UserSchema.post("find", async function (result) {
-//   return await getFilteredResults(result);
-// });
 
 const User = mongoose.model("users", UserSchema);
 

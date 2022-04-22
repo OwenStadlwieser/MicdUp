@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { getCurrentTime } = require("../../reusableFunctions/helpers");
-const { getFilteredResults } = require("../../utils/securityHelpers");
-const { ProfileSchema } = require("./Profile");
-// Create Schema
+
 const postSchema = new Schema({
   nsfw: {
     type: Boolean,
@@ -79,12 +77,6 @@ const postSchema = new Schema({
     default: Date.now,
   },
 });
-
-// postSchema.post("find", async function (result) {
-//   console.log(result);
-//   let res = await getFilteredResults(result);
-//   return res;
-// });
 
 const Post = mongoose.model("posts", postSchema);
 

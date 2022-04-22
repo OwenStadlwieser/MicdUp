@@ -9,7 +9,6 @@ const {
   GraphQLID,
   GraphQLInt,
 } = require("graphql");
-const { getFilteredResults } = require("../../../utils/securityHelpers");
 const getUserPosts = {
   type: new GraphQLList(PostType),
   args: { userId: { type: GraphQLID }, skipMult: { type: GraphQLInt } },

@@ -44,7 +44,8 @@ const fetchChat = {
           blocked.findIndex(
             (blockedmember) =>
               blockedmember.toString() === members[i].toString()
-          )
+          ) > -1 &&
+          members.length <= 2
         ) {
           throw new Error("blocked user in chat");
         }
