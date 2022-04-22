@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Text, View } from "react-native";
+import { Text, View, Dimensions } from "react-native";
 // redux
 import { getUserQuery } from "../../redux/actions/user";
 import { logout, setSocket } from "../../redux/actions/auth";
@@ -20,6 +20,20 @@ import { io } from "socket.io-client";
 //styles
 import { styles } from "../../styles/Styles";
 import NotificationView from "./Notifs/NotificationView";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { navigationRef } from "../../redux/actions/display";
+
+const { width, height } = Dimensions.get("window");
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#1A3561",
+  },
+};
+const Stack = createStackNavigator();
 
 export class Dashboard extends Component {
   constructor() {
@@ -61,27 +75,37 @@ export class Dashboard extends Component {
     return (
       <View style={styles.containerPrivate}>
         <View style={styles.contentContainer}>
-          {mountedComponent === "Feed" ? (
-            <Feed key={this.props.loggedIn} />
-          ) : mountedComponent === "Create" ? (
-            <Create />
-          ) : mountedComponent === "Dms" ? (
-            <Dms />
-          ) : mountedComponent === "Live" ? (
-            <Live />
-          ) : mountedComponent === "Profile" ? (
-            <Profile
-              key={profile ? profile.id : "notloggedin"}
-              id={profile ? profile.id : ""}
-              userName={user && user.userName ? user.userName : ""}
-            />
-          ) : mountedComponent === "Search" ? (
-            <Search key={keyForSearch} />
-          ) : mountedComponent === "Notifs" ? (
-            <NotificationView />
-          ) : (
-            <Feed />
-          )}
+          <NavigationContainer
+            style={{ width }}
+            theme={MyTheme}
+            ref={navigationRef}
+          >
+            <Stack.Navigator initialRouteName={mountedComponent}>
+              <Stack.Screen
+                name="Feed"
+                component={Feed}
+                key={this.props.loggedIn}
+              />
+              <Stack.Screen
+                name="Search"
+                key={keyForSearch}
+                component={Search}
+              />
+              <Stack.Screen name="Create" component={Create} />
+              <Stack.Screen name="Dms" component={Dms} />
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                key={profile ? profile.id : "notloggedin"}
+                id={profile ? profile.id : ""}
+                userName={user && user.userName ? user.userName : ""}
+              />
+              <Stack.Screen
+                name="NotificationView"
+                component={NotificationView}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
         </View>
         <Navbar />
       </View>

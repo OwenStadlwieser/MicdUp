@@ -10,7 +10,6 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { navigate } from "../../redux/actions/display";
 import { styles } from "../../styles/Styles";
-const { width, height } = Dimensions.get("window");
 
 export class NotificationBell extends Component {
   constructor() {

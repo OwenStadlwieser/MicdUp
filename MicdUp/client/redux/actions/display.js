@@ -17,6 +17,9 @@ import {
   SHOW_HEADER,
 } from "../types";
 
+import { createNavigationContainerRef } from "@react-navigation/native";
+export const navigationRef = createNavigationContainerRef();
+
 export const setCurrentKey = (payload) => (dispatch) => {
   dispatch({
     type: SET_CURRENT_KEY,
@@ -96,6 +99,10 @@ export const showHeader = (payload) => (dispatch) => {
   });
 };
 export const navigate = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    console.log(payload);
+    navigationRef.navigate(payload);
+  }
   dispatch({
     type: NAVIGATE,
     payload,
