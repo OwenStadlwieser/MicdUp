@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const contextService = require("request-context");
 // Create Schema
 const ProfileSchema = new Schema({
   following: {

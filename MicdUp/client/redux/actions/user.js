@@ -13,6 +13,7 @@ export const getUserQuery = () => async (dispatch) => {
   try {
     const res = await privateClient.query({
       query: GET_USER_QUERY,
+      fetchPolicy: "no-cache",
     });
     if (res && res.data) {
       dispatch({

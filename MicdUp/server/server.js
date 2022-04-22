@@ -15,7 +15,6 @@ const { User } = require("./database/models/User");
 const { Profile } = require("./database/models/Profile");
 const { Filter } = require("./database/models/Filter");
 const { resetSearches } = require("./cron/searches");
-const contextService = require("request-context");
 const chatSocket = require("./sockets/chat");
 const app = express();
 app.use(bodyParser.json({ limit: "100mb" }));
@@ -51,8 +50,6 @@ if (app.get("env") === "production") {
 // look more into
 app.use(session(sess));
 
-app.use(contextService.middleware("request"));
-
 app.use(function (req, res, next) {
   if (verifiedUrls.includes(req.headers.origin)) {
     res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
@@ -82,7 +79,6 @@ app.use(async (req, res, next) => {
     });
     req.profile = profile;
     req.user = user;
-    contextService.set("request:user", user);
     req.isAuthenticated = true;
   }
   req.host = req.get("host");

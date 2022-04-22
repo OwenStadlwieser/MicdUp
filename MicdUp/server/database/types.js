@@ -240,7 +240,6 @@ const ProfilePublicType = new GraphQLObjectType({
       resolve(parent, args, context, info) {
         if (context.profile) {
           let blocked = [...context.profile.blockedMap.keys()];
-          console.log(blocked, parent.id);
           return (
             blocked.findIndex(
               (blockedmember) => blockedmember.toString() === parent.id
@@ -600,14 +599,12 @@ const PostType = new GraphQLObjectType({
     comments: {
       type: new GraphQLList(CommentType),
       async resolve(parent, a, context, i) {
-        console.log("hereee");
         let blocked = [];
         let blockedBy = [];
         if (context.profile) {
           blocked = [...context.profile.blockedMap.keys()];
           blockedBy = [...context.profile.blockedByMap.keys()];
         }
-        console.log(blocked, blockedBy);
         const index = await checkIfIsInPrivateList(context, parent);
         if (index < 0) return [];
         return await Comment.find({
