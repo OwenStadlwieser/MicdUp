@@ -3,8 +3,13 @@ import { connect } from "react-redux";
 import { View } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
-import { navigationRefSearch } from "../../../redux/actions/display";
+import {
+  navigationRefSearch,
+  searchNavigate,
+} from "../../../redux/actions/display";
+
 // components
+import { AntDesign } from "@expo/vector-icons";
 import Feed from "../Feed/Feed";
 import Profile from "../Profile/Profile";
 import Search from "./Search";
@@ -33,7 +38,12 @@ export class SearchNavigator extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { keyForSearch, currentProfile } = this.props;
+    const {
+      keyForSearch,
+      currentProfile,
+      searchViewingProfile,
+      searchViewingTag,
+    } = this.props;
     return (
       <NavigationContainer
         independent={true}
@@ -41,7 +51,15 @@ export class SearchNavigator extends Component {
         theme={MyTheme}
         ref={navigationRefSearch}
       >
-        <Stack.Navigator initialRouteName={"Search"}>
+        <Stack.Navigator
+          initialRouteName={
+            searchViewingProfile
+              ? "SearchProfile"
+              : searchViewingTag
+              ? "SearchFeed"
+              : "Search"
+          }
+        >
           <Stack.Screen
             name="Search"
             initialParams={{ key: keyForSearch }}
@@ -58,7 +76,19 @@ export class SearchNavigator extends Component {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            options={{ headerShown: true }}
+            options={{
+              headerShown: true,
+              headerLeft: () => (
+                <AntDesign
+                  name="leftcircle"
+                  size={24}
+                  color="#1A3561"
+                  onPress={() => {
+                    this.props.searchNavigate();
+                  }}
+                />
+              ),
+            }}
             name="SearchProfile"
             component={Profile}
             initialParams={{
@@ -74,6 +104,8 @@ export class SearchNavigator extends Component {
 const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
   keyForSearch: state.display.keyForSearch,
+  searchViewingTag: state.display.searchViewingTag,
+  searchViewingProfile: state.display.searchViewingProfile,
 });
 
-export default connect(mapStateToProps, {})(SearchNavigator);
+export default connect(mapStateToProps, { searchNavigate })(SearchNavigator);

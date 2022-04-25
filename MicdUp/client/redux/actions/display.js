@@ -1,6 +1,4 @@
 import {
-  CHANGE_LOGIN,
-  CHANGE_SIGNUP,
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
   NAVIGATE,
@@ -86,6 +84,9 @@ export const navigate = (payload) => (dispatch) => {
   if (navigationRef.isReady()) {
     navigationRef.navigate(payload);
   }
+  if (navigationRefSearch.isReady()) {
+    navigationRefSearch.navigate("Search");
+  }
   dispatch({
     type: NAVIGATE,
     payload,
@@ -128,8 +129,11 @@ export const searchViewTag = (payload) => (dispatch) => {
   }
 };
 
-export const searchNavigate = () => (dispatch) => {
-  if (navigationRefSearch.isReady()) {
-    navigationRefSearch.navigate("Search");
-  }
-};
+export const searchNavigate =
+  (payload = "Search") =>
+  (dispatch) => {
+    console.log(navigationRefSearch.isReady());
+    if (navigationRefSearch.isReady()) {
+      navigationRefSearch.navigate(payload);
+    }
+  };
