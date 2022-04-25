@@ -18,7 +18,7 @@ import {
 
 import { createNavigationContainerRef } from "@react-navigation/native";
 export const navigationRef = createNavigationContainerRef();
-
+export const navigationRefSearch = createNavigationContainerRef();
 export const setCurrentKey = (payload) => (dispatch) => {
   dispatch({
     type: SET_CURRENT_KEY,
@@ -113,6 +113,9 @@ export const searchViewProfile = (payload) => (dispatch) => {
     type: VIEW_PROFILE_SEARCH,
     payload,
   });
+  if (navigationRefSearch.isReady()) {
+    navigationRefSearch.navigate("SearchProfile");
+  }
 };
 
 export const searchViewTag = (payload) => (dispatch) => {
@@ -120,4 +123,13 @@ export const searchViewTag = (payload) => (dispatch) => {
     type: VIEW_TAG_SEARCH,
     payload,
   });
+  if (navigationRefSearch.isReady()) {
+    navigationRefSearch.navigate("SearchFeed");
+  }
+};
+
+export const searchNavigate = () => (dispatch) => {
+  if (navigationRefSearch.isReady()) {
+    navigationRefSearch.navigate("Search");
+  }
 };

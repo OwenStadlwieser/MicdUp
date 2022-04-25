@@ -26,7 +26,10 @@ export const getUserQuery = () => async (dispatch) => {
         });
         dispatch({
           type: VIEW_PROFILE,
-          payload: res.data.getUser.profile,
+          payload: {
+            ...res.data.getUser.profile,
+            user: { userName: res.data.getUser.userName },
+          },
         });
       }
     }

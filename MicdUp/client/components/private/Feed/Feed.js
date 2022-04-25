@@ -15,9 +15,13 @@ import { Appbar, Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
 // redux
-import { navigate } from "../../../redux/actions/display";
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
-import { addLoading, removeLoading } from "../../../redux/actions/display";
+import {
+  addLoading,
+  removeLoading,
+  searchNavigate,
+  navigate,
+} from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
 import {
   getFollowingFeed,
@@ -43,7 +47,11 @@ export class Feed extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   getData = async (skipMult) => {
-    const { fromSearch, tag, loggedIn } = this.props;
+    const { loggedIn, tag } = this.props;
+    const { fromSearch } = this.props.route.params
+      ? this.props.route.params
+      : {};
+    console.log(tag, 12343);
     this.props.addLoading("Feed");
     this.mounted && this.setState({ loading: true });
     if (fromSearch && tag) {
@@ -66,8 +74,11 @@ export class Feed extends Component {
   };
 
   async handleScroll(event) {
-    const { fromSearch, loggedIn, cachedPosts } = this.props;
+    const { loggedIn, cachedPosts } = this.props;
     const { loading, tag, prevLength, following } = this.state;
+    const { fromSearch } = this.props.route.params
+      ? this.props.route.params
+      : {};
     const postsToView = fromSearch
       ? tag
         ? cachedPosts[tag._id]
@@ -93,7 +104,7 @@ export class Feed extends Component {
   }
 
   render() {
-    const { fromSearch, profile, cachedPosts, loggedIn } = this.props;
+    const { profile, cachedPosts, loggedIn } = this.props;
     const {
       isRecordingComment,
       loading,
@@ -102,6 +113,9 @@ export class Feed extends Component {
       outerScrollEnabled,
       refreshing,
     } = this.state;
+    const { fromSearch } = this.props.route.params
+      ? this.props.route.params
+      : {};
     const postsToView = fromSearch
       ? tag
         ? cachedPosts[tag._id]
@@ -111,7 +125,6 @@ export class Feed extends Component {
       : following
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
-    console.log(this.props.route);
     return (
       <View
         style={{
@@ -134,7 +147,7 @@ export class Feed extends Component {
           >
             <Appbar.BackAction
               onPress={() => {
-                this.props.navigate("Search");
+                this.props.searchNavigate("Search");
               }}
             />
             <Appbar.Content title={tag.title} subtitle="Topic" />
@@ -295,6 +308,7 @@ const mapStateToProps = (state) => ({
   profile: state.auth.user.profile,
   loggedIn: state.auth.loggedIn,
   cachedPosts: state.auth.posts,
+  tag: state.display.tagFromSearch,
 });
 
 export default connect(mapStateToProps, {
@@ -306,4 +320,5 @@ export default connect(mapStateToProps, {
   getFollowingFeed,
   getNotLoggedInFeed,
   getTopicsFeed,
+  searchNavigate,
 })(Feed);

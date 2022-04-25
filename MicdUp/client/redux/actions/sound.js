@@ -102,10 +102,3 @@ export const pauseSound = () => async (dispatch) => {
     }
   }
 };
-
-export const searchViewProfile = (payload) => (dispatch) => {
-  dispatch({
-    type: VIEW_PROFILE_SEARCH,
-    payload,
-  });
-};

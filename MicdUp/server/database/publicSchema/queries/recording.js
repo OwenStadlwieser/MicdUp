@@ -64,9 +64,13 @@ const getRecordingsFromTag = {
       }
       const posts = await Post.aggregate([
         {
-          $match: { _id: { $in: tag.posts } },
-          owner: { $nin: blocked },
-          owner: { $nin: blockedBy },
+          $match: {
+            $and: [
+              { _id: { $in: tag.posts } },
+              { owner: { $nin: blocked } },
+              { owner: { $nin: blockedBy } },
+            ],
+          },
         },
         {
           $addFields: {

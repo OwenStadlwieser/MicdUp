@@ -99,7 +99,9 @@ export class Post extends Component {
                       return;
                     }
                     this.props.navigate("Search");
-                    this.props.viewProfile(post.owner);
+                    this.props.viewProfile({
+                      ...post.owner,
+                    });
                     this.props.searchViewProfile(true);
                     this.mounted && this.setState({ showing: false });
                   }}

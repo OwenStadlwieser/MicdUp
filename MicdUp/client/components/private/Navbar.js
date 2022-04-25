@@ -109,7 +109,10 @@ export class NavBar extends Component {
               : styles.navbarButton
           }
           onPress={() => {
-            this.props.viewProfile(this.props.profile);
+            this.props.viewProfile({
+              ...this.props.profile,
+              user: { userName: this.props.userName },
+            });
             this.props.navigate("Profile");
           }}
         >
@@ -129,6 +132,7 @@ export class NavBar extends Component {
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
   profile: state.auth.user.profile,
+  userName: state.auth.user.userName,
 });
 
 export default connect(mapStateToProps, { navigate, viewProfile })(NavBar);

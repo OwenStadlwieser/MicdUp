@@ -74,7 +74,7 @@ export class SoundPlayer extends Component {
                       return;
                     }
                     this.props.navigate("Search");
-                    this.props.viewProfile(sound.owner);
+                    this.props.viewProfile({ ...sound.owner });
                     this.props.searchViewProfile(true);
                     this.mounted && this.setState({ showing: false });
                   }}

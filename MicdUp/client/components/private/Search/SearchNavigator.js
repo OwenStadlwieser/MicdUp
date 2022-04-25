@@ -1,0 +1,79 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { View } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { navigationRefSearch } from "../../../redux/actions/display";
+// components
+import Feed from "../Feed/Feed";
+import Profile from "../Profile/Profile";
+import Search from "./Search";
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#1A3561",
+  },
+};
+const Stack = createStackNavigator();
+
+export class SearchNavigator extends Component {
+  constructor() {
+    super();
+    this.state = {
+      loading: false,
+    };
+
+    this.mounted = true;
+  }
+
+  componentWillUnmount = () => (this.mounted = false);
+
+  componentDidMount = () => {};
+
+  render() {
+    const { keyForSearch, currentProfile } = this.props;
+    return (
+      <NavigationContainer
+        independent={true}
+        style={{}}
+        theme={MyTheme}
+        ref={navigationRefSearch}
+      >
+        <Stack.Navigator initialRouteName={"Search"}>
+          <Stack.Screen
+            name="Search"
+            initialParams={{ key: keyForSearch }}
+            component={Search}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SearchFeed"
+            component={Feed}
+            initialParams={{
+              key: this.props.loggedIn,
+              fromSearch: true,
+            }}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            options={{ headerShown: true }}
+            name="SearchProfile"
+            component={Profile}
+            initialParams={{
+              key: currentProfile ? currentProfile.id : "notloggedin",
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+  }
+}
+
+const mapStateToProps = (state) => ({
+  currentProfile: state.display.viewingProfile,
+  keyForSearch: state.display.keyForSearch,
+});
+
+export default connect(mapStateToProps, {})(SearchNavigator);

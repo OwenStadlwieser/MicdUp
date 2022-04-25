@@ -18,13 +18,13 @@ import Feed from "./components/private/Feed/Feed";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
 import CircleSnail from "react-native-progress/CircleSnail";
 import NotificationBell from "./components/private/NotificationBell";
+import SearchNavigator from "./components/private/Search/SearchNavigator";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
-import Search from "./components/private/Search/Search";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -128,7 +128,7 @@ export class Root extends Component {
               <Stack.Screen
                 name="Search"
                 initialParams={{ key: keyForSearch }}
-                component={Search}
+                component={SearchNavigator}
                 options={{ headerShown: false }}
               />
               <Stack.Screen

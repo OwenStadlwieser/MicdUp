@@ -94,10 +94,7 @@ export class Profile extends Component {
 
   async handleScroll(event) {
     const { getUserPosts, cachedPosts } = this.props;
-    const { loading, prevLength } = this.state;
-    const { id } = this.props.route.params
-      ? this.props.route.params
-      : this.props;
+    const { id } = this.props.currentProfile;
     const posts = cachedPosts[id];
     try {
       if (
@@ -118,9 +115,7 @@ export class Profile extends Component {
 
   async onSwipeDown(gestureState) {
     const { getUserPosts, clearPosts } = this.props;
-    const { id } = this.props.route.params
-      ? this.props.route.params
-      : this.props;
+    const { id } = this.props.currentProfile;
     if (this.state.loading) return;
     this.props.addLoading("Profile");
     await clearPosts(id);
@@ -181,9 +176,7 @@ export class Profile extends Component {
 
   getPosts = async (fromRefresh = false) => {
     const { getUserPosts, cachedPosts } = this.props;
-    const { id } = this.props.route.params
-      ? this.props.route.params
-      : this.props;
+    const { id } = this.props.currentProfile;
     this.props.setCurrentKey(id);
     this.mounted && this.setState({ refreshing: true });
     const posts = cachedPosts[id];
@@ -238,9 +231,11 @@ export class Profile extends Component {
       otherUserSettings,
     } = this.state;
     const { profile, currentProfile, backArrow, cachedPosts } = this.props;
-    const { userName, id } = this.props.route.params
-      ? this.props.route.params
-      : this.props;
+    console.log(this.props.currentProfile);
+    const { userName } = this.props.currentProfile.user
+      ? this.props.currentProfile.user
+      : {};
+    const { id } = this.props.currentProfile;
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
     const posts = cachedPosts[id];
     if (!profile && !currentProfile) {

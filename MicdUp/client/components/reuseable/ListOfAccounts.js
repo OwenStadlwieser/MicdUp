@@ -138,7 +138,7 @@ export class ListOfAccounts extends Component {
                 ]}
                 underlayColor="#6FF6FF"
                 onPress={() => {
-                  this.props.viewProfile(data.item);
+                  this.props.viewProfile({ ...data.item });
                   this.mounted &&
                     this.setState({
                       viewingProfile: true,

@@ -18,6 +18,7 @@ import Comment from "../reuseable/Comment";
 import Profile from "./Profile/Profile";
 import Search from "./Search/Search";
 import Navbar from "./Navbar";
+import SearchNavigator from "./Search/SearchNavigator";
 // helpers
 import { getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
@@ -97,7 +98,6 @@ export class Dashboard extends Component {
             screenListeners={{
               state: (e) => {
                 // Do something with the state
-                console.log(e.data);
                 this.props.navigateStateChanged(
                   e.data.state.routeNames[e.data.state.index]
                 );
@@ -114,7 +114,7 @@ export class Dashboard extends Component {
             <Stack.Screen
               name="Search"
               initialParams={{ key: keyForSearch }}
-              component={Search}
+              component={SearchNavigator}
               options={{ headerShown: false }}
             />
             <Stack.Screen
