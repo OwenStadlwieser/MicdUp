@@ -39,15 +39,6 @@ export class Settings extends Component {
         ))
       : (settings = (
           <View style={styles.pane}>
-            <AntDesign
-              style={styles.topLeftIcon}
-              name="leftcircle"
-              size={24}
-              color="white"
-              onPress={() => {
-                this.props.hideSetting();
-              }}
-            />
             <ScrollView
               scrollEnabled={true}
               style={styles.settingsOptionsContainer}

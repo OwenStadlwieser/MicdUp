@@ -285,10 +285,7 @@ const likePost = {
       );
       return post;
     });
-    const privatePermissionIndex = await checkIfIsInPrivateList(
-      context,
-      parent
-    );
+    const privatePermissionIndex = await checkIfIsInPrivateList(context, post);
     const owner = await Profile.findOne({
       _id: post.owner,
       $not: { blockedBy: { $all: [context.profile.id] } },
@@ -315,7 +312,6 @@ const likePost = {
         }
         await profile.save();
         await post.save();
-        console.log("test");
         makeLikeNotification(
           await User.findOne(context.profile.user),
           "post",
@@ -336,7 +332,6 @@ const likePost = {
         await profile.save();
         post.likers.splice(index, 1);
         await post.save();
-        console.log("test2");
         // makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
         return post;
       }
@@ -416,10 +411,7 @@ const commentToPost = {
     if (!owner) {
       throw new Error("No owner");
     }
-    const privatePermissionIndex = await checkIfIsInPrivateList(
-      context,
-      parent
-    );
+    const privatePermissionIndex = await checkIfIsInPrivateList(context, post);
     if (privatePermissionIndex < 0) {
       return {};
     }

@@ -53,6 +53,7 @@ import {
   addLoading,
   removeLoading,
   setCurrentKey,
+  navigate,
 } from "../../../redux/actions/display";
 // audio
 import {
@@ -68,7 +69,6 @@ export class Profile extends Component {
     super();
     this.state = {
       loading: false,
-      settingsShown: false,
       recording: false,
       playbackObject: {},
       currentBioRecording: "",
@@ -94,6 +94,7 @@ export class Profile extends Component {
 
   async handleScroll(event) {
     const { getUserPosts, cachedPosts } = this.props;
+    const { loading, prevLength } = this.state;
     const { id } = this.props.currentProfile;
     const posts = cachedPosts[id];
     try {
@@ -104,9 +105,11 @@ export class Profile extends Component {
         prevLength !== posts.length
       ) {
         this.props.addLoading("Profile");
-        this.mounted && this.setState({ prevLength: posts.length });
+        this.mounted &&
+          this.setState({ prevLength: posts.length, loading: true });
         await getUserPosts(id, Math.round(posts.length / 20));
         this.props.removeLoading("Profile");
+        this.mounted && this.setState({ loading: false });
       }
     } catch (err) {
       console.log(err);
@@ -195,10 +198,6 @@ export class Profile extends Component {
     await this.getPosts();
   };
 
-  hideSetting = () => {
-    this.mounted && this.setState({ settingsShown: false });
-  };
-
   setNewBioRecording = (newR) => {
     this.mounted && this.setState({ newBioRecording: newR });
   };
@@ -218,7 +217,6 @@ export class Profile extends Component {
       directionalOffsetThreshold: 80,
     };
     const {
-      settingsShown,
       recording,
       newBioRecording,
       playingId,
@@ -283,19 +281,17 @@ export class Profile extends Component {
             setImage={this.setImage.bind(this)}
           />
         )}
-        {!settingsShown && (
-          <Ionicons
-            onPress={() => {
-              isUserProfile
-                ? this.mounted && this.setState({ settingsShown: true })
-                : this.mounted && this.setState({ otherUserSettings: true });
-            }}
-            name="settings-outline"
-            size={24}
-            color="white"
-            style={styles.topRightIcon}
-          />
-        )}
+        <Ionicons
+          onPress={() => {
+            isUserProfile
+              ? this.props.navigate("Settings")
+              : this.mounted && this.setState({ otherUserSettings: true });
+          }}
+          name="settings-outline"
+          size={24}
+          color="white"
+          style={styles.topRightIcon}
+        />
         {backArrow && !showingListOfAccounts && (
           <AntDesign
             style={[styles.topLeftIcon, { zIndex: 8 }]}
@@ -307,279 +303,274 @@ export class Profile extends Component {
             }}
           />
         )}
-        {settingsShown && (
-          <Settings hideSetting={this.hideSetting.bind(this)} />
-        )}
-        {!settingsShown && (
-          <View style={styles.paneUncentered}>
-            {loading && (
-              <View style={styles.refresh}>
-                <Text style={styles.nextButtonText}>Loading</Text>
-              </View>
-            )}
-            <GestureRecognizer
-              onSwipeDown={(state) => this.onSwipeDown(state)}
-              config={config}
-            >
-              <View style={styles.profileHeader}>
-                <View style={styles.imageAndFollowing}>
-                  <View style={styles.imageAndIcon}>
+        <View style={styles.paneUncentered}>
+          {loading && (
+            <View style={styles.refresh}>
+              <Text style={styles.nextButtonText}>Loading</Text>
+            </View>
+          )}
+          <GestureRecognizer
+            onSwipeDown={(state) => this.onSwipeDown(state)}
+            config={config}
+          >
+            <View style={styles.profileHeader}>
+              <View style={styles.imageAndFollowing}>
+                <View style={styles.imageAndIcon}>
+                  <TouchableHighlight
+                    style={[
+                      styles.profileImgContainerSmall,
+                      {
+                        borderColor: recording ? "red" : "#30F3FF",
+                        borderWidth: 1,
+                      },
+                    ]}
+                  >
+                    <Image
+                      source={
+                        currentProfile && currentProfile.image
+                          ? { uri: currentProfile.image.signedUrl }
+                          : require("../../../assets/no-profile-pic-icon-27.jpg")
+                      }
+                      style={styles.profileImgSmall}
+                    />
+                  </TouchableHighlight>
+                  {isUserProfile && (
                     <TouchableHighlight
-                      style={[
-                        styles.profileImgContainerSmall,
-                        {
-                          borderColor: recording ? "red" : "#30F3FF",
-                          borderWidth: 1,
-                        },
-                      ]}
+                      onPress={() => {
+                        this.mounted && this.setState({ selectImage: true });
+                      }}
                     >
-                      <Image
-                        source={
-                          currentProfile && currentProfile.image
-                            ? { uri: currentProfile.image.signedUrl }
-                            : require("../../../assets/no-profile-pic-icon-27.jpg")
-                        }
-                        style={styles.profileImgSmall}
+                      <Entypo
+                        style={styles.uploadIcon}
+                        name="upload"
+                        size={24}
+                        color="#30F3FF"
                       />
                     </TouchableHighlight>
-                    {isUserProfile && (
-                      <TouchableHighlight
-                        onPress={() => {
-                          this.mounted && this.setState({ selectImage: true });
-                        }}
-                      >
-                        <Entypo
-                          style={styles.uploadIcon}
-                          name="upload"
-                          size={24}
-                          color="#30F3FF"
-                        />
-                      </TouchableHighlight>
-                    )}
-                  </View>
+                  )}
                 </View>
-                <Text numberOfLines={1} style={[styles.profileText]}>
-                  @{userName}
-                </Text>
-                <Text style={styles.followersText}>
-                  <Text
-                    onPress={() => {
-                      const { getFollowersQuery } = this.props;
-                      this.mounted &&
-                        this.setState({
-                          showingListOfAccounts: true,
-                          listOfAccountsParams: {
-                            title: "Followers",
-                            getData: async function (skipMult) {
-                              const res = await getFollowersQuery(id, skipMult);
-                              return res && res.followers ? res.followers : [];
-                            },
-                          },
-                        });
-                    }}
-                    style={{ fontSize: small, fontStyle: "italic" }}
-                  >
-                    {currentProfile ? currentProfile.followersCount : 0}{" "}
-                    Followers{"  "}
-                  </Text>
-                  <Text
-                    onPress={() => {
-                      const { getFollowingQuery } = this.props;
-                      this.mounted &&
-                        this.setState({
-                          showingListOfAccounts: true,
-
-                          listOfAccountsParams: {
-                            title: "Following",
-                            getData: async function (skipMult) {
-                              const res = await getFollowingQuery(id, skipMult);
-                              return res && res.following ? res.following : [];
-                            },
-                          },
-                        });
-                    }}
-                    style={{ fontSize: small, fontStyle: "italic" }}
-                  >
-                    {currentProfile
-                      ? currentProfile.followingCount + " Following  "
-                      : 0 + " Following  "}
-                  </Text>
-                  <Text
-                    onPress={() => {
-                      const { getPrivatesQuery } = this.props;
-                      if (!isUserProfile) return;
-                      this.mounted &&
-                        this.setState({
-                          showingListOfAccounts: true,
-                          isPrivates: true,
-                          listOfAccountsParams: {
-                            title: "Privates",
-                            getData: async function (skipMult) {
-                              const res = await getPrivatesQuery(skipMult);
-                              return res && res.privates ? res.privates : [];
-                            },
-                          },
-                        });
-                    }}
-                    style={{ fontSize: small, fontStyle: "italic" }}
-                  >
-                    {currentProfile && currentProfile.privatesCount
-                      ? currentProfile.privatesCount
-                      : 0}{" "}
-                    Privates{"        "}
-                  </Text>
-                </Text>
-                <Bio
-                  id={id}
-                  startRecording={this.startRecording.bind(this)}
-                  stopRecordingBio={this.stopRecordingBio.bind(this)}
-                  currentSound={playingId}
-                  setNewBioRecording={this.setNewBioRecording.bind(this)}
-                  newBioRecording={newBioRecording}
-                />
-                {!isUserProfile && (
-                  <View style={styles.foreignProfileButtons}>
-                    <TouchableOpacity
-                      onPress={async () => {
-                        await this.props.followProfile(id);
-                      }}
-                      style={styles.smallNextButton}
-                    >
-                      <Text style={styles.nextButtonText}>
-                        {currentProfile && currentProfile.isFollowedByUser
-                          ? "unfollow"
-                          : "follow"}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={async () => {
-                        await this.props.addToPrivates(
-                          id,
-                          currentProfile.isPrivateByUser
-                        );
-                      }}
-                      style={styles.smallNextButton}
-                    >
-                      <Text style={styles.nextButtonText}>
-                        {currentProfile && currentProfile.isPrivateByUser
-                          ? "remove private"
-                          : "add private"}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.smallNextButton}>
-                      <Text
-                        onPress={async () => {
-                          await this.props.createOrOpenChat(
-                            [id, profile.id],
-                            profile.id
-                          );
-                        }}
-                        style={styles.nextButtonText}
-                      >
-                        Message
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
               </View>
-            </GestureRecognizer>
-            <SwipeListView
-              data={posts ? posts.filter((i) => i) : []}
-              disableRightSwipe
-              disableLeftSwipe={!isUserProfile || !outerScrollEnabled}
-              onScroll={this.handleScroll.bind(this)}
-              scrollEventThrottle={50}
-              ref={(view) => (this.scrollView = view)}
-              useNativeDriver={false}
-              scrollEnabled={outerScrollEnabled}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={() => {
-                    this.getPosts(true);
-                  }}
-                />
-              }
-              renderItem={(data, rowMap) => (
-                <Post
-                  isUserProfile={isUserProfile}
-                  key={data.item.id}
-                  post={data.item}
-                  postArray={posts}
-                  setOuterScroll={this.setOuterScroll.bind(this)}
-                  index={data.index}
-                  canViewPrivate={
-                    profile && id === profile.id
-                      ? true
-                      : currentProfile.canViewPrivatesFromUser
-                  }
-                  higherUp={false}
-                />
-              )}
-              renderHiddenItem={(data, rowMap) => {
-                return (
-                  <View style={listStyles.rowBack}>
-                    <TouchableOpacity
-                      style={[
-                        listStyles.backRightBtn,
-                        listStyles.backRightBtnRight,
-                      ]}
-                      onPress={async () => {
-                        await this.props.deletePost(data.item.id);
-                      }}
-                    >
-                      <Entypo name="trash" size={24} color="red" />
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-              rightOpenValue={-75}
-            />
-            {recording && Platform.OS !== "web" && (
-              <AudioRecordingVisualization
-                recording={recording}
-                barWidth={barWidth}
-                barMargin={barMargin}
-              />
-            )}
-            {recording && Platform.OS !== "web" && (
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 50,
-                  position: "absolute",
-                  bottom: height * 0.08,
-                  width,
-                  left: 0,
-                  opacity: 1.0,
-                  zIndex: 6,
-                }}
-              >
-                <FontAwesome5
-                  onPress={async () => {
-                    const { bio } = this.state;
+              <Text numberOfLines={1} style={[styles.profileText]}>
+                @{userName}
+              </Text>
+              <Text style={styles.followersText}>
+                <Text
+                  onPress={() => {
+                    const { getFollowersQuery } = this.props;
                     this.mounted &&
                       this.setState({
-                        recording: false,
-                        isRecordingComment: false,
+                        showingListOfAccounts: true,
+                        listOfAccountsParams: {
+                          title: "Followers",
+                          getData: async function (skipMult) {
+                            const res = await getFollowersQuery(id, skipMult);
+                            return res && res.followers ? res.followers : [];
+                          },
+                        },
                       });
-                    if (bio) {
-                      await this.stopRecordingBio();
-                      this.mounted && this.setState({ bio: false });
-                    }
                   }}
-                  style={{
-                    fontSize: largeIconFontSize,
-                    opacity: 1.0,
+                  style={{ fontSize: small, fontStyle: "italic" }}
+                >
+                  {currentProfile ? currentProfile.followersCount : 0} Followers
+                  {"  "}
+                </Text>
+                <Text
+                  onPress={() => {
+                    const { getFollowingQuery } = this.props;
+                    this.mounted &&
+                      this.setState({
+                        showingListOfAccounts: true,
+
+                        listOfAccountsParams: {
+                          title: "Following",
+                          getData: async function (skipMult) {
+                            const res = await getFollowingQuery(id, skipMult);
+                            return res && res.following ? res.following : [];
+                          },
+                        },
+                      });
                   }}
-                  name="record-vinyl"
-                  color={"red"}
-                />
-              </View>
+                  style={{ fontSize: small, fontStyle: "italic" }}
+                >
+                  {currentProfile
+                    ? currentProfile.followingCount + " Following  "
+                    : 0 + " Following  "}
+                </Text>
+                <Text
+                  onPress={() => {
+                    const { getPrivatesQuery } = this.props;
+                    if (!isUserProfile) return;
+                    this.mounted &&
+                      this.setState({
+                        showingListOfAccounts: true,
+                        isPrivates: true,
+                        listOfAccountsParams: {
+                          title: "Privates",
+                          getData: async function (skipMult) {
+                            const res = await getPrivatesQuery(skipMult);
+                            return res && res.privates ? res.privates : [];
+                          },
+                        },
+                      });
+                  }}
+                  style={{ fontSize: small, fontStyle: "italic" }}
+                >
+                  {currentProfile && currentProfile.privatesCount
+                    ? currentProfile.privatesCount
+                    : 0}{" "}
+                  Privates{"        "}
+                </Text>
+              </Text>
+              <Bio
+                id={id}
+                startRecording={this.startRecording.bind(this)}
+                stopRecordingBio={this.stopRecordingBio.bind(this)}
+                currentSound={playingId}
+                setNewBioRecording={this.setNewBioRecording.bind(this)}
+                newBioRecording={newBioRecording}
+              />
+              {!isUserProfile && (
+                <View style={styles.foreignProfileButtons}>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await this.props.followProfile(id);
+                    }}
+                    style={styles.smallNextButton}
+                  >
+                    <Text style={styles.nextButtonText}>
+                      {currentProfile && currentProfile.isFollowedByUser
+                        ? "unfollow"
+                        : "follow"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await this.props.addToPrivates(
+                        id,
+                        currentProfile.isPrivateByUser
+                      );
+                    }}
+                    style={styles.smallNextButton}
+                  >
+                    <Text style={styles.nextButtonText}>
+                      {currentProfile && currentProfile.isPrivateByUser
+                        ? "remove private"
+                        : "add private"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.smallNextButton}>
+                    <Text
+                      onPress={async () => {
+                        await this.props.createOrOpenChat(
+                          [id, profile.id],
+                          profile.id
+                        );
+                      }}
+                      style={styles.nextButtonText}
+                    >
+                      Message
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </GestureRecognizer>
+          <SwipeListView
+            data={posts ? posts.filter((i) => i) : []}
+            disableRightSwipe
+            disableLeftSwipe={!isUserProfile || !outerScrollEnabled}
+            onScroll={this.handleScroll.bind(this)}
+            scrollEventThrottle={50}
+            ref={(view) => (this.scrollView = view)}
+            useNativeDriver={false}
+            scrollEnabled={outerScrollEnabled}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  this.getPosts(true);
+                }}
+              />
+            }
+            renderItem={(data, rowMap) => (
+              <Post
+                isUserProfile={isUserProfile}
+                key={data.item.id}
+                post={data.item}
+                postArray={posts}
+                setOuterScroll={this.setOuterScroll.bind(this)}
+                index={data.index}
+                canViewPrivate={
+                  profile && id === profile.id
+                    ? true
+                    : currentProfile.canViewPrivatesFromUser
+                }
+                higherUp={false}
+              />
             )}
-          </View>
-        )}
+            renderHiddenItem={(data, rowMap) => {
+              return (
+                <View style={listStyles.rowBack}>
+                  <TouchableOpacity
+                    style={[
+                      listStyles.backRightBtn,
+                      listStyles.backRightBtnRight,
+                    ]}
+                    onPress={async () => {
+                      await this.props.deletePost(data.item.id);
+                    }}
+                  >
+                    <Entypo name="trash" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            rightOpenValue={-75}
+          />
+          {recording && Platform.OS !== "web" && (
+            <AudioRecordingVisualization
+              recording={recording}
+              barWidth={barWidth}
+              barMargin={barMargin}
+            />
+          )}
+          {recording && Platform.OS !== "web" && (
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 50,
+                position: "absolute",
+                bottom: height * 0.08,
+                width,
+                left: 0,
+                opacity: 1.0,
+                zIndex: 6,
+              }}
+            >
+              <FontAwesome5
+                onPress={async () => {
+                  const { bio } = this.state;
+                  this.mounted &&
+                    this.setState({
+                      recording: false,
+                      isRecordingComment: false,
+                    });
+                  if (bio) {
+                    await this.stopRecordingBio();
+                    this.mounted && this.setState({ bio: false });
+                  }
+                }}
+                style={{
+                  fontSize: largeIconFontSize,
+                  opacity: 1.0,
+                }}
+                name="record-vinyl"
+                color={"red"}
+              />
+            </View>
+          )}
+        </View>
       </View>
     );
   }
@@ -607,4 +598,5 @@ export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   setCurrentKey,
+  navigate,
 })(Profile);

@@ -16,7 +16,7 @@ import Dms from "./Dms/Dms";
 import Feed from "./Feed/Feed";
 import Comment from "../reuseable/Comment";
 import Profile from "./Profile/Profile";
-import Search from "./Search/Search";
+import Settings from "./Profile/Settings";
 import Navbar from "./Navbar";
 import SearchNavigator from "./Search/SearchNavigator";
 // helpers
@@ -110,6 +110,12 @@ export class Dashboard extends Component {
               component={Feed}
               initialParams={{ key: this.props.loggedIn }}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={Settings}
+              initialParams={{ key: this.props.loggedIn }}
+              options={{ headerShown: true }}
             />
             <Stack.Screen
               name="Search"
