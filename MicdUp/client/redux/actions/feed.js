@@ -76,6 +76,7 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
       variables: { skipMult },
       fetchPolicy: "no-cache",
     });
+    console.log(res.data.getNotLoggedInFeed);
     if (!res || !res.data || !res.data.getNotLoggedInFeed) {
       dispatch(
         showMessage({ success: false, message: "Fetching feed failed" })

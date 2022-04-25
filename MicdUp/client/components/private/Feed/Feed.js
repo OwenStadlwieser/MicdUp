@@ -51,7 +51,6 @@ export class Feed extends Component {
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
-    console.log(tag, 12343);
     this.props.addLoading("Feed");
     this.mounted && this.setState({ loading: true });
     if (fromSearch && tag) {
@@ -71,6 +70,13 @@ export class Feed extends Component {
   };
   componentDidMount = async () => {
     await this.getData(0);
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const { loggedIn } = this.props;
+    if (loggedIn && !prevProps.loggedIn) {
+      await this.getData(0);
+    }
   };
 
   async handleScroll(event) {
@@ -105,6 +111,7 @@ export class Feed extends Component {
 
   render() {
     const { profile, cachedPosts, loggedIn } = this.props;
+    console.log(loggedIn);
     const {
       isRecordingComment,
       loading,
@@ -134,7 +141,7 @@ export class Feed extends Component {
           overflow: "scroll",
           flex: 1,
         }}
-        key={this.props.route.params ? this.props.route.params.key : ""}
+        key={this.props.loggedIn}
       >
         {tag ? (
           <Appbar.Header

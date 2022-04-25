@@ -71,7 +71,7 @@ const getFollowingTopicsFeed = {
       let following = context.profile.followingTopics.keys();
       return await Post.find({
         $and: [
-          { owner: { $in: Array.from(following) } },
+          { tags: { $in: Array.from(following) } },
           { owner: { $nin: blocked } },
           { owner: { $nin: blockedBy } },
         ],
