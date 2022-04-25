@@ -19,6 +19,8 @@ import Profile from "../Profile/Profile";
 import Feed from "../Feed/Feed";
 import PopularTags from "./PopularTags";
 import RecommendedTags from "./RecommendedTags";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 // styles
 import { styles } from "../../../styles/Styles";
 
@@ -136,7 +138,7 @@ export class Search extends Component {
             </View>
           </View>
         )}
-        {term.length > 0 && !searchViewingProfile ? (
+        {term.length > 0 && !searchViewingProfile && (
           <View style={styles.searchResultsContainer}>
             <ScrollView style={styles.tagResultsContainer}>
               {tags &&
@@ -185,18 +187,6 @@ export class Search extends Component {
                 ))}
             </ScrollView>
           </View>
-        ) : (
-          searchViewingProfile && (
-            <Profile
-              key={id}
-              id={id}
-              backArrow={true}
-              backAction={(() => {
-                this.props.searchViewProfile(false);
-              }).bind(this)}
-              userName={userName}
-            />
-          )
         )}
       </View>
     );
