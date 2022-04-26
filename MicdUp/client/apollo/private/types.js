@@ -28,6 +28,7 @@ likes
 isLikedByUser
 privatePost
 dateCreated
+duration
 speechToText {
   word
   time
@@ -61,6 +62,7 @@ likersCount
 seenBy
 signedUrl
 dateCreated
+duration
 speechToText {
   word
   time
@@ -74,6 +76,7 @@ likes
 isLikedByUser
 repliesLength
 dateCreated
+duration
 speechToText {
   word
   time

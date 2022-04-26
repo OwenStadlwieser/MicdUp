@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { ScrollView as GestureHandlerScrollView } from "react-native-gesture-handler";
 import ProgressBar from "../../reuseable/ProgressBar";
+import DeleteableItem from "../../reuseable/DeleteableItem";
 // styles
 import { styles, postWidth, postHeight } from "../../../styles/Styles";
 //icons
@@ -28,7 +29,8 @@ import {
   navigate,
   searchViewTag,
 } from "../../../redux/actions/display";
-import DeleteableItem from "../../reuseable/DeleteableItem";
+// helpers
+import { forHumans, getCurrentTime } from "../../../reuseableFunctions/helpers";
 
 export class Post extends Component {
   constructor() {
@@ -51,6 +53,7 @@ export class Post extends Component {
   render() {
     const { post, index, playingId, isPause, canViewPrivate, profile } =
       this.props;
+    console.log(post);
     return (
       <TouchableHighlight
         onPress={async () => {
@@ -162,6 +165,20 @@ export class Post extends Component {
               post={post}
               textStyle={{}}
             />
+            <View
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ alignSelf: "flex-start", fontWeight: "700" }}>
+                {forHumans(getCurrentTime() - post.dateCreated)} Ago
+              </Text>
+              <Text style={{ alignSelf: "flex-start", fontWeight: "700" }}>
+                {forHumans(post.duration)}
+              </Text>
+            </View>
           </View>
           <View style={[styles.textAndPlayButtonContainer, { flex: 1 }]}>
             <View style={styles.postPlayButton}>

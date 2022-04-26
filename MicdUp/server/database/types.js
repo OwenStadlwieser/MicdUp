@@ -325,6 +325,12 @@ const CommentWithoutReplyType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
+      },
+    },
     speechToText: {
       type: new GraphQLList(
         new GraphQLObjectType({
@@ -411,6 +417,12 @@ const CommentType = new GraphQLObjectType({
           }),
         })
       ),
+    },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
+      },
     },
     isDeleted: { type: GraphQLBoolean },
     replies: {
@@ -519,6 +531,12 @@ const PostType = new GraphQLObjectType({
       type: new GraphQLList(TagsType),
       async resolve(parent, args, context, info) {
         return await Tag.find({ _id: { $in: parent.tags } });
+      },
+    },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
       },
     },
     title: { type: GraphQLString },
@@ -647,6 +665,12 @@ const ChatType = new GraphQLObjectType({
       type: ProfilePublicType,
       async resolve(parent, args, context, info) {
         return await Profile.findById(parent.creator);
+      },
+    },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
       },
     },
     members: {
@@ -809,6 +833,12 @@ const FileType = new GraphQLObjectType({
           }),
         })
       ),
+    },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
+      },
     },
     signedUrl: {
       type: GraphQLString,
