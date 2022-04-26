@@ -173,7 +173,7 @@ export class Feed extends Component {
         style={{
           display: "flex",
           justifyContent: "flex-start",
-          marginTop: height * 0.1,
+          marginTop: height * 0.02,
           overflow: "scroll",
           flex: 1,
         }}
