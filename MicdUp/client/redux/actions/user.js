@@ -7,7 +7,7 @@ import {
   SEARCH_USERS_QUERY,
 } from "../../apollo/private/user";
 import { SET_USER, LOG_IN, DELETE_ACCOUNT, VIEW_PROFILE } from "../types";
-import { showMessage } from "./display";
+import { showMessage, navigate } from "./display";
 
 export const getUserQuery = () => async (dispatch) => {
   try {
@@ -31,6 +31,7 @@ export const getUserQuery = () => async (dispatch) => {
             user: { userName: res.data.getUser.userName },
           },
         });
+        dispatch(navigate("Profile"));
       }
     }
     return res.data.getUser;

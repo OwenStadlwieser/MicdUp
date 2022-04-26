@@ -98,12 +98,12 @@ export class Post extends Component {
                       this.mounted && this.setState({ showing: false });
                       return;
                     }
-                    this.props.navigate("Search");
                     this.props.viewProfile({
                       ...post.owner,
                     });
                     this.props.searchViewProfile(true);
                     this.mounted && this.setState({ showing: false });
+                    this.props.navigate("SearchProfile");
                   }}
                 >
                   <Image
@@ -145,7 +145,6 @@ export class Post extends Component {
                         title={"title"}
                         key={index}
                         onDelete={() => {
-                          this.props.navigate("Search");
                           this.props.searchViewTag(tag);
                         }}
                         icon={"tag-multiple"}

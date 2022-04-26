@@ -14,9 +14,16 @@ import { Button } from "react-native-paper";
 // helpers
 import { io } from "socket.io-client";
 // redux
-import { addLoading, removeLoading } from "../../../redux/actions/display";
-import { createOrOpenChat } from "../../../redux/actions/chat";
-import { viewChats, viewMoreChats } from "../../../redux/actions/chat";
+import {
+  addLoading,
+  removeLoading,
+  navigate,
+} from "../../../redux/actions/display";
+import {
+  viewChats,
+  viewMoreChats,
+  createOrOpenChat,
+} from "../../../redux/actions/chat";
 import { searchUsers } from "../../../redux/actions/user";
 // components
 import DropDown from "../../reuseable/DropDown";
@@ -54,31 +61,16 @@ export class Dms extends Component {
     this.mounted = false;
   };
 
-  componentDidUpdate = async (prevProps) => {
-    if (prevProps.activeChatId && !this.props.activeChatId) {
-      this.mounted && this.setState({ users: "" });
-      this.props.addLoading("DMS");
-      if (!this.props.activeChatId) await this.props.viewChats(0);
-      this.props.removeLoading("DMS");
-    }
-  };
-
   componentDidMount = async () => {
-    const { activeChatId } = this.props;
     this.props.addLoading("DMS");
-    if (!activeChatId) await this.props.viewChats(0);
+    await this.props.viewChats(0);
     this.props.removeLoading("DMS");
   };
 
   render() {
-    const { chats, showingChat, activeChatId, profile } = this.props;
+    const { chats, profile } = this.props;
     const { users, userNames, showDropDown, refreshing } = this.state;
-    console.log(chats);
-    const app = activeChatId ? (
-      <View style={styles.pane}>
-        <Chat />
-      </View>
-    ) : (
+    const app = (
       <TouchableOpacity
         onPress={() => {
           this.mounted && this.setState({ showDropDown: false });
@@ -206,6 +198,7 @@ export class Dms extends Component {
                 onPress={async () => {
                   this.props.addLoading("DMS");
                   await this.props.viewMoreChats(chat, 0);
+                  this.props.navigate("Chat");
                   this.mounted && this.setState({ showingChat: true });
                   this.props.removeLoading("DMS");
                 }}
@@ -244,7 +237,6 @@ const mapStateToProps = (state) => ({
   chats: state.chat.chats,
   showingChat: state.chat.showingChat,
   activeChats: state.chat.activeChats,
-  activeChatId: state.chat.activeChatId,
   socket: state.auth.socket,
   profile: state.auth.user.profile,
 });
@@ -256,4 +248,5 @@ export default connect(mapStateToProps, {
   createOrOpenChat,
   addLoading,
   removeLoading,
+  navigate,
 })(Dms);

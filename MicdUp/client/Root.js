@@ -18,7 +18,8 @@ import Feed from "./components/private/Feed/Feed";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
 import CircleSnail from "react-native-progress/CircleSnail";
 import NotificationBell from "./components/private/NotificationBell";
-import SearchNavigator from "./components/private/Search/SearchNavigator";
+import Search from "./components/private/Search/Search";
+import Profile from "./components/private/Profile/Profile";
 import ListOfAccounts from "./components/reuseable/ListOfAccounts";
 // helpers
 import publicIP from "react-native-public-ip";
@@ -95,6 +96,7 @@ export class Root extends Component {
       keyForSearch,
       showHeader,
       title,
+      currentProfile,
     } = this.props;
     let app;
 
@@ -119,22 +121,46 @@ export class Root extends Component {
               initialRouteName={mountedComponent}
             >
               <Stack.Screen
-                name="ListOfAccounts"
-                component={ListOfAccounts}
-                initialParams={{ key: this.props.loggedIn }}
-                options={{ headerShown: true, headerTitle: title }}
-              />
-              <Stack.Screen
                 name="Feed"
                 component={Feed}
                 initialParams={{ key: this.props.loggedIn }}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+                name="ListOfAccounts"
+                component={ListOfAccounts}
+                initialParams={{ key: this.props.loggedIn }}
+                options={{ headerShown: true, headerTitle: title }}
+              />
+              <Stack.Screen
                 name="Search"
                 initialParams={{ key: keyForSearch }}
-                component={SearchNavigator}
+                component={Search}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="SearchFeed"
+                component={Feed}
+                initialParams={{
+                  key: this.props.loggedIn,
+                  fromSearch: true,
+                }}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                options={{
+                  headerShown: true,
+                  headerTitle: currentProfile
+                    ? currentProfile.user
+                      ? currentProfile.user.userName
+                      : "SearchProfile"
+                    : "SearchProfile",
+                }}
+                name={"SearchProfile"}
+                component={Profile}
+                initialParams={{
+                  key: currentProfile ? currentProfile.id : "notloggedin",
+                }}
               />
               <Stack.Screen
                 name="Create"
@@ -223,6 +249,8 @@ const mapStateToProps = (state) => ({
   keyForSearch: state.display.keyForSearch,
   showHeader: state.display.showHeader,
   title: state.display.list,
+  userName: state.auth.user.userName,
+  currentProfile: state.display.viewingProfile,
 });
 export default connect(mapStateToProps, {
   setIp,

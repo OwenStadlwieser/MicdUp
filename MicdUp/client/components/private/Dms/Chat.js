@@ -15,7 +15,6 @@ import {
   RefreshControl,
 } from "react-native";
 import SpeechToText from "../../reuseable/SpeechToText";
-import { Appbar } from "react-native-paper";
 //styles
 import { styles, chatWidth } from "../../../styles/Styles";
 // icons
@@ -111,212 +110,180 @@ export class Chat extends Component {
   handleMore = () => console.log("Shown more");
 
   render() {
-    const {
-      activeChats,
-      profile,
-      activeChatMembers,
-      userName,
-      playingId,
-      isPause,
-    } = this.props;
+    const { activeChats, profile, playingId, isPause } = this.props;
     const { recording, refreshing } = this.state;
     return (
-      <View style={styles.chatPane}>
-        <Appbar.Header
-          style={[
-            styles.appBarHeader,
-            {
-              position: "absolute",
-              top: 0,
-              backgroundColor: "white",
-            },
-          ]}
-        >
-          <Appbar.BackAction
-            onPress={() => {
-              this.props.hideChats();
-            }}
-          />
-          <Appbar.Content
-            title={activeChatMembers
-              .filter((member) => member)
-              .map((member, res) => {
-                return userName !== member.user.userName
-                  ? member.user.userName + " "
-                  : "";
-              })}
-            subtitle="Members"
-          />
-          <Appbar.Action icon="dots-vertical" onPress={this.handleMore} />
-        </Appbar.Header>
-        <View style={styles.messagesParentContainer}>
-          <ScrollView
-            ref={(view) => {
-              this.scrollView = view;
-            }}
-            onContentSizeChange={() => {
-              const { lastFetched } = this.state;
-              !lastFetched && this.scrollView.scrollToEnd({ animated: true });
-            }}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={async () => {
-                  this.mounted && this.setState({ refreshing: true });
-                  const { activeChatId, activeChatMembers } = this.props;
-                  const { lastFetched } = this.state;
-                  this.mounted &&
-                    this.setState({
-                      loading: true,
-                      fetching: true,
-                      lastFetched: Math.floor(activeChats.length / 20),
-                    });
-                  this.props.addLoading("CHAT");
-                  await this.props.viewMoreChats(
-                    { id: activeChatId, members: activeChatMembers },
-                    activeChats && activeChats.length > 0
-                      ? Math.floor(activeChats.length / 20)
-                      : 0
-                  );
-                  this.props.removeLoading("CHAT");
-                  this.mounted &&
-                    this.setState({ loading: false, fetching: false });
-                  this.mounted && this.setState({ refreshing: false });
-                }}
-              />
-            }
-            contentContainerStyle={styles.messagesContainer}
-            scrollEventThrottle={16}
-          >
-            {activeChats &&
-              activeChats.length > 0 &&
-              activeChats.map(
-                (chat, index) =>
-                  chat && (
-                    <TouchableOpacity
-                      key={chat.id}
-                      style={[
-                        profile.id === chat.owner.id
-                          ? styles.userChat
-                          : styles.foreignChat,
-                        {
-                          backgroundColor:
-                            playingId === chat.id && !isPause
-                              ? "#6FF6FF"
-                              : "white",
-                        },
-                      ]}
-                      onPress={async () => {
-                        console.log(getCurrentTime());
-                        console.log(chat.dateCreated);
-                        this.props.addLoading("CHAT");
-                        if (playingId === chat.id && !isPause) {
-                          await this.props.pauseSound();
-                        } else if (chat.signedUrl) {
-                          await this.props.changeSound(chat, chat.signedUrl);
-                        }
-                        this.props.removeLoading("CHAT");
-                      }}
-                    >
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          width: chatWidth,
-                          paddingHorizontal: 20,
+      <View style={styles.pane}>
+        <View style={styles.chatPane}>
+          <View style={styles.messagesParentContainer}>
+            <ScrollView
+              ref={(view) => {
+                this.scrollView = view;
+              }}
+              onContentSizeChange={() => {
+                const { lastFetched } = this.state;
+                !lastFetched && this.scrollView.scrollToEnd({ animated: true });
+              }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={async () => {
+                    this.mounted && this.setState({ refreshing: true });
+                    const { activeChatId, activeChatMembers } = this.props;
+                    const { lastFetched } = this.state;
+                    this.mounted &&
+                      this.setState({
+                        loading: true,
+                        fetching: true,
+                        lastFetched: Math.floor(activeChats.length / 20),
+                      });
+                    this.props.addLoading("CHAT");
+                    await this.props.viewMoreChats(
+                      { id: activeChatId, members: activeChatMembers },
+                      activeChats && activeChats.length > 0
+                        ? Math.floor(activeChats.length / 20)
+                        : 0
+                    );
+                    this.props.removeLoading("CHAT");
+                    this.mounted &&
+                      this.setState({ loading: false, fetching: false });
+                    this.mounted && this.setState({ refreshing: false });
+                  }}
+                />
+              }
+              contentContainerStyle={styles.messagesContainer}
+              scrollEventThrottle={16}
+            >
+              {activeChats &&
+                activeChats.length > 0 &&
+                activeChats.map(
+                  (chat, index) =>
+                    chat && (
+                      <TouchableOpacity
+                        key={chat.id}
+                        style={[
+                          profile.id === chat.owner.id
+                            ? styles.userChat
+                            : styles.foreignChat,
+                          {
+                            backgroundColor:
+                              playingId === chat.id && !isPause
+                                ? "#6FF6FF"
+                                : "white",
+                          },
+                        ]}
+                        onPress={async () => {
+                          console.log(getCurrentTime());
+                          console.log(chat.dateCreated);
+                          this.props.addLoading("CHAT");
+                          if (playingId === chat.id && !isPause) {
+                            await this.props.pauseSound();
+                          } else if (chat.signedUrl) {
+                            await this.props.changeSound(chat, chat.signedUrl);
+                          }
+                          this.props.removeLoading("CHAT");
                         }}
                       >
-                        <View style={{ flex: 3 }}>
-                          <Text
-                            numberOfLines={1}
-                            style={[styles.blackText, { width: 200 }]}
-                          >
-                            @
-                            {chat && chat.owner && chat.owner.user
-                              ? chat.owner.user.userName
-                              : ""}
-                          </Text>
-                          <TouchableHighlight
-                            style={[
-                              styles.commentImgContainer,
-                              {
-                                borderColor: "#30F3FF",
-                                borderWidth: 1,
-                              },
-                            ]}
-                          >
-                            <Image
-                              source={
-                                chat && chat.owner && chat.owner.image
-                                  ? {
-                                      uri: chat.owner.image.signedUrl,
-                                    }
-                                  : require("../../../assets/no-profile-pic-icon-27.jpg")
-                              }
-                              style={styles.commentImg}
-                            />
-                          </TouchableHighlight>
-                        </View>
                         <View
                           style={{
-                            flex: 7,
-                            position: "relative",
-                            overflow: "hidden",
+                            display: "flex",
+                            flexDirection: "row",
+                            width: chatWidth,
+                            paddingHorizontal: 20,
                           }}
                         >
-                          {chat.speechToText && chat.speechToText[0] && (
-                            <SpeechToText
-                              containerStyle={[{ flexDirection: "row" }]}
-                              fontSize={24}
-                              post={chat}
-                              textStyle={{}}
-                            />
-                          )}
-                        </View>
-                        {chat.signedUrl && (
+                          <View style={{ flex: 3 }}>
+                            <Text
+                              numberOfLines={1}
+                              style={[styles.blackText, { width: 200 }]}
+                            >
+                              @
+                              {chat && chat.owner && chat.owner.user
+                                ? chat.owner.user.userName
+                                : ""}
+                            </Text>
+                            <TouchableHighlight
+                              style={[
+                                styles.commentImgContainer,
+                                {
+                                  borderColor: "#30F3FF",
+                                  borderWidth: 1,
+                                },
+                              ]}
+                            >
+                              <Image
+                                source={
+                                  chat && chat.owner && chat.owner.image
+                                    ? {
+                                        uri: chat.owner.image.signedUrl,
+                                      }
+                                    : require("../../../assets/no-profile-pic-icon-27.jpg")
+                                }
+                                style={styles.commentImg}
+                              />
+                            </TouchableHighlight>
+                          </View>
                           <View
                             style={{
-                              flex: 2,
-                              justifyContent: "center",
-                              alignItems: "center",
+                              flex: 7,
+                              position: "relative",
+                              overflow: "hidden",
                             }}
                           >
-                            {chat.signedUrl && (
-                              <Like
-                                type={"Chat"}
-                                postId={chat.id}
-                                ownerId={chat.owner.id}
+                            {chat.speechToText && chat.speechToText[0] && (
+                              <SpeechToText
+                                containerStyle={[{ flexDirection: "row" }]}
+                                fontSize={24}
                                 post={chat}
-                              />
-                            )}
-                            {chat.owner.id === profile.id && (
-                              <Feather
-                                onPress={async () => {}}
-                                name="scissors"
-                                size={24}
-                                color="red"
+                                textStyle={{}}
                               />
                             )}
                           </View>
-                        )}
-                      </View>
-                      <Text
-                        style={{ alignSelf: "flex-start", fontWeight: "700" }}
-                      >
-                        {forHumans(getCurrentTime() - chat.dateCreated)} Ago
-                      </Text>
-                    </TouchableOpacity>
-                  )
-              )}
-          </ScrollView>
+                          {chat.signedUrl && (
+                            <View
+                              style={{
+                                flex: 2,
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              {chat.signedUrl && (
+                                <Like
+                                  type={"Chat"}
+                                  postId={chat.id}
+                                  ownerId={chat.owner.id}
+                                  post={chat}
+                                />
+                              )}
+                              {chat.owner.id === profile.id && (
+                                <Feather
+                                  onPress={async () => {}}
+                                  name="scissors"
+                                  size={24}
+                                  color="red"
+                                />
+                              )}
+                            </View>
+                          )}
+                        </View>
+                        <Text
+                          style={{ alignSelf: "flex-start", fontWeight: "700" }}
+                        >
+                          {forHumans(getCurrentTime() - chat.dateCreated)} Ago
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                )}
+            </ScrollView>
+          </View>
+          <RecordingControls
+            onRecordingStart={(() => {
+              this.mounted && this.setState({ recording: true });
+            }).bind(this)}
+            backButtonAction={this.backButtonAction.bind(this)}
+            onSend={this.onSend.bind(this)}
+          />
         </View>
-        <RecordingControls
-          onRecordingStart={(() => {
-            this.mounted && this.setState({ recording: true });
-          }).bind(this)}
-          backButtonAction={this.backButtonAction.bind(this)}
-          onSend={this.onSend.bind(this)}
-        />
       </View>
     );
   }

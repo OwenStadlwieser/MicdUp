@@ -216,6 +216,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
         type: CLEAR_POSTS,
       });
     }
+    dispatch(setCurrentKey(userId));
     dispatch({
       type: SET_POSTS,
       payload: { posts: res.data.getUserPosts.filter((el) => el), userId },

@@ -73,10 +73,10 @@ export class SoundPlayer extends Component {
                       this.mounted && this.setState({ showing: false });
                       return;
                     }
-                    this.props.navigate("Search");
                     this.props.viewProfile({ ...sound.owner });
                     this.props.searchViewProfile(true);
                     this.mounted && this.setState({ showing: false });
+                    this.props.navigate("SearchProfile");
                   }}
                 >
                   <Image

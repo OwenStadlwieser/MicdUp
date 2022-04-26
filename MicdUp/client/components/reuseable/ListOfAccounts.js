@@ -105,7 +105,7 @@ export class ListOfAccounts extends Component {
         }}
       >
         <SwipeListView
-          data={data.filter((el) => el)}
+          data={data ? data.filter((el) => el) : []}
           disableRightSwipe
           disableLeftSwipe={false}
           onScroll={this.handleScroll.bind(this)}
@@ -126,9 +126,9 @@ export class ListOfAccounts extends Component {
                     this.mounted && this.setState({ showing: false });
                     return;
                   }
-                  this.props.navigate("Search");
                   this.props.viewProfile({ ...data.item });
                   this.props.searchViewProfile(true);
+                  this.props.navigate("SearchProfile");
                 }}
               >
                 <Fragment>

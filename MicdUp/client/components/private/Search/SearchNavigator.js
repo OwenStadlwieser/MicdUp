@@ -45,12 +45,7 @@ export class SearchNavigator extends Component {
       searchViewingTag,
     } = this.props;
     return (
-      <NavigationContainer
-        independent={true}
-        style={{}}
-        theme={MyTheme}
-        ref={navigationRefSearch}
-      >
+      <NavigationContainer independent={true} style={{}} theme={MyTheme}>
         <Stack.Navigator
           initialRouteName={
             searchViewingProfile
@@ -78,16 +73,6 @@ export class SearchNavigator extends Component {
           <Stack.Screen
             options={{
               headerShown: true,
-              headerLeft: () => (
-                <AntDesign
-                  name="leftcircle"
-                  size={24}
-                  color="#1A3561"
-                  onPress={() => {
-                    this.props.searchNavigate();
-                  }}
-                />
-              ),
             }}
             name="SearchProfile"
             component={Profile}

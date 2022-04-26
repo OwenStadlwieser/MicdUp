@@ -183,6 +183,7 @@ export class Profile extends Component {
       await getUserPosts(id, 0);
     } else if (posts && posts.length > 0) {
     } else if (id) {
+      console.log("here");
       this.props.addLoading("Profile");
       await getUserPosts(id, 0);
       this.props.removeLoading("Profile");
@@ -220,7 +221,6 @@ export class Profile extends Component {
       selectImage,
       outerScrollEnabled,
       showingListOfAccounts,
-      listOfAccountsParams,
       refreshing,
       otherUserSettings,
     } = this.state;
@@ -231,6 +231,7 @@ export class Profile extends Component {
     const { id } = this.props.currentProfile;
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
     const posts = cachedPosts[id];
+    console.log(posts);
     if (!profile && !currentProfile) {
       return (
         <View key={this.props.route.params.key}>

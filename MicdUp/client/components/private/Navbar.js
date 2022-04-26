@@ -27,7 +27,7 @@ export class NavBar extends Component {
 
   render() {
     const { mountedComponent } = this.props;
-    console.log(mountedComponent);
+    console.log(mountedComponent, mountedComponent === "SearchProfile");
     return (
       <View style={styles.navbar}>
         <TouchableOpacity
@@ -50,7 +50,9 @@ export class NavBar extends Component {
         </TouchableOpacity>
         <TouchableOpacity
           style={
-            mountedComponent === "Search"
+            mountedComponent === "Search" ||
+            mountedComponent === "SearchFeed" ||
+            mountedComponent === "SearchProfile"
               ? styles.activeNavbarButton
               : styles.navbarButton
           }
@@ -62,7 +64,13 @@ export class NavBar extends Component {
             <FontAwesome
               name="search"
               size={24}
-              color={mountedComponent === "Search" ? "#6FF6FF" : "black"}
+              color={
+                mountedComponent === "Search" ||
+                mountedComponent === "SearchFeed" ||
+                mountedComponent === "SearchProfile"
+                  ? "#6FF6FF"
+                  : "black"
+              }
             />
           </Text>
         </TouchableOpacity>

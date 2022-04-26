@@ -18,8 +18,9 @@ import Comment from "../reuseable/Comment";
 import Profile from "./Profile/Profile";
 import Settings from "./Profile/Settings";
 import Navbar from "./Navbar";
-import SearchNavigator from "./Search/SearchNavigator";
+import Search from "./Search/Search";
 import ListOfAccounts from "../reuseable/ListOfAccounts";
+import Chat from "./Dms/Chat";
 // helpers
 import { getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
@@ -85,8 +86,10 @@ export class Dashboard extends Component {
       currentKey,
       postIndex,
       title,
+      userName,
+      activeChatMembers,
+      currentProfile,
     } = this.props;
-
     return (
       <Fragment>
         <NavigationContainer
@@ -108,16 +111,16 @@ export class Dashboard extends Component {
             initialRouteName={mountedComponent}
           >
             <Stack.Screen
-              name="ListOfAccounts"
-              component={ListOfAccounts}
-              initialParams={{ key: this.props.loggedIn }}
-              options={{ headerShown: true, headerTitle: title }}
-            />
-            <Stack.Screen
               name="Feed"
               component={Feed}
               initialParams={{ key: this.props.loggedIn }}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="ListOfAccounts"
+              component={ListOfAccounts}
+              initialParams={{ key: this.props.loggedIn }}
+              options={{ headerShown: true, headerTitle: title }}
             />
             <Stack.Screen
               name="Settings"
@@ -128,8 +131,32 @@ export class Dashboard extends Component {
             <Stack.Screen
               name="Search"
               initialParams={{ key: keyForSearch }}
-              component={SearchNavigator}
+              component={Search}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SearchFeed"
+              component={Feed}
+              initialParams={{
+                key: this.props.loggedIn,
+                fromSearch: true,
+              }}
+              options={{ headerShown: true }}
+            />
+            <Stack.Screen
+              options={{
+                headerShown: true,
+                headerTitle: currentProfile
+                  ? currentProfile.user
+                    ? currentProfile.user.userName
+                    : "SearchProfile"
+                  : "SearchProfile",
+              }}
+              name={"SearchProfile"}
+              component={Profile}
+              initialParams={{
+                key: currentProfile ? currentProfile.id : "notloggedin",
+              }}
             />
             <Stack.Screen
               options={{ headerShown: false }}
@@ -165,6 +192,22 @@ export class Dashboard extends Component {
               options={{ headerShown: false }}
               component={NotificationView}
             />
+            <Stack.Screen
+              name="Chat"
+              options={{
+                headerShown: true,
+                headerTitle:
+                  "Members: " +
+                  activeChatMembers
+                    .filter((member) => member)
+                    .map((member, res) => {
+                      return userName !== member.user.userName
+                        ? member.user.userName + ", "
+                        : "";
+                    }),
+              }}
+              component={Chat}
+            />
           </Stack.Navigator>
         </NavigationContainer>
 
@@ -184,6 +227,9 @@ const mapStateToProps = (state) => ({
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,
   title: state.display.list,
+  activeChatMembers: state.chat.activeChatMembers,
+  userName: state.auth.user.userName,
+  currentProfile: state.display.viewingProfile,
 });
 
 export default connect(mapStateToProps, {

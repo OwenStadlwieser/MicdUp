@@ -14,12 +14,12 @@ import { listStyles, styles, postHeight } from "../../../styles/Styles";
 import { Appbar, Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
+import { Button } from "react-native-paper";
 // redux
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
 import {
   addLoading,
   removeLoading,
-  searchNavigate,
   navigate,
 } from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
@@ -46,8 +46,34 @@ export class Feed extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
+  updateNavigationOptions = (tag) => {
+    const { navigation } = this.props;
+
+    if (!tag) {
+      return;
+    }
+    navigation.setOptions({
+      headerTitle: tag.title,
+      headerRight: () => (
+        <Button
+          color="red"
+          icon={!tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"}
+          onPress={async () => {
+            const { tag } = this.state;
+            this.props.addLoading("Feed");
+            const newTag = await this.props.followTag(tag._id);
+            this.mounted && this.setState({ tag: newTag });
+            if (newTag) {
+              this.updateNavigationOptions(newTag);
+            }
+            this.props.removeLoading("Feed");
+          }}
+        />
+      ),
+    });
+  };
   getData = async (skipMult) => {
-    const { loggedIn, tag } = this.props;
+    const { loggedIn, tag, navigation } = this.props;
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
@@ -55,6 +81,7 @@ export class Feed extends Component {
     this.mounted && this.setState({ loading: true });
     if (fromSearch && tag) {
       this.mounted && this.setState({ tag: { ...tag } });
+      this.updateNavigationOptions(tag);
       await this.props.getRecordingsFromTag(tag._id, skipMult);
     } else if (!fromSearch && loggedIn) {
       await this.props.getFollowingFeed(skipMult);
@@ -73,8 +100,13 @@ export class Feed extends Component {
   };
 
   componentDidUpdate = async (prevProps) => {
-    const { loggedIn } = this.props;
+    const { loggedIn, tag } = this.props;
+    const tag2 = this.state.tag;
     if (loggedIn && !prevProps.loggedIn) {
+      await this.getData(0);
+    }
+
+    if (tag && tag2 && tag._id && tag2._id && tag._id !== tag2._id) {
       await this.getData(0);
     }
   };
@@ -111,7 +143,6 @@ export class Feed extends Component {
 
   render() {
     const { profile, cachedPosts, loggedIn } = this.props;
-    console.log(loggedIn);
     const {
       isRecordingComment,
       loading,
@@ -132,6 +163,7 @@ export class Feed extends Component {
       : following
       ? cachedPosts["FOLLOWINGFEED"]
       : cachedPosts["TOPICSFEED"];
+
     return (
       <View
         style={{
@@ -141,98 +173,68 @@ export class Feed extends Component {
           overflow: "scroll",
           flex: 1,
         }}
-        key={this.props.loggedIn}
+        key={this.props.tag ? this.props.tag.id : this.props.loggedIn}
       >
-        {tag ? (
-          <Appbar.Header
-            style={[
-              styles.appBarHeader,
-              {
-                backgroundColor: "white",
-              },
-            ]}
+        {profile && !fromSearch && (
+          <View
+            style={{
+              width,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Appbar.BackAction
-              onPress={() => {
-                this.props.searchNavigate("Search");
-              }}
-            />
-            <Appbar.Content title={tag.title} subtitle="Topic" />
-            <Appbar.Action
-              color="red"
-              icon={
-                !tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"
+            <Title
+              style={
+                (styles.nextButtonText,
+                {
+                  color: following ? "#6FF6FF" : "white",
+                  paddingRight: 10,
+                  borderRightColor: "white",
+                  borderRightWidth: 2,
+                })
               }
               onPress={async () => {
-                this.props.addLoading("Feed");
-                const newTag = await this.props.followTag(tag._id);
-                this.mounted && this.setState({ tag: newTag });
-                this.props.removeLoading("Feed");
-              }}
-            />
-          </Appbar.Header>
-        ) : (
-          profile && (
-            <View
-              style={{
-                width,
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
+                if (
+                  following ||
+                  !cachedPosts["FOLLOWINGFEED"] ||
+                  cachedPosts["FOLLOWINGFEED"].length == 0
+                ) {
+                  this.props.addLoading("Feed");
+                  this.mounted && this.setState({ loading: true });
+                  await this.props.getFollowingFeed(0);
+                  this.mounted && this.setState({ loading: false });
+                  this.props.removeLoading("Feed");
+                }
+                this.mounted && this.setState({ following: true });
               }}
             >
-              <Title
-                style={
-                  (styles.nextButtonText,
-                  {
-                    color: following ? "#6FF6FF" : "white",
-                    paddingRight: 10,
-                    borderRightColor: "white",
-                    borderRightWidth: 2,
-                  })
+              FOLLOWING
+            </Title>
+            <Title
+              style={
+                (styles.nextButtonText,
+                { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
+              }
+              onPress={async () => {
+                if (
+                  !following ||
+                  !cachedPosts["TOPICSFEED"] ||
+                  cachedPosts["TOPICSFEED"].length == 0
+                ) {
+                  this.props.addLoading("Feed");
+                  this.mounted && this.setState({ loading: true });
+                  await this.props.getTopicsFeed(0);
+                  this.mounted && this.setState({ loading: false });
+                  this.props.removeLoading("Feed");
                 }
-                onPress={async () => {
-                  if (
-                    following ||
-                    !cachedPosts["FOLLOWINGFEED"] ||
-                    cachedPosts["FOLLOWINGFEED"].length == 0
-                  ) {
-                    this.props.addLoading("Feed");
-                    this.mounted && this.setState({ loading: true });
-                    await this.props.getFollowingFeed(0);
-                    this.mounted && this.setState({ loading: false });
-                    this.props.removeLoading("Feed");
-                  }
-                  this.mounted && this.setState({ following: true });
-                }}
-              >
-                FOLLOWING
-              </Title>
-              <Title
-                style={
-                  (styles.nextButtonText,
-                  { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
-                }
-                onPress={async () => {
-                  if (
-                    !following ||
-                    !cachedPosts["TOPICSFEED"] ||
-                    cachedPosts["TOPICSFEED"].length == 0
-                  ) {
-                    this.props.addLoading("Feed");
-                    this.mounted && this.setState({ loading: true });
-                    await this.props.getTopicsFeed(0);
-                    this.mounted && this.setState({ loading: false });
-                    this.props.removeLoading("Feed");
-                  }
-                  this.mounted && this.setState({ following: false });
-                }}
-              >
-                TOPICS
-              </Title>
-            </View>
-          )
+                this.mounted && this.setState({ following: false });
+              }}
+            >
+              TOPICS
+            </Title>
+          </View>
         )}
         {!loading && (!postsToView || postsToView.length == 0) ? (
           <Text
@@ -327,5 +329,4 @@ export default connect(mapStateToProps, {
   getFollowingFeed,
   getNotLoggedInFeed,
   getTopicsFeed,
-  searchNavigate,
 })(Feed);

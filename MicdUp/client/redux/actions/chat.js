@@ -42,7 +42,6 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching chat failed" })
       );
     }
-    dispatch(navigate("Dms"));
     dispatch({
       type: SET_ACTIVE_CHATS,
       payload: {
@@ -51,6 +50,7 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
         activeChatMembers: res.data.fetchChat.members,
       },
     });
+    dispatch(navigate("Chat"));
     return res.data.fetchChat;
   } catch (err) {
     console.log(err);
@@ -101,7 +101,7 @@ export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
         activeChatMembers: chat.members,
       },
     });
-    
+
     return res.data.fetchChatMessages;
   } catch (err) {
     console.log(err);

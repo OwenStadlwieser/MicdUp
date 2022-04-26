@@ -85,9 +85,7 @@ export const navigate = (payload) => (dispatch) => {
   if (navigationRef.isReady()) {
     navigationRef.navigate(payload);
   }
-  if (navigationRefSearch.isReady()) {
-    navigationRefSearch.navigate("Search");
-  }
+
   dispatch({
     type: NAVIGATE,
     payload,
@@ -125,8 +123,8 @@ export const searchViewProfile = (payload) => (dispatch) => {
     type: VIEW_PROFILE_SEARCH,
     payload,
   });
-  if (navigationRefSearch.isReady()) {
-    navigationRefSearch.navigate("SearchProfile");
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("SearchProfile");
   }
 };
 
@@ -135,8 +133,8 @@ export const searchViewTag = (payload) => (dispatch) => {
     type: VIEW_TAG_SEARCH,
     payload,
   });
-  if (navigationRefSearch.isReady()) {
-    navigationRefSearch.navigate("SearchFeed");
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("SearchFeed");
   }
 };
 
