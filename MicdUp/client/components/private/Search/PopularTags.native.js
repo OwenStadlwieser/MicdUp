@@ -65,7 +65,7 @@ export class PopularTags extends Component {
               left: width * 0.5,
             }}
           >
-            <CircleSnail color={["white", "#1A3561", "#6FF6FF"]} />
+            <CircleSnail color={["black", "#6FF6FF"]} />
           </View>
         )}
         <Carousel
