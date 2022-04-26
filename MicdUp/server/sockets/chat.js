@@ -15,6 +15,7 @@ const {
 } = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
+  ffmpegGetDuration,
 } = require("../database/privateSchema/mutations/recording");
 var ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
@@ -110,6 +111,8 @@ exports = module.exports = function (io) {
             }
           }
           await ffmpegMergeAndUpload(fileName, message._id, fileNames, command);
+          const duration = await ffmpegGetDuration(fileName);
+          message.duration = duration;
           message.signedUrl = await getSignedUrl(`${message._id}.mp4`);
           await message.save({ session });
           chat.messages.push(message._id);

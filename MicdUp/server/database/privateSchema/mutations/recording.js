@@ -26,6 +26,7 @@ const mongoose = require("mongoose");
 const { makeLikeNotification } = require("../../../utils/sendNotification");
 const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
 const { getCurrentTime } = require("../../../reusableFunctions/helpers");
+const { resolve } = require("path");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -119,6 +120,8 @@ const createRecording = {
     session.startTransaction();
     try {
       await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      post.duration = duration;
       for (let i = 0; i < tags.length; i++) {
         if (!tags[i]) continue;
         tags[i] = tags[i].replace(/ /g, "");
@@ -221,6 +224,8 @@ const uploadBio = {
     // convert file to mp4 (might as well keep them all the same)
     try {
       await ffmpegMergeAndUpload(fileName, bio._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      bio.duration = duration;
       await profile.save({ session });
       await bio.save({ session });
       await session.commitTransaction();
@@ -464,6 +469,8 @@ const commentToPost = {
         `${comment._id}.mp4`
       );
       await ffmpegMergeAndUpload(fileName, comment._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      comment.duration = duration;
       fs.unlink(fileName, function (err) {
         if (err) throw err;
       });
@@ -512,6 +519,16 @@ const commentToPost = {
   },
 };
 
+const ffmpegGetDuration = async (fileName) => {
+  return await new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(fileName, function (err, metadata) {
+      //console.dir(metadata); // all metadata
+      console.log(metadata.format.duration);
+      resolve(metadata.format.duration);
+    });
+  });
+};
+
 const ffmpegMergeAndUpload = async (fileName, id, fileNames, command) => {
   await new Promise((resolve, reject) => {
     command
@@ -547,4 +564,5 @@ module.exports = {
   commentToPost,
   ffmpegMergeAndUpload,
   addListenerAuthenticated,
+  ffmpegGetDuration,
 };

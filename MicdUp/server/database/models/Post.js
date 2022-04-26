@@ -66,6 +66,10 @@ const postSchema = new Schema({
   signedUrl: {
     type: String,
   },
+  duration: {
+    type: Number,
+    default: 0,
+  },
   lastFetched: {
     type: Date,
   },

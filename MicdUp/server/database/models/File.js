@@ -24,6 +24,10 @@ const fileSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    duration: {
+      type: Number,
+      default: 0,
+    },
     speechToText: [
       {
         word: {
