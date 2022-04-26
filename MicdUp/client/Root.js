@@ -19,6 +19,7 @@ import SoundPlayer from "./components/reuseable/SoundPlayer";
 import CircleSnail from "react-native-progress/CircleSnail";
 import NotificationBell from "./components/private/NotificationBell";
 import SearchNavigator from "./components/private/Search/SearchNavigator";
+import ListOfAccounts from "./components/reuseable/ListOfAccounts";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -91,11 +92,9 @@ export class Root extends Component {
       loggedIn,
       mountedComponent,
       loading,
-      cachedPosts,
-      currentKey,
-      postIndex,
       keyForSearch,
       showHeader,
+      title,
     } = this.props;
     let app;
 
@@ -119,6 +118,12 @@ export class Root extends Component {
               }}
               initialRouteName={mountedComponent}
             >
+              <Stack.Screen
+                name="ListOfAccounts"
+                component={ListOfAccounts}
+                initialParams={{ key: this.props.loggedIn }}
+                options={{ headerShown: true, headerTitle: title }}
+              />
               <Stack.Screen
                 name="Feed"
                 component={Feed}
@@ -217,6 +222,7 @@ const mapStateToProps = (state) => ({
   currentKey: state.auth.currentKey,
   keyForSearch: state.display.keyForSearch,
   showHeader: state.display.showHeader,
+  title: state.display.list,
 });
 export default connect(mapStateToProps, {
   setIp,

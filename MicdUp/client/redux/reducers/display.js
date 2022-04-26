@@ -19,6 +19,7 @@ import {
   VIEW_TAG_SEARCH,
   SHOW_HEADER,
   CURRENT_PROFILE_BLOCKED,
+  SET_LIST,
 } from "../types";
 
 const initialState = {
@@ -38,12 +39,18 @@ const initialState = {
   tagFromSearch: {},
   searchViewingTag: false,
   showHeader: true,
+  list: "",
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   let copy;
   switch (type) {
+    case SET_LIST:
+      return {
+        ...state,
+        list: payload,
+      };
     case SHOW_HEADER:
       return {
         ...state,

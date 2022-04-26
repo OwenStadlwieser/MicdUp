@@ -12,6 +12,7 @@ import {
   SET_CURRENT_KEY,
   VIEW_TAG_SEARCH,
   SHOW_HEADER,
+  SET_LIST,
 } from "../types";
 
 import { createNavigationContainerRef } from "@react-navigation/native";
@@ -89,6 +90,16 @@ export const navigate = (payload) => (dispatch) => {
   }
   dispatch({
     type: NAVIGATE,
+    payload,
+  });
+};
+
+export const setList = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("ListOfAccounts");
+  }
+  dispatch({
+    type: SET_LIST,
     payload,
   });
 };

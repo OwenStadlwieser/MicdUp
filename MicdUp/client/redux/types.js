@@ -52,3 +52,4 @@ export const DELETE_TAG = "DELETE_TAG";
 export const VIEW_TAG_SEARCH = "VIEW_TAG_SEARCH";
 export const SHOW_HEADER = "SHOW_HEADER";
 export const CURRENT_PROFILE_BLOCKED = "CURRENT_PROFILE_BLOCKED";
+export const SET_LIST = "SET_LIST";

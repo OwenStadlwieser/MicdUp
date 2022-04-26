@@ -19,6 +19,7 @@ import Profile from "./Profile/Profile";
 import Settings from "./Profile/Settings";
 import Navbar from "./Navbar";
 import SearchNavigator from "./Search/SearchNavigator";
+import ListOfAccounts from "../reuseable/ListOfAccounts";
 // helpers
 import { getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
@@ -83,6 +84,7 @@ export class Dashboard extends Component {
       cachedPosts,
       currentKey,
       postIndex,
+      title,
     } = this.props;
 
     return (
@@ -105,6 +107,12 @@ export class Dashboard extends Component {
             }}
             initialRouteName={mountedComponent}
           >
+            <Stack.Screen
+              name="ListOfAccounts"
+              component={ListOfAccounts}
+              initialParams={{ key: this.props.loggedIn }}
+              options={{ headerShown: true, headerTitle: title }}
+            />
             <Stack.Screen
               name="Feed"
               component={Feed}
@@ -175,6 +183,7 @@ const mapStateToProps = (state) => ({
   postIndex: state.display.postIndex,
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,
+  title: state.display.list,
 });
 
 export default connect(mapStateToProps, {

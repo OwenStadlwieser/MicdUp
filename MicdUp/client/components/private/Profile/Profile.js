@@ -24,13 +24,11 @@ import {
   listStyles,
 } from "../../../styles/Styles";
 // children
-import Settings from "./Settings";
 import Bio from "./Bio";
 import Post from "./Post";
 import ImagePicker from "../../reuseable/ImagePicker";
 import AudioRecordingVisualization from "../../reuseable/AudioRecordingVisualization";
 import { SwipeListView } from "react-native-swipe-list-view";
-import ListOfAccounts from "../../reuseable/ListOfAccounts";
 import GestureRecognizer from "react-native-swipe-gestures";
 import OtherUserSettings from "../../reuseable/OtherUserSettings";
 // redux
@@ -43,9 +41,6 @@ import {
 import {
   updateProfilePic,
   followProfile,
-  getFollowersQuery,
-  getFollowingQuery,
-  getPrivatesQuery,
   addToPrivates,
 } from "../../../redux/actions/profile";
 import { createOrOpenChat } from "../../../redux/actions/chat";
@@ -54,6 +49,7 @@ import {
   removeLoading,
   setCurrentKey,
   navigate,
+  setList,
 } from "../../../redux/actions/display";
 // audio
 import {
@@ -229,7 +225,6 @@ export class Profile extends Component {
       otherUserSettings,
     } = this.state;
     const { profile, currentProfile, backArrow, cachedPosts } = this.props;
-    console.log(this.props.currentProfile);
     const { userName } = this.props.currentProfile.user
       ? this.props.currentProfile.user
       : {};
@@ -241,18 +236,6 @@ export class Profile extends Component {
         <View key={this.props.route.params.key}>
           <Text>Loading</Text>
         </View>
-      );
-    }
-    if (showingListOfAccounts) {
-      return (
-        <ListOfAccounts
-          key={this.props.route.params.key}
-          hideList={() => {
-            this.mounted && this.setState({ showingListOfAccounts: false });
-          }}
-          isUserProfile={isUserProfile}
-          params={listOfAccountsParams}
-        />
       );
     }
     if (otherUserSettings) {
@@ -356,18 +339,7 @@ export class Profile extends Component {
               <Text style={styles.followersText}>
                 <Text
                   onPress={() => {
-                    const { getFollowersQuery } = this.props;
-                    this.mounted &&
-                      this.setState({
-                        showingListOfAccounts: true,
-                        listOfAccountsParams: {
-                          title: "Followers",
-                          getData: async function (skipMult) {
-                            const res = await getFollowersQuery(id, skipMult);
-                            return res && res.followers ? res.followers : [];
-                          },
-                        },
-                      });
+                    this.props.setList("Followers");
                   }}
                   style={{ fontSize: small, fontStyle: "italic" }}
                 >
@@ -376,19 +348,7 @@ export class Profile extends Component {
                 </Text>
                 <Text
                   onPress={() => {
-                    const { getFollowingQuery } = this.props;
-                    this.mounted &&
-                      this.setState({
-                        showingListOfAccounts: true,
-
-                        listOfAccountsParams: {
-                          title: "Following",
-                          getData: async function (skipMult) {
-                            const res = await getFollowingQuery(id, skipMult);
-                            return res && res.following ? res.following : [];
-                          },
-                        },
-                      });
+                    this.props.setList("Following");
                   }}
                   style={{ fontSize: small, fontStyle: "italic" }}
                 >
@@ -398,20 +358,8 @@ export class Profile extends Component {
                 </Text>
                 <Text
                   onPress={() => {
-                    const { getPrivatesQuery } = this.props;
                     if (!isUserProfile) return;
-                    this.mounted &&
-                      this.setState({
-                        showingListOfAccounts: true,
-                        isPrivates: true,
-                        listOfAccountsParams: {
-                          title: "Privates",
-                          getData: async function (skipMult) {
-                            const res = await getPrivatesQuery(skipMult);
-                            return res && res.privates ? res.privates : [];
-                          },
-                        },
-                      });
+                    this.props.setList("Privates");
                   }}
                   style={{ fontSize: small, fontStyle: "italic" }}
                 >
@@ -590,13 +538,11 @@ export default connect(mapStateToProps, {
   followProfile,
   createOrOpenChat,
   deletePost,
-  getFollowersQuery,
-  getFollowingQuery,
-  getPrivatesQuery,
   addToPrivates,
   clearPosts,
   addLoading,
   removeLoading,
   setCurrentKey,
   navigate,
+  setList,
 })(Profile);
