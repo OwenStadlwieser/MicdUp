@@ -231,7 +231,6 @@ export class Profile extends Component {
     const { id } = this.props.currentProfile;
     const isUserProfile = profile && currentProfile ? profile.id === id : true;
     const posts = cachedPosts[id];
-    console.log(posts);
     if (!profile && !currentProfile) {
       return (
         <View key={this.props.route.params.key}>

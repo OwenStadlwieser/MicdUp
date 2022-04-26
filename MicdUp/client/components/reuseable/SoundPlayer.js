@@ -22,11 +22,11 @@ export class SoundPlayer extends Component {
 
   render() {
     return (
-      <TouchableOpacity style={{ paddingRight: 10 }}>
-        <AntDesign
-          onPress={() => {
+      <TouchableOpacity  onPress={() => {
             this.props.showSoundModal(true);
-          }}
+          }} style={{ paddingRight: 10 }}>
+        <AntDesign
+          
           name="sound"
           size={24}
           color="white"

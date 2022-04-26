@@ -35,6 +35,8 @@ export class SoundModal extends Component {
 
   componentDidMount = () => {};
 
+  componentDidUpdate = (prevProps) => {
+  }
   render() {
     const { playingId, sound, isPause, profile } = this.props;
     return (
@@ -50,7 +52,7 @@ export class SoundModal extends Component {
           style={[styles.modalMainContainer, { padding: 20 }]}
         >
           <Fragment>
-            {sound && sound.owner && (
+            {sound && sound.owner ? (
               <View
                 style={{
                   flexDirection: "column",
@@ -121,6 +123,8 @@ export class SoundModal extends Component {
                   width={width * 0.5}
                 />
               </View>
+            ) : (
+              <Text>No sound playing</Text>
             )}
           </Fragment>
         </TouchableHighlight>
