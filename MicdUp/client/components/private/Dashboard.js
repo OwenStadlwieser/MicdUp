@@ -29,6 +29,7 @@ import { styles } from "../../styles/Styles";
 import NotificationView from "./Notifs/NotificationView";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import Header from "../reuseable/Header";
 
 const { width, height } = Dimensions.get("window");
 
@@ -96,7 +97,7 @@ export class Dashboard extends Component {
           style={{ width }}
           theme={MyTheme}
           ref={navigationRef}
-          screenOptions={{ headerShown: false }}
+          screenOptions={{ headerShown: true }}
           gestureResponseDista
         >
           <Stack.Navigator
@@ -108,13 +109,23 @@ export class Dashboard extends Component {
                 );
               },
             }}
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: "#1A3561",
+              },
+              headerTintColor: "#fff",
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+              headerRight: () => <Header />,
+            }}
             initialRouteName={mountedComponent}
           >
             <Stack.Screen
               name="Feed"
               component={Feed}
               initialParams={{ key: this.props.loggedIn }}
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
             />
             <Stack.Screen
               name="ListOfAccounts"
@@ -132,7 +143,7 @@ export class Dashboard extends Component {
               name="Search"
               initialParams={{ key: keyForSearch }}
               component={Search}
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
             />
             <Stack.Screen
               name="SearchFeed"
@@ -159,7 +170,7 @@ export class Dashboard extends Component {
               }}
             />
             <Stack.Screen
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
               name="Create"
               component={Create}
             />
@@ -173,12 +184,12 @@ export class Dashboard extends Component {
               component={Comment}
             />
             <Stack.Screen
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
               name="Dms"
               component={Dms}
             />
             <Stack.Screen
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
               name="Profile"
               component={Profile}
               initialParams={{
@@ -189,7 +200,7 @@ export class Dashboard extends Component {
             />
             <Stack.Screen
               name="Notifs"
-              options={{ headerShown: false }}
+              options={{ headerShown: true }}
               component={NotificationView}
             />
             <Stack.Screen

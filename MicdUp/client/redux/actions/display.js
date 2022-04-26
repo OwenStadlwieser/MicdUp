@@ -13,6 +13,7 @@ import {
   VIEW_TAG_SEARCH,
   SHOW_HEADER,
   SET_LIST,
+  SHOW_SOUND_MODAL,
 } from "../types";
 
 import { createNavigationContainerRef } from "@react-navigation/native";
@@ -25,6 +26,12 @@ export const setCurrentKey = (payload) => (dispatch) => {
   });
 };
 
+export const showSoundModal = (payload) => (dispatch) => {
+  dispatch({
+    type: SHOW_SOUND_MODAL,
+    payload,
+  });
+};
 export const addLoading = (payload) => (dispatch) => {
   dispatch({
     type: ADD_LOADING,

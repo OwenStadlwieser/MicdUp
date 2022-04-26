@@ -27,6 +27,8 @@ import { getData } from "./reuseableFunctions/helpers";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
+import Header from "./components/reuseable/Header";
+import SoundModal from "./components/reuseable/SoundModal";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -97,6 +99,7 @@ export class Root extends Component {
       showHeader,
       title,
       currentProfile,
+      showingSoundModal,
     } = this.props;
     let app;
 
@@ -106,7 +109,7 @@ export class Root extends Component {
           <NavigationContainer
             theme={MyTheme}
             ref={navigationRef}
-            screenOptions={{ headerShown: false }}
+            screenOptions={{ headerShown: true }}
           >
             <Stack.Navigator
               screenListeners={{
@@ -118,13 +121,23 @@ export class Root extends Component {
                   );
                 },
               }}
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: "#1A3561",
+                },
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+                headerRight: () => <SoundPlayer />,
+              }}
               initialRouteName={mountedComponent}
             >
               <Stack.Screen
                 name="Feed"
                 component={Feed}
                 initialParams={{ key: this.props.loggedIn }}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 name="ListOfAccounts"
@@ -136,7 +149,7 @@ export class Root extends Component {
                 name="Search"
                 initialParams={{ key: keyForSearch }}
                 component={Search}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 name="SearchFeed"
@@ -145,7 +158,7 @@ export class Root extends Component {
                   key: this.props.loggedIn,
                   fromSearch: true,
                 }}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 options={{
@@ -165,17 +178,17 @@ export class Root extends Component {
               <Stack.Screen
                 name="Create"
                 component={LoginManager}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 name="Dms"
                 component={LoginManager}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 name="Profile"
                 component={LoginManager}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
               />
               <Stack.Screen
                 initialParams={{}}
@@ -192,6 +205,7 @@ export class Root extends Component {
               <CircleSnail size={60} color={["white", "#1A3561", "#6FF6FF"]} />
             </View>
           )}
+          {showingSoundModal && <SoundModal />}
           {showHeader && <SoundPlayer />}
           {displayMessage && (
             <View style={styles.messageContainer}>
@@ -213,12 +227,8 @@ export class Root extends Component {
             </View>
           )}
           <Dashboard></Dashboard>
-          {showHeader && (
-            <Fragment>
-              <SoundPlayer />
-              <NotificationBell />
-            </Fragment>
-          )}
+          <Header />
+          {showingSoundModal && <SoundModal />}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -236,21 +246,17 @@ export class Root extends Component {
 
 const mapStateToProps = (state) => ({
   loggedIn: state.auth.loggedIn,
-  showLogin: state.display.showLogin,
-  showSignup: state.display.showSignup,
   displayMessage: state.display.displayMessage,
   currentMessage: state.display.currentMessage,
   messageState: state.display.messageState,
   mountedComponent: state.display.mountedComponent,
   loading: state.display.loading,
-  postIndex: state.display.postIndex,
-  cachedPosts: state.auth.posts,
-  currentKey: state.auth.currentKey,
   keyForSearch: state.display.keyForSearch,
   showHeader: state.display.showHeader,
   title: state.display.list,
   userName: state.auth.user.userName,
   currentProfile: state.display.viewingProfile,
+  showingSoundModal: state.display.showingSoundModal,
 });
 export default connect(mapStateToProps, {
   setIp,

@@ -59,7 +59,7 @@ export class SearchNavigator extends Component {
             name="Search"
             initialParams={{ key: keyForSearch }}
             component={Search}
-            options={{ headerShown: false }}
+            options={{ headerShown: true }}
           />
           <Stack.Screen
             name="SearchFeed"
@@ -68,7 +68,7 @@ export class SearchNavigator extends Component {
               key: this.props.loggedIn,
               fromSearch: true,
             }}
-            options={{ headerShown: false }}
+            options={{ headerShown: true }}
           />
           <Stack.Screen
             options={{

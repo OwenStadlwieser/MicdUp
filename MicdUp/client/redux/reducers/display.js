@@ -20,6 +20,7 @@ import {
   SHOW_HEADER,
   CURRENT_PROFILE_BLOCKED,
   SET_LIST,
+  SHOW_SOUND_MODAL,
 } from "../types";
 
 const initialState = {
@@ -39,6 +40,7 @@ const initialState = {
   tagFromSearch: {},
   searchViewingTag: false,
   showHeader: true,
+  showingSoundModal: false,
   list: "",
 };
 
@@ -46,6 +48,11 @@ export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
   let copy;
   switch (type) {
+    case SHOW_SOUND_MODAL:
+      return {
+        ...state,
+        showingSoundModal: payload,
+      };
     case SET_LIST:
       return {
         ...state,

@@ -21,6 +21,7 @@ import {
   addLoading,
   removeLoading,
   navigate,
+  showHeader,
 } from "../../../redux/actions/display";
 import { followTag } from "../../../redux/actions/tag";
 import {
@@ -44,11 +45,14 @@ export class Feed extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.showHeader(true);
+    this.mounted = false;
+  };
 
   updateNavigationOptions = (tag) => {
     const { navigation } = this.props;
-
+    this.props.showHeader(false);
     if (!tag) {
       return;
     }
@@ -329,4 +333,5 @@ export default connect(mapStateToProps, {
   getFollowingFeed,
   getNotLoggedInFeed,
   getTopicsFeed,
+  showHeader,
 })(Feed);

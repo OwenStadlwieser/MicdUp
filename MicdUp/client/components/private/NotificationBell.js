@@ -28,7 +28,7 @@ export class NotificationBell extends Component {
   render() {
     const { navigate } = this.props;
     return (
-      <Text style={[styles.toptopRightIcon, { zIndex: 50 }]}>
+      <Text>
         <MaterialCommunityIcons
           onPress={() => navigate("Notifs")}
           name="bell"
