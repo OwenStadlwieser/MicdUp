@@ -185,7 +185,7 @@ export class Feed extends Component {
               width,
               display: "flex",
               flexDirection: "row",
-              justifyContent: "center",
+              justifyContent: "space-evenly",
               alignItems: "center",
             }}
           >
@@ -196,7 +196,7 @@ export class Feed extends Component {
                   width: width * 0.35,
                   color: following ? "#6FF6FF" : "white",
                   paddingRight: 10,
-                  textAlign: "center",
+                  textAlign: "right",
                 })
               }
               onPress={async () => {
@@ -223,7 +223,7 @@ export class Feed extends Component {
                   width: width * 0.35,
                   color: !following ? "#6FF6FF" : "white",
                   paddingLeft: 10,
-                  textAlign: "center",
+                  textAlign: "left",
                 })
               }
               onPress={async () => {
