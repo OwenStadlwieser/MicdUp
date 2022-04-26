@@ -193,10 +193,10 @@ export class Feed extends Component {
               style={
                 (styles.nextButtonText,
                 {
+                  width: width * 0.35,
                   color: following ? "#6FF6FF" : "white",
                   paddingRight: 10,
-                  borderRightColor: "white",
-                  borderRightWidth: 2,
+                  textAlign: "center",
                 })
               }
               onPress={async () => {
@@ -219,7 +219,12 @@ export class Feed extends Component {
             <Title
               style={
                 (styles.nextButtonText,
-                { color: !following ? "#6FF6FF" : "white", paddingLeft: 10 })
+                {
+                  width: width * 0.35,
+                  color: !following ? "#6FF6FF" : "white",
+                  paddingLeft: 10,
+                  textAlign: "center",
+                })
               }
               onPress={async () => {
                 if (
