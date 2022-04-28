@@ -23,6 +23,9 @@ export const getFollowingFeed = (skipMult) => async (dispatch) => {
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
+        payload: {
+          userId: "FOLLOWINGFEED",
+        },
       });
     }
     dispatch({
@@ -54,6 +57,9 @@ export const getTopicsFeed = (skipMult) => async (dispatch) => {
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
+        payload: {
+          userId: "TOPICSFEED",
+        },
       });
     }
     dispatch({
@@ -87,6 +93,9 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
+        payload: {
+          userId: "NOTLOGGEDINFEED",
+        },
       });
     }
     dispatch({

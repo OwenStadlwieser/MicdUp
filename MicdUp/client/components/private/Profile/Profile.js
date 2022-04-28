@@ -176,14 +176,12 @@ export class Profile extends Component {
   getPosts = async (fromRefresh = false) => {
     const { getUserPosts, cachedPosts } = this.props;
     const { id } = this.props.currentProfile;
-    this.props.setCurrentKey(id);
     this.mounted && this.setState({ refreshing: true });
     const posts = cachedPosts[id];
     if (posts && posts.length > 0 && fromRefresh) {
       await getUserPosts(id, 0);
     } else if (posts && posts.length > 0) {
     } else if (id) {
-      console.log("here");
       this.props.addLoading("Profile");
       await getUserPosts(id, 0);
       this.props.removeLoading("Profile");

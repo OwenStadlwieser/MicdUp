@@ -53,7 +53,6 @@ export class Post extends Component {
   render() {
     const { post, index, playingId, isPause, canViewPrivate, profile } =
       this.props;
-    console.log(post);
     return (
       <TouchableHighlight
         onPress={async () => {

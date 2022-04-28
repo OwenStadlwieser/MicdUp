@@ -68,7 +68,9 @@ export const updateTags = (payload) => (dispatch) => {
 export const clearPosts = (payload) => (dispatch) => {
   dispatch({
     type: CLEAR_POSTS,
-    payload,
+    payload: {
+      userId: payload,
+    },
   });
 };
 export const addListener = (postId, ipAddr, listenTime) => async (dispatch) => {
@@ -214,6 +216,9 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
+        payload: {
+          userId,
+        },
       });
     }
     dispatch(setCurrentKey(userId));
@@ -416,6 +421,9 @@ export const getRecordingsFromTag =
       if (skipMult == 0) {
         dispatch({
           type: CLEAR_POSTS,
+          payload: {
+            userId: searchTag,
+          },
         });
       }
       dispatch({

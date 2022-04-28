@@ -126,16 +126,18 @@ export default function (state = { ...initialState }, action) {
         },
       };
     case SET_POSTS:
-      let oldPosts = state.posts[state.currentKey];
-      let newPosts = oldPosts && payload.skipMult != 0
-        ? [...oldPosts, ...payload.posts]
-        : [...payload.posts];
+      console.log(payload.userId, 1232, payload.posts);
+      let oldPosts = state.posts[payload.userId];
+      let newPosts =
+        oldPosts && payload.skipMult != 0
+          ? [...oldPosts, ...payload.posts]
+          : [...payload.posts];
       return {
         ...state,
-        posts: { ...state.posts, [state.currentKey]: newPosts },
+        posts: { ...state.posts, [payload.userId]: newPosts },
       };
     case CLEAR_POSTS:
-      delete state.posts[state.currentKey];
+      delete state.posts[payload.userId];
       return {
         ...state,
       };
