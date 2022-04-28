@@ -444,6 +444,7 @@ export class Profile extends Component {
                 key={data.item.id}
                 post={data.item}
                 postArray={posts}
+                currentKey={currentProfile.id}
                 setOuterScroll={this.setOuterScroll.bind(this)}
                 index={data.index}
                 canViewPrivate={
@@ -463,7 +464,10 @@ export class Profile extends Component {
                       listStyles.backRightBtnRight,
                     ]}
                     onPress={async () => {
-                      await this.props.deletePost(data.item.id);
+                      await this.props.deletePost(
+                        data.item.id,
+                        currentProfile.id
+                      );
                     }}
                   >
                     <Entypo name="trash" size={24} color="red" />

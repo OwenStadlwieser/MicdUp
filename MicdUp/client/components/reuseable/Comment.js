@@ -44,7 +44,8 @@ import {
 } from "../../redux/actions/comment";
 import { showHeader } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
-
+// helpers
+import { forHumans, getCurrentTime } from "../../reuseableFunctions/helpers";
 const { height } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
@@ -118,6 +119,8 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
+    console.log(currentKey, 1232);
+
     this.props.showHeader(false);
     this.mounted && this.setState({ loading: true });
     await this.props.getComments(post);
@@ -287,6 +290,32 @@ export class Comment extends Component {
               >
                 <Text style={styles.replyActionsText}>Reply</Text>
               </TouchableHighlight>
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  flex: 1,
+                  paddingLeft: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    alignSelf: "flex-start",
+                    fontWeight: "700",
+                  }}
+                >
+                  {forHumans(getCurrentTime() - comment.dateCreated)} Ago
+                </Text>
+                <Text
+                  style={{
+                    alignSelf: "flex-start",
+                    fontWeight: "700",
+                  }}
+                >
+                  {forHumans(comment.duration)}
+                </Text>
+              </View>
               {index !== 0 && comment.repliesLength > 0 && (
                 <TouchableHighlight
                   onPress={async () => {

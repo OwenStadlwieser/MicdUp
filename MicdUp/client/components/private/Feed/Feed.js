@@ -158,16 +158,16 @@ export class Feed extends Component {
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
-    const postsToView = fromSearch
+    const key = fromSearch
       ? tag
-        ? cachedPosts[tag._id]
-        : []
+        ? tag._id
+        : null
       : !loggedIn
-      ? cachedPosts["NOTLOGGEDINFEED"]
+      ? "NOTLOGGEDINFEED"
       : following
-      ? cachedPosts["FOLLOWINGFEED"]
-      : cachedPosts["TOPICSFEED"];
-
+      ? "FOLLOWINGFEED"
+      : "TOPICSFEED";
+    const postsToView = key ? cachedPosts[key] : [];
     return (
       <View
         style={{
@@ -286,6 +286,7 @@ export class Feed extends Component {
                   key={data.item.id}
                   post={data.item}
                   postArray={postsToView}
+                  currentKey={key}
                   index={data.index}
                   canViewPrivate={
                     data.item.owner
@@ -304,7 +305,7 @@ export class Feed extends Component {
                         listStyles.backRightBtnRight,
                       ]}
                       onPress={async () => {
-                        await this.props.deletePost(data.item.id);
+                        await this.props.deletePost(data.item.id, key);
                       }}
                     >
                       <Entypo name="trash" size={24} color="red" />

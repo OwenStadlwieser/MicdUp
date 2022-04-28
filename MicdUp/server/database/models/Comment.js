@@ -52,6 +52,10 @@ const commentSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  duration: {
+    type: Number,
+    default: 0,
+  },
   speechToText: [
     {
       word: {

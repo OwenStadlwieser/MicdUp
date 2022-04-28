@@ -90,7 +90,7 @@ export default function (state = { ...initialState }, action) {
     case SET_CURRENT_KEY:
       return {
         ...state,
-        currentKey: payload,
+        currentKey: payload.currentKey,
       };
     case LOG_OUT:
       return {
@@ -142,25 +142,26 @@ export default function (state = { ...initialState }, action) {
         ...state,
       };
     case DELETE_POST:
-      let postsToDelete = [...state.posts[state.currentKey]];
+      let postsToDelete = [...state.posts[payload.currentKey]];
       const postDelIndex = postsToDelete.findIndex(
         (post) => post.id === payload.id
       );
       postsToDelete.splice(postDelIndex, 1);
       return {
         ...state,
-        posts: { ...state.posts, [state.currentKey]: postsToDelete },
+        posts: { ...state.posts, [payload.currentKey]: postsToDelete },
       };
     case UPDATE_POST:
-      const posts = [...state.posts[state.currentKey]];
+      const posts = [...state.posts[payload.currentKey]];
       const postIndex = posts.findIndex((post) => post.id === payload.id);
       posts[postIndex] = payload;
       return {
         ...state,
-        posts: { ...state.posts, [state.currentKey]: posts },
+        posts: { ...state.posts, [payload.currentKey]: posts },
       };
     case UPDATE_POST_COMMENTS:
       const posts3 = [...state.posts[state.currentKey]];
+      console.log(state.currentKey);
       const post3Index = posts3.findIndex((post) => post.id === payload.id);
       posts3[post3Index].comments = payload.data;
       return {

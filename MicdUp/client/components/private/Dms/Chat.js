@@ -266,11 +266,32 @@ export class Chat extends Component {
                             </View>
                           )}
                         </View>
-                        <Text
-                          style={{ alignSelf: "flex-start", fontWeight: "700" }}
+                        <View
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            flexDirection: "row",
+                            width: chatWidth,
+                            paddingHorizontal: 20,
+                          }}
                         >
-                          {forHumans(getCurrentTime() - chat.dateCreated)} Ago
-                        </Text>
+                          <Text
+                            style={{
+                              alignSelf: "flex-start",
+                              fontWeight: "700",
+                            }}
+                          >
+                            {forHumans(getCurrentTime() - chat.dateCreated)} Ago
+                          </Text>
+                          <Text
+                            style={{
+                              alignSelf: "flex-start",
+                              fontWeight: "700",
+                            }}
+                          >
+                            {forHumans(chat.duration)}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                     )
                 )}

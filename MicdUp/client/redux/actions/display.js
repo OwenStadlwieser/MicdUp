@@ -22,7 +22,7 @@ export const navigationRefSearch = createNavigationContainerRef();
 export const setCurrentKey = (payload) => (dispatch) => {
   dispatch({
     type: SET_CURRENT_KEY,
-    payload,
+    payload: { currentKey: payload },
   });
 };
 
@@ -53,7 +53,12 @@ export const receiveNotif = (payload) => (dispatch) => {
   });
 };
 
-export const showComments = (payload) => (dispatch) => {
+export const showComments = (payload, currentKey) => (dispatch) => {
+  console.log(currentKey, 4343);
+  dispatch({
+    type: SET_CURRENT_KEY,
+    payload: { currentKey },
+  });
   if (navigationRef.isReady()) {
     navigationRef.navigate("Comment");
   }

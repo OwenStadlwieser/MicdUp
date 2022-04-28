@@ -199,7 +199,7 @@ export class Post extends Component {
                     />
                     <TouchableOpacity
                       onPress={() => {
-                        this.props.showComments(index);
+                        this.props.showComments(index, this.props.currentKey);
                       }}
                     >
                       <FontAwesome name="comment" size={24} color="#1A3561" />

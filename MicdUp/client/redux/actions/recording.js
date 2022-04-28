@@ -221,7 +221,6 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
         },
       });
     }
-    dispatch(setCurrentKey(userId));
     dispatch({
       type: SET_POSTS,
       payload: { posts: res.data.getUserPosts.filter((el) => el), userId },
@@ -232,7 +231,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
   }
 };
 
-export const likePost = (postId) => async (dispatch) => {
+export const likePost = (postId, currentKey) => async (dispatch) => {
   try {
     if (!checkIfLoggedIn()) {
       dispatch(
@@ -262,7 +261,7 @@ export const likePost = (postId) => async (dispatch) => {
     }
     dispatch({
       type: UPDATE_POST,
-      payload: res.data.likePost,
+      payload: { post: res.data.likePost, currentKey },
     });
     return res.data.likePost;
   } catch (err) {
@@ -270,7 +269,7 @@ export const likePost = (postId) => async (dispatch) => {
   }
 };
 
-export const deletePost = (postId) => async (dispatch) => {
+export const deletePost = (postId, currentKey) => async (dispatch) => {
   try {
     if (!checkIfLoggedIn()) {
       dispatch(
@@ -301,7 +300,7 @@ export const deletePost = (postId) => async (dispatch) => {
     if (res && res.data && res.data.deletePost && res.data.deletePost.success) {
       dispatch({
         type: DELETE_POST,
-        payload: { id: postId },
+        payload: { id: postId, currentKey },
       });
     }
     return res.data.deletePost;
@@ -417,7 +416,6 @@ export const getRecordingsFromTag =
         );
         return false;
       }
-      dispatch(setCurrentKey(searchTag));
       if (skipMult == 0) {
         dispatch({
           type: CLEAR_POSTS,
