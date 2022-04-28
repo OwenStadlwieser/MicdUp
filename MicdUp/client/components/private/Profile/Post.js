@@ -196,6 +196,7 @@ export class Post extends Component {
                       type={"Post"}
                       postId={post.id}
                       ownerId={post.owner.id}
+                      currentKey={this.props.currentKey}
                     />
                     <TouchableOpacity
                       onPress={() => {

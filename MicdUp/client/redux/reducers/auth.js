@@ -144,7 +144,7 @@ export default function (state = { ...initialState }, action) {
     case DELETE_POST:
       let postsToDelete = [...state.posts[payload.currentKey]];
       const postDelIndex = postsToDelete.findIndex(
-        (post) => post.id === payload.id
+        (post) => post.id === payload.post.id
       );
       postsToDelete.splice(postDelIndex, 1);
       return {
@@ -153,8 +153,8 @@ export default function (state = { ...initialState }, action) {
       };
     case UPDATE_POST:
       const posts = [...state.posts[payload.currentKey]];
-      const postIndex = posts.findIndex((post) => post.id === payload.id);
-      posts[postIndex] = payload;
+      const postIndex = posts.findIndex((post) => post.id === payload.post.id);
+      posts[postIndex] = payload.post;
       return {
         ...state,
         posts: { ...state.posts, [payload.currentKey]: posts },

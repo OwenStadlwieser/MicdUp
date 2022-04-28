@@ -50,7 +50,8 @@ export class Like extends Component {
                   this.props.parents,
                   { id: postId, owner: { id: ownerId } }
                 );
-              } else if (type === "Post") await this.props.likePost(post.id);
+              } else if (type === "Post")
+                await this.props.likePost(post.id, this.props.currentKey);
               this.props.removeLoading("LIKE");
             }}
           >
