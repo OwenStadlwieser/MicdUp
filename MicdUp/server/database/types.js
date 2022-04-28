@@ -703,6 +703,12 @@ const ChatMessageType = new GraphQLObjectType({
         return await Profile.findById(parent.owner);
       },
     },
+    duration: {
+      type: GraphQLInt,
+      resolve(parent, args, context, info) {
+        return Math.floor(parent.duration * 1000);
+      },
+    },
     speechToText: {
       type: new GraphQLList(
         new GraphQLObjectType({
