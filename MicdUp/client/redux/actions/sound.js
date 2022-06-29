@@ -7,8 +7,7 @@ import { addListenerAuthenticated, addListener } from "./recording";
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (sound, url, queue) => async (dispatch) => {
-  let { currentPlayingSound, currentPlaybackObject, currentIntervalId, time } =
-    store.getState().sound;
+  let { currentPlayingSound, currentIntervalId, time } = store.getState().sound;
   let { user, ipAddr } = store.getState().auth;
   sound.uri = url;
   if (currentPlayingSound && currentPlayingSound.uri !== url) {
@@ -34,42 +33,47 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
   }
   const playbackObject = await playSound(sound.uri, soundExpo);
   const intervalId = setInterval(async () => {
-    const status = await playbackObject.getStatusAsync();
-    if (
-      status.didJustFinish ||
-      status.durationMillis === status.positionMillis
-    ) {
-      let { queue, currentPlayingSound } = store.getState().sound;
-      let { user, ipAddr } = store.getState().auth;
-      if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
-        dispatch(
-          addListenerAuthenticated(
-            currentPlayingSound.id,
-            status.durationMillis
-          )
-        );
-      } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
-        dispatch(
-          addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
+    try {
+      const status = await playbackObject.getStatusAsync();
+      if (
+        status.didJustFinish ||
+        status.durationMillis === status.positionMillis
+      ) {
+        let { queue, currentPlayingSound } = store.getState().sound;
+        let { user, ipAddr } = store.getState().auth;
+        if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
+          dispatch(
+            addListenerAuthenticated(
+              currentPlayingSound.id,
+              status.durationMillis
+            )
+          );
+        } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
+          dispatch(
+            addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
+          );
+        }
+        if (queue && queue.length > 0) {
+          let newSound = queue.shift();
+          await dispatch(changeSound(newSound, newSound.signedUrl, queue));
+          return;
+        }
+        await soundExpo.unloadAsync();
+        clearInterval(intervalId);
+        dispatch({
+          type: SOUND_ENDED,
+        });
+      } else {
+        await dispatch(
+          setTime({
+            time: status.positionMillis,
+            duration: status.durationMillis,
+          })
         );
       }
-      if (queue && queue.length > 0) {
-        let newSound = queue.shift();
-        await dispatch(changeSound(newSound, newSound.signedUrl, queue));
-        return;
-      }
-      await soundExpo.unloadAsync();
+    } catch (err) {
+      console.log(err);
       clearInterval(intervalId);
-      dispatch({
-        type: SOUND_ENDED,
-      });
-    } else {
-      await dispatch(
-        setTime({
-          time: status.positionMillis,
-          duration: status.durationMillis,
-        })
-      );
     }
   }, 100);
   dispatch({
