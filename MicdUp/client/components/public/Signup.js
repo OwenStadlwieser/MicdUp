@@ -17,12 +17,10 @@ import {
   Platform,
   Dimensions,
   TextInput,
-  Text,
-  TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
+import { Header } from "@react-navigation/stack";
 import { Button } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
 import DatePicker from "react-native-datepicker";
 
 const { height } = Dimensions.get("window");
