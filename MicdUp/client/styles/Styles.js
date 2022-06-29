@@ -42,6 +42,11 @@ const styles = StyleSheet.create({
   commentsContainer: {
     flex: 10,
   },
+  avoidingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   searchTags: {
     display: "flex",
     flexDirection: "column",

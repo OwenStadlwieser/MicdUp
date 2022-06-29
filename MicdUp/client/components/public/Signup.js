@@ -67,7 +67,11 @@ export class Signup extends Component {
   render() {
     const { email, phone, password, date, user } = this.state;
     return (
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={(Header.HEIGHT ? Header.HEIGHT : 0) + 20} // adjust the value here if you need more padding
+        style={styles.avoidingView}
+        behavior="padding"
+      >
         <TextInput
           value={user}
           style={
