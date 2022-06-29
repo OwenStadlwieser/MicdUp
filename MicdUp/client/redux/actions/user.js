@@ -60,7 +60,7 @@ export const deleteAccount = () => async (dispatch) => {
 
 export const verifyEmail = (email) => async (dispatch) => {
   try {
-    const res = await privateClient.mutate({
+    const res = await publicClient.mutate({
       mutation: VERIFY_EMAIL_MUTATION,
       variables: { email },
       fetchPolicy: "no-cache",
@@ -77,7 +77,7 @@ export const verifyEmail = (email) => async (dispatch) => {
 export const setEmailVerified =
   (verificationCode, email) => async (dispatch) => {
     try {
-      const res = await privateClient.mutate({
+      const res = await publicClient.mutate({
         mutation: SET_EMAIL_VERIFIED_MUTATION,
         variables: { verificationCode, email },
         fetchPolicy: "no-cache",

@@ -19,7 +19,7 @@ const createUser = {
     // FIXME: implement transaction
     returnObject = {
       success: true,
-      message: "Sign up successful",
+      message: "Sign up successful, Verify Email to continue",
     };
     const session = await mongoose.startSession();
     session.startTransaction();

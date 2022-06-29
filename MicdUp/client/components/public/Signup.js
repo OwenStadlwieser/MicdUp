@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 // redux
 import { showMessage, showHeader } from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
+import { navigate } from "../../redux/actions/display";
 // styles
 import { styles } from "../../styles/Styles";
 //helpers
@@ -19,6 +20,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
+import VerifyEmail from "../private/Profile/VerifyEmail";
 import { Header } from "@react-navigation/stack";
 import { Button } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
@@ -34,6 +36,7 @@ export class Signup extends Component {
       password: "",
       date: "",
       user: "",
+      signupComplete: false,
     };
 
     this.mounted = true;
@@ -58,13 +61,22 @@ export class Signup extends Component {
     this.props.showMessage(res.data.createUser);
     if (res.data.createUser.success)
       setTimeout(() => {
-        this.props.changeSignup(false);
+        this.mounted && this.setState({ signupComplete: true });
       }, 3000);
   }
 
   render() {
-    const { email, phone, password, date, user } = this.state;
-    return (
+    const { email, phone, password, date, user, signupComplete } = this.state;
+    return signupComplete ? (
+      <VerifyEmail
+        hideVerifyEmail={() => {
+          () => this.mounted && this.setState({ signupComplete: false });
+        }}
+        emailVerifiedSuccess={() => {
+          this.props.navigate("Login");
+        }}
+      />
+    ) : (
       <KeyboardAvoidingView
         keyboardVerticalOffset={(Header.HEIGHT ? Header.HEIGHT : 0) + 20} // adjust the value here if you need more padding
         style={styles.avoidingView}
@@ -189,4 +201,5 @@ export default connect(mapStateToProps, {
   register,
   showMessage,
   showHeader,
+  navigate,
 })(Signup);

@@ -5,6 +5,7 @@ import { styles } from "../../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import { verifyEmail, setEmailVerified } from "../../../redux/actions/user";
 import { showMessage } from "../../../redux/actions/display";
+import { Button } from "react-native-paper";
 
 export class VerifyEmail extends Component {
   constructor() {
@@ -39,7 +40,9 @@ export class VerifyEmail extends Component {
         message: "Email Verified.",
       });
       setTimeout(() => {
-        this.props.hideVerifyEmail();
+        this.props.emailVerifiedSuccess
+          ? this.props.emailVerifiedSuccess()
+          : this.props.hideVerifyEmail();
       }, 3000);
     }
   };
@@ -65,7 +68,7 @@ export class VerifyEmail extends Component {
               placeholder="Email"
               onChangeText={(text) => this.onChange("email", text)}
             />
-            <TouchableOpacity
+            <Button
               style={styles.button}
               accessibilityLabel="Verify Email"
               onPress={async () => {
@@ -87,7 +90,7 @@ export class VerifyEmail extends Component {
               }}
             >
               <Text style={styles.text}>Verify Email</Text>
-            </TouchableOpacity>
+            </Button>
           </View>
         ) : (
           <View>
@@ -97,7 +100,7 @@ export class VerifyEmail extends Component {
               placeholder="Verification Code"
               onChangeText={(text) => this.onChange("verificationCode", text)}
             />
-            <TouchableOpacity
+            <Button
               style={styles.button}
               accessibilityLabel="Verification Code"
               onPress={async () => {
@@ -113,7 +116,7 @@ export class VerifyEmail extends Component {
               }}
             >
               <Text style={styles.text}>Verify Code</Text>
-            </TouchableOpacity>
+            </Button>
           </View>
         )}
       </View>

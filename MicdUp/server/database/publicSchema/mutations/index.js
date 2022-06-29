@@ -5,7 +5,7 @@ const graphql = require("graphql"); //use graphql package
 */
 const { GraphQLObjectType, GraphQLID } = graphql;
 const { createUser, forgotPassChange } = require("./auth");
-const { forgotPass } = require("./user");
+const { forgotPass, verifyEmail, setEmailVerified } = require("./user");
 const { addListener } = require("./recording");
 const Mutation = new GraphQLObjectType({
   name: "MutationType",
@@ -14,6 +14,8 @@ const Mutation = new GraphQLObjectType({
     forgotPass,
     forgotPassChange,
     addListener,
+    verifyEmail,
+    setEmailVerified,
   }, //fields end here
 });
 

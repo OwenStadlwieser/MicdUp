@@ -13,16 +13,25 @@ const login = {
   },
   async resolve(parent, { authenticator, password }, context) {
     const user = await User.findOne({
-      $or: [
-        { userName: authenticator },
-        { email: authenticator },
-        { phone: authenticator },
+      $and: [
+        {
+          $or: [
+            { userName: authenticator },
+            { email: authenticator },
+            { phone: authenticator },
+          ],
+        },
       ],
     });
     if (!user) {
       return {
         success: false,
         message: "No user with that identifier",
+      };
+    } else if (!user.emailVerified) {
+      return {
+        success: false,
+        message: "Email not verified",
       };
     }
     const isValid = await bcrypt.compare(password, user.password);
