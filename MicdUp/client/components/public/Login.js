@@ -1,15 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-} from "react-native";
+import { View, TextInput, Text, KeyboardAvoidingView } from "react-native";
 import { styles } from "../../styles/Styles";
 import { Button } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
+import { Header } from "react-navigation-stack";
 // redux
 import { showHeader } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
@@ -60,7 +54,11 @@ export class Login extends Component {
           />
         ))
       : (login = (
-          <KeyboardAvoidingView style={styles.container}>
+          <KeyboardAvoidingView
+            keyboardVerticalOffset={Header.HEIGHT + 20} // adjust the value here if you need more padding
+            style={{ flex: 1 }}
+            behavior="padding"
+          >
             <TextInput
               style={styles.textInput}
               value={authenticator}
