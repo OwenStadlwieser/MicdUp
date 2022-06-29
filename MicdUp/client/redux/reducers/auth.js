@@ -151,7 +151,7 @@ export default function (state = { ...initialState }, action) {
         ...state,
         posts: { ...state.posts, [payload.currentKey]: postsToDelete },
       };
-    case UPDATE_POST:
+  case UPDATE_POST:
       const posts = [...state.posts[payload.currentKey]];
       const postIndex = posts.findIndex((post) => post.id === payload.post.id);
       posts[postIndex] = payload.post;

@@ -19,7 +19,6 @@ export const getFollowingFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    dispatch(setCurrentKey("FOLLOWINGFEED"));
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
@@ -53,7 +52,6 @@ export const getTopicsFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    dispatch(setCurrentKey("TOPICSFEED"));
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,
@@ -88,8 +86,6 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching feed failed" })
       );
     }
-    dispatch(setCurrentKey("NOTLOGGEDINFEED"));
-
     if (skipMult == 0) {
       dispatch({
         type: CLEAR_POSTS,

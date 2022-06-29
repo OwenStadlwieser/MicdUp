@@ -253,6 +253,7 @@ export class Chat extends Component {
                                   postId={chat.id}
                                   ownerId={chat.owner.id}
                                   post={chat}
+                                  currentKey={"CHAT"}
                                 />
                               )}
                               {chat.owner.id === profile.id && (

@@ -41,14 +41,14 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
     ) {
       let { queue, currentPlayingSound } = store.getState().sound;
       let { user, ipAddr } = store.getState().auth;
-      if (user && currentPlayingSound.id && user._id) {
+      if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
         dispatch(
           addListenerAuthenticated(
             currentPlayingSound.id,
             status.durationMillis
           )
         );
-      } else if (currentPlayingSound.id && ipAddr) {
+      } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
         dispatch(
           addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
         );
