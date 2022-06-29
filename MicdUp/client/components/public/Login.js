@@ -56,7 +56,7 @@ export class Login extends Component {
       : (login = (
           <KeyboardAvoidingView
             keyboardVerticalOffset={Header.HEIGHT + 20} // adjust the value here if you need more padding
-            style={{ flex: 1 }}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
             behavior="padding"
           >
             <TextInput
