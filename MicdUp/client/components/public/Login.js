@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { View, TextInput, Text, KeyboardAvoidingView } from "react-native";
 import { styles } from "../../styles/Styles";
 import { Button } from "react-native-paper";
-import { Header } from "react-navigation-stack";
+import { Header } from "@react-navigation/stack";
 // redux
 import { showHeader } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
