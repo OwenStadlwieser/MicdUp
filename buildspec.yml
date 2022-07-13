@@ -34,7 +34,7 @@ phases:
     commands:
       - cd MicdUp
       - cd server
-      - npm i
+      - npm i --force
       # - command
       # - command
   build:
