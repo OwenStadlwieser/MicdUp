@@ -4,7 +4,7 @@ import { View, TextInput, TouchableOpacity, Text } from "react-native";
 import { styles } from "../../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import { verifyEmail, setEmailVerified } from "../../../redux/actions/user";
-import { showMessage } from "../../../redux/actions/display";
+import { showMessage, navigate } from "../../../redux/actions/display";
 import { Button } from "react-native-paper";
 
 export class VerifyEmail extends Component {
@@ -40,9 +40,7 @@ export class VerifyEmail extends Component {
         message: "Email Verified.",
       });
       setTimeout(() => {
-        this.props.emailVerifiedSuccess
-          ? this.props.emailVerifiedSuccess()
-          : this.props.hideVerifyEmail();
+        this.props.navigate("Login");
       }, 3000);
     }
   };
@@ -51,15 +49,6 @@ export class VerifyEmail extends Component {
     const { email, stage, verificationCode } = this.state;
     return (
       <View style={styles.container}>
-        <AntDesign
-          style={styles.backArrow}
-          name="leftcircle"
-          size={24}
-          color="white"
-          onPress={() => {
-            this.props.hideVerifyEmail();
-          }}
-        />
         {stage === 1 ? (
           <View>
             <TextInput
@@ -130,4 +119,5 @@ export default connect(mapStateToProps, {
   verifyEmail,
   showMessage,
   setEmailVerified,
+  navigate,
 })(VerifyEmail);

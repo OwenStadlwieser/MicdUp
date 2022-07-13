@@ -1,6 +1,5 @@
-import { Text, View, Dimensions, SafeAreaView } from "react-native";
-import { Button } from "react-native-paper";
-import React, { Component, Fragment, useEffect } from "react";
+import { Text, View } from "react-native";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
@@ -17,10 +16,10 @@ import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
 import CircleSnail from "react-native-progress/CircleSnail";
-import NotificationBell from "./components/private/NotificationBell";
 import Search from "./components/private/Search/Search";
 import Profile from "./components/private/Profile/Profile";
 import ListOfAccounts from "./components/reuseable/ListOfAccounts";
+import VerifyEmail from "./components/private/Profile/VerifyEmail";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -197,6 +196,7 @@ export class Root extends Component {
               />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
             </Stack.Navigator>
           </NavigationContainer>
           <Navbar />

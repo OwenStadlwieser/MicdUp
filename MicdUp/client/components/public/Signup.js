@@ -36,7 +36,6 @@ export class Signup extends Component {
       password: "",
       date: "",
       user: "",
-      signupComplete: false,
     };
 
     this.mounted = true;
@@ -61,22 +60,13 @@ export class Signup extends Component {
     this.props.showMessage(res.data.createUser);
     if (res.data.createUser.success)
       setTimeout(() => {
-        this.mounted && this.setState({ signupComplete: true });
+        this.mounted && this.props.navigate("VerifyEmail");
       }, 3000);
   }
 
   render() {
-    const { email, phone, password, date, user, signupComplete } = this.state;
-    return signupComplete ? (
-      <VerifyEmail
-        hideVerifyEmail={() => {
-          () => this.mounted && this.setState({ signupComplete: false });
-        }}
-        emailVerifiedSuccess={() => {
-          this.props.navigate("Login");
-        }}
-      />
-    ) : (
+    const { email, phone, password, date, user } = this.state;
+    return (
       <KeyboardAvoidingView
         keyboardVerticalOffset={(Header.HEIGHT ? Header.HEIGHT : 0) + 20} // adjust the value here if you need more padding
         style={styles.avoidingView}
