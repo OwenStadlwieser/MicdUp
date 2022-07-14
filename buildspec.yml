@@ -55,7 +55,9 @@ phases:
   #file-format: JunitXml | CucumberJson
 artifacts:
   files:
-    - MicdUp/server/*
+    - "**/*"
+  base-directory:
+    - "MicdUp/server"
 # - location
 # - location
 #name: $(date +%Y-%m-%d)
