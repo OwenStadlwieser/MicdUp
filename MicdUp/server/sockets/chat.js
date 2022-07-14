@@ -70,7 +70,6 @@ exports = module.exports = function (io) {
         var jsonPath = path.join(
           __dirname,
           "..",
-          "temp",
           `${message._id}.${fileTypeFixed}`
         );
         const base64 = messageData.substr(messageData.indexOf(",") + 1);
@@ -82,12 +81,7 @@ exports = module.exports = function (io) {
 
         var command = ffmpeg();
         command.input(jsonPath).inputFormat(fileTypeFixed);
-        const fileName = path.join(
-          __dirname,
-          "..",
-          "temp",
-          `${message._id}.mp4`
-        );
+        const fileName = path.join(__dirname, "..", `${message._id}.mp4`);
         const session = await mongoose.startSession();
         session.startTransaction();
         const fileNames = [];
