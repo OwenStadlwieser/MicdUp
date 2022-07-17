@@ -62,7 +62,8 @@ const makeNotification = async (
   if (!NotificationTypesBackend[type]) {
     throw new Error("Unknown type");
   }
-  let title = sender.userName;
+  let title =
+    sender.userName + " " + actionMessage + " " + PostToContentType[type];
   let body =
     sender.userName + " " + actionMessage + " " + PostToContentType[type];
 
@@ -107,7 +108,7 @@ const makeNotification = async (
     type,
   });
   await notif.save();
-  sendNotification(title, body, data, tokens);
+  sendNotification(title, body, notif, tokens);
 };
 
 // deletes notification from db
