@@ -18,6 +18,18 @@ const notifSchema = new Schema(
       type: String,
       required: true,
     },
+    itemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    type: {
+      type: String,
+    },
+    deleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     image: {
       type: mongoose.Schema.Types.ObjectId,
       required: false,
@@ -36,4 +48,5 @@ const notifSchema = new Schema(
   options
 );
 
-module.exports = { notifSchema };
+const Notif = mongoose.model("notif", notifSchema);
+module.exports = { notifSchema, Notif };
