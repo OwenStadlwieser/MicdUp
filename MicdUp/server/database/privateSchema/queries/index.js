@@ -7,7 +7,12 @@ const { GraphQLObjectType, GraphQLID } = graphql;
 const { fetchChats, fetchChatMessages } = require("./chat");
 const { getUser } = require("../../privateSchema/queries/user");
 const { getPrivates } = require("./profile");
-const { getFollowingFeed, getFollowingTopicsFeed } = require("./recording");
+const {
+  getFollowingFeed,
+  getFollowingTopicsFeed,
+  getSpecificPost,
+} = require("./recording");
+const { getUserNotifs } = require("./notifs");
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -17,6 +22,8 @@ const RootQuery = new GraphQLObjectType({
     getPrivates,
     getFollowingFeed,
     getFollowingTopicsFeed,
+    getUserNotifs,
+    getSpecificPost,
   }, //fields end here
 });
 

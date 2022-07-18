@@ -80,13 +80,15 @@ const likeComment = {
     if (comment && index < 0) {
       comment.likers.push(context.profile._id);
       await comment.save();
+      const post = await Post.findById(comment.post);
       await makeNotification(
         await User.findOne(context.profile.user),
         NotificationTypesBackend.LikeComment,
         {},
         comment.owner,
-        LIKE_MESSAGE,
-        comment._id
+        LIKE_MESSAGE + " " + post.title,
+        comment._id,
+        comment.post
       );
       return comment;
     }

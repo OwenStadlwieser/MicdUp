@@ -23,6 +23,8 @@ const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
 const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 const {
   LIKE_MESSAGE,
+  COMMENT_MESSAGE,
+  REPLY_MESSAGE,
   NotificationTypesBackend,
 } = require("../../../utils/constants");
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -321,8 +323,9 @@ const likePost = {
           NotificationTypesBackend.LikePost,
           {},
           post.owner,
-          LIKE_MESSAGE,
-          post._id
+          LIKE_MESSAGE + " " + post.title,
+          post._id,
+          null
         );
         return post;
       }
@@ -503,15 +506,16 @@ const commentToPost = {
         comment.isTop = false;
         await comment.save({ session });
         await commentParent.save({ session });
-        await session.commitTransaction();
         await makeNotification(
           await User.findById(context.profile.user),
           NotificationTypesBackend.ReplyComment,
           {},
           commentParent.owner,
           REPLY_MESSAGE,
-          comment._id
+          comment._id,
+          comment.post
         );
+        await session.commitTransaction();
         return commentParent;
       } else {
         if (!post) {
@@ -522,15 +526,16 @@ const commentToPost = {
         comment.post = post._id;
         await comment.save({ session });
         await post.save({ session });
-        await session.commitTransaction();
         await makeNotification(
           await User.findById(context.profile.user),
-          NotificationTypesBackend.PostComment,
+          NotificationTypesBackend.CommentPost,
           {},
           post.owner,
-          COMMENT_MESSAGE,
-          comment._id
+          COMMENT_MESSAGE + " " + post.title,
+          comment._id,
+          comment.post
         );
+        await session.commitTransaction();
         return comment;
       }
     } catch (err) {

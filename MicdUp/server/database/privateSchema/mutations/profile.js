@@ -108,7 +108,8 @@ const followProfile = {
           {},
           foreignProfile,
           FOLLOW_MESSAGE,
-          foreignProfile._id
+          foreignProfile._id,
+          null
         );
         returnObject = { message: "followed", success: true };
       }

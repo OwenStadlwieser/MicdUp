@@ -21,7 +21,7 @@ const {
   followTopic,
   blockProfile,
 } = require("./profile");
-const { addToken } = require("./notifs");
+const { addToken, markNotifsAsSeen } = require("./notifs");
 const { likeComment, deleteComment } = require("./comment");
 
 const { fetchChat } = require("./chat");
@@ -44,6 +44,7 @@ const Mutation = new GraphQLObjectType({
     addListenerAuthenticated,
     followTopic,
     blockProfile,
+    markNotifsAsSeen,
   }, //fields end here
 });
 

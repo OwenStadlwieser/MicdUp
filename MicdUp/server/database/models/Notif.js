@@ -22,6 +22,9 @@ const notifSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
     type: {
       type: String,
     },
@@ -43,6 +46,11 @@ const notifSchema = new Schema(
     dateCreated: {
       type: Date,
       default: Date.now,
+    },
+    seenByUser: {
+      type: Boolean,
+      default: false,
+      required: true,
     },
   },
   options

@@ -16,6 +16,7 @@ import {
   SET_CURRENT_KEY,
   UPDATE_FOLLOWER_COUNT,
   UPDATE_PRIVATE_COUNT,
+  SET_SINGLE_POST,
 } from "../types";
 
 const initialState = {
@@ -50,6 +51,11 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         socket: payload,
+      };
+    case SET_SINGLE_POST:
+      return {
+        ...state,
+        posts: { ...state.posts, SinglePost: [payload] },
       };
     case UPDATE_FOLLOWER_COUNT:
       let currentCount = state.user.profile.followingCount;
@@ -151,7 +157,7 @@ export default function (state = { ...initialState }, action) {
         ...state,
         posts: { ...state.posts, [payload.currentKey]: postsToDelete },
       };
-  case UPDATE_POST:
+    case UPDATE_POST:
       const posts = [...state.posts[payload.currentKey]];
       const postIndex = posts.findIndex((post) => post.id === payload.post.id);
       posts[postIndex] = payload.post;

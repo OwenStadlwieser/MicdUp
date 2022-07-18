@@ -1,7 +1,7 @@
-const LIKE_MESSAGE = "liked your";
-const FOLLOW_MESSAGE = "followed your";
-const COMMENT_MESSAGE = "commented on your";
-const REPLY_MESSAGE = "replied to your";
+const LIKE_MESSAGE = "liked";
+const FOLLOW_MESSAGE = "followed you";
+const COMMENT_MESSAGE = "commented on";
+const REPLY_MESSAGE = "replied to your comment";
 
 const NotificationTypesBackend = {
   // done

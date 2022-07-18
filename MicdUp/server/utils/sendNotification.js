@@ -57,15 +57,14 @@ const makeNotification = async (
   data,
   receiver,
   actionMessage,
-  itemId
+  itemId,
+  parentId
 ) => {
   if (!NotificationTypesBackend[type]) {
     throw new Error("Unknown type");
   }
-  let title =
-    sender.userName + " " + actionMessage + " " + PostToContentType[type];
-  let body =
-    sender.userName + " " + actionMessage + " " + PostToContentType[type];
+  let title = sender.userName + " " + actionMessage;
+  let body = sender.userName + " " + actionMessage;
 
   let receiverUser = await User.findOne({ profile: receiver });
   if (title == receiverUser.userName) {
@@ -93,11 +92,6 @@ const makeNotification = async (
     await notif.delete();
   }
 
-  console.log(
-    "SENDING TO",
-    notif.dateCreated.getTime(),
-    now.getTime() - 60 * 60 * 1000 * 24
-  );
   console.log(tokens);
 
   notif = new Notif({
@@ -106,6 +100,7 @@ const makeNotification = async (
     text: body,
     itemId,
     type,
+    parentId,
   });
   await notif.save();
   sendNotification(title, body, notif, tokens);

@@ -26,14 +26,17 @@ export class NotificationBell extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { navigate } = this.props;
+    const { navigate, unseenNotifs } = this.props;
     return (
       <Text>
+        <Text style={{ fontStyle: "italic", color: "white" }}>
+          {unseenNotifs}
+        </Text>
         <MaterialCommunityIcons
           onPress={() => navigate("Notifs")}
           name="bell"
           size={24}
-          color="white"
+          color={unseenNotifs > 0 ? "red" : "white"}
         />
       </Text>
     );
@@ -42,6 +45,7 @@ export class NotificationBell extends Component {
 
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
+  unseenNotifs: state.notifs.unseenNotifs,
 });
 
 export default connect(mapStateToProps, { navigate })(NotificationBell);
