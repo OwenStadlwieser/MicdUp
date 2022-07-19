@@ -209,21 +209,25 @@ export class Dms extends Component {
                   chat.members.length > 0 &&
                   chat.members
                     .filter((member) => member)
-                    .map((member, index) => (
-                      <View key={index} style={styles.messageMember}>
-                        <Image
-                          source={
-                            member && member.image
-                              ? { uri: member.image.signedUrl }
-                              : require("../../../assets/no-profile-pic-icon-27.jpg")
-                          }
-                          style={styles.commentImg}
-                        />
-                        <Text style={styles.listItemTextUser}>
-                          {member.user.userName}
-                        </Text>
-                      </View>
-                    ))}
+                    .map(
+                      (member, index) =>
+                        member &&
+                        member.user && (
+                          <View key={index} style={styles.messageMember}>
+                            <Image
+                              source={
+                                member && member.image
+                                  ? { uri: member.image.signedUrl }
+                                  : require("../../../assets/no-profile-pic-icon-27.jpg")
+                              }
+                              style={styles.commentImg}
+                            />
+                            <Text style={styles.listItemTextUser}>
+                              {member.user.userName}
+                            </Text>
+                          </View>
+                        )
+                    )}
               </TouchableOpacity>
             ))}
         </ScrollView>
