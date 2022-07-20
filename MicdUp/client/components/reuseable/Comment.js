@@ -200,7 +200,7 @@ export class Comment extends Component {
           style={{
             paddingLeft: index > 0 && index < 12 ? index * 10 : 0,
             right: index >= 12 ? 10 : 0,
-            borderLeftColor: "#1A3561",
+            borderLeftColor: "#000000",
             borderStyle: "solid",
             borderLeftWidth: 1,
             flexDirection: "row",
@@ -220,7 +220,7 @@ export class Comment extends Component {
               paddingTop: height * 0.01,
               justifyContent: "space-evenly",
               paddingHorizontal: 15,
-              borderLeftColor: "#1A3561",
+              borderLeftColor: "#000000",
               borderStyle: "solid",
               left: index >= 12 ? -1 : 0,
               borderLeftWidth: index >= 12 ? 0 : 1,
@@ -461,7 +461,7 @@ export class Comment extends Component {
               }}
             >
               <Text
-                style={{ color: "#1A3561", fontStyle: "italic", fontSize: 24 }}
+                style={{ color: "#000000", fontStyle: "italic", fontSize: 24 }}
               >
                 Be the first to comment!
               </Text>

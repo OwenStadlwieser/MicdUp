@@ -35,8 +35,7 @@ export class SoundModal extends Component {
 
   componentDidMount = () => {};
 
-  componentDidUpdate = (prevProps) => {
-  }
+  componentDidUpdate = (prevProps) => {};
   render() {
     const { playingId, sound, isPause, profile } = this.props;
     return (
@@ -103,7 +102,7 @@ export class SoundModal extends Component {
                     }}
                     name="playcircleo"
                     size={24}
-                    color="#1A3561"
+                    color="#000000"
                     style={{ paddingBottom: 30 }}
                   />
                 ) : (

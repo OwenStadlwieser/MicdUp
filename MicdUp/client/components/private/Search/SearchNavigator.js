@@ -18,7 +18,7 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#1A3561",
+    background: "#000000",
   },
 };
 const Stack = createStackNavigator();

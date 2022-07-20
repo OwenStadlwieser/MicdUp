@@ -33,7 +33,7 @@ const largeIconFontSize =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   textInputComments: {
     borderWidth: 2,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     flex: 7,
   },
@@ -246,21 +246,21 @@ const styles = StyleSheet.create({
   },
   containerPrivate: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
   },
   contentContainer: {
     flex: 9,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
   },
   pane: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
     height: contentPaneHeight,
     justifyContent: "center",
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   paneSpaceEvenly: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
     height: contentPaneHeight,
     justifyContent: "space-evenly",
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   paneUncentered: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
     height: contentPaneHeight,
   },
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderTopWidth: 1,
-    borderTopColor: "#1A3561",
+    borderTopColor: "#000000",
     height: height * 0.125,
   },
   modalContainer: {
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     height: height * 0.15,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     backgroundColor: "white",
     paddingLeft: width * 0.05,
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   },
   commentActionsDiv: {
     flexDirection: "row",
-    borderLeftColor: "#1A3561",
+    borderLeftColor: "#000000",
     borderStyle: "solid",
     borderLeftWidth: 1,
   },
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     flexDirection: "row",
-    borderLeftColor: "#1A3561",
+    borderLeftColor: "#000000",
     borderStyle: "solid",
     borderLeftWidth: 1,
   },
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     alignItems: "center",
     borderRadius: 20,
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
   },
   listItemContainer: {
     height: listItemHeight,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderStyle: "solid",
     padding: 10,
@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
   },
   listItemContainerUser: {
     height: listItemHeight,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderStyle: "solid",
     padding: 10,
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
   },
   listItemContainerChat: {
     height: height * 0.1,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderRadius: 8,
     paddingVertical: 10,

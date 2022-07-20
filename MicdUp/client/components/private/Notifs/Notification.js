@@ -77,7 +77,7 @@ export class Notification extends Component {
           }
           style={styles.commentImg}
         />
-        <Text style={{ fontSize: medium, fontWeight: 500, color: "#1A3561" }}>
+        <Text style={{ fontSize: medium, fontWeight: 500, color: "#000000" }}>
           {text}
         </Text>
       </TouchableOpacity>
