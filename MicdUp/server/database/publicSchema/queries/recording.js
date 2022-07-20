@@ -33,7 +33,6 @@ const getUserPosts = {
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
-      console.log(posts);
       return posts;
     } catch (err) {
       console.log(err);

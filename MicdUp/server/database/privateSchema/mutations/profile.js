@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Profile } = require("../../models/Profile");
+const { User } = require("../../models/User");
 const { Tag } = require("../../models/Tag");
 const { File } = require("../../models/File");
 const { GraphQLString, GraphQLID, GraphQLBoolean } = require("graphql");
@@ -11,6 +12,14 @@ const {
 } = require("../../types");
 const { uploadFileFromBase64, deleteFile } = require("../../../utils/awsS3");
 const { getCurrentTime } = require("../../../reusableFunctions/helpers");
+const {
+  makeNotification,
+  deleteNotification,
+} = require("../../../utils/sendNotification");
+const {
+  FOLLOW_MESSAGE,
+  NotificationTypesBackend,
+} = require("../../../utils/constants");
 const updateProfilePic = {
   type: FileType,
   args: {
@@ -83,10 +92,25 @@ const followProfile = {
       if (foreignProfile.followers.get(`${profile._id}`)) {
         foreignProfile.followers.delete(`${profile._id}`);
         profile.following.delete(`${foreignProfile._id}`);
+        await deleteNotification(
+          context.profile.user,
+          foreignProfile,
+          foreignProfile._id,
+          NotificationTypesBackend.Follow
+        );
         returnObject = { message: "unfollowed", success: true };
       } else {
         foreignProfile.followers.set(`${profile._id}`, "1");
         profile.following.set(`${foreignProfile._id}`, "1");
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.Follow,
+          {},
+          foreignProfile,
+          FOLLOW_MESSAGE,
+          foreignProfile._id,
+          null
+        );
         returnObject = { message: "followed", success: true };
       }
       await profile.save({ session });

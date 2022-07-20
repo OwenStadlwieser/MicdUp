@@ -1,18 +1,10 @@
 const mongoose = require("mongoose");
 const graphql = require("graphql");
-const {
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLSchema,
-  GraphQLList,
-  GraphQLBoolean,
-  GraphQLFloat,
-} = graphql;
+const { GraphQLString } = graphql;
 
 const { User } = require("../../models/User");
-const { NotifType } = require("../../types");
+const { Notif } = require("../../models/Notif");
+const { NotifType, MessageType } = require("../../types");
 
 const addToken = {
   type: NotifType,
@@ -42,6 +34,38 @@ const addToken = {
   },
 };
 
+const markNotifsAsSeen = {
+  type: MessageType,
+  args: {},
+  async resolve(parent, {}, context) {
+    // check if already liked and unlike
+    if (!context.user.id) {
+      throw new Error("Must be signed in to add a push token.");
+    }
+    let index = -1;
+
+    try {
+      await Notif.updateMany(
+        {
+          receiver: context.user.profile,
+        },
+        {
+          seenByUser: true,
+        }
+      );
+      return {
+        success: true,
+        message: "notifs seen",
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.message,
+      };
+    }
+  },
+};
 module.exports = {
   addToken,
+  markNotifsAsSeen,
 };

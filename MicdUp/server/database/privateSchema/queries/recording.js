@@ -53,6 +53,32 @@ const getFollowingFeed = {
   },
 };
 
+const getSpecificPost = {
+  type: PostType,
+  args: { postId: { type: GraphQLID } },
+  async resolve(parent, { postId }, context) {
+    try {
+      if (
+        !context.user ||
+        !context.profile.following ||
+        !(context.profile.following instanceof Map)
+      ) {
+        return;
+      }
+      let blocked = [...context.profile.blockedMap.keys()];
+      let blockedBy = [...context.profile.blockedByMap.keys()];
+      return await Post.findOne({
+        $and: [
+          { _id: postId },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+};
 const getFollowingTopicsFeed = {
   type: new GraphQLList(PostType),
   args: { skipMult: { type: GraphQLInt } },
@@ -88,4 +114,5 @@ const getFollowingTopicsFeed = {
 module.exports = {
   getFollowingFeed,
   getFollowingTopicsFeed,
+  getSpecificPost,
 };

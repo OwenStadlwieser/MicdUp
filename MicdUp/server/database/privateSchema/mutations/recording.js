@@ -6,16 +6,8 @@ var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
 const { uploadFile, deleteFile } = require("../../../utils/awsS3");
-const {
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLSchema,
-  GraphQLList,
-  GraphQLBoolean,
-  GraphQLFloat,
-} = graphql;
+const { GraphQLID, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLFloat } =
+  graphql;
 const { Post } = require("../../models/Post");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
@@ -23,10 +15,18 @@ const { Comment } = require("../../models/Comment");
 const { User } = require("../../models/User");
 const { Profile } = require("../../models/Profile");
 const mongoose = require("mongoose");
-const { makeLikeNotification } = require("../../../utils/sendNotification");
+const {
+  makeNotification,
+  deleteNotification,
+} = require("../../../utils/sendNotification");
 const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
 const { getCurrentTime } = require("../../../reusableFunctions/helpers");
-const { resolve } = require("path");
+const {
+  LIKE_MESSAGE,
+  COMMENT_MESSAGE,
+  REPLY_MESSAGE,
+  NotificationTypesBackend,
+} = require("../../../utils/constants");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -301,11 +301,15 @@ const likePost = {
         }
         await profile.save();
         await post.save();
-        makeLikeNotification(
-          await User.findOne(context.profile.user),
-          "post",
+
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.LikePost,
           {},
-          post.owner
+          post.owner,
+          LIKE_MESSAGE + " " + post.title,
+          post._id,
+          null
         );
         return post;
       }
@@ -318,6 +322,12 @@ const likePost = {
             );
           }
         }
+        await deleteNotification(
+          context.profile.user,
+          post.owner,
+          post._id,
+          NotificationTypesBackend.LikePost
+        );
         await profile.save();
         post.likers.splice(index, 1);
         await post.save();
@@ -461,7 +471,6 @@ const commentToPost = {
     session.startTransaction();
     try {
       if (replyingTo) {
-        let ultimateParent;
         const commentParent = await Comment.findOne({
           _id: replyingTo,
         });
@@ -476,8 +485,18 @@ const commentToPost = {
         }
         comment.parent = commentParent._id;
         comment.post = postId;
+        comment.isTop = false;
         await comment.save({ session });
         await commentParent.save({ session });
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.ReplyComment,
+          {},
+          commentParent.owner,
+          REPLY_MESSAGE,
+          comment._id,
+          comment.post
+        );
         await session.commitTransaction();
         return commentParent;
       } else {
@@ -489,6 +508,15 @@ const commentToPost = {
         comment.post = post._id;
         await comment.save({ session });
         await post.save({ session });
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.CommentPost,
+          {},
+          post.owner,
+          COMMENT_MESSAGE + " " + post.title,
+          comment._id,
+          comment.post
+        );
         await session.commitTransaction();
         return comment;
       }

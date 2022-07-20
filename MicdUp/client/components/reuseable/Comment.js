@@ -46,6 +46,7 @@ import { showHeader } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 // helpers
 import { forHumans, getCurrentTime } from "../../reuseableFunctions/helpers";
+import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 const { height } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
@@ -122,15 +123,23 @@ export class Comment extends Component {
     console.log(currentKey, 1232);
 
     this.props.showHeader(false);
-    this.mounted && this.setState({ loading: true });
-    await this.props.getComments(post);
-    this.mounted && this.setState({ loading: false });
     setInterval(() => {
       const { v } = this.state;
       this.mounted &&
         this.state.recording &&
         this.setState({ v: v === 1 ? 0 : v + 1 });
     }, 1000);
+    if (
+      currentKey == SINGLE_POST_KEY &&
+      post.comments &&
+      post.comments.length > 0
+    ) {
+      console.log("right here");
+      return;
+    }
+    this.mounted && this.setState({ loading: true });
+    await this.props.getComments(post);
+    this.mounted && this.setState({ loading: false });
   };
 
   startRecordingComment = async () => {
@@ -402,6 +411,7 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
+    console.log(currentKey, postIndex, post);
     if (!post) {
       return (
         <View

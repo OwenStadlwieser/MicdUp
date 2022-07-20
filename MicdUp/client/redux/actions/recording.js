@@ -12,6 +12,7 @@ import {
   DELETE_POST,
   CLEAR_POSTS,
   DELETE_TAG,
+  SET_SINGLE_POST,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
@@ -24,12 +25,14 @@ import {
   GET_RECORDINGS_FROM_TAG_QUERY,
   ADD_LISTENER_LOGGED_IN_MUTATION,
   ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
+  GET_SPECIFIC_POST_QUERY,
 } from "../../apollo/private/recording";
-import { ADD_LISTENER_MUTATION } from "../../apollo/private/recording";
+import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
-import store from "../index";
 import { setCurrentKey } from "./display";
+import store from "../index";
+import { SHOW_MORE_REPLIES } from "../../apollo/private/comment";
 export function checkIfLoggedIn() {
   let { loggedIn } = store.getState().auth;
   if (loggedIn) {
@@ -154,6 +157,35 @@ export const uploadRecording =
     }
   };
 
+export const openSpecificPost = (postId, commentId) => async (dispatch) => {
+  try {
+    const res = await privateClient.query({
+      query: GET_SPECIFIC_POST_QUERY,
+      variables: {
+        postId,
+      },
+      fetchPolicy: "no-cache",
+    });
+    const post = res.data.getSpecificPost;
+    console.log(commentId, 1234345);
+    if (commentId) {
+      const commentChain = await publicClient.query({
+        query: SHOW_MORE_REPLIES(5),
+        variables: {
+          commentId,
+        },
+      });
+      console.log(commentChain, 12324334);
+      post.comments = [commentChain.data.getReplies];
+    }
+    dispatch({
+      type: SET_SINGLE_POST,
+      payload: post,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const uploadBio =
   (files, fileTypes, speechToText) => async (dispatch) => {
     try {

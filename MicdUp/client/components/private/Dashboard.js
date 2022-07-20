@@ -5,6 +5,7 @@ import { Text, View, Dimensions } from "react-native";
 import { getUserQuery } from "../../redux/actions/user";
 import { logout, setSocket } from "../../redux/actions/auth";
 import { chatRecieved } from "../../redux/actions/chat";
+import { getUserNotifs } from "../../redux/actions/notifs";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 import {
   navigationRef,
@@ -21,6 +22,7 @@ import Navbar from "./Navbar";
 import Search from "./Search/Search";
 import ListOfAccounts from "../reuseable/ListOfAccounts";
 import Chat from "./Dms/Chat";
+import SinglePostContainer from "../reuseable/SinglePostContainer";
 // helpers
 import { getData } from "../../reuseableFunctions/helpers";
 import { io } from "socket.io-client";
@@ -61,6 +63,7 @@ export class Dashboard extends Component {
     this.props.addLoading("Dashboard");
     const { chatRecieved } = this.props;
     await this.props.getUserQuery();
+    await this.props.getUserNotifs(0);
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
       this.props.logout();
@@ -124,6 +127,12 @@ export class Dashboard extends Component {
             <Stack.Screen
               name="Feed"
               component={Feed}
+              initialParams={{ key: this.props.loggedIn }}
+              options={{ headerShown: true }}
+            />
+            <Stack.Screen
+              name="SinglePostContainer"
+              component={SinglePostContainer}
               initialParams={{ key: this.props.loggedIn }}
               options={{ headerShown: true }}
             />
@@ -251,4 +260,5 @@ export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   navigateStateChanged,
+  getUserNotifs,
 })(Dashboard);

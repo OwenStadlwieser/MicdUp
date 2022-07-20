@@ -54,18 +54,18 @@ export const receiveNotif = (payload) => (dispatch) => {
 };
 
 export const showComments = (payload, currentKey) => (dispatch) => {
-  console.log(currentKey, 4343);
+  console.log(currentKey, payload, 4343);
   dispatch({
     type: SET_CURRENT_KEY,
     payload: { currentKey },
   });
-  if (navigationRef.isReady()) {
-    navigationRef.navigate("Comment");
-  }
   dispatch({
     type: SHOW_COMMENTS,
     payload,
   });
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("Comment");
+  }
 };
 
 export const hideNotif = (payload) => (dispatch) => {

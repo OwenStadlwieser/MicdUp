@@ -1,88 +1,88 @@
 import React, { Component } from "react";
-import { connect,useStore,useDispatch } from "react-redux";
-import { FlatList, View, ScrollView, StyleSheet, Text } from "react-native";
+import { connect, useStore, useDispatch } from "react-redux";
+import { View, RefreshControl, StyleSheet } from "react-native";
 import Notification from "./Notification";
 
-import { getData } from "../../../reuseableFunctions/helpers";
+import { styles } from "../../../styles/Styles";
 import { hideNotif } from "../../../redux/actions/display";
-import store from "../../../redux";
-import { Dispatch } from "redux";
-
+import { SwipeListView } from "react-native-swipe-list-view";
+import { markNotifsAsSeen, getUserNotifs } from "../../../redux/actions/notifs";
 export class NotificationView extends Component {
   constructor() {
     super();
     this.state = {
       loading: true,
       notif_data: [],
+      refreshing: false,
+      prevLength: 0,
     };
 
-    
     this.mounted = true;
   }
 
-
   componentWillUnmount = () => (this.mounted = false);
 
-
-  componentDidMount = () => {
-    this._getNotifs();
-    store.subscribe(() => {
-
-      if(store.getState().display.receiveNotif){
-        console.log("NOTIFICATION RECEIVED");
-
-        this.state.loading=true;
-        this.forceUpdate();
-        this._getNotifs();
-        this.props.hideNotif();
-      };
-
-    })
+  componentDidMount = async () => {
+    await this.props.markNotifsAsSeen();
   };
 
-  _getNotifs = async() => {
-    let notifs = await getData("notifications");
-    console.log("GOT NOTIFS: ");
-    console.log(notifs);
-    //this.state.notif_data = notifs;
-    this.state.notif_data = JSON.parse(notifs);
-    this.state.loading = false;
-    // console.log("STATE CHANGED");
-    // console.log(this.notif_data);
-    this.forceUpdate();
-  }
-
- render() {
-    
-
-
-    if(this.state.loading){
-      return (<View><Text>LOADING...</Text></View>)
-    }
-
+  render() {
+    const { notifs } = this.props;
+    const { refreshing } = this.state;
+    console.log("NOTIFS ", notifs);
     return (
-    <View>
-            <ScrollView>
-                {
-                    this.state.notif_data.map((notif,index) => {
-                        return (
-                            <Notification data={notif} key={notif.identifier}/>
-                        )
-                    } )
-                }
-            </ScrollView>
-    </View>);
+      <View
+        style={[
+          styles.paneUncentered,
+          {
+            position: "relative",
+          },
+        ]}
+      >
+        <SwipeListView
+          data={notifs}
+          disableRightSwipe
+          disableLeftSwipe
+          useNativeDriver={false}
+          scrollEnabled={true}
+          nestedScrollEnabled={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                this.mounted && this.setState({ refreshing: true });
+                await this.getUserNotifs(0);
+                this.mounted && this.setState({ refreshing: false });
+              }}
+            />
+          }
+          onEndReached={async () => {
+            const { refreshing, prevLength } = this.state;
+            console.log(prevLength, notifs.length);
+            if (
+              !refreshing &&
+              prevLength != notifs.length &&
+              Math.round(notifs.length / 20) > 0
+            ) {
+              this.mounted &&
+                this.setState({ refreshing: true, prevLength: notifs.length });
+              await this.props.getUserNotifs(Math.round(notifs.length / 20));
+              this.mounted && this.setState({ refreshing: false });
+            }
+          }}
+          renderItem={(data, rowMap) => <Notification data={data.item} />}
+        />
+      </View>
+    );
   }
 }
 
-const styles = StyleSheet.create({
-    notifList: {
-        justifyContent:'space-between'
-    },
-})
-
 const mapStateToProps = (state) => ({
-
+  notifs: state.notifs.notifs,
 });
 
-export default connect(mapStateToProps, {hideNotif})(NotificationView);
+export default connect(mapStateToProps, {
+  hideNotif,
+  markNotifsAsSeen,
+  getUserNotifs,
+})(NotificationView);

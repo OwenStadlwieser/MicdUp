@@ -11,7 +11,6 @@ const {
   GraphQLID,
   GraphQLString,
   GraphQLInt,
-  GraphQLSchema,
   GraphQLList,
   GraphQLBoolean,
   GraphQLFloat,
@@ -19,7 +18,6 @@ const {
 const { getFile } = require("../utils/awsS3");
 const {
   checkIfIsInPrivateList,
-  checkIfBlocked,
   profileCheckForBlocked,
 } = require("../utils/securityHelpers");
 
@@ -421,7 +419,7 @@ const CommentType = new GraphQLObjectType({
     duration: {
       type: GraphQLInt,
       resolve(parent, args, context, info) {
-        return Math.floor(parent.duration * 1000);
+        return Math.floor((parent.duration ? parent.duration : 0) * 1000);
       },
     },
     isDeleted: { type: GraphQLBoolean },
@@ -459,7 +457,7 @@ const CommentType = new GraphQLObjectType({
     repliesLength: {
       type: GraphQLInt,
       resolve(parent, args, context, info) {
-        return parent.replies.length;
+        return parent.replies ? parent.replies.length : 0;
       },
     },
     ultimateParent: { type: GraphQLID },
@@ -501,16 +499,18 @@ const CommentType = new GraphQLObjectType({
     likes: {
       type: GraphQLInt,
       resolve(parent, args, context, info) {
-        return parent.likers.length;
+        return parent.likers ? parent.likers.length : 0;
       },
     },
     isLikedByUser: {
       type: GraphQLInt,
       resolve(parent, args, context, info) {
-        const index = parent.likers.findIndex((id) => {
-          if (!context.profile || !context.profile.id) return false;
-          return id.toString() === context.profile.id;
-        });
+        const index = parent.liker
+          ? parent.likers.findIndex((id) => {
+              if (!context.profile || !context.profile.id) return false;
+              return id.toString() === context.profile.id;
+            })
+          : -1;
         return index > -1;
       },
     },
@@ -889,11 +889,41 @@ const MessageType = new GraphQLObjectType({
 const NotifType = new GraphQLObjectType({
   name: "Notif",
   fields: () => ({
-    success: { type: GraphQLBoolean },
-    message: { type: GraphQLString },
+    id: {
+      type: GraphQLID,
+      resolve(parent, args, context, info) {
+        return parent.id;
+      },
+    },
+    sender: {
+      type: ProfilePublicType,
+      async resolve(parent, args, context, info) {
+        return await Profile.findOne({ user: parent.sender });
+      },
+    },
+    receiver: { type: GraphQLString },
+    text: { type: GraphQLString },
+    type: { type: GraphQLString },
+    itemId: { type: GraphQLString },
+    parentId: { type: GraphQLString },
+    dateCreated: { type: GraphQLFloat },
+    image: {
+      type: FileType,
+      async resolve(parent, args, context, info) {
+        const res = await File.findOne({ _id: parent.image });
+        return res;
+      },
+    },
   }),
 });
 
+const NotifQueryType = new GraphQLObjectType({
+  name: "NotifQuery",
+  fields: () => ({
+    notifs: { type: new GraphQLList(NotifType) },
+    numberOfUnseenNotifs: { type: GraphQLInt },
+  }),
+});
 const TagsType = new GraphQLObjectType({
   name: "Tags",
   fields: () => ({
@@ -968,4 +998,5 @@ module.exports = {
   ChatMessageType,
   NotifType,
   FilterType,
+  NotifQueryType,
 };

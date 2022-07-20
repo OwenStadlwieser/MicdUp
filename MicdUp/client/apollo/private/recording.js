@@ -117,6 +117,14 @@ const ADD_LISTENER_NOT_LOGGED_IN_MUTATION = gql`
   }
 `;
 
+const GET_SPECIFIC_POST_QUERY = gql`
+  query getSpecificPost($postId: ID!) {
+    getSpecificPost(postId: $postId) {
+      ${postType}
+    }
+  }
+`;
+
 const COMMENT_POST_MUTATION = (duplication) => {
   return gql`
     mutation commentToPost(
@@ -154,4 +162,5 @@ export {
   GET_RECORDINGS_FROM_TAG_QUERY,
   ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
   ADD_LISTENER_LOGGED_IN_MUTATION,
+  GET_SPECIFIC_POST_QUERY,
 };

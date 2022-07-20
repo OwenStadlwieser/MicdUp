@@ -67,6 +67,16 @@ speechToText {
   word
   time
 }`;
+
+const notifType = `id
+sender {
+  ${profilePublicType}
+}
+parentId
+dateCreated
+text
+type
+itemId`;
 const commentType = `id
 ultimateParent
 isDeleted
@@ -89,4 +99,11 @@ owner {
   }
 }`;
 
-export { postType, commentType, chatType, profilePublicType, tagType };
+export {
+  postType,
+  commentType,
+  chatType,
+  profilePublicType,
+  tagType,
+  notifType,
+};
