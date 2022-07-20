@@ -37,7 +37,9 @@ export class Filters extends Component {
 
   componentDidMount = async () => {
     this.props.addLoading("FiltersNative");
-    await this.props.getFilters(0);
+    const res = await this.props.getFilters(0);
+    console.log("filters", res);
+    this.mounted && this.setState({ entries: res });
     this.props.removeLoading("FiltersNative");
   };
 

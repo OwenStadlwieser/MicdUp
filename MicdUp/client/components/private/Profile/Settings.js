@@ -59,23 +59,6 @@ export class Settings extends Component {
                 />
                 <Text style={styles.logoutText}>Logout</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.settingsOption}>
-                <Text>Option 2</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.settingsOption}>
-                <Text>Option 3</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.settingsOption}>
-                <Text>Option 4</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.settingsOption}
-                onPress={async () => {
-                  this.mounted && this.setState({ verifyEmail: true });
-                }}
-              >
-                <Text>Verify Email</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.settingsOption}
                 onPress={async () => {
