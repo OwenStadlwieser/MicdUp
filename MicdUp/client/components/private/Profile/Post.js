@@ -203,7 +203,7 @@ export class Post extends Component {
                         this.props.showComments(index, this.props.currentKey);
                       }}
                     >
-                      <FontAwesome name="comment" size={24} color="#1A3561" />
+                      <FontAwesome name="comment" size={24} color="#000000" />
                     </TouchableOpacity>
                   </Fragment>
                 )}

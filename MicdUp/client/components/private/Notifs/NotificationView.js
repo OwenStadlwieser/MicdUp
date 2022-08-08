@@ -23,13 +23,12 @@ export class NotificationView extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = async () => {
-    await this.props.markNotifsAsSeen();
+    this.props.markNotifsAsSeen();
   };
 
   render() {
     const { notifs } = this.props;
     const { refreshing } = this.state;
-    console.log("NOTIFS ", notifs);
     return (
       <View
         style={[
@@ -58,7 +57,6 @@ export class NotificationView extends Component {
           }
           onEndReached={async () => {
             const { refreshing, prevLength } = this.state;
-            console.log(prevLength, notifs.length);
             if (
               !refreshing &&
               prevLength != notifs.length &&

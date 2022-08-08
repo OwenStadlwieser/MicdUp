@@ -183,7 +183,7 @@ export class ListOfAccounts extends Component {
                         style={[
                           styles.nextButtonText,
                           {
-                            backgroundColor: "#1A3561",
+                            backgroundColor: "#000000",
                             alignSelf: "stretch",
                           },
                         ]}
@@ -219,7 +219,7 @@ export class ListOfAccounts extends Component {
                         style={[
                           styles.nextButtonText,
                           {
-                            backgroundColor: "#1A3561",
+                            backgroundColor: "#000000",
                             alignSelf: "stretch",
                             marginTop: 10,
                           },

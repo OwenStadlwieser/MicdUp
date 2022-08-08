@@ -67,12 +67,9 @@ export class Profile extends Component {
       loading: false,
       recording: false,
       playbackObject: {},
-      currentBioRecording: "",
       newBioRecording: {},
       selectImage: false,
       bio: false,
-      isRecordingComment: false,
-      postsInvalid: false,
       prevLength: 0,
       showingListOfAccounts: false,
       listOfAccountsParams: {},
@@ -191,6 +188,13 @@ export class Profile extends Component {
 
   componentDidMount = async () => {
     await this.getPosts();
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    const { id } = prevProps.currentProfile;
+    if (this.props.currentProfile.id && !id) {
+      await this.getPosts();
+    }
   };
 
   setNewBioRecording = (newR) => {
@@ -369,6 +373,7 @@ export class Profile extends Component {
               </Text>
               <Bio
                 id={id}
+                isUserProfile={isUserProfile}
                 startRecording={this.startRecording.bind(this)}
                 stopRecordingBio={this.stopRecordingBio.bind(this)}
                 currentSound={playingId}
@@ -504,7 +509,6 @@ export class Profile extends Component {
                   this.mounted &&
                     this.setState({
                       recording: false,
-                      isRecordingComment: false,
                     });
                   if (bio) {
                     await this.stopRecordingBio();

@@ -46,7 +46,7 @@ export class ImagePickerModal extends Component {
               this.props.setSelected("camera");
             }}
           >
-            <Entypo name="camera" style={styles.largeIcon} color="#1A3561" />
+            <Entypo name="camera" style={styles.largeIcon} color="#000000" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -56,7 +56,7 @@ export class ImagePickerModal extends Component {
             <AntDesign
               name="picture"
               style={styles.largeIcon}
-              color="#1A3561"
+              color="#000000"
             />
           </TouchableOpacity>
         </TouchableOpacity>

@@ -24,13 +24,11 @@ export const GET_USER_NOTIF_QUERY = () => {
   `;
 };
 
-export const MARK_NOTIFS_AS_SEEN_MUTATION = () => {
-  gql`
-    mutation markNotifsAsSeen() {
-      markNotifsAsSeen() {
-        success
-        message
-      }
+export const MARK_NOTIFS_AS_SEEN_MUTATION = gql`
+  mutation markNotifsAsSeen {
+    markNotifsAsSeen {
+      success
+      message
     }
-  `;
-};
+  }
+`;

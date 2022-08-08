@@ -157,7 +157,7 @@ export class Clips extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     borderColor: "white",
     borderRadius: 8,
     borderStyle: "solid",
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   item_children: {
     width: childrenWidth,
     height: childrenHeight - 4,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

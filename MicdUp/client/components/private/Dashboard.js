@@ -39,7 +39,7 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#1A3561",
+    background: "#000000",
   },
 };
 const Stack = createStackNavigator();
@@ -114,7 +114,7 @@ export class Dashboard extends Component {
             }}
             screenOptions={{
               headerStyle: {
-                backgroundColor: "#1A3561",
+                backgroundColor: "#000000",
               },
               headerTintColor: "#fff",
               headerTitleStyle: {

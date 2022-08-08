@@ -43,7 +43,7 @@ const markNotifsAsSeen = {
       throw new Error("Must be signed in to add a push token.");
     }
     let index = -1;
-
+    console.log("marked");
     try {
       await Notif.updateMany(
         {
@@ -58,6 +58,7 @@ const markNotifsAsSeen = {
         message: "notifs seen",
       };
     } catch (err) {
+      console.log(err);
       return {
         success: false,
         message: err.message,
