@@ -609,8 +609,7 @@ const styles = StyleSheet.create({
     borderRadius: height * 0.15,
   },
   messagesParentContainer: {
-    marginTop: height * 0.1,
-    paddingTop: height * 0.03,
+    paddingTop: height * 0.01,
     flex: 6,
   },
   messagesContainer: {
