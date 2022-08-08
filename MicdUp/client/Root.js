@@ -227,7 +227,6 @@ export class Root extends Component {
             </View>
           )}
           <Dashboard></Dashboard>
-          <Header />
           {showingSoundModal && <SoundModal />}
           {displayMessage && (
             <View style={styles.messageContainer}>

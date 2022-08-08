@@ -77,7 +77,7 @@ export const markNotifsAsSeen = () => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
-      mutation: MARK_NOTIFS_AS_SEEN_MUTATION(),
+      mutation: MARK_NOTIFS_AS_SEEN_MUTATION,
       variables: {},
       fetchPolicy,
     });

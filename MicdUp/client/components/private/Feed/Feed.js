@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   View,
@@ -147,14 +147,8 @@ export class Feed extends Component {
 
   render() {
     const { profile, cachedPosts, loggedIn } = this.props;
-    const {
-      isRecordingComment,
-      loading,
-      tag,
-      following,
-      outerScrollEnabled,
-      refreshing,
-    } = this.state;
+    const { loading, tag, following, outerScrollEnabled, refreshing } =
+      this.state;
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
@@ -187,16 +181,17 @@ export class Feed extends Component {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
+              padding: 20,
             }}
           >
-            <Title
+            <TouchableOpacity
               style={
-                (styles.nextButtonText,
+                (styles.nextButton,
                 {
                   width: width * 0.35,
-                  color: following ? "#6FF6FF" : "white",
-                  paddingRight: 10,
-                  textAlign: "right",
+                  backgroundColor: following ? "#6FF6FF" : "white",
+                  padding: 10,
+                  textAlign: "center",
                 })
               }
               onPress={async () => {
@@ -214,16 +209,16 @@ export class Feed extends Component {
                 this.mounted && this.setState({ following: true });
               }}
             >
-              FOLLOWING
-            </Title>
-            <Title
+              <Text style={styles.nextButtonText}>FOLLOWING</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               style={
-                (styles.nextButtonText,
+                (styles.nextButton,
                 {
                   width: width * 0.35,
-                  color: !following ? "#6FF6FF" : "white",
-                  paddingLeft: 10,
-                  textAlign: "left",
+                  backgroundColor: !following ? "#6FF6FF" : "white",
+                  padding: 10,
+                  textAlign: "center",
                 })
               }
               onPress={async () => {
@@ -241,82 +236,88 @@ export class Feed extends Component {
                 this.mounted && this.setState({ following: false });
               }}
             >
-              TOPICS
-            </Title>
+              <Text style={styles.nextButtonText}>TOPICS</Text>
+            </TouchableOpacity>
           </View>
         )}
-        {!loading && (!postsToView || postsToView.length == 0) ? (
-          <Text
-            style={[styles.nextButtonText, { color: "white", paddingTop: 20 }]}
-          >
-            No posts found
-          </Text>
-        ) : (
-          <View
-            style={[
-              styles.paneUncentered,
-              {
-                position: "relative",
-              },
-            ]}
-          >
-            <SwipeListView
-              data={postsToView ? postsToView.filter((n) => n) : []}
-              disableRightSwipe
-              disableLeftSwipe={!outerScrollEnabled}
-              onScroll={this.handleScroll.bind(this)}
-              scrollEventThrottle={50}
-              useNativeDriver={false}
-              scrollEnabled={outerScrollEnabled}
-              nestedScrollEnabled={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={async () => {
-                    this.mounted && this.setState({ refreshing: true });
-                    await this.getData(0);
-                    this.mounted && this.setState({ refreshing: false });
-                  }}
-                />
-              }
-              renderItem={(data, rowMap) => (
-                <Post
-                  setOuterScroll={this.setOuterScroll.bind(this)}
-                  isRecordingComment={isRecordingComment}
-                  key={data.item.id}
-                  post={data.item}
-                  postArray={postsToView}
-                  currentKey={key}
-                  index={data.index}
-                  canViewPrivate={
-                    data.item.owner
-                      ? data.item.owner.canViewPrivatesFromUser
-                      : false
-                  }
-                  higherUp={false}
-                />
-              )}
-              renderHiddenItem={(data, rowMap) => {
-                return (
-                  <View style={listStyles.rowBack}>
-                    <TouchableOpacity
-                      style={[
-                        listStyles.backRightBtn,
-                        listStyles.backRightBtnRight,
-                      ]}
-                      onPress={async () => {
-                        await this.props.deletePost(data.item.id, key);
-                      }}
-                    >
-                      <Entypo name="trash" size={24} color="red" />
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-              rightOpenValue={-75}
-            />
-          </View>
-        )}
+
+        <View
+          style={[
+            styles.paneUncentered,
+            {
+              position: "relative",
+            },
+          ]}
+        >
+          <SwipeListView
+            data={postsToView ? postsToView.filter((n) => n) : []}
+            disableRightSwipe
+            disableLeftSwipe={!outerScrollEnabled}
+            onScroll={this.handleScroll.bind(this)}
+            scrollEventThrottle={50}
+            useNativeDriver={false}
+            scrollEnabled={outerScrollEnabled}
+            nestedScrollEnabled={false}
+            ListHeaderComponent={() => {
+              return !loading && (!postsToView || postsToView.length == 0) ? (
+                <Title
+                  style={[
+                    styles.nextButtonText,
+                    { color: "white", paddingTop: 20 },
+                  ]}
+                >
+                  No posts found
+                </Title>
+              ) : (
+                <Fragment></Fragment>
+              );
+            }}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={async () => {
+                  this.mounted && this.setState({ refreshing: true });
+                  await this.getData(0);
+                  this.mounted && this.setState({ refreshing: false });
+                }}
+              />
+            }
+            renderItem={(data, rowMap) => (
+              <Post
+                setOuterScroll={this.setOuterScroll.bind(this)}
+                key={data.item.id}
+                post={data.item}
+                postArray={postsToView}
+                currentKey={key}
+                index={data.index}
+                canViewPrivate={
+                  data.item.owner
+                    ? data.item.owner.canViewPrivatesFromUser
+                    : false
+                }
+                higherUp={false}
+              />
+            )}
+            renderHiddenItem={(data, rowMap) => {
+              return (
+                <View style={listStyles.rowBack}>
+                  <TouchableOpacity
+                    style={[
+                      listStyles.backRightBtn,
+                      listStyles.backRightBtnRight,
+                    ]}
+                    onPress={async () => {
+                      await this.props.deletePost(data.item.id, key);
+                    }}
+                  >
+                    <Entypo name="trash" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            rightOpenValue={-75}
+          />
+        </View>
       </View>
     );
   }

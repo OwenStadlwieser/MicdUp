@@ -29,7 +29,6 @@ export class Notification extends Component {
   render() {
     const { data, profile } = this.props;
     const { sender, text, itemId, parentId } = data;
-    console.log(data);
     return (
       <TouchableOpacity
         style={styles.notif}
