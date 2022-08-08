@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 const Schema = mongoose.Schema;
-
 // Create Schema
 const commentSchema = new Schema({
   owner: {
@@ -51,6 +51,10 @@ const commentSchema = new Schema({
   isDeleted: {
     type: Boolean,
     default: false,
+  },
+  duration: {
+    type: Number,
+    default: 0,
   },
   speechToText: [
     {

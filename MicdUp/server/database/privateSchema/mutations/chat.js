@@ -21,6 +21,8 @@ const fetchChat = {
       if (members.length > 20) {
         throw new Error("Too many members");
       }
+      let blocked = [...context.profile.blockedMap.keys()];
+
       const index = members.findIndex(
         (member) => member.toString() === creator.toString()
       );
@@ -30,10 +32,23 @@ const fetchChat = {
       if (!context.user.id) {
         throw new Error("Must be signed in to message");
       }
-      let chat = await Chat.findOne({ members });
+
+      let chat = await Chat.findOne({
+        members,
+        $not: { members: { $all: blocked } },
+      });
       if (chat) return chat;
       chat = new Chat({ members, creator });
       for (let i = 0; i < members.length; i++) {
+        if (
+          blocked.findIndex(
+            (blockedmember) =>
+              blockedmember.toString() === members[i].toString()
+          ) > -1 &&
+          members.length <= 2
+        ) {
+          throw new Error("blocked user in chat");
+        }
         await Profile.findByIdAndUpdate(
           members[i],
           {

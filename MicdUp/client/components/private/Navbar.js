@@ -4,8 +4,12 @@ import { View, Text, TouchableOpacity } from "react-native";
 // redux
 import { viewProfile } from "../../redux/actions/display";
 import { navigate } from "../../redux/actions/display";
+import { withNavigation } from "react-navigation";
 // styles
 import { styles } from "../../styles/Styles";
+// icons
+import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export class NavBar extends Component {
   constructor() {
@@ -23,6 +27,7 @@ export class NavBar extends Component {
 
   render() {
     const { mountedComponent } = this.props;
+    console.log(mountedComponent, mountedComponent === "SearchProfile");
     return (
       <View style={styles.navbar}>
         <TouchableOpacity
@@ -35,11 +40,19 @@ export class NavBar extends Component {
             this.props.navigate("Feed");
           }}
         >
-          <Text style={styles.navbarText}>Feed</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome
+              name="feed"
+              size={24}
+              color={mountedComponent === "Feed" ? "#6FF6FF" : "black"}
+            />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
-            mountedComponent === "Search"
+            mountedComponent === "Search" ||
+            mountedComponent === "SearchFeed" ||
+            mountedComponent === "SearchProfile"
               ? styles.activeNavbarButton
               : styles.navbarButton
           }
@@ -47,7 +60,19 @@ export class NavBar extends Component {
             this.props.navigate("Search");
           }}
         >
-          <Text style={styles.navbarText}>Search</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome
+              name="search"
+              size={24}
+              color={
+                mountedComponent === "Search" ||
+                mountedComponent === "SearchFeed" ||
+                mountedComponent === "SearchProfile"
+                  ? "#6FF6FF"
+                  : "black"
+              }
+            />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -59,7 +84,13 @@ export class NavBar extends Component {
             this.props.navigate("Create");
           }}
         >
-          <Text style={styles.navbarText}>Create</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome5
+              name="record-vinyl"
+              size={36}
+              color={mountedComponent === "Create" ? "#6FF6FF" : "red"}
+            />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -71,7 +102,13 @@ export class NavBar extends Component {
             this.props.navigate("Dms");
           }}
         >
-          <Text style={styles.navbarText}>Chat</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome
+              name="users"
+              size={24}
+              color={mountedComponent === "Dms" ? "#6FF6FF" : "black"}
+            />
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
@@ -80,11 +117,20 @@ export class NavBar extends Component {
               : styles.navbarButton
           }
           onPress={() => {
-            this.props.viewProfile(this.props.profile);
+            this.props.viewProfile({
+              ...this.props.profile,
+              user: { userName: this.props.userName },
+            });
             this.props.navigate("Profile");
           }}
         >
-          <Text style={styles.navbarText}>Profile</Text>
+          <Text style={styles.navbarText}>
+            <FontAwesome
+              name="user"
+              size={24}
+              color={mountedComponent === "Profile" ? "#6FF6FF" : "black"}
+            />
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -94,6 +140,7 @@ export class NavBar extends Component {
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
   profile: state.auth.user.profile,
+  userName: state.auth.user.userName,
 });
 
 export default connect(mapStateToProps, { navigate, viewProfile })(NavBar);

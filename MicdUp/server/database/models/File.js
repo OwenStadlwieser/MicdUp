@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const options = { discriminatorKey: "kind" };
@@ -22,6 +23,10 @@ const fileSchema = new Schema(
     dateCreated: {
       type: Date,
       default: Date.now,
+    },
+    duration: {
+      type: Number,
+      default: 0,
     },
     speechToText: [
       {

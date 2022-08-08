@@ -8,14 +8,19 @@ import {
   SET_BIO,
   VIEW_PROFILE_SEARCH,
   UPDATE_FOLLOWER_COUNT,
-  UPDATE_CURRENT_RECORDINGS,
   RECEIVE_NOTIF,
   HIDE_NOTIF,
   SHOW_COMMENTS,
-  HIDE_COMMENTS,
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
   UPDATE_PRIVATE_COUNT_FROM_LIST,
+  REMOVE_LOADING,
+  ADD_LOADING,
+  VIEW_TAG_SEARCH,
+  SHOW_HEADER,
+  CURRENT_PROFILE_BLOCKED,
+  SET_LIST,
+  SHOW_SOUND_MODAL,
 } from "../types";
 
 const initialState = {
@@ -28,37 +33,71 @@ const initialState = {
   viewingProfile: {},
   keyForSearch: Math.random(),
   searchViewingProfile: false,
-  viewingPostsSearch: [],
   receiveNotif: false,
-  showingComments: false,
   postIndex: -1,
+  loading: false,
+  loadingMap: {},
+  tagFromSearch: {},
+  searchViewingTag: false,
+  showHeader: true,
+  showingSoundModal: false,
+  list: "",
 };
 
 export default function (state = { ...initialState }, action) {
   const { type, payload } = action;
+  let copy;
   switch (type) {
+    case SHOW_SOUND_MODAL:
+      return {
+        ...state,
+        showingSoundModal: payload,
+      };
+    case SET_LIST:
+      return {
+        ...state,
+        list: payload,
+      };
+    case SHOW_HEADER:
+      return {
+        ...state,
+        showHeader: payload,
+      };
+    case VIEW_TAG_SEARCH:
+      return {
+        ...state,
+        searchViewingTag: true,
+        tagFromSearch: payload,
+      };
     case NAVIGATE:
       return {
         ...state,
         mountedComponent: payload,
         keyForSearch: Math.random(),
         searchViewingProfile: false,
+        searchViewingTag: false,
+        tagFromSearch: {},
       };
-    case UPDATE_CURRENT_RECORDINGS:
+    case ADD_LOADING:
+      copy = { ...state.loadingMap };
+      copy[payload] = true;
       return {
         ...state,
-        viewingPostsSearch: payload,
+        loadingMap: copy,
+        loading: Object.keys(copy).length > 0,
+      };
+    case REMOVE_LOADING:
+      copy = { ...state.loadingMap };
+      delete copy[payload];
+      return {
+        ...state,
+        loadingMap: copy,
+        loading: Object.keys(copy).length > 0,
       };
     case SHOW_COMMENTS:
       return {
         ...state,
         postIndex: payload,
-        showingComments: true,
-      };
-    case HIDE_COMMENTS:
-      return {
-        ...state,
-        showingComments: false,
       };
     case RECEIVE_NOTIF:
       return {
@@ -79,6 +118,14 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         showSignup: payload,
+      };
+    case CURRENT_PROFILE_BLOCKED:
+      return {
+        ...state,
+        viewingProfile: {
+          ...state.viewingProfile,
+          isBlockedByUser: payload,
+        },
       };
     case DISPLAY_MESSAGE:
       return {

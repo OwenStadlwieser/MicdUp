@@ -256,7 +256,6 @@ export class Create extends Component {
           <View style={styles.iconSmallContainer}>
             <Fontisto
               onPress={async () => {
-                let currentTag = "";
                 const { functionID } = this.state;
                 this.mounted && this.setState({ promptShown: true });
                 if (functionID) {
@@ -265,8 +264,7 @@ export class Create extends Component {
                 const newPrompt = await this.props.randomPrompt();
                 this.mounted && this.setState({ prompt: newPrompt });
                 const newFunctionID = setTimeout(() => {
-                  currentTag = this.props.tag + " " + newPrompt.tag.title + " ";
-                  this.props.updateTags(currentTag);
+                  this.props.updateTags(newPrompt.tag.title);
                 }, 10000);
                 this.mounted && this.setState({ functionID: newFunctionID });
               }}

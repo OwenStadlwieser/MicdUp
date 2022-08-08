@@ -8,7 +8,7 @@ import {
 } from "../../apollo/public/auth";
 import { LOG_IN, LOG_OUT, DISPLAY_MESSAGE, SET_SOCKET, SET_IP } from "../types";
 import { storeData, clearAsyncStorage } from "../../reuseableFunctions/helpers";
-import { showMessage } from "./display";
+import { showMessage, navigate } from "./display";
 
 export const setSocket = (socket) => async (dispatch) => {
   try {
@@ -42,6 +42,7 @@ export const login = (authenticator, password) => async (dispatch) => {
     if (res.data.login.success) {
       await storeData("token", res.data.login.message);
       dispatch({ type: LOG_IN });
+      dispatch(navigate("Profile"));
     }
     if (res && res.data && !res.data.login.success) {
       dispatch(showMessage(res.data.login));

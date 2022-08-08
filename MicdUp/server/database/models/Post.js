@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
-// Create Schema
 const postSchema = new Schema({
   nsfw: {
     type: Boolean,
@@ -65,6 +65,10 @@ const postSchema = new Schema({
   },
   signedUrl: {
     type: String,
+  },
+  duration: {
+    type: Number,
+    default: 0,
   },
   lastFetched: {
     type: Date,

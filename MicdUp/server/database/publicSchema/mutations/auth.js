@@ -4,6 +4,7 @@ const { Profile } = require("../../models/Profile");
 const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const bcrypt = require("bcryptjs");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 
 const createUser = {
   type: MessageType,
@@ -18,7 +19,7 @@ const createUser = {
     // FIXME: implement transaction
     returnObject = {
       success: true,
-      message: "Sign up successful",
+      message: "Sign up successful, Verify Email to continue",
     };
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -29,6 +30,7 @@ const createUser = {
         email,
         password,
         dob,
+        dateCreated: getCurrentTime(),
       });
       const newProfile = new Profile({});
       newUser.profile = newProfile._id;
@@ -80,7 +82,7 @@ const forgotPassChange = {
         message: "Invalid code",
       };
     }
-    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
+    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > getCurrentTime()) {
       return {
         success: false,
         message: "Token has expired",

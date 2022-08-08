@@ -11,17 +11,22 @@ import {
   UPDATE_COMMENT_TO_POST,
   DELETE_POST,
   SET_SOCKET,
-  ADD_POSTS,
+  CLEAR_POSTS,
   SET_IP,
+  SET_CURRENT_KEY,
+  UPDATE_FOLLOWER_COUNT,
+  UPDATE_PRIVATE_COUNT,
+  SET_SINGLE_POST,
 } from "../types";
 
 const initialState = {
   loggedIn: false,
   user: {},
   profile: {},
-  posts: [],
+  posts: {},
   socket: {},
   ipAddr: "",
+  currentKey: "",
 };
 
 export default function (state = { ...initialState }, action) {
@@ -46,6 +51,52 @@ export default function (state = { ...initialState }, action) {
       return {
         ...state,
         socket: payload,
+      };
+    case SET_SINGLE_POST:
+      return {
+        ...state,
+        posts: { ...state.posts, SinglePost: [payload] },
+      };
+    case UPDATE_FOLLOWER_COUNT:
+      let currentCount = state.user.profile.followingCount;
+      let change = 0;
+      if (payload.isFollowedByUser) {
+        change = 1;
+      } else {
+        change = -1;
+      }
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            followingCount: currentCount + change,
+          },
+        },
+      };
+    case UPDATE_PRIVATE_COUNT:
+      currentCount = state.user.profile.privatesCount;
+      let change_private = 0;
+      if (payload.isPrivateByUser) {
+        change_private = 1;
+      } else {
+        change_private = -1;
+      }
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: {
+            ...state.user.profile,
+            privatesCount: currentCount + change_private,
+          },
+        },
+      };
+    case SET_CURRENT_KEY:
+      return {
+        ...state,
+        currentKey: payload.currentKey,
       };
     case LOG_OUT:
       return {
@@ -80,44 +131,51 @@ export default function (state = { ...initialState }, action) {
           },
         },
       };
-    case ADD_POSTS:
-      return {
-        ...state,
-        posts: [...state.posts, ...payload],
-      };
     case SET_POSTS:
+      console.log(payload.userId, 1232, payload.posts);
+      let oldPosts = state.posts[payload.userId];
+      let newPosts =
+        oldPosts && payload.skipMult != 0
+          ? [...oldPosts, ...payload.posts]
+          : [...payload.posts];
       return {
         ...state,
-        posts: [...payload],
+        posts: { ...state.posts, [payload.userId]: newPosts },
+      };
+    case CLEAR_POSTS:
+      delete state.posts[payload.userId];
+      return {
+        ...state,
       };
     case DELETE_POST:
-      let postsToDelete = [...state.posts];
+      let postsToDelete = [...state.posts[payload.currentKey]];
       const postDelIndex = postsToDelete.findIndex(
-        (post) => post.id === payload.id
+        (post) => post.id === payload.post.id
       );
       postsToDelete.splice(postDelIndex, 1);
       return {
         ...state,
-        posts: [...postsToDelete],
+        posts: { ...state.posts, [payload.currentKey]: postsToDelete },
       };
     case UPDATE_POST:
-      const posts = [...state.posts];
-      const postIndex = posts.findIndex((post) => post.id === payload.id);
-      posts[postIndex] = payload;
+      const posts = [...state.posts[payload.currentKey]];
+      const postIndex = posts.findIndex((post) => post.id === payload.post.id);
+      posts[postIndex] = payload.post;
       return {
         ...state,
-        posts: [...posts],
+        posts: { ...state.posts, [payload.currentKey]: posts },
       };
     case UPDATE_POST_COMMENTS:
-      const posts3 = [...state.posts];
+      const posts3 = [...state.posts[state.currentKey]];
+      console.log(state.currentKey);
       const post3Index = posts3.findIndex((post) => post.id === payload.id);
       posts3[post3Index].comments = payload.data;
       return {
         ...state,
-        posts: [...posts3],
+        posts: { ...state.posts, [state.currentKey]: posts3 },
       };
     case UPDATE_COMMENT_TO_POST:
-      const posts4 = [...state.posts];
+      const posts4 = [...state.posts[state.currentKey]];
       let postIndex2 = posts4.findIndex((post) => post.id === payload.postId);
       let postTarget = posts4[postIndex2];
       let indicies = [];
@@ -135,7 +193,7 @@ export default function (state = { ...initialState }, action) {
         }
         return {
           ...state,
-          posts: [...posts4],
+          posts: { ...state.posts, [state.currentKey]: posts4 },
         };
       }
       indicies.push(
@@ -158,7 +216,7 @@ export default function (state = { ...initialState }, action) {
       posts4[postIndex2].comments = postTarget.comments;
       return {
         ...state,
-        posts: [...posts4],
+        posts: { ...state.posts, [state.currentKey]: posts4 },
       };
     default:
       return state;

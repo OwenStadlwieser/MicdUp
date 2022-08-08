@@ -10,7 +10,6 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { navigate } from "../../redux/actions/display";
 import { styles } from "../../styles/Styles";
-const { width, height } = Dimensions.get("window");
 
 export class NotificationBell extends Component {
   constructor() {
@@ -27,22 +26,26 @@ export class NotificationBell extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { navigate } = this.props;
-    console.log("rendeiring");
+    const { navigate, unseenNotifs } = this.props;
     return (
-      <MaterialCommunityIcons
-        style={[styles.toptopRightIcon, { zIndex: 50 }]}
-        onPress={() => navigate("Notifs")}
-        name="bell"
-        size={24}
-        color="white"
-      />
+      <Text>
+        <Text style={{ fontStyle: "italic", color: "white" }}>
+          {unseenNotifs}
+        </Text>
+        <MaterialCommunityIcons
+          onPress={() => navigate("Notifs")}
+          name="bell"
+          size={24}
+          color={unseenNotifs > 0 ? "red" : "white"}
+        />
+      </Text>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
   mountedComponent: state.display.mountedComponent,
+  unseenNotifs: state.notifs.unseenNotifs,
 });
 
 export default connect(mapStateToProps, { navigate })(NotificationBell);

@@ -10,8 +10,9 @@ import {
   UPDATE_COMMENT_TO_POST,
   UPDATE_POST_COMMENTS,
   DELETE_POST,
-  ADD_POSTS,
-  UPDATE_CURRENT_RECORDINGS,
+  CLEAR_POSTS,
+  DELETE_TAG,
+  SET_SINGLE_POST,
 } from "../types";
 import {
   UPLOAD_RECORDING_MUTATION,
@@ -24,12 +25,22 @@ import {
   GET_RECORDINGS_FROM_TAG_QUERY,
   ADD_LISTENER_LOGGED_IN_MUTATION,
   ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
+  GET_SPECIFIC_POST_QUERY,
 } from "../../apollo/private/recording";
-import { ADD_LISTENER_MUTATION } from "../../apollo/private/recording";
+import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 import { publicClient, privateClient } from "../../apollo/client";
 import { showMessage } from "./display";
+import { setCurrentKey } from "./display";
 import store from "../index";
-
+import { SHOW_MORE_REPLIES } from "../../apollo/private/comment";
+export function checkIfLoggedIn() {
+  let { loggedIn } = store.getState().auth;
+  if (loggedIn) {
+    return true;
+  } else {
+    return false;
+  }
+}
 export const updateClips = (payload) => (dispatch) => {
   dispatch({
     type: ALTER_CLIPS,
@@ -44,6 +55,12 @@ export const updateTitle = (payload) => (dispatch) => {
   });
 };
 
+export const deleteTag = (payload) => (dispatch) => {
+  dispatch({
+    type: DELETE_TAG,
+    payload,
+  });
+};
 export const updateTags = (payload) => (dispatch) => {
   dispatch({
     type: UPDATE_TAGS,
@@ -51,6 +68,14 @@ export const updateTags = (payload) => (dispatch) => {
   });
 };
 
+export const clearPosts = (payload) => (dispatch) => {
+  dispatch({
+    type: CLEAR_POSTS,
+    payload: {
+      userId: payload,
+    },
+  });
+};
 export const addListener = (postId, ipAddr, listenTime) => async (dispatch) => {
   const res = await publicClient.mutate({
     mutation: ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
@@ -87,6 +112,15 @@ export const uploadRecording =
   ) =>
   async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       const res = await privateClient.mutate({
         mutation: UPLOAD_RECORDING_MUTATION,
         variables: {
@@ -123,9 +157,47 @@ export const uploadRecording =
     }
   };
 
+export const openSpecificPost = (postId, commentId) => async (dispatch) => {
+  try {
+    const res = await privateClient.query({
+      query: GET_SPECIFIC_POST_QUERY,
+      variables: {
+        postId,
+      },
+      fetchPolicy: "no-cache",
+    });
+    const post = res.data.getSpecificPost;
+    console.log(commentId, 1234345);
+    if (commentId) {
+      const commentChain = await publicClient.query({
+        query: SHOW_MORE_REPLIES(5),
+        variables: {
+          commentId,
+        },
+      });
+      console.log(commentChain, 12324334);
+      post.comments = [commentChain.data.getReplies];
+    }
+    dispatch({
+      type: SET_SINGLE_POST,
+      payload: post,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const uploadBio =
   (files, fileTypes, speechToText) => async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       const res = await privateClient.mutate({
         mutation: UPLOAD_BIO_MUTATION,
         variables: {
@@ -173,26 +245,35 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
       );
       return false;
     }
-    let { user } = store.getState().auth;
-    if (skipMult === 0 && user.profile && user.profile.id === userId) {
+    if (skipMult == 0) {
       dispatch({
-        type: SET_POSTS,
-        payload: res.data.getUserPosts,
-      });
-    } else if (user.profile && user.profile.id === userId) {
-      dispatch({
-        type: ADD_POSTS,
-        payload: res.data.getUserPosts,
+        type: CLEAR_POSTS,
+        payload: {
+          userId,
+        },
       });
     }
+    dispatch({
+      type: SET_POSTS,
+      payload: { posts: res.data.getUserPosts.filter((el) => el), userId },
+    });
     return res.data.getUserPosts;
   } catch (err) {
     console.log(err);
   }
 };
 
-export const likePost = (postId) => async (dispatch) => {
+export const likePost = (postId, currentKey) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: LIKE_POST_MUTATION,
@@ -212,7 +293,7 @@ export const likePost = (postId) => async (dispatch) => {
     }
     dispatch({
       type: UPDATE_POST,
-      payload: res.data.likePost,
+      payload: { post: res.data.likePost, currentKey },
     });
     return res.data.likePost;
   } catch (err) {
@@ -220,8 +301,17 @@ export const likePost = (postId) => async (dispatch) => {
   }
 };
 
-export const deletePost = (postId) => async (dispatch) => {
+export const deletePost = (postId, currentKey) => async (dispatch) => {
   try {
+    if (!checkIfLoggedIn()) {
+      dispatch(
+        showMessage({
+          success: false,
+          message: "Create an account and login to access this feature",
+        })
+      );
+      return;
+    }
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
       mutation: DELETE_POST_MUTATION,
@@ -242,7 +332,7 @@ export const deletePost = (postId) => async (dispatch) => {
     if (res && res.data && res.data.deletePost && res.data.deletePost.success) {
       dispatch({
         type: DELETE_POST,
-        payload: { id: postId },
+        payload: { id: postId, currentKey },
       });
     }
     return res.data.deletePost;
@@ -252,14 +342,14 @@ export const deletePost = (postId) => async (dispatch) => {
 };
 
 export const getComments =
-  (postId, skipMult = 0) =>
+  (post, skipMult = 0) =>
   async (dispatch) => {
     try {
       let fetchPolicy = "no-cache";
       const res = await publicClient.query({
         query: GET_COMMENT_POST_QUERY,
         variables: {
-          postId,
+          postId: post.id,
           skipMult,
         },
         fetchPolicy,
@@ -275,7 +365,11 @@ export const getComments =
       }
       dispatch({
         type: UPDATE_POST_COMMENTS,
-        payload: { data: res.data.getComments, id: postId },
+        payload: {
+          data: res.data.getComments,
+          id: post.id,
+          owner: post.owner.id,
+        },
       });
       return res.data.getComments;
     } catch (err) {
@@ -283,14 +377,23 @@ export const getComments =
     }
   };
 export const commentPost =
-  (postId, replyingTo, files, fileTypes, text, speechToText, parents) =>
+  (post, replyingTo, files, fileTypes, text, speechToText, parents) =>
   async (dispatch) => {
     try {
+      if (!checkIfLoggedIn()) {
+        dispatch(
+          showMessage({
+            success: false,
+            message: "Create an account and login to access this feature",
+          })
+        );
+        return;
+      }
       let fetchPolicy = "no-cache";
       const res = await privateClient.mutate({
         mutation: COMMENT_POST_MUTATION(3),
         variables: {
-          postId,
+          postId: post.id,
           replyingTo,
           files,
           fileTypes,
@@ -310,7 +413,12 @@ export const commentPost =
       }
       dispatch({
         type: UPDATE_COMMENT_TO_POST,
-        payload: { comment: res.data.commentToPost, parents, postId },
+        payload: {
+          comment: res.data.commentToPost,
+          parents,
+          owner: post.owner.id,
+          postId: post.id,
+        },
       });
       return res.data.commentToPost;
     } catch (err) {
@@ -340,9 +448,20 @@ export const getRecordingsFromTag =
         );
         return false;
       }
+      if (skipMult == 0) {
+        dispatch({
+          type: CLEAR_POSTS,
+          payload: {
+            userId: searchTag,
+          },
+        });
+      }
       dispatch({
-        type: UPDATE_CURRENT_RECORDINGS,
-        payload: res.data.getRecordingsFromTag,
+        type: SET_POSTS,
+        payload: {
+          posts: res.data.getRecordingsFromTag.filter((el) => el),
+          userId: searchTag,
+        },
       });
       return res.data.getRecordingsFromTag;
     } catch (err) {

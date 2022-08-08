@@ -30,7 +30,15 @@ const fetchChatMessages = {
       if (index === -1) {
         throw new Error("Must be in chat to view messages");
       }
-      const chats = await Message.find({ _id: { $in: chat.messages } })
+      let blocked = [...context.profile.blockedMap.keys()];
+      let blockedBy = [...context.profile.blockedByMap.keys()];
+      const chats = await Message.find({
+        $and: [
+          { _id: { $in: chat.messages } },
+          { owner: { $nin: blocked } },
+          { owner: { $nin: blockedBy } },
+        ],
+      })
         .sort({ dateCreated: -1 })
         .skip(size * skipMult)
         .limit(size);
@@ -52,7 +60,12 @@ const fetchChats = {
       if (!context.user.id) {
         throw new Error("Must be signed in to message");
       }
-      const chats = await Chat.find({ _id: { $in: context.profile.chats } })
+      let blocked = [...context.profile.blockedMap.keys()];
+
+      const chats = await Chat.find({
+        _id: { $in: context.profile.chats },
+        $not: { members: { $all: blocked } },
+      })
         .sort({ dateCreated: 1 })
         .skip(size * skipMult)
         .limit(size);

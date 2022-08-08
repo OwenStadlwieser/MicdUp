@@ -42,7 +42,6 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching chat failed" })
       );
     }
-    dispatch(navigate("Dms"));
     dispatch({
       type: SET_ACTIVE_CHATS,
       payload: {
@@ -51,6 +50,7 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
         activeChatMembers: res.data.fetchChat.members,
       },
     });
+    dispatch(navigate("Chat"));
     return res.data.fetchChat;
   } catch (err) {
     console.log(err);
@@ -81,6 +81,7 @@ export const viewChats = (skipMult) => async (dispatch) => {
 
 export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
   try {
+    console.log(skipMult);
     const res = await privateClient.query({
       query: FETCH_CHAT_MESSAGES_QUERY,
       variables: { skipMult, chatId: chat.id },
@@ -91,6 +92,7 @@ export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
         showMessage({ success: false, message: "Fetching chat failed" })
       );
     }
+
     dispatch({
       type: ADD_CHATS,
       payload: {
@@ -99,6 +101,7 @@ export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
         activeChatMembers: chat.members,
       },
     });
+
     return res.data.fetchChatMessages;
   } catch (err) {
     console.log(err);

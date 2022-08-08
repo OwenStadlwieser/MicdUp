@@ -7,12 +7,13 @@ import {
   SEARCH_USERS_QUERY,
 } from "../../apollo/private/user";
 import { SET_USER, LOG_IN, DELETE_ACCOUNT, VIEW_PROFILE } from "../types";
-import { showMessage } from "./display";
+import { showMessage, navigate } from "./display";
 
 export const getUserQuery = () => async (dispatch) => {
   try {
     const res = await privateClient.query({
       query: GET_USER_QUERY,
+      fetchPolicy: "no-cache",
     });
     if (res && res.data) {
       dispatch({
@@ -25,8 +26,12 @@ export const getUserQuery = () => async (dispatch) => {
         });
         dispatch({
           type: VIEW_PROFILE,
-          payload: res.data.getUser.profile,
+          payload: {
+            ...res.data.getUser.profile,
+            user: { userName: res.data.getUser.userName },
+          },
         });
+        dispatch(navigate("Profile"));
       }
     }
     return res.data.getUser;
@@ -55,7 +60,7 @@ export const deleteAccount = () => async (dispatch) => {
 
 export const verifyEmail = (email) => async (dispatch) => {
   try {
-    const res = await privateClient.mutate({
+    const res = await publicClient.mutate({
       mutation: VERIFY_EMAIL_MUTATION,
       variables: { email },
       fetchPolicy: "no-cache",
@@ -72,7 +77,7 @@ export const verifyEmail = (email) => async (dispatch) => {
 export const setEmailVerified =
   (verificationCode, email) => async (dispatch) => {
     try {
-      const res = await privateClient.mutate({
+      const res = await publicClient.mutate({
         mutation: SET_EMAIL_VERIFIED_MUTATION,
         variables: { verificationCode, email },
         fetchPolicy: "no-cache",

@@ -18,11 +18,18 @@ import {
   followProfile,
   updateFollowCounts,
   addToPrivates,
+  getFollowersQuery,
+  getFollowingQuery,
+  getPrivatesQuery,
   updatePrivateCounts,
 } from "../../redux/actions/profile";
-import { viewProfile } from "../../redux/actions/display";
-// children
-import Profile from "../private/Profile/Profile";
+import {
+  viewProfile,
+  showHeader,
+  navigate,
+  searchViewProfile,
+} from "../../redux/actions/display";
+
 const { height, width } = Dimensions.get("window");
 export class ListOfAccounts extends Component {
   constructor() {
@@ -37,19 +44,34 @@ export class ListOfAccounts extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.showHeader(true);
+    this.mounted = false;
+  };
 
+  getData = async (skipMult) => {
+    const { title } = this.props;
+    const { id } = this.props.currentProfile;
+    if (title === "Followers") {
+      const res = await this.props.getFollowersQuery(id, skipMult);
+      return res && res.followers ? res.followers : [];
+    } else if (title === "Following") {
+      const res = await this.props.getFollowingQuery(id, skipMult);
+      return res && res.following ? res.following : [];
+    } else if (title === "Privates") {
+      const res = await this.props.getPrivatesQuery(skipMult);
+      return res && res.privates ? res.privates : [];
+    }
+  };
   componentDidMount = async () => {
-    const { getData } = this.props.params;
+    this.props.showHeader(false);
     this.mounted && this.setState({ loading: true });
-    const res = await getData(0);
+    const res = await this.getData(0);
     this.mounted && this.setState({ loading: false, data: res });
   };
 
   async handleScroll(event) {
-    const { params } = this.props;
     const { loading, prevLength, data } = this.state;
-    const { getData } = params;
     try {
       if (
         event.nativeEvent.contentOffset.y >
@@ -59,7 +81,7 @@ export class ListOfAccounts extends Component {
       ) {
         this.mounted &&
           this.setState({ loading: true, prevLength: data.length });
-        const res = await getData(Math.round(data.length / 20));
+        const res = await this.getData(Math.round(data.length / 20));
         this.mounted &&
           this.setState({ loading: false, data: [...data, ...res] });
       }
@@ -68,30 +90,10 @@ export class ListOfAccounts extends Component {
     }
   }
   render() {
-    const { action1, action2, swipeable, swipeAction } = this.props.params;
-    const { isUserProfile } = this.props;
-    const { data, viewingProfile, userName, id } = this.state;
-    if (viewingProfile)
-      return (
-        <View
-          style={{
-            height: height * 0.9,
-            width,
-            zIndex: 5,
-            backgroundColor: "transparent",
-            position: "absolute",
-          }}
-        >
-          <Profile
-            backArrow={true}
-            backAction={(() => {
-              this.mounted && this.setState({ viewingProfile: false });
-            }).bind(this)}
-            userName={userName}
-            id={id}
-          />
-        </View>
-      );
+    const { data } = this.state;
+    const { currentProfile, profile } = this.props;
+    const { id } = this.props.currentProfile;
+    const isUserProfile = profile && currentProfile ? profile.id === id : true;
     return (
       <View
         style={{
@@ -102,25 +104,10 @@ export class ListOfAccounts extends Component {
           position: "absolute",
         }}
       >
-        <Appbar.Header
-          style={{
-            backgroundColor: "#1A3561",
-            width,
-            height: height * 0.1,
-            zIndex: 2,
-          }}
-        >
-          <Appbar.BackAction
-            onPress={() => {
-              this.props.hideList();
-            }}
-          />
-          <Appbar.Content title={this.props.params.title} />
-        </Appbar.Header>
         <SwipeListView
-          data={data}
+          data={data ? data.filter((el) => el) : []}
           disableRightSwipe
-          disableLeftSwipe={!swipeable}
+          disableLeftSwipe={false}
           onScroll={this.handleScroll.bind(this)}
           scrollEventThrottle={50}
           useNativeDriver={Platform.OS === "web" ? false : true}
@@ -134,13 +121,14 @@ export class ListOfAccounts extends Component {
                 ]}
                 underlayColor="#6FF6FF"
                 onPress={() => {
-                  this.props.viewProfile(data.item);
-                  this.mounted &&
-                    this.setState({
-                      viewingProfile: true,
-                      userName: data.item.user.userName,
-                      id: data.item.id,
-                    });
+                  if (profile && profile.id === data.item.id) {
+                    this.props.navigate("Profile");
+                    this.mounted && this.setState({ showing: false });
+                    return;
+                  }
+                  this.props.viewProfile({ ...data.item });
+                  this.props.searchViewProfile(true);
+                  this.props.navigate("SearchProfile");
                 }}
               >
                 <Fragment>
@@ -195,7 +183,7 @@ export class ListOfAccounts extends Component {
                         style={[
                           styles.nextButtonText,
                           {
-                            backgroundColor: "#1A3561",
+                            backgroundColor: "#000000",
                             alignSelf: "stretch",
                           },
                         ]}
@@ -231,7 +219,7 @@ export class ListOfAccounts extends Component {
                         style={[
                           styles.nextButtonText,
                           {
-                            backgroundColor: "#1A3561",
+                            backgroundColor: "#000000",
                             alignSelf: "stretch",
                             marginTop: 10,
                           },
@@ -241,28 +229,6 @@ export class ListOfAccounts extends Component {
                           ? "remove private"
                           : "add private"}
                       </Button>
-                    )}
-                    {action1 && (
-                      <Button
-                        icon={action1.icon}
-                        color={action1.color}
-                        mode="contained"
-                        onPress={() => {
-                          action1.onPress(data.item);
-                        }}
-                        style={action1.style}
-                      ></Button>
-                    )}
-                    {action2 && (
-                      <Button
-                        icon={action2.icon}
-                        color={action2.color}
-                        mode="contained"
-                        onPress={() => {
-                          action2.onPress(data.item);
-                        }}
-                        style={action2.style}
-                      ></Button>
                     )}
                   </View>
                 </Fragment>
@@ -278,6 +244,9 @@ export class ListOfAccounts extends Component {
 
 const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
+  title: state.display.list,
+  user: state.auth.user,
+  profile: state.auth.user.profile,
 });
 
 export default connect(mapStateToProps, {
@@ -286,4 +255,10 @@ export default connect(mapStateToProps, {
   viewProfile,
   addToPrivates,
   updatePrivateCounts,
+  showHeader,
+  getFollowersQuery,
+  getFollowingQuery,
+  getPrivatesQuery,
+  navigate,
+  searchViewProfile,
 })(ListOfAccounts);

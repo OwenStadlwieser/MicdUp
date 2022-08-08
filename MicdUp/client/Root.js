@@ -1,33 +1,47 @@
-import { StatusBar } from "expo-status-bar";
-import { Text, View, TouchableOpacity, Platform } from "react-native";
-import React, { Component, useEffect } from "react";
+import { Text, View } from "react-native";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // styles
 import { styles } from "./styles/Styles";
 // redux
 import { setIp } from "./redux/actions/auth";
-import { changeLogin, changeSignup } from "./redux/actions/display";
+import { navigationRef, navigateStateChanged } from "./redux/actions/display";
 // children
+import LoginManager from "./components/reuseable/LoginManager";
+import Comment from "./components/reuseable/Comment";
 import Dashboard from "./components/private/Dashboard";
 import Navbar from "./components/private/Navbar";
 import Login from "./components/public/Login";
 import Signup from "./components/public/Signup";
 import Feed from "./components/private/Feed/Feed";
-import Create from "./components/private/Create/Create";
 import SoundPlayer from "./components/reuseable/SoundPlayer";
+import CircleSnail from "react-native-progress/CircleSnail";
+import Search from "./components/private/Search/Search";
+import Profile from "./components/private/Profile/Profile";
+import ListOfAccounts from "./components/reuseable/ListOfAccounts";
+import VerifyEmail from "./components/private/Profile/VerifyEmail";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
-import NotificationBell from "./components/private/NotificationBell";
-
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
-import Search from "./components/private/Search/Search";
+import Header from "./components/reuseable/Header";
+import SoundModal from "./components/reuseable/SoundModal";
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#000000",
+  },
+};
+const Stack = createStackNavigator();
 
 export class Root extends Component {
   constructor() {
     super();
     this.state = {
-      loading: false,
       token: "",
       loggedIn: false,
     };
@@ -74,19 +88,125 @@ export class Root extends Component {
   render() {
     const { token } = this.state;
     const {
-      showLogin,
-      showSignup,
       displayMessage,
       currentMessage,
       messageState,
       loggedIn,
       mountedComponent,
+      loading,
+      keyForSearch,
+      showHeader,
+      title,
+      currentProfile,
+      showingSoundModal,
     } = this.props;
     let app;
+
     if (!loggedIn && !token)
       app = (
-        <View style={styles.rootContainer}>
-          <SoundPlayer />
+        <Fragment>
+          <NavigationContainer
+            theme={MyTheme}
+            ref={navigationRef}
+            screenOptions={{ headerShown: true }}
+          >
+            <Stack.Navigator
+              screenListeners={{
+                state: (e) => {
+                  // Do something with the state
+                  console.log(e.data);
+                  this.props.navigateStateChanged(
+                    e.data.state.routeNames[e.data.state.index]
+                  );
+                },
+              }}
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: "#000000",
+                },
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+                headerRight: () => <SoundPlayer />,
+              }}
+              initialRouteName={mountedComponent}
+            >
+              <Stack.Screen
+                name="Feed"
+                component={Feed}
+                initialParams={{ key: this.props.loggedIn }}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="ListOfAccounts"
+                component={ListOfAccounts}
+                initialParams={{ key: this.props.loggedIn }}
+                options={{ headerShown: true, headerTitle: title }}
+              />
+              <Stack.Screen
+                name="Search"
+                initialParams={{ key: keyForSearch }}
+                component={Search}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="SearchFeed"
+                component={Feed}
+                initialParams={{
+                  key: this.props.loggedIn,
+                  fromSearch: true,
+                }}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                options={{
+                  headerShown: true,
+                  headerTitle: currentProfile
+                    ? currentProfile.user
+                      ? currentProfile.user.userName
+                      : "SearchProfile"
+                    : "SearchProfile",
+                }}
+                name={"SearchProfile"}
+                component={Profile}
+                initialParams={{
+                  key: currentProfile ? currentProfile.id : "notloggedin",
+                }}
+              />
+              <Stack.Screen
+                name="Create"
+                component={LoginManager}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="Dms"
+                component={LoginManager}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={LoginManager}
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen
+                initialParams={{}}
+                name="Comment"
+                component={Comment}
+              />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <Navbar />
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <CircleSnail size={60} color={["black", "#6FF6FF"]} />
+            </View>
+          )}
+          {showingSoundModal && <SoundModal />}
+          {showHeader && <SoundPlayer />}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -96,57 +216,18 @@ export class Root extends Component {
               </Text>
             </View>
           )}
-          {mountedComponent === "Feed" ? (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <Feed />
-              </View>
-              <Navbar />
-            </View>
-          ) : mountedComponent === "Search" ? (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <Search />
-              </View>
-              <Navbar />
-            </View>
-          ) : showLogin ? (
-            <Login />
-          ) : showSignup ? (
-            <Signup />
-          ) : (
-            <View style={styles.containerPrivate}>
-              <View style={styles.contentContainer}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    this.props.changeLogin(true);
-                  }}
-                  accessibilityLabel="Login"
-                >
-                  <Text style={styles.text}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    this.props.changeSignup(true);
-                  }}
-                  accessibilityLabel="Sign Up"
-                >
-                  <Text style={styles.text}>Sign Up</Text>
-                </TouchableOpacity>
-                <StatusBar style="auto" />
-              </View>
-              <Navbar />
-            </View>
-          )}
-        </View>
+        </Fragment>
       );
     else
       app = (
-        <View style={styles.rootContainer}>
-          <SoundPlayer />
-          <NotificationBell />
+        <Fragment>
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <CircleSnail size={60} color={["black", "#6FF6FF"]} />
+            </View>
+          )}
+          <Dashboard></Dashboard>
+          {showingSoundModal && <SoundModal />}
           {displayMessage && (
             <View style={styles.messageContainer}>
               <Text
@@ -156,8 +237,7 @@ export class Root extends Component {
               </Text>
             </View>
           )}
-          <Dashboard></Dashboard>
-        </View>
+        </Fragment>
       );
     return app;
   }
@@ -165,15 +245,19 @@ export class Root extends Component {
 
 const mapStateToProps = (state) => ({
   loggedIn: state.auth.loggedIn,
-  showLogin: state.display.showLogin,
-  showSignup: state.display.showSignup,
   displayMessage: state.display.displayMessage,
   currentMessage: state.display.currentMessage,
   messageState: state.display.messageState,
   mountedComponent: state.display.mountedComponent,
+  loading: state.display.loading,
+  keyForSearch: state.display.keyForSearch,
+  showHeader: state.display.showHeader,
+  title: state.display.list,
+  userName: state.auth.user.userName,
+  currentProfile: state.display.viewingProfile,
+  showingSoundModal: state.display.showingSoundModal,
 });
 export default connect(mapStateToProps, {
-  changeSignup,
-  changeLogin,
   setIp,
+  navigateStateChanged,
 })(Root);

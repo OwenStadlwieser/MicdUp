@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { changeSignup, showMessage } from "../../redux/actions/display";
+// redux
+import { showMessage, showHeader } from "../../redux/actions/display";
 import { register } from "../../redux/actions/auth";
+import { navigate } from "../../redux/actions/display";
+// styles
 import { styles } from "../../styles/Styles";
+//helpers
 import {
   validateUsername,
   validateEmail,
@@ -14,11 +18,11 @@ import {
   Platform,
   Dimensions,
   TextInput,
-  Text,
-  TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import VerifyEmail from "../private/Profile/VerifyEmail";
+import { Header } from "@react-navigation/stack";
+import { Button } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
 
 const { height } = Dimensions.get("window");
@@ -37,13 +41,18 @@ export class Signup extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.showHeader(true);
+    this.mounted = false;
+  };
 
   onChange = (name, text) => {
     this.mounted && this.setState({ [name]: text });
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.props.showHeader(false);
+  };
 
   async signup() {
     const { email, phone, password, user, date } = this.state;
@@ -51,23 +60,18 @@ export class Signup extends Component {
     this.props.showMessage(res.data.createUser);
     if (res.data.createUser.success)
       setTimeout(() => {
-        this.props.changeSignup(false);
+        this.mounted && this.props.navigate("VerifyEmail");
       }, 3000);
   }
 
   render() {
     const { email, phone, password, date, user } = this.state;
     return (
-      <KeyboardAvoidingView style={styles.container}>
-        <AntDesign
-          style={styles.backArrow}
-          name="leftcircle"
-          size={24}
-          color="white"
-          onPress={() => {
-            this.props.changeSignup(false);
-          }}
-        />
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={(Header.HEIGHT ? Header.HEIGHT : 0) + 20} // adjust the value here if you need more padding
+        style={styles.avoidingView}
+        behavior="padding"
+      >
         <TextInput
           value={user}
           style={
@@ -173,15 +177,9 @@ export class Signup extends Component {
           />
         )}
 
-        <TouchableOpacity
-          onPress={async () => {
-            await this.signup();
-          }}
-          style={styles.button}
-          accessibilityLabel="Signup"
-        >
-          <Text style={styles.text}>Sign Up</Text>
-        </TouchableOpacity>
+        <Button style={styles.button} onPress={async () => await this.signup()}>
+          Signup
+        </Button>
       </KeyboardAvoidingView>
     );
   }
@@ -190,7 +188,8 @@ export class Signup extends Component {
 const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, {
-  changeSignup,
   register,
   showMessage,
+  showHeader,
+  navigate,
 })(Signup);

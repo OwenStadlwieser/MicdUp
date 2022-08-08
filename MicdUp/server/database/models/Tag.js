@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { getCurrentTime } = require("../../reusableFunctions/helpers");
 
 // Create Schema
 const tagsSchema = new Schema({
@@ -27,6 +28,11 @@ const tagsSchema = new Schema({
   hr24searches: {
     type: Number,
     default: 0,
+  },
+  followers: {
+    type: mongoose.Schema.Types.Map,
+    of: String,
+    default: new Map(),
   },
 });
 

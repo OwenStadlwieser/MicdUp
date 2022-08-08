@@ -4,7 +4,8 @@ import { View, TextInput, TouchableOpacity, Text } from "react-native";
 import { styles } from "../../../styles/Styles";
 import { AntDesign } from "@expo/vector-icons";
 import { verifyEmail, setEmailVerified } from "../../../redux/actions/user";
-import { showMessage } from "../../../redux/actions/display";
+import { showMessage, navigate } from "../../../redux/actions/display";
+import { Button } from "react-native-paper";
 
 export class VerifyEmail extends Component {
   constructor() {
@@ -39,7 +40,7 @@ export class VerifyEmail extends Component {
         message: "Email Verified.",
       });
       setTimeout(() => {
-        this.props.hideVerifyEmail();
+        this.props.navigate("Login");
       }, 3000);
     }
   };
@@ -48,15 +49,6 @@ export class VerifyEmail extends Component {
     const { email, stage, verificationCode } = this.state;
     return (
       <View style={styles.container}>
-        <AntDesign
-          style={styles.backArrow}
-          name="leftcircle"
-          size={24}
-          color="white"
-          onPress={() => {
-            this.props.hideVerifyEmail();
-          }}
-        />
         {stage === 1 ? (
           <View>
             <TextInput
@@ -65,7 +57,7 @@ export class VerifyEmail extends Component {
               placeholder="Email"
               onChangeText={(text) => this.onChange("email", text)}
             />
-            <TouchableOpacity
+            <Button
               style={styles.button}
               accessibilityLabel="Verify Email"
               onPress={async () => {
@@ -87,7 +79,7 @@ export class VerifyEmail extends Component {
               }}
             >
               <Text style={styles.text}>Verify Email</Text>
-            </TouchableOpacity>
+            </Button>
           </View>
         ) : (
           <View>
@@ -97,7 +89,7 @@ export class VerifyEmail extends Component {
               placeholder="Verification Code"
               onChangeText={(text) => this.onChange("verificationCode", text)}
             />
-            <TouchableOpacity
+            <Button
               style={styles.button}
               accessibilityLabel="Verification Code"
               onPress={async () => {
@@ -113,7 +105,7 @@ export class VerifyEmail extends Component {
               }}
             >
               <Text style={styles.text}>Verify Code</Text>
-            </TouchableOpacity>
+            </Button>
           </View>
         )}
       </View>
@@ -127,4 +119,5 @@ export default connect(mapStateToProps, {
   verifyEmail,
   showMessage,
   setEmailVerified,
+  navigate,
 })(VerifyEmail);

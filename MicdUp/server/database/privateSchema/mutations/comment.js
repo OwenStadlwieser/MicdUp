@@ -1,20 +1,16 @@
-const {User} = require("../../models/User")
+const { User } = require("../../models/User");
 const { Comment } = require("../../models/Comment");
 const { Post } = require("../../models/Post");
 const mongoose = require("mongoose");
-const {makeLikeNotification} = require("../../../utils/sendNotification");
+const { makeLikeNotification } = require("../../../utils/sendNotification");
 const graphql = require("graphql");
-const {
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLSchema,
-  GraphQLList,
-  GraphQLBoolean,
-  GraphQLFloat,
-} = graphql;
+const { GraphQLID } = graphql;
 const { CommentType } = require("../../types");
+const {
+  makeNotification,
+  deleteNotification,
+} = require("../../../utils/sendNotification");
+const { NotificationTypesBackend } = require("../../../utils/constants");
 
 const deleteComment = {
   type: CommentType,
@@ -40,6 +36,14 @@ const deleteComment = {
       if (!comment) {
         throw new Error("post not found");
       }
+      await deleteNotification(
+        context.profile.user,
+        post.owner,
+        comment._id,
+        comment.isTop
+          ? NotificationTypesBackend.CommentPost
+          : NotificationTypesBackend.ReplyComment
+      );
       comment.isDeleted = true;
       await comment.save({ session });
       await session.commitTransaction();
@@ -76,12 +80,27 @@ const likeComment = {
     if (comment && index < 0) {
       comment.likers.push(context.profile._id);
       await comment.save();
-      makeLikeNotification(await User.findOne(context.profile.user),"comment",{},comment.owner);
+      const post = await Post.findById(comment.post);
+      await makeNotification(
+        await User.findOne(context.profile.user),
+        NotificationTypesBackend.LikeComment,
+        {},
+        comment.owner,
+        LIKE_MESSAGE + " " + post.title,
+        comment._id,
+        comment.post
+      );
       return comment;
     }
     if (comment && index > -1) {
       comment.likers.splice(index, 1);
       await comment.save();
+      await deleteNotification(
+        context.profile.user,
+        comment.owner,
+        comment._id,
+        NotificationTypesBackend.LikeComment
+      );
       // makeLikeNotification(await User.findOne(context.profile.user),"comment",{},comment.owner);
       return comment;
     }

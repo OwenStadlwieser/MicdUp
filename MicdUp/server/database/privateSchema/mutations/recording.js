@@ -6,24 +6,27 @@ var path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("node-ffprobe-installer").path;
 const { uploadFile, deleteFile } = require("../../../utils/awsS3");
-const {
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLSchema,
-  GraphQLList,
-  GraphQLBoolean,
-  GraphQLFloat,
-} = graphql;
+const { GraphQLID, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLFloat } =
+  graphql;
 const { Post } = require("../../models/Post");
 const { File } = require("../../models/File");
 const { Tag } = require("../../models/Tag");
 const { Comment } = require("../../models/Comment");
 const { User } = require("../../models/User");
+const { Profile } = require("../../models/Profile");
 const mongoose = require("mongoose");
-const { makeLikeNotification } = require("../../../utils/sendNotification");
+const {
+  makeNotification,
+  deleteNotification,
+} = require("../../../utils/sendNotification");
 const { checkIfIsInPrivateList } = require("../../../utils/securityHelpers");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
+const {
+  LIKE_MESSAGE,
+  COMMENT_MESSAGE,
+  REPLY_MESSAGE,
+  NotificationTypesBackend,
+} = require("../../../utils/constants");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -77,6 +80,7 @@ const createRecording = {
       privatePost,
       fileExtension: ".mp4",
       speechToText,
+      dateCreated: getCurrentTime(),
     });
     // prep files for combine
     try {
@@ -116,13 +120,15 @@ const createRecording = {
     session.startTransaction();
     try {
       await ffmpegMergeAndUpload(fileName, post._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      post.duration = duration;
       for (let i = 0; i < tags.length; i++) {
         if (!tags[i]) continue;
         tags[i] = tags[i].replace(/ /g, "");
         if (!tags[i]) continue;
         let tag = await Tag.findOne({ title: tags[i] });
         if (!tag) {
-          tag = new Tag({ title: tags[i] });
+          tag = new Tag({ title: tags[i], dateCreated: getCurrentTime() });
         }
         tag.count = tag.count + 1;
         tag.posts.push(post._id);
@@ -171,6 +177,7 @@ const uploadBio = {
       owner: context.profile.id,
       fileExtension: ".mp4",
       speechToText,
+      dateCreated: getCurrentTime(),
     });
     try {
       var fileType = fileTypes.replace("audio/", "");
@@ -217,6 +224,8 @@ const uploadBio = {
     // convert file to mp4 (might as well keep them all the same)
     try {
       await ffmpegMergeAndUpload(fileName, bio._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      bio.duration = duration;
       await profile.save({ session });
       await bio.save({ session });
       await session.commitTransaction();
@@ -272,6 +281,7 @@ const likePost = {
       throw new Error("Must be signed in to post");
     }
     let index = -1;
+    const profile = await Profile.findById(context.profile.id);
     const post = await Post.findOne({
       _id: postId,
     }).then((post) => {
@@ -280,30 +290,68 @@ const likePost = {
       );
       return post;
     });
-    const privatePermissionIndex = post.privatePost
-      ? await checkIfIsInPrivateList(context, post)
-      : 1;
+    const privatePermissionIndex = await checkIfIsInPrivateList(context, post);
+    const owner = await Profile.findOne({
+      _id: post.owner,
+      $not: { blockedBy: { $all: [context.profile.id] } },
+    });
+    if (!owner) {
+      throw new Error("No owner");
+    }
+    // does not have permission to like this post
     if (privatePermissionIndex < 0) {
       return post;
     }
-    if (post && index < 0) {
-      post.likers.push(context.profile._id);
-      await post.save();
-      console.log("test");
-      makeLikeNotification(
-        await User.findOne(context.profile.user),
-        "post",
-        {},
-        post.owner
-      );
-      return post;
-    }
-    if (post && index > -1) {
-      post.likers.splice(index, 1);
-      await post.save();
-      console.log("test2");
-      // makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
-      return post;
+    try {
+      if (post && index < 0) {
+        post.likers.push(context.profile._id);
+        for (let i = 0; i < post.tags.length; i++) {
+          if (profile.likedTags.get(`${post.tags[i]}`)) {
+            profile.likedTags.set(
+              `${post.tags[i]}`,
+              profile.likedTags.get(`${post.tags[i]}`) + 1
+            );
+          } else {
+            profile.likedTags.set(`${post.tags[i]}`, 1);
+          }
+        }
+        await profile.save();
+        await post.save();
+
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.LikePost,
+          {},
+          post.owner,
+          LIKE_MESSAGE + " " + post.title,
+          post._id,
+          null
+        );
+        return post;
+      }
+      if (post && index > -1) {
+        for (let i = 0; i < post.tags.length; i++) {
+          if (profile.likedTags.get(`${post.tags[i]}`)) {
+            profile.likedTags.set(
+              `${post.tags[i]}`,
+              profile.likedTags.get(`${post.tags[i]}`) - 1
+            );
+          }
+        }
+        await deleteNotification(
+          context.profile.user,
+          post.owner,
+          post._id,
+          NotificationTypesBackend.LikePost
+        );
+        await profile.save();
+        post.likers.splice(index, 1);
+        await post.save();
+        // makeLikeNotification(await User.findOne(context.profile.user),"post",{},post.owner);
+        return post;
+      }
+    } catch (err) {
+      console.log(err);
     }
   },
 };
@@ -371,9 +419,14 @@ const commentToPost = {
     const post = await Post.findOne({
       _id: postId,
     });
-    const privatePermissionIndex = post.privatePost
-      ? await checkIfIsInPrivateList(context, post)
-      : 1;
+    const owner = await Profile.findOne({
+      _id: post.owner,
+      $not: { blockedBy: { $all: [context.profile.id] } },
+    });
+    if (!owner) {
+      throw new Error("No owner");
+    }
+    const privatePermissionIndex = await checkIfIsInPrivateList(context, post);
     if (privatePermissionIndex < 0) {
       return {};
     }
@@ -392,6 +445,7 @@ const commentToPost = {
         owner: context.profile.id,
         fileExtension: ".mp4",
         speechToText,
+        dateCreated: getCurrentTime(),
       });
       var fileNames = [];
       var command = ffmpeg();
@@ -425,6 +479,8 @@ const commentToPost = {
         `${comment._id}.mp4`
       );
       await ffmpegMergeAndUpload(fileName, comment._id, fileNames, command);
+      const duration = await ffmpegGetDuration(fileName);
+      comment.duration = duration;
       fs.unlink(fileName, function (err) {
         if (err) throw err;
       });
@@ -433,7 +489,6 @@ const commentToPost = {
     session.startTransaction();
     try {
       if (replyingTo) {
-        let ultimateParent;
         const commentParent = await Comment.findOne({
           _id: replyingTo,
         });
@@ -448,8 +503,18 @@ const commentToPost = {
         }
         comment.parent = commentParent._id;
         comment.post = postId;
+        comment.isTop = false;
         await comment.save({ session });
         await commentParent.save({ session });
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.ReplyComment,
+          {},
+          commentParent.owner,
+          REPLY_MESSAGE,
+          comment._id,
+          comment.post
+        );
         await session.commitTransaction();
         return commentParent;
       } else {
@@ -461,6 +526,15 @@ const commentToPost = {
         comment.post = post._id;
         await comment.save({ session });
         await post.save({ session });
+        await makeNotification(
+          await User.findById(context.profile.user),
+          NotificationTypesBackend.CommentPost,
+          {},
+          post.owner,
+          COMMENT_MESSAGE + " " + post.title,
+          comment._id,
+          comment.post
+        );
         await session.commitTransaction();
         return comment;
       }
@@ -471,6 +545,16 @@ const commentToPost = {
       session.endSession();
     }
   },
+};
+
+const ffmpegGetDuration = async (fileName) => {
+  return await new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(fileName, function (err, metadata) {
+      //console.dir(metadata); // all metadata
+      console.log(metadata.format.duration);
+      resolve(metadata.format.duration);
+    });
+  });
 };
 
 const ffmpegMergeAndUpload = async (fileName, id, fileNames, command) => {
@@ -508,4 +592,5 @@ module.exports = {
   commentToPost,
   ffmpegMergeAndUpload,
   addListenerAuthenticated,
+  ffmpegGetDuration,
 };

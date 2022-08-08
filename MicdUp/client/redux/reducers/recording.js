@@ -3,6 +3,7 @@ import {
   UPDATE_TITLE,
   UPDATE_TAGS,
   CLEAR_RECORDING,
+  DELETE_TAG,
 } from "../types";
 
 const initialState = {
@@ -24,10 +25,17 @@ export default function (state = { ...initialState }, action) {
         ...state,
         title: payload,
       };
+    case DELETE_TAG:
+      let tags = [...state.tags];
+      tags.splice(payload, 1);
+      return {
+        ...state,
+        tags: [...tags],
+      };
     case UPDATE_TAGS:
       return {
         ...state,
-        tags: payload,
+        tags: [...state.tags, payload],
       };
     case CLEAR_RECORDING:
       return {

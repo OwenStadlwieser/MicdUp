@@ -12,6 +12,7 @@ import Carousel from "react-native-snap-carousel";
 import { showMessage } from "../../../redux/actions/display";
 import { updateClips } from "../../../redux/actions/recording";
 import { getFilters } from "../../../redux/actions/filter";
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 // import { AudioEngine } from "react-native-audio-engine";
 //(applyFilter: (NSString *)filePath numberParameter:(nonnull NSNumber *)
 //reverbSetting numberParameter:(nonnull NSNumber *)pitchChange
@@ -29,12 +30,17 @@ export class Filters extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("FiltersNative");
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
-    this.mounted && this.setState({ loading: true });
+    this.props.addLoading("FiltersNative");
     const res = await this.props.getFilters(0);
-    this.mounted && this.setState({ entries: res, loading: false });
+    console.log("filters", res);
+    this.mounted && this.setState({ entries: res });
+    this.props.removeLoading("FiltersNative");
   };
 
   selectFilter(item) {
@@ -160,12 +166,12 @@ export class Filters extends Component {
             index > 0 &&
             !this.state.entries[index + 1]
           ) {
-            this.mounted && this.setState({ loading: true });
+            this.props.addLoading("FiltersNative");
             const res = await this.props.getFilters((index + 1) / 30);
+            this.props.removeLoading("FiltersNative");
             this.mounted &&
               this.setState({
                 entries: [...this.state.entries, ...res],
-                loading: false,
               });
           }
         }}
@@ -187,4 +193,6 @@ export default connect(mapStateToProps, {
   showMessage,
   updateClips,
   getFilters,
+  addLoading,
+  removeLoading,
 })(Filters);

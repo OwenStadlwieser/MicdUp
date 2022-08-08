@@ -13,7 +13,13 @@ image {
   id
   signedUrl
 }
+isBlockedByUser
 `;
+
+const tagType = `_id
+title
+count
+isFollowedByUser`;
 
 const postType = `id
 title
@@ -21,6 +27,8 @@ signedUrl
 likes
 isLikedByUser
 privatePost
+dateCreated
+duration
 speechToText {
   word
   time
@@ -31,6 +39,9 @@ owner {
     id
     userName
   }
+}
+tags {
+  ${tagType}
 }`;
 
 const chatType = `id
@@ -45,15 +56,27 @@ owner {
     userName
   }
 }
+dateCreated
 isLikedByUser
 likersCount
 seenBy
 signedUrl
 dateCreated
+duration
 speechToText {
   word
   time
 }`;
+
+const notifType = `id
+sender {
+  ${profilePublicType}
+}
+parentId
+dateCreated
+text
+type
+itemId`;
 const commentType = `id
 ultimateParent
 isDeleted
@@ -62,6 +85,8 @@ text
 likes
 isLikedByUser
 repliesLength
+dateCreated
+duration
 speechToText {
   word
   time
@@ -74,4 +99,11 @@ owner {
   }
 }`;
 
-export { postType, commentType, chatType, profilePublicType };
+export {
+  postType,
+  commentType,
+  chatType,
+  profilePublicType,
+  tagType,
+  notifType,
+};

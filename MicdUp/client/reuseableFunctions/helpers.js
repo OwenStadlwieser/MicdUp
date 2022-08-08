@@ -48,6 +48,36 @@ const playSound = async (uri, sound) => {
   }
 };
 
+/**
+ * Translates seconds into human readable format of seconds, minutes, hours, days, and years
+ *
+ * @param  {number} seconds The number of seconds to be processed
+ * @return {string}         The phrase describing the amount of time
+ */
+function forHumans(secondsMilli) {
+  let seconds = Math.floor(secondsMilli / 1000);
+  var levels = [
+    [Math.floor(seconds / 31536000), "years"],
+    [Math.floor((seconds % 31536000) / 86400), "days"],
+    [Math.floor(((seconds % 31536000) % 86400) / 3600), "hours"],
+    [Math.floor((((seconds % 31536000) % 86400) % 3600) / 60), "minutes"],
+    [(((seconds % 31536000) % 86400) % 3600) % 60, "seconds"],
+  ];
+  var returntext = "";
+
+  for (var i = 0, max = levels.length; i < max; i++) {
+    if (levels[i][0] === 0) continue;
+    returntext +=
+      " " +
+      levels[i][0] +
+      " " +
+      (levels[i][0] === 1
+        ? levels[i][1].substr(0, levels[i][1].length - 1)
+        : levels[i][1]);
+    return returntext;
+  }
+}
+
 const duplicateNotifsString = (n) => {
   let string = "";
   for (let i = 0; i < n; i++) {
@@ -215,6 +245,13 @@ function onSpeechResultsClips(e) {
     console.log("speech recognition", err);
   }
 }
+
+const getCurrentTime = () => {
+  var d1 = new Date();
+  d1.toUTCString();
+  return Math.floor(d1.getTime());
+};
+
 export {
   storeData,
   getData,
@@ -227,4 +264,6 @@ export {
   onSpeechResults,
   onSpeechStart,
   onSpeechResultsClips,
+  getCurrentTime,
+  forHumans,
 };

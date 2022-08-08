@@ -1,15 +1,27 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { View, TouchableOpacity, Image, Text, ScrollView } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import { Title } from "react-native-paper";
 // users
 import { searchUsers } from "../../../redux/actions/user";
 import { searchTags } from "../../../redux/actions/tag";
-import { getRecordingsFromTag } from "../../../redux/actions/recording";
-import { viewProfile, searchViewProfile } from "../../../redux/actions/display";
+import {
+  viewProfile,
+  searchViewProfile,
+  searchViewTag,
+} from "../../../redux/actions/display";
 // components
 import SearchComponent from "../../reuseable/SearchComponent";
-import Profile from "../Profile/Profile";
-import Feed from "../Feed/Feed";
+import PopularTags from "./PopularTags";
+import RecommendedTags from "./RecommendedTags";
+
 // styles
 import { styles } from "../../../styles/Styles";
 
@@ -23,6 +35,7 @@ export class Search extends Component {
       term: "",
       userName: "",
       searchExecuted: false,
+      tag: null,
     };
 
     this.mounted = true;
@@ -30,16 +43,7 @@ export class Search extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {
-    const { currentProfile, searchViewingProfile } = this.props;
-    if (searchViewingProfile && currentProfile.id) {
-      this.mounted &&
-        this.setState({
-          id: currentProfile.id,
-          userName: currentProfile.user.userName,
-        });
-    }
-  };
+  componentDidMount = () => {};
 
   setUsersState = (users) => {
     this.mounted && this.setState({ users });
@@ -52,37 +56,67 @@ export class Search extends Component {
   setSearchTerm = (term) => {
     this.mounted && this.setState({ term });
   };
+
   render() {
-    const { users, term, userName, tags, searchExecuted, id } = this.state;
-    const { searchViewingProfile } = this.props;
-    console.log(id, 2);
+    const { users, term, tags } = this.state;
     return (
-      <View style={[styles.paneUncentered, { alignItems: "center" }]}>
-        {!searchViewingProfile && (
-          <SearchComponent
-            parentViewStyle={{ zIndex: 2 }}
-            searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-            inputStyle={styles.inputStyleUsers}
-            isForUser={true}
-            placeholder={"Search"}
-            setStateOnChange={true}
-            setStateOnChangeFunc={this.setSearchTerm.bind(this)}
-            setResOnChange={true}
-            setResOnChangeFunc={this.setUsersState.bind(this)}
-            searchFunction={this.props.searchUsers}
-            secondSearchFunction={this.props.searchTags}
-            secondSearch={true}
-            setSecondRes={this.setTagsState.bind(this)}
-            splitSearchTerm={true}
-            inputStyle={styles.textInputRecEdit}
-            placeHolderColor={"white"}
-            scrollable={true}
-            displayResults={false}
-            initValue={users ? users.toString() : ""}
-          />
+      <View
+        key={this.props.route.params.key}
+        style={[styles.paneUncentered, { alignItems: "center" }]}
+      >
+        <SearchComponent
+          parentViewStyle={{ zIndex: 2 }}
+          searchInputContainerStyle={styles.searchInputContainerStyleUsers}
+          isForUser={true}
+          placeholder={"Search"}
+          setStateOnChange={true}
+          setStateOnChangeFunc={this.setSearchTerm.bind(this)}
+          setResOnChange={true}
+          setResOnChangeFunc={this.setUsersState.bind(this)}
+          searchFunction={this.props.searchUsers}
+          secondSearchFunction={this.props.searchTags}
+          secondSearch={true}
+          setSecondRes={this.setTagsState.bind(this)}
+          splitSearchTerm={true}
+          inputStyle={styles.textInputRecEdit}
+          placeHolderColor={"white"}
+          scrollable={true}
+          displayResults={false}
+          initValue={users ? users.toString() : ""}
+        />
+        {term.length == 0 && (
+          <View style={styles.searchTags}>
+            <View>
+              <Title
+                style={{
+                  alignSelf: "baseline",
+                  paddingLeft: 15,
+                  fontStyle: "italic",
+                  fontWeight: "700",
+                  color: "white",
+                }}
+              >
+                Popular Topics
+              </Title>
+              <PopularTags setSelectedTag={this.props.searchViewTag} />
+            </View>
+            <View>
+              <Title
+                style={{
+                  alignSelf: "baseline",
+                  paddingLeft: 15,
+                  fontStyle: "italic",
+                  fontWeight: "700",
+                  color: "white",
+                }}
+              >
+                Recommmended Topics
+              </Title>
+              <RecommendedTags setSelectedTag={this.props.searchViewTag} />
+            </View>
+          </View>
         )}
-        {searchExecuted && <Feed fromSearch={true} />}
-        {term.length > 0 && !searchViewingProfile ? (
+        {term.length > 0 && (
           <View style={styles.searchResultsContainer}>
             <ScrollView style={styles.tagResultsContainer}>
               {tags &&
@@ -91,8 +125,7 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={async () => {
-                      await this.props.getRecordingsFromTag(res._id, 0);
-                      this.mounted && this.setState({ searchExecuted: true });
+                      this.props.searchViewTag;
                     }}
                     style={styles.listItemContainerUser}
                   >
@@ -107,12 +140,10 @@ export class Search extends Component {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      this.mounted &&
-                        this.setState({
-                          userName: res.userName,
-                          id: res.profile.id,
-                        });
-                      this.props.viewProfile(res.profile);
+                      this.props.viewProfile({
+                        ...res.profile,
+                        user: { userName: res.userName },
+                      });
                       this.props.searchViewProfile(true);
                     }}
                     style={styles.listItemContainerUser}
@@ -132,18 +163,6 @@ export class Search extends Component {
                 ))}
             </ScrollView>
           </View>
-        ) : (
-          searchViewingProfile && (
-            <Profile
-              key={id}
-              id={id}
-              backArrow={true}
-              backAction={(() => {
-                this.props.searchViewProfile(false);
-              }).bind(this)}
-              userName={userName}
-            />
-          )
         )}
       </View>
     );
@@ -151,7 +170,6 @@ export class Search extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  searchViewingProfile: state.display.searchViewingProfile,
   currentProfile: state.display.viewingProfile,
 });
 
@@ -160,5 +178,5 @@ export default connect(mapStateToProps, {
   viewProfile,
   searchViewProfile,
   searchTags,
-  getRecordingsFromTag,
+  searchViewTag,
 })(Search);

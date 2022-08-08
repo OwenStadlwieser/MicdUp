@@ -1,16 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-} from "react-native";
+import { View, TextInput, Text, KeyboardAvoidingView } from "react-native";
 import { styles } from "../../styles/Styles";
-import { AntDesign } from "@expo/vector-icons";
+import { Button } from "react-native-paper";
+import { Header } from "@react-navigation/stack";
 // redux
-import { changeLogin } from "../../redux/actions/display";
+import { showHeader } from "../../redux/actions/display";
 import { login } from "../../redux/actions/auth";
 // components
 import ForgotPassword from "./ForgotPassword";
@@ -29,10 +24,13 @@ export class Login extends Component {
   }
 
   componentWillUnmount = () => {
+    this.props.showHeader(true);
     this.mounted = false;
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () => {
+    this.props.showHeader(false);
+  };
 
   login = async () => {
     const { authenticator, password } = this.state;
@@ -56,16 +54,11 @@ export class Login extends Component {
           />
         ))
       : (login = (
-          <KeyboardAvoidingView style={styles.container}>
-            <AntDesign
-              style={styles.topLeftIcon}
-              name="leftcircle"
-              size={24}
-              color="white"
-              onPress={() => {
-                this.props.changeLogin(false);
-              }}
-            />
+          <KeyboardAvoidingView
+            keyboardVerticalOffset={(Header.HEIGHT ? Header.HEIGHT : 0) + 20} // adjust the value here if you need more padding
+            style={styles.avoidingView}
+            behavior="padding"
+          >
             <TextInput
               style={styles.textInput}
               value={authenticator}
@@ -89,13 +82,12 @@ export class Login extends Component {
                 Forgot Password
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={async () => await this.login()}
+            <Button
               style={styles.button}
-              accessibilityLabel="Login"
+              onPress={async () => await this.login()}
             >
-              <Text style={styles.text}>Login</Text>
-            </TouchableOpacity>
+              Login
+            </Button>
           </KeyboardAvoidingView>
         ));
     return login;
@@ -104,4 +96,4 @@ export class Login extends Component {
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { changeLogin, login })(Login);
+export default connect(mapStateToProps, { login, showHeader })(Login);

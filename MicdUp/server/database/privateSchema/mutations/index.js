@@ -13,9 +13,15 @@ const {
   commentToPost,
   addListenerAuthenticated,
 } = require("./recording");
-const { verifyEmail, setEmailVerified, deleteAccount } = require("./user");
-const { updateProfilePic, followProfile, addToPrivates } = require("./profile");
-const { addToken } = require("./notifs");
+const { deleteAccount } = require("./user");
+const {
+  updateProfilePic,
+  followProfile,
+  addToPrivates,
+  followTopic,
+  blockProfile,
+} = require("./profile");
+const { addToken, markNotifsAsSeen } = require("./notifs");
 const { likeComment, deleteComment } = require("./comment");
 
 const { fetchChat } = require("./chat");
@@ -27,8 +33,6 @@ const Mutation = new GraphQLObjectType({
     likePost,
     deletePost,
     commentToPost,
-    verifyEmail,
-    setEmailVerified,
     deleteAccount,
     updateProfilePic,
     followProfile,
@@ -38,6 +42,9 @@ const Mutation = new GraphQLObjectType({
     deleteComment,
     addToPrivates,
     addListenerAuthenticated,
+    followTopic,
+    blockProfile,
+    markNotifsAsSeen,
   }, //fields end here
 });
 

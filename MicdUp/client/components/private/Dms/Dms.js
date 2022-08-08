@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   View,
@@ -8,13 +8,22 @@ import {
   Text,
   Dimensions,
   TouchableWithoutFeedback,
+  RefreshControl,
 } from "react-native";
 import { Button } from "react-native-paper";
 // helpers
 import { io } from "socket.io-client";
 // redux
-import { createOrOpenChat } from "../../../redux/actions/chat";
-import { viewChats, viewMoreChats } from "../../../redux/actions/chat";
+import {
+  addLoading,
+  removeLoading,
+  navigate,
+} from "../../../redux/actions/display";
+import {
+  viewChats,
+  viewMoreChats,
+  createOrOpenChat,
+} from "../../../redux/actions/chat";
 import { searchUsers } from "../../../redux/actions/user";
 // components
 import DropDown from "../../reuseable/DropDown";
@@ -47,21 +56,21 @@ export class Dms extends Component {
     this.mounted && this.setState({ term });
   };
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("DMS");
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {
-    const { activeChatId, socket } = this.props;
-    if (!activeChatId) await this.props.viewChats(0);
+    this.props.addLoading("DMS");
+    await this.props.viewChats(0);
+    this.props.removeLoading("DMS");
   };
 
   render() {
-    const { chats, showingChat, activeChatId, profile } = this.props;
-    const { users, userNames, showDropDown } = this.state;
-    const app = activeChatId ? (
-      <View style={styles.pane}>
-        <Chat />
-      </View>
-    ) : (
+    const { chats, profile } = this.props;
+    const { users, userNames, showDropDown, refreshing } = this.state;
+    const app = (
       <TouchableOpacity
         onPress={() => {
           this.mounted && this.setState({ showDropDown: false });
@@ -73,7 +82,7 @@ export class Dms extends Component {
           <SearchComponent
             parentViewStyle={{ zIndex: 2 }}
             searchInputContainerStyle={styles.searchInputContainerStyleUsers}
-            inputStyle={styles.inputStyleUsers}
+            inputStyle={styles.textInputRecEdit}
             isForUser={true}
             placeholder={"Find Friends"}
             setStateOnChange={true}
@@ -82,7 +91,6 @@ export class Dms extends Component {
             setResOnChangeFunc={this.setUsersState.bind(this)}
             searchFunction={this.props.searchUsers}
             splitSearchTerm={true}
-            inputStyle={styles.textInputRecEdit}
             placeHolderColor={"white"}
             scrollable={true}
             onFocus={() =>
@@ -101,12 +109,15 @@ export class Dms extends Component {
                 zIndex: 2,
                 height: height * 0.3,
               }}
-              results={users.map((user) => {
-                user.image = user.profile.image
-                  ? user.profile.image.signedUrl
-                  : false;
-                return user;
-              })}
+              results={
+                users &&
+                users.map((user) => {
+                  user.image = user.profile.image
+                    ? user.profile.image.signedUrl
+                    : false;
+                  return user;
+                })
+              }
               image={true}
               title={"userName"}
               onBlur={() => {
@@ -128,16 +139,7 @@ export class Dms extends Component {
           )}
         </View>
         {userNames && userNames.length > 0 && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              minHeight: 0,
-              paddingBottom: 20,
-            }}
-          >
+          <View style={styles.deleteItemContainer}>
             {userNames.map((user, index) => (
               <DeleteableItem
                 item={user}
@@ -150,7 +152,6 @@ export class Dms extends Component {
                   const index = currentNames.findIndex((user2) => {
                     return user.userName === user2.userName;
                   });
-                  console.log(index);
                   currentNames.splice(index, 1);
                   this.mounted && this.setState({ userNames: currentNames });
                 }}
@@ -163,10 +164,12 @@ export class Dms extends Component {
                 icon="creation"
                 mode="contained"
                 onPress={async () => {
+                  this.props.addLoading("DMS");
                   await this.props.createOrOpenChat(
                     [...userNames.map((user) => user.profile.id), profile.id],
                     profile.id
                   );
+                  this.props.removeLoading("DMS");
                 }}
               >
                 Create Chat
@@ -174,41 +177,60 @@ export class Dms extends Component {
             )}
           </View>
         )}
-        <View style={{ zIndex: 1 }}>
-          <ScrollView style={{}}>
-            {chats &&
-              chats.length > 0 &&
-              chats.map((chat, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={async () => {
-                    await this.props.viewMoreChats(chat, 0);
-                    this.mounted && this.setState({ showingChat: true });
-                  }}
-                  style={styles.listItemContainerChat}
-                >
-                  {chat &&
-                    chat.members &&
-                    chat.members.length > 0 &&
-                    chat.members.map((member, index) => (
-                      <View key={index} style={styles.messageMember}>
-                        <Image
-                          source={
-                            member && member.image
-                              ? { uri: member.image.signedUrl }
-                              : require("../../../assets/no-profile-pic-icon-27.jpg")
-                          }
-                          style={styles.commentImg}
-                        />
-                        <Text style={styles.listItemTextUser}>
-                          {member.user.userName}
-                        </Text>
-                      </View>
-                    ))}
-                </TouchableOpacity>
-              ))}
-          </ScrollView>
-        </View>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                this.mounted && this.setState({ refreshing: true });
+                await this.props.viewChats(0);
+                this.mounted && this.setState({ refreshing: false });
+              }}
+            />
+          }
+          style={{ zIndex: 1 }}
+        >
+          {chats &&
+            chats.length > 0 &&
+            chats.map((chat, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={async () => {
+                  this.props.addLoading("DMS");
+                  await this.props.viewMoreChats(chat, 0);
+                  this.props.navigate("Chat");
+                  this.mounted && this.setState({ showingChat: true });
+                  this.props.removeLoading("DMS");
+                }}
+                style={styles.listItemContainerChat}
+              >
+                {chat &&
+                  chat.members &&
+                  chat.members.length > 0 &&
+                  chat.members
+                    .filter((member) => member)
+                    .map(
+                      (member, index) =>
+                        member &&
+                        member.user && (
+                          <View key={index} style={styles.messageMember}>
+                            <Image
+                              source={
+                                member && member.image
+                                  ? { uri: member.image.signedUrl }
+                                  : require("../../../assets/no-profile-pic-icon-27.jpg")
+                              }
+                              style={styles.commentImg}
+                            />
+                            <Text style={styles.listItemTextUser}>
+                              {member.user.userName}
+                            </Text>
+                          </View>
+                        )
+                    )}
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
       </TouchableOpacity>
     );
     return app;
@@ -219,7 +241,6 @@ const mapStateToProps = (state) => ({
   chats: state.chat.chats,
   showingChat: state.chat.showingChat,
   activeChats: state.chat.activeChats,
-  activeChatId: state.chat.activeChatId,
   socket: state.auth.socket,
   profile: state.auth.user.profile,
 });
@@ -229,4 +250,7 @@ export default connect(mapStateToProps, {
   viewMoreChats,
   searchUsers,
   createOrOpenChat,
+  addLoading,
+  removeLoading,
+  navigate,
 })(Dms);

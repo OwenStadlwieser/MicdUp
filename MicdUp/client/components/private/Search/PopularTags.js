@@ -1,0 +1,84 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+// components
+import { View, Text, Dimensions, TouchableHighlight } from "react-native";
+import { SnapList, SnapItem } from "react-snaplist-carousel";
+import CircleSnail from "react-native-progress/CircleSnail";
+// redux
+import { getPopularTags } from "../../../redux/actions/tag";
+import { styles } from "../../../styles/Styles";
+
+const { height, width } = Dimensions.get("screen");
+export class PopularTags extends Component {
+  constructor() {
+    super();
+    this.state = {
+      loading: false,
+      tags: [],
+    };
+
+    this.mounted = true;
+  }
+
+  componentWillUnmount = () => (this.mounted = false);
+
+  componentDidMount = async () => {
+    this.mounted && this.setState({ loading: true });
+    const tags = await this.props.getPopularTags();
+    this.mounted && this.setState({ loading: false, tags });
+  };
+
+  render() {
+    const { tags, loading } = this.state;
+
+    return (
+      <SnapList style={{ height: height * 0.15, flex: "initial" }}>
+        {loading && (
+          <View
+            style={{
+              position: "absolute",
+              top: height * 0.075,
+              left: width * 0.5,
+            }}
+          >
+            <CircleSnail color={["black", "#6FF6FF"]} />
+          </View>
+        )}
+        {tags &&
+          tags.map((tag, index) => (
+            <SnapItem
+              height={height * 0.15}
+              margin={{ left: `15px` }}
+              snapAlign="center"
+              key={index}
+            >
+              <TouchableHighlight
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: width * 0.2,
+                  shadowColor: "black",
+                  shadowRadius: 5,
+                  paddingHorizontal: 10,
+                }}
+                underlayColor="#6FF6FF"
+                onPress={() => {
+                  this.props.setSelectedTag(tag);
+                }}
+              >
+                <Text style={styles.tagTitle}>{tag.title}</Text>
+              </TouchableHighlight>
+            </SnapItem>
+          ))}
+      </SnapList>
+    );
+  }
+}
+
+const mapStateToProps = (state) => ({});
+
+export default connect(mapStateToProps, {
+  getPopularTags,
+})(PopularTags);

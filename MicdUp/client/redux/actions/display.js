@@ -1,6 +1,4 @@
 import {
-  CHANGE_LOGIN,
-  CHANGE_SIGNUP,
   DISPLAY_MESSAGE,
   HIDE_MESSAGE,
   NAVIGATE,
@@ -9,8 +7,44 @@ import {
   RECEIVE_NOTIF,
   HIDE_NOTIF,
   SHOW_COMMENTS,
-  HIDE_COMMENTS,
+  ADD_LOADING,
+  REMOVE_LOADING,
+  SET_CURRENT_KEY,
+  VIEW_TAG_SEARCH,
+  SHOW_HEADER,
+  SET_LIST,
+  SHOW_SOUND_MODAL,
 } from "../types";
+
+import { createNavigationContainerRef } from "@react-navigation/native";
+export const navigationRef = createNavigationContainerRef();
+export const navigationRefSearch = createNavigationContainerRef();
+export const setCurrentKey = (payload) => (dispatch) => {
+  dispatch({
+    type: SET_CURRENT_KEY,
+    payload: { currentKey: payload },
+  });
+};
+
+export const showSoundModal = (payload) => (dispatch) => {
+  dispatch({
+    type: SHOW_SOUND_MODAL,
+    payload,
+  });
+};
+export const addLoading = (payload) => (dispatch) => {
+  dispatch({
+    type: ADD_LOADING,
+    payload,
+  });
+};
+
+export const removeLoading = (payload) => (dispatch) => {
+  dispatch({
+    type: REMOVE_LOADING,
+    payload,
+  });
+};
 
 export const receiveNotif = (payload) => (dispatch) => {
   dispatch({
@@ -19,17 +53,19 @@ export const receiveNotif = (payload) => (dispatch) => {
   });
 };
 
-export const showComments = (payload) => (dispatch) => {
+export const showComments = (payload, currentKey) => (dispatch) => {
+  console.log(currentKey, payload, 4343);
+  dispatch({
+    type: SET_CURRENT_KEY,
+    payload: { currentKey },
+  });
   dispatch({
     type: SHOW_COMMENTS,
     payload,
   });
-};
-
-export const hideComments = () => (dispatch) => {
-  dispatch({
-    type: HIDE_COMMENTS,
-  });
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("Comment");
+  }
 };
 
 export const hideNotif = (payload) => (dispatch) => {
@@ -39,18 +75,6 @@ export const hideNotif = (payload) => (dispatch) => {
   });
 };
 
-export const changeLogin = (payload) => (dispatch) => {
-  dispatch({
-    type: CHANGE_LOGIN,
-    payload,
-  });
-};
-export const changeSignup = (payload) => (dispatch) => {
-  dispatch({
-    type: CHANGE_SIGNUP,
-    payload,
-  });
-};
 export const showMessage = (payload) => (dispatch) => {
   dispatch({
     type: DISPLAY_MESSAGE,
@@ -63,11 +87,40 @@ export const showMessage = (payload) => (dispatch) => {
   }, 3000);
 };
 
+export const showHeader = (payload) => (dispatch) => {
+  dispatch({
+    type: SHOW_HEADER,
+    payload,
+  });
+};
 export const navigate = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(payload);
+  }
+
   dispatch({
     type: NAVIGATE,
     payload,
   });
+};
+
+export const setList = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("ListOfAccounts");
+  }
+  dispatch({
+    type: SET_LIST,
+    payload,
+  });
+};
+
+export const navigateStateChanged = (payload) => (dispatch) => {
+  if (navigationRef.isReady()) {
+    dispatch({
+      type: NAVIGATE,
+      payload: navigationRef.current.getCurrentRoute().name,
+    });
+  }
 };
 
 export const viewProfile = (payload) => (dispatch) => {
@@ -82,4 +135,26 @@ export const searchViewProfile = (payload) => (dispatch) => {
     type: VIEW_PROFILE_SEARCH,
     payload,
   });
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("SearchProfile");
+  }
 };
+
+export const searchViewTag = (payload) => (dispatch) => {
+  dispatch({
+    type: VIEW_TAG_SEARCH,
+    payload,
+  });
+  if (navigationRef.isReady()) {
+    navigationRef.navigate("SearchFeed");
+  }
+};
+
+export const searchNavigate =
+  (payload = "Search") =>
+  (dispatch) => {
+    console.log(navigationRefSearch.isReady());
+    if (navigationRefSearch.isReady()) {
+      navigationRefSearch.navigate(payload);
+    }
+  };

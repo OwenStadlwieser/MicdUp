@@ -17,12 +17,15 @@ const small = normalize(15);
 const medium = normalize(17);
 const large = normalize(20);
 const xl = normalize(24);
-const postHeight = width > 1000 ? height * 0.25 : height * 0.14;
+const postHeight = width > 1000 ? height * 0.35 : height * 0.23;
 const postPadding = height * 0.02;
+const chatWidth = width * 0.8;
 const filterHeight = height * 0.2;
 const postWidth = width > 1000 ? width * 0.8 : width;
 const listItemHeight = height * 0.08;
 const listItemHeight2X = listItemHeight * 2;
+const contentPaneHeight = height * 0.875;
+const contentPaneWithHeaderHeight = height * 0.775;
 const largeIconFontSize =
   width * 0.24 < (height * 0.21) / 1.7 - 10
     ? width * 0.24
@@ -30,7 +33,7 @@ const largeIconFontSize =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
@@ -38,7 +41,23 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     flex: 10,
-    paddingTop: 15,
+  },
+  avoidingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchTags: {
+    display: "flex",
+    flexDirection: "column",
+    width,
+    flex: 1,
+    justifyContent: "space-evenly",
+  },
+  appBarHeader: {
+    width,
+    height: height * 0.1,
+    zIndex: 51,
   },
   recordingContainerComments: {
     width,
@@ -51,9 +70,11 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderTopWidth: 1,
     marginTop: 10,
+    backgroundColor: "white",
   },
   chatPane: {
-    height: height * 0.9,
+    height: contentPaneHeight,
+    display: "flex",
   },
   recordingContainerChat: {
     width,
@@ -69,7 +90,7 @@ const styles = StyleSheet.create({
   },
   textInputComments: {
     borderWidth: 2,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     flex: 7,
   },
@@ -81,14 +102,14 @@ const styles = StyleSheet.create({
   },
   commentParent: {},
   commentOpenContainer: {
-    height: height * 0.85,
     backgroundColor: "white",
     borderWidth: 2,
     borderStyle: "solid",
     borderColor: "black",
     borderRadius: 8,
     width: width > 1000 ? width * 0.6 : width,
-    position: "absolute",
+    position: "relative",
+    flex: 1,
     zIndex: 3,
     top: 0,
     left: 0,
@@ -107,13 +128,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: "black",
     width: width * 0.6,
-    height: 40,
     borderRadius: 10,
     marginTop: height * 0.05,
     position: "relative",
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: "black",
     fontStyle: "italic",
   },
   forgotPassButton: {
@@ -229,39 +246,39 @@ const styles = StyleSheet.create({
   },
   containerPrivate: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
   },
   contentContainer: {
     flex: 9,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     width: width,
   },
   pane: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
     justifyContent: "center",
     alignItems: "center",
   },
   paneSpaceEvenly: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
     justifyContent: "space-evenly",
     alignItems: "center",
   },
   paneUncentered: {
     flex: 1,
-    backgroundColor: "#1A3561",
+    backgroundColor: "#000000",
     width: width,
-    height: height * 0.9,
+    height: contentPaneHeight,
   },
   profileHeader: {
     width,
@@ -294,15 +311,10 @@ const styles = StyleSheet.create({
     height: height * 0.1,
     display: "flex",
     justifyContent: "center",
-    borderBottomWidth: 2,
-    borderColor: "gray",
-    borderStyle: "solid",
   },
   activeNavbarButton: {
     width: width * 0.2,
-    borderBottomWidth: 4,
-    borderColor: "black",
-    borderStyle: "solid",
+    color: "#6FF6FF",
     textAlign: "center",
     height: height * 0.1,
     display: "flex",
@@ -314,14 +326,14 @@ const styles = StyleSheet.create({
     fontSize: small,
   },
   navbar: {
-    flex: 1,
     flexDirection: "row",
     width: width,
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
     borderTopWidth: 1,
-    borderTopColor: "#1A3561",
+    borderTopColor: "#000000",
+    height: height * 0.125,
   },
   modalContainer: {
     zIndex: 998,
@@ -357,7 +369,7 @@ const styles = StyleSheet.create({
   toptopLeftIcon: {
     position: "absolute",
     left: width * 0.08,
-    top: height * 0.04,
+    top: height * 0.08,
   },
   topRightIcon: {
     position: "absolute",
@@ -368,7 +380,7 @@ const styles = StyleSheet.create({
   toptopRightIcon: {
     position: "absolute",
     right: width * 0.08,
-    top: height * 0.04,
+    top: height * 0.08,
     zIndex: 2,
   },
   largeIcon: {
@@ -376,7 +388,7 @@ const styles = StyleSheet.create({
   },
   settingsOptionsContainer: {
     width,
-    marginTop: height * 0.1,
+    marginTop: height * 0.125,
     height: height * 0.8,
   },
   settingsOption: {
@@ -385,7 +397,7 @@ const styles = StyleSheet.create({
     height: height * 0.15,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     backgroundColor: "white",
     paddingLeft: width * 0.05,
@@ -419,6 +431,21 @@ const styles = StyleSheet.create({
     height: height * 0.05,
     zIndex: 99,
   },
+  deleteItemContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    minHeight: 0,
+    paddingBottom: 20,
+    maxHeight: height * 0.2,
+    overflow: "scroll",
+  },
+  tagTitle: {
+    fontWeight: "700",
+    fontStyle: "italic",
+    fontSize: large,
+  },
   postContainer: {
     height: postHeight,
     width: postWidth,
@@ -430,6 +457,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: "row",
     position: "relative",
+    paddingVertical: 10,
+    overflow: "scroll",
+  },
+  notif: {
+    borderRadius: 8,
+    borderWidth: 2,
+    marginBottom: postPadding,
+    backgroundColor: "white",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    position: "relative",
+    paddingVertical: 10,
+    overflow: "scroll",
   },
   higherPostContainer: {
     height: postHeight,
@@ -451,9 +493,9 @@ const styles = StyleSheet.create({
     fontSize: large,
   },
   postTitle: {
-    flex: 1,
     fontStyle: "italic",
     fontSize: width > 1000 ? medium : large,
+    fontWeight: "700",
   },
   textAndPlayButtonContainer: {
     flexDirection: "row",
@@ -514,7 +556,7 @@ const styles = StyleSheet.create({
   },
   commentActionsDiv: {
     flexDirection: "row",
-    borderLeftColor: "#1A3561",
+    borderLeftColor: "#000000",
     borderStyle: "solid",
     borderLeftWidth: 1,
   },
@@ -534,7 +576,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     flexDirection: "row",
-    borderLeftColor: "#1A3561",
+    borderLeftColor: "#000000",
     borderStyle: "solid",
     borderLeftWidth: 1,
   },
@@ -566,32 +608,30 @@ const styles = StyleSheet.create({
     width: height * 0.15,
     borderRadius: height * 0.15,
   },
-  messagesContainer: {
-    flexDirection: "column",
-    height: height * 0.6,
+  messagesParentContainer: {
     marginTop: height * 0.1,
     paddingTop: height * 0.03,
+    flex: 6,
+  },
+  messagesContainer: {
+    flexDirection: "column",
   },
   userChat: {
     left: 0,
     backgroundColor: "white",
-    width: width * 0.6,
-    flexDirection: "row",
+    width: chatWidth,
+    flexDirection: "column",
     borderRadius: 8,
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
     alignItems: "center",
     marginTop: 20,
     marginLeft: width * 0.05,
   },
   foreignChat: {
-    marginLeft: width * 0.35,
+    marginLeft: width * 0.15,
     backgroundColor: "gray",
-    width: width * 0.6,
-    flexDirection: "row",
+    width: chatWidth,
+    flexDirection: "column",
     borderRadius: 8,
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
     alignItems: "center",
     marginTop: 20,
   },
@@ -703,7 +743,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderStyle: "solid",
     alignItems: "center",
     borderRadius: 20,
@@ -751,7 +791,7 @@ const styles = StyleSheet.create({
   },
   listItemContainer: {
     height: listItemHeight,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderStyle: "solid",
     padding: 10,
@@ -763,7 +803,7 @@ const styles = StyleSheet.create({
   },
   listItemContainerUser: {
     height: listItemHeight,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderStyle: "solid",
     padding: 10,
@@ -776,7 +816,7 @@ const styles = StyleSheet.create({
   },
   listItemContainerChat: {
     height: height * 0.1,
-    borderColor: "#1A3561",
+    borderColor: "#000000",
     borderWidth: 2,
     borderRadius: 8,
     paddingVertical: 10,
@@ -806,6 +846,59 @@ const styles = StyleSheet.create({
   deletePromptButton: {
     marginHorizontal: 8,
   },
+  loadingContainer: {
+    height,
+    width: width * 0.3,
+    left: width * 0.35,
+    position: "absolute",
+    justifyContent: "center",
+    zIndex: 67,
+    alignItems: "center",
+  },
+});
+
+const listStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    flex: 1,
+  },
+  backTextWhite: {
+    color: "#FFF",
+  },
+  rowFront: {
+    alignItems: "center",
+    backgroundColor: "#CCC",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    height: 50,
+  },
+  rowBack: {
+    alignItems: "center",
+    backgroundColor: "transparent",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 15,
+    right: 0,
+    width,
+  },
+  backRightBtn: {
+    alignItems: "center",
+    bottom: 0,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    width: 75,
+    borderWidth: 2,
+    zIndex: -1,
+  },
+  backRightBtnRight: {
+    backgroundColor: "white",
+    right: 0,
+    height: postHeight,
+    borderRadius: 8,
+  },
 });
 
 export {
@@ -820,4 +913,6 @@ export {
   large,
   listItemHeight,
   listItemHeight2X,
+  listStyles,
+  chatWidth,
 };

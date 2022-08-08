@@ -4,6 +4,7 @@ import {
   UPDATE_FOLLOW_COUNTS,
   UPDATE_PRIVATE_COUNT,
   UPDATE_PRIVATE_COUNT_FROM_LIST,
+  CURRENT_PROFILE_BLOCKED,
 } from "../types";
 import { privateClient, publicClient } from "../../apollo/client";
 import { showMessage } from "./display";
@@ -14,8 +15,41 @@ import {
   GET_PRIVATES_QUERY,
   ADD_TO_PRIVATES_MUTATION,
   GET_FOLLOWING_QUERY,
+  BLOCK_PROFILE_MUTATION,
 } from "../../apollo/private/profile";
 
+export const blockProfile = (profileId, blocking) => async (dispatch) => {
+  const res = await privateClient.mutate({
+    mutation: BLOCK_PROFILE_MUTATION,
+    variables: {
+      profileId,
+      blocking,
+    },
+    fetchPolicy: "no-cache",
+  });
+  if (!res.data || !res.data.blockProfile) {
+    dispatch(
+      showMessage({
+        success: false,
+        message: "Something went wrong. Please contact support.",
+      })
+    );
+    return !blocking;
+  }
+  if (res.data.blockProfile.success) {
+    dispatch({
+      type: CURRENT_PROFILE_BLOCKED,
+      payload: blocking,
+    });
+  }
+  dispatch(
+    showMessage({
+      success: res.data.blockProfile.success,
+      message: res.data.blockProfile.message,
+    })
+  );
+  return blocking;
+};
 export const followProfile =
   (profileId, followingFromProfile = true) =>
   async (dispatch) => {
@@ -36,11 +70,10 @@ export const followProfile =
         );
         return false;
       }
-      followingFromProfile &&
-        dispatch({
-          type: UPDATE_FOLLOWER_COUNT,
-          payload: { ...res.data.followProfile },
-        });
+      dispatch({
+        type: UPDATE_FOLLOWER_COUNT,
+        payload: { ...res.data.followProfile },
+      });
       return res.data.followProfile;
     } catch (err) {
       console.log(err);
@@ -213,11 +246,10 @@ export const addToPrivates =
             message: `${res.data.addToPrivates.user.userName} can no longer see your private posts`,
           })
         );
-      addingFromProfile &&
-        dispatch({
-          type: UPDATE_PRIVATE_COUNT,
-          payload: { ...res.data.addToPrivates },
-        });
+      dispatch({
+        type: UPDATE_PRIVATE_COUNT,
+        payload: { ...res.data.addToPrivates },
+      });
       return res.data.addToPrivates;
     } catch (err) {
       console.log(err);

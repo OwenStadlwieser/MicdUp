@@ -29,6 +29,7 @@ function useHttps(req, res, next) {
 }
 
 app.use(useHttps);
+
 let db = process.env.DATABASE.replace("<DB_PASSWORD>", process.env.DB_PASSWORD);
 db = db.replace("<DB_USERNAME>", process.env.DB_USERNAME);
 
@@ -83,6 +84,7 @@ app.use(async (req, res, next) => {
   req.host = req.get("host");
   next();
 });
+
 app.use((req, res, next) => {
   if (req.isAuthenticated)
     app.use("/private", graphqlHTTP({ schema: privateSchema, graphiql: true }));

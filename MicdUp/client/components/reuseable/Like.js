@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 // redux
 import { likePost } from "../../redux/actions/recording";
 import { updateCommentDisplay, likeComment } from "../../redux/actions/comment";
+import { addLoading, removeLoading } from "../../redux/actions/display";
 // icons
 import { AntDesign } from "@expo/vector-icons";
 // styles
@@ -18,12 +19,15 @@ export class Like extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  componentWillUnmount = () => {
+    this.props.removeLoading("COMMENT");
+    this.mounted = false;
+  };
 
   componentDidMount = () => {};
 
   render() {
-    const { post, type } = this.props;
+    const { post, type, postId, ownerId } = this.props;
     return (
       <View
         onStartShouldSetResponder={(event) => true}
@@ -35,14 +39,20 @@ export class Like extends Component {
         <View>
           <TouchableOpacity
             onPress={async () => {
+              this.props.addLoading("LIKE");
               if (type === "Comment") {
-                const newComment = await this.props.likeComment(post.id);
+                const newComment = await this.props.likeComment(
+                  post.id,
+                  post.owner.id
+                );
                 this.props.updateCommentDisplay(
                   newComment,
                   this.props.parents,
-                  this.props.postId
+                  { id: postId, owner: { id: ownerId } }
                 );
-              } else if (type === "Post") this.props.likePost(post.id);
+              } else if (type === "Post")
+                await this.props.likePost(post.id, this.props.currentKey);
+              this.props.removeLoading("LIKE");
             }}
           >
             <AntDesign
@@ -65,4 +75,6 @@ export default connect(mapStateToProps, {
   likePost,
   likeComment,
   updateCommentDisplay,
+  addLoading,
+  removeLoading,
 })(Like);

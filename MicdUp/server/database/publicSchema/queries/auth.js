@@ -3,6 +3,7 @@ const { GraphQLString } = require("graphql");
 const { MessageType } = require("../../types");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getCurrentTime } = require("../../../reusableFunctions/helpers");
 
 const login = {
   type: MessageType,
@@ -12,16 +13,25 @@ const login = {
   },
   async resolve(parent, { authenticator, password }, context) {
     const user = await User.findOne({
-      $or: [
-        { userName: authenticator },
-        { email: authenticator },
-        { phone: authenticator },
+      $and: [
+        {
+          $or: [
+            { userName: authenticator },
+            { email: authenticator },
+            { phone: authenticator },
+          ],
+        },
       ],
     });
     if (!user) {
       return {
         success: false,
         message: "No user with that identifier",
+      };
+    } else if (!user.emailVerified) {
+      return {
+        success: false,
+        message: "Email not verified",
       };
     }
     const isValid = await bcrypt.compare(password, user.password);
@@ -69,7 +79,7 @@ const forgotPassVerify = {
         message: "Invalid code",
       };
     }
-    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > Date.now()) {
+    if (user.resetPasswordCreatedAt + 1000 * 60 * 10 > getCurrentTime()) {
       return {
         success: false,
         message: "Token has expired",

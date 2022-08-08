@@ -17,10 +17,10 @@ export class DeleteableItem extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { onDelete, item, title, style, color } = this.props;
+    const { onDelete, item, title, style, color, icon = "delete" } = this.props;
     return (
       <Button
-        icon="delete"
+        icon={icon}
         color={color}
         mode="contained"
         onPress={onDelete}

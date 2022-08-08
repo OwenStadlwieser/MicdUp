@@ -4,8 +4,10 @@ const { Profile } = require("../database/models/Profile");
 const { Chat } = require("../database/models/Chat");
 const { User } = require("../database/models/User");
 const { Message, File } = require("../database/models/File");
+const { getCurrentTime } = require("../reusableFunctions/helpers");
 const fs = require("fs");
 var path = require("path");
+
 const {
   uploadFileFromBase64,
   getSignedUrl,
@@ -13,6 +15,7 @@ const {
 } = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
+  ffmpegGetDuration,
 } = require("../database/privateSchema/mutations/recording");
 var ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
@@ -41,7 +44,7 @@ exports = module.exports = function (io) {
       socket.on("new message", async function (data) {
         const { messageData, chatId, fileType, speechToText } = data;
         socket.profileId = userIds[socket.id];
-
+        console.log("new message");
         if (!socket.profileId) {
           throw new Error("must be logged in");
         }
@@ -59,6 +62,7 @@ exports = module.exports = function (io) {
           owner: socket.profileId,
           speechToText,
           fileExtension: ".mp4",
+          dateCreated: getCurrentTime(),
         });
 
         var fileTypeFixed = fileType.replace("audio/", "");
@@ -97,16 +101,18 @@ exports = module.exports = function (io) {
             if (
               image.signedUrl &&
               image.lastFetched &&
-              image.lastFetched + 60 * 30 < Date.now()
+              image.lastFetched + 60 * 30 < getCurrentTime()
             ) {
               image.signedUrl = image.signedUrl;
             } else {
               image.signedUrl = await getFile(image._id + image.fileExtension);
-              image.lastFetched = Date.now();
+              image.lastFetched = getCurrentTime();
               await image.save({ session });
             }
           }
           await ffmpegMergeAndUpload(fileName, message._id, fileNames, command);
+          const duration = await ffmpegGetDuration(fileName);
+          message.duration = duration;
           message.signedUrl = await getSignedUrl(`${message._id}.mp4`);
           await message.save({ session });
           chat.messages.push(message._id);
@@ -114,7 +120,7 @@ exports = module.exports = function (io) {
           await session.commitTransaction();
           let returnMessage = {};
           returnMessage.id = message._id;
-          returnMessage.dateCreated = message.dateCreated;
+          returnMessage.dateCreated = Math.floor(message.dateCreated.getTime());
           returnMessage.signedUrl = message.signedUrl;
           returnMessage.owner = {};
           returnMessage.owner.id = profileDoc._id;
@@ -122,7 +128,14 @@ exports = module.exports = function (io) {
           returnMessage.owner.user = {};
           returnMessage.owner.user._id = user._id;
           returnMessage.owner.user.userName = user.userName;
-          io.to(chatId).emit("new message", returnMessage, chat._id);
+          let blocked_member = false;
+          for (member in chat.members) {
+            if (profileDoc.blockedMap.get(`${member}`)) {
+              blocked_member = true;
+            }
+          }
+          !blocked_member &&
+            io.to(chatId).emit("new message", returnMessage, chat._id);
         } catch (err) {
           console.log(err);
           await session.abortTransaction();
