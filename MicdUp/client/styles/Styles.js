@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   chatPane: {
-    height: contentPaneHeight,
     display: "flex",
+    flex: 1,
   },
   recordingContainerChat: {
     width,
