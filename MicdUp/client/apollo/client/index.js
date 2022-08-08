@@ -2,11 +2,11 @@ import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { getData } from "../../reuseableFunctions/helpers";
 const httpLinkPublic = createHttpLink({
-  uri: "http://localhost:6002/public",
+  uri: "http://micdupdevbackend-env.eba-gwujqkuj.us-east-2.elasticbeanstalk.com/public",
 });
 
 const httpLinkPrivate = createHttpLink({
-  uri: "http://localhost:6002/private",
+  uri: "http://micdupdevbackend-env.eba-gwujqkuj.us-east-2.elasticbeanstalk.com/private",
 });
 
 const authLink = setContext(async (_, { headers }) => {
