@@ -7,6 +7,8 @@ import {
 } from "../../apollo/private/notifs";
 import { SET_NOTIFS, APPEND_NOTIFS, UPDATE_NOTIFS_UNSEEN } from "../types";
 import { showMessage } from "./display";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export const addToken = (token) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
@@ -28,7 +30,7 @@ export const addToken = (token) => async (dispatch) => {
     }
     return res.data.success;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -69,7 +71,7 @@ export const getUserNotifs = (skipMult) => async (dispatch) => {
     });
     return res.data.getUserNotifs;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -96,6 +98,6 @@ export const markNotifsAsSeen = () => async (dispatch) => {
     });
     return res.data.success;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };

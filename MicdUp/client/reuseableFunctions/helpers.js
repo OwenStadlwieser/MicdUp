@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { rollbar } from "../reuseableFunctions/constants";
 
 const storeData = async (key, value) => {
   try {
@@ -44,7 +45,7 @@ const playSound = async (uri, sound) => {
     await playbackObject.playAsync();
     return playbackObject;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 

@@ -1,4 +1,5 @@
 import { Audio } from "expo-av";
+import { rollbar } from "../reuseableFunctions/constants";
 
 import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
@@ -15,7 +16,7 @@ const startRecording = async (Voice, onRecordingStatusUpdate) => {
         (await Voice.isAvailable()) &&
         Voice.start("en-US");
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     const { recording } = await Audio.Recording.createAsync(
       Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
@@ -37,7 +38,7 @@ const stopRecording = async (recording, Voice) => {
   try {
     Voice && Platform.OS !== "web" && Voice.stop();
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
   return uri;
 };

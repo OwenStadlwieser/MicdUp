@@ -29,6 +29,8 @@ import {
   navigate,
   searchViewProfile,
 } from "../../redux/actions/display";
+// helpers
+import { rollbar } from "../../reuseableFunctions/constants";
 
 const { height, width } = Dimensions.get("window");
 export class ListOfAccounts extends Component {
@@ -86,7 +88,7 @@ export class ListOfAccounts extends Component {
           this.setState({ loading: false, data: [...data, ...res] });
       }
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   }
   render() {

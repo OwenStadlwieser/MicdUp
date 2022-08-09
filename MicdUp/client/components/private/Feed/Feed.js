@@ -29,6 +29,8 @@ import {
   getNotLoggedInFeed,
   getTopicsFeed,
 } from "../../../redux/actions/feed";
+// helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 const { height, width } = Dimensions.get("window");
 export class Feed extends Component {
@@ -141,11 +143,12 @@ export class Feed extends Component {
         await this.getData(Math.round(postsToView.length / 20));
       }
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   }
 
   render() {
+    rollbar.log("Hello world2");
     const { profile, cachedPosts, loggedIn } = this.props;
     const { loading, tag, following, outerScrollEnabled, refreshing } =
       this.state;

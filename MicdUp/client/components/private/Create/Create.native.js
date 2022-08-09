@@ -35,6 +35,8 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
+import { rollbar } from "../../../reuseableFunctions/constants";
+
 const { width, height } = Dimensions.get("window");
 const barWidth = 5;
 const barMargin = 1;
@@ -59,12 +61,12 @@ export class Create extends Component {
         console.log("end");
       };
       Voice.onSpeechError = async (err) => {
-        // console.log(err);
+        // rollbar.log(err);
         Voice.stop();
       };
       Voice.onSpeechResults = onSpeechResultsClips.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.mounted = true;
     this.colors = ["white", "red"];
@@ -107,7 +109,7 @@ export class Create extends Component {
       console.log("stopping");
       Voice && Platform.OS !== "web" && Voice.stop();
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&

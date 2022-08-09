@@ -56,6 +56,8 @@ import {
   startRecording,
   stopRecording,
 } from "../../../reuseableFunctions/recording";
+// helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 var { height, width } = Dimensions.get("window");
 const barWidth = 5;
@@ -105,7 +107,7 @@ export class Profile extends Component {
         this.mounted && this.setState({ loading: false });
       }
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   }
 

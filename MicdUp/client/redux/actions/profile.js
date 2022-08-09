@@ -17,6 +17,7 @@ import {
   GET_FOLLOWING_QUERY,
   BLOCK_PROFILE_MUTATION,
 } from "../../apollo/private/profile";
+import { rollbar } from "../../reuseableFunctions/constants";
 
 export const blockProfile = (profileId, blocking) => async (dispatch) => {
   const res = await privateClient.mutate({
@@ -76,7 +77,7 @@ export const followProfile =
       });
       return res.data.followProfile;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -87,7 +88,7 @@ export const updateFollowCounts = (followingCount) => (dispatch) => {
       payload: { followingCount },
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -98,7 +99,7 @@ export const updatePrivateCounts = (privatesCount) => (dispatch) => {
       payload: { privatesCount },
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -132,7 +133,7 @@ export const updateProfilePic =
       });
       return true;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -159,7 +160,7 @@ export const getFollowersQuery =
       }
       return res.data.getFollowers;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -184,7 +185,7 @@ export const getFollowingQuery = (profileId, skipMult) => async (dispatch) => {
     }
     return res.data.getFollowing;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -208,7 +209,7 @@ export const getPrivatesQuery = (skipMult) => async (dispatch) => {
     }
     return res.data.getPrivates;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -252,6 +253,6 @@ export const addToPrivates =
       });
       return res.data.addToPrivates;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };

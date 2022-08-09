@@ -3,6 +3,8 @@ import { AppRegistry, Platform, NativeModules } from "react-native";
 import Root from "./Root";
 import { Provider } from "react-redux";
 import store from "./redux/index";
+import { rollbar } from "./reuseableFunctions/constants";
+import { Provider as RollbarProvider } from "@rollbar/react";
 
 export default function App() {
   // if (Platform.OS === "ios") {
@@ -10,10 +12,13 @@ export default function App() {
   //     console.log(string);
   //   });
   // }
+  rollbar.log("Hello World");
   return (
-    <Provider store={store}>
-      <Root />
-    </Provider>
+    <RollbarProvider instance={rollbar}>
+      <Provider store={store}>
+        <Root />
+      </Provider>
+    </RollbarProvider>
   );
 }
 AppRegistry.registerComponent("main", () => App);

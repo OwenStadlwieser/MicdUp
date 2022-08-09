@@ -37,6 +37,8 @@ import {
   forHumans,
 } from "../../../reuseableFunctions/helpers";
 import RecordingControls from "../../reuseable/RecordingControls";
+// helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 const { width, height } = Dimensions.get("window");
 
@@ -56,7 +58,7 @@ export class Chat extends Component {
       Voice.onSpeechResults = onSpeechResults.bind(this);
       Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.scrollView = null;
     this.mounted = true;

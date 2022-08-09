@@ -33,6 +33,8 @@ import { showMessage } from "./display";
 import { setCurrentKey } from "./display";
 import store from "../index";
 import { SHOW_MORE_REPLIES } from "../../apollo/private/comment";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export function checkIfLoggedIn() {
   let { loggedIn } = store.getState().auth;
   if (loggedIn) {
@@ -153,7 +155,7 @@ export const uploadRecording =
         payload: "Feed",
       });
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -183,7 +185,7 @@ export const openSpecificPost = (postId, commentId) => async (dispatch) => {
       payload: post,
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 export const uploadBio =
@@ -222,7 +224,7 @@ export const uploadBio =
       });
       return true;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 export const getUserPosts = (userId, skipMult) => async (dispatch) => {
@@ -259,7 +261,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
     });
     return res.data.getUserPosts;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -297,7 +299,7 @@ export const likePost = (postId, currentKey) => async (dispatch) => {
     });
     return res.data.likePost;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -337,7 +339,7 @@ export const deletePost = (postId, currentKey) => async (dispatch) => {
     }
     return res.data.deletePost;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -373,7 +375,7 @@ export const getComments =
       });
       return res.data.getComments;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 export const commentPost =
@@ -422,7 +424,7 @@ export const commentPost =
       });
       return res.data.commentToPost;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -465,6 +467,6 @@ export const getRecordingsFromTag =
       });
       return res.data.getRecordingsFromTag;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };

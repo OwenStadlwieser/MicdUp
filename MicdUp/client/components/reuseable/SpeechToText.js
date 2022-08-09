@@ -3,6 +3,9 @@ import { connect } from "react-redux";
 import { View, Text, Animated, Dimensions, Platform } from "react-native";
 import rnTextSize, { TSFontSpecs } from "react-native-text-size";
 import { styles } from "../../styles/Styles";
+// helpers
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export class SpeechToText extends Component {
   constructor() {
     super();
@@ -189,7 +192,7 @@ export class SpeechToText extends Component {
         }
       });
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 

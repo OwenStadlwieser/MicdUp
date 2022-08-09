@@ -1,5 +1,7 @@
 import { publicClient } from "../../apollo/client/index";
 import { GET_FILTERS_QUERY } from "../../apollo/private/filter";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 let previousQuery = -1;
 export const getFilters =
   (skipMult = 0) =>
@@ -15,6 +17,6 @@ export const getFilters =
       });
       return res.data.getFilters;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };

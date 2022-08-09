@@ -45,6 +45,7 @@ import {
 import { showHeader } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 // helpers
+import { rollbar } from "../../reuseableFunctions/constants";
 import { forHumans, getCurrentTime } from "../../reuseableFunctions/helpers";
 import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 const { height } = Dimensions.get("window");
@@ -66,7 +67,7 @@ export class Comment extends Component {
       Voice.onSpeechResults = onSpeechResults.bind(this);
       Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.colors = ["white", "red"];
     this.mounted = true;

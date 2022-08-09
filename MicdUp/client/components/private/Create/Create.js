@@ -30,6 +30,8 @@ import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
+//helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 export class Create extends Component {
   constructor() {
@@ -52,7 +54,7 @@ export class Create extends Component {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
       Voice.onSpeechStart = this.onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.mounted = true;
     this.colors = ["white", "red"];
@@ -110,7 +112,7 @@ export class Create extends Component {
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
