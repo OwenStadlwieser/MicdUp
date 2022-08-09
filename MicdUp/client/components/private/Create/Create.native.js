@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // components
 import EditRecording from "./EditRecording";
@@ -227,42 +227,44 @@ export class Create extends Component {
           </View>
           <View style={styles.iconContainer}>
             {!recording && (
-              <TouchableOpacity
-                onPress={async () => {
-                  await this.startRecording();
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="microphone-plus"
-                  size={75}
-                  color="red"
-                  style={styles.recordingMicIcon}
-                />
-              </TouchableOpacity>
+              <Fragment>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await this.startRecording();
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="microphone-plus"
+                    size={75}
+                    color="red"
+                    style={styles.recordingMicIcon}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    if (recording) {
+                      await this.stopRecording();
+                    }
+                    const currentClips = this.props.clips;
+                    if (!currentClips || currentClips.length === 0) {
+                      this.props.showMessage({
+                        success: false,
+                        message: "Record a clip before continuing",
+                      });
+                      return;
+                    }
+                    this.mounted && this.setState({ editRecording: true });
+                  }}
+                >
+                  <AntDesign
+                    style={styles.recordingCircleIcon}
+                    name="rightcircle"
+                    size={48}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              </Fragment>
             )}
-            <TouchableOpacity
-              onPress={async () => {
-                if (recording) {
-                  await this.stopRecording();
-                }
-                const currentClips = this.props.clips;
-                if (!currentClips || currentClips.length === 0) {
-                  this.props.showMessage({
-                    success: false,
-                    message: "Record a clip before continuing",
-                  });
-                  return;
-                }
-                this.mounted && this.setState({ editRecording: true });
-              }}
-            >
-              <AntDesign
-                style={styles.recordingCircleIcon}
-                name="rightcircle"
-                size={48}
-                color="white"
-              />
-            </TouchableOpacity>
           </View>
           <TouchableOpacity
             onPress={async () => {
@@ -297,22 +299,20 @@ export class Create extends Component {
         )}
         {recording && (
           <TouchableOpacity
-            onPress={async () => {
-              await this.stopRecording();
-            }}
             style={{
               alignItems: "center",
               justifyContent: "center",
               fontSize: 50,
               position: "absolute",
               bottom: height * 0.08,
-              width,
-              left: 0,
               opacity: 1.0,
               zIndex: 6,
             }}
           >
             <FontAwesome5
+              onPress={async () => {
+                await this.stopRecording();
+              }}
               style={{
                 fontSize: largeIconFontSize,
                 opacity: 1.0,

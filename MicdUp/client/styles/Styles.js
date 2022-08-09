@@ -523,6 +523,7 @@ const styles = StyleSheet.create({
     flex: 3,
     width: width,
     flexDirection: "row",
+    zIndex: 6,
   },
   iconSmallContainer: {
     width: width * 0.15,
@@ -533,6 +534,7 @@ const styles = StyleSheet.create({
     width: width * 0.7,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 6,
   },
   recordingMicIcon: {
     paddingLeft: 10,
@@ -837,7 +839,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontSize: large,
     color: "black",
-    marginRight: 8,
+    paddingRight: 18,
   },
   promptTopic: {
     flexDirection: "row",
@@ -847,7 +849,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     left: width * 0.05,
     borderRadius: 24,
-    zIndex: 2,
+    zIndex: 6,
   },
   deletePromptButton: {
     marginHorizontal: 8,
