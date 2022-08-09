@@ -105,6 +105,9 @@ export class Feed extends Component {
     await this.getData(0);
   };
 
+  componentWillUnmount = () => {
+    this.props.removeLoading("Feed");
+  };
   componentDidUpdate = async (prevProps) => {
     const { loggedIn, tag } = this.props;
     const tag2 = this.state.tag;
