@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 // styles
-import { listStyles, styles, postHeight } from "../../../styles/Styles";
+import { listStyles, styles, postHeight, small } from "../../../styles/Styles";
 // components
 import { Appbar, Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -211,7 +211,19 @@ export class Feed extends Component {
                 this.mounted && this.setState({ following: true });
               }}
             >
-              <Text style={styles.nextButtonText}>FOLLOWING</Text>
+              <Text
+                style={
+                  (styles.nextButtonText,
+                  {
+                    color: following ? "white" : "black",
+                    fontStyle: "italic",
+                    fontSize: small,
+                    fontWeight: "600",
+                  })
+                }
+              >
+                FOLLOWING
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
@@ -238,7 +250,19 @@ export class Feed extends Component {
                 this.mounted && this.setState({ following: false });
               }}
             >
-              <Text style={styles.nextButtonText}>TOPICS</Text>
+              <Text
+                style={
+                  (styles.nextButtonText,
+                  {
+                    color: !following ? "white" : "black",
+                    fontStyle: "italic",
+                    fontSize: small,
+                    fontWeight: "600",
+                  })
+                }
+              >
+                TOPICS
+              </Text>
             </TouchableOpacity>
           </View>
         )}
