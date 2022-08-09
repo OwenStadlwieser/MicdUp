@@ -34,6 +34,10 @@ exports = module.exports = function (io) {
           throw new Error("Invalid token");
         }
         const profile = await Profile.findOne({ user: userId.user });
+        if (!profile) {
+          console.log("unable to find profile");
+          return;
+        }
         socket.profileId = profile._id;
         for (let i = 0; i < profile.chats.length; i++) {
           socket.join(profile.chats[i].toString());
