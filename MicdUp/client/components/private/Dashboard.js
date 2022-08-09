@@ -32,7 +32,7 @@ import NotificationView from "./Notifs/NotificationView";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import Header from "../reuseable/Header";
-
+import { baseUrl } from "../../reuseableFunctions/constantsshared";
 const { width, height } = Dimensions.get("window");
 
 const MyTheme = {
@@ -69,11 +69,18 @@ export class Dashboard extends Component {
       this.props.logout();
     } else {
       const token = await getData("token");
-      const socket = io.connect("http://localhost:6002/");
+      console.log(baseUrl);
+      const socket = io.connect(baseUrl);
       socket.emit("new user", token);
       socket.on("new message", async function (message, chatId) {
         console.log("recieved", message);
         chatRecieved(message, chatId);
+      });
+      socket.on("disconnected", async function () {
+        const token = await getData("token");
+        if (token) {
+          socket.emit("new user", token);
+        }
       });
       this.props.setSocket(socket);
     }
@@ -93,6 +100,7 @@ export class Dashboard extends Component {
       userName,
       activeChatMembers,
       currentProfile,
+      socket,
     } = this.props;
     return (
       <Fragment>

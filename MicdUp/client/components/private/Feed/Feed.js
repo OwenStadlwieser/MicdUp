@@ -148,7 +148,6 @@ export class Feed extends Component {
   }
 
   render() {
-    rollbar.log("Hello world2");
     const { profile, cachedPosts, loggedIn } = this.props;
     const { loading, tag, following, outerScrollEnabled, refreshing } =
       this.state;

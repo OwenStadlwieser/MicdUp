@@ -12,7 +12,6 @@ export default function App() {
   //     console.log(string);
   //   });
   // }
-  rollbar.log("Hello World");
   return (
     <RollbarProvider instance={rollbar}>
       <Provider store={store}>
