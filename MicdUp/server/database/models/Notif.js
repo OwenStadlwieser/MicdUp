@@ -49,7 +49,7 @@ const notifSchema = new Schema(
     },
     seenByUser: {
       type: Boolean,
-      default: true,
+      default: false,
       required: true,
     },
   },
