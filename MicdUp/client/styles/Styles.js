@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    width,
   },
   postsContainer: {
     marginTop: height * 0.015,
@@ -835,12 +836,18 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     fontStyle: "italic",
     fontSize: large,
-    color: "#FFFFFF",
+    color: "black",
     marginRight: 8,
   },
   promptTopic: {
     flexDirection: "row",
     alignItems: "center",
+    position: "absolute",
+    width: width * 0.9,
+    backgroundColor: "white",
+    left: width * 0.05,
+    borderRadius: 24,
+    zIndex: 2,
   },
   deletePromptButton: {
     marginHorizontal: 8,

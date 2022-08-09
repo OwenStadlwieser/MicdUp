@@ -34,7 +34,7 @@ import Clips from "./Clips";
 import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
-import { Button } from "react-native-paper";
+import { addLoading } from "../../../redux/actions/display";
 import { rollbar } from "../../../reuseableFunctions/constants";
 
 const { width, height } = Dimensions.get("window");
@@ -91,7 +91,9 @@ export class Create extends Component {
   };
 
   startRecording = async () => {
+    this.props.addLoading("Create");
     const recording = await startRecording(Voice, () => {});
+    this.props.removeLoading("Create");
     this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
@@ -99,6 +101,7 @@ export class Create extends Component {
     const { recording, results } = this.state;
     const { clips } = this.props;
     console.log("Stopping recording..");
+    this.props.addLoading("Create");
 
     if (!recording || !recording.stopAndUnloadAsync) {
       return;
@@ -138,6 +141,7 @@ export class Create extends Component {
         v: 0,
       });
     this.props.updateClips(this.state.audioBlobs);
+    this.props.removeLoading("Create");
     console.log("Recording stopped and stored at", uri);
   };
 
@@ -159,6 +163,31 @@ export class Create extends Component {
       />
     ) : (
       <View style={styles.pane}>
+        {promptShown && (
+          <View style={styles.promptTopic}>
+            <TouchableOpacity
+              style={styles.deletePromptButton}
+              onPress={() => {
+                const { functionID } = this.state;
+                if (functionID) {
+                  clearTimeout(functionID);
+                }
+                this.mounted &&
+                  this.setState({
+                    promptShown: false,
+                    prompt: {},
+                    functionID: 0,
+                  });
+              }}
+              accessibilityLabel="Remove Prompt"
+            >
+              <AntDesign size={32} name="closecircleo" color="red" />
+            </TouchableOpacity>
+            <Text style={styles.promptText}>
+              {prompt.prompt ? prompt.prompt : ""}
+            </Text>
+          </View>
+        )}
         <View style={styles.recordingPeopleContainer}>
           <TouchableHighlight
             style={[
@@ -183,31 +212,6 @@ export class Create extends Component {
           >
             @{user ? user.userName : ""}
           </Text>
-          {promptShown && (
-            <View style={styles.promptTopic}>
-              <TouchableOpacity
-                style={styles.deletePromptButton}
-                onPress={() => {
-                  const { functionID } = this.state;
-                  if (functionID) {
-                    clearTimeout(functionID);
-                  }
-                  this.mounted &&
-                    this.setState({
-                      promptShown: false,
-                      prompt: {},
-                      functionID: 0,
-                    });
-                }}
-                accessibilityLabel="Remove Prompt"
-              >
-                <AntDesign size={32} name="closecircleo" color="white" />
-              </TouchableOpacity>
-              <Text style={styles.promptText}>
-                {prompt.prompt ? prompt.prompt : ""}
-              </Text>
-            </View>
-          )}
         </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
@@ -223,13 +227,18 @@ export class Create extends Component {
           </View>
           <View style={styles.iconContainer}>
             {!recording && (
-              <MaterialCommunityIcons
-                onPress={this.startRecording}
-                name="microphone-plus"
-                size={75}
-                color="red"
-                style={styles.recordingMicIcon}
-              />
+              <TouchableOpacity
+                onPress={async () => {
+                  await this.startRecording();
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="microphone-plus"
+                  size={75}
+                  color="red"
+                  style={styles.recordingMicIcon}
+                />
+              </TouchableOpacity>
             )}
             <TouchableOpacity
               onPress={async () => {
@@ -255,27 +264,29 @@ export class Create extends Component {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.iconSmallContainer}>
+          <TouchableOpacity
+            onPress={async () => {
+              const { functionID } = this.state;
+              this.mounted && this.setState({ promptShown: true });
+              if (functionID) {
+                clearTimeout(functionID);
+              }
+              const newPrompt = await this.props.randomPrompt();
+              this.mounted && this.setState({ prompt: newPrompt });
+              const newFunctionID = setTimeout(() => {
+                this.props.updateTags(newPrompt.tag.title);
+              }, 10000);
+              this.mounted && this.setState({ functionID: newFunctionID });
+            }}
+            style={styles.iconSmallContainer}
+          >
             <Fontisto
-              onPress={async () => {
-                const { functionID } = this.state;
-                this.mounted && this.setState({ promptShown: true });
-                if (functionID) {
-                  clearTimeout(functionID);
-                }
-                const newPrompt = await this.props.randomPrompt();
-                this.mounted && this.setState({ prompt: newPrompt });
-                const newFunctionID = setTimeout(() => {
-                  this.props.updateTags(newPrompt.tag.title);
-                }, 10000);
-                this.mounted && this.setState({ functionID: newFunctionID });
-              }}
               style={styles.recordingHashtagIcon}
               name="hashtag"
               size={24}
               color="white"
             />
-          </View>
+          </TouchableOpacity>
         </View>
         {recording && (
           <AudioRecordingVisualization
@@ -285,7 +296,10 @@ export class Create extends Component {
           />
         )}
         {recording && (
-          <View
+          <TouchableOpacity
+            onPress={async () => {
+              await this.stopRecording();
+            }}
             style={{
               alignItems: "center",
               justifyContent: "center",
@@ -299,9 +313,6 @@ export class Create extends Component {
             }}
           >
             <FontAwesome5
-              onPress={() => {
-                this.stopRecording();
-              }}
               style={{
                 fontSize: largeIconFontSize,
                 opacity: 1.0,
@@ -309,7 +320,7 @@ export class Create extends Component {
               name="record-vinyl"
               color={"red"}
             />
-          </View>
+          </TouchableOpacity>
         )}
       </View>
     );
@@ -327,5 +338,6 @@ export default connect(mapStateToProps, {
   updateClips,
   updateTags,
   showMessage,
+  addLoading,
   randomPrompt,
 })(Create);

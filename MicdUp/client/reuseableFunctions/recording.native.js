@@ -4,12 +4,13 @@ import { rollbar } from "../reuseableFunctions/constants";
 import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
   try {
+    rollbar.log("Requesting permission..");
     await Audio.requestPermissionsAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
       playsInSilentModeIOS: true,
     });
-    console.log("Starting recording..");
+    rollbar.log("Requesting Voice..");
     try {
       Voice &&
         Platform.OS !== "web" &&
@@ -18,14 +19,17 @@ const startRecording = async (Voice, onRecordingStatusUpdate) => {
     } catch (err) {
       rollbar.log(err);
     }
+    rollbar.log("Starting recording..");
     const { recording } = await Audio.Recording.createAsync(
       Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
       onRecordingStatusUpdate
     );
+    rollbar.log("Finished starting recording..");
+
     return recording;
     console.log("Recording started");
   } catch (err) {
-    console.error("Failed to start recording", err);
+    rollbar.error("Failed to start recording", err);
   }
 };
 
