@@ -34,7 +34,7 @@ import Clips from "./Clips";
 import { showMessage } from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
-import { addLoading } from "../../../redux/actions/display";
+import { addLoading, removeLoading } from "../../../redux/actions/display";
 import { rollbar } from "../../../reuseableFunctions/constants";
 
 const { width, height } = Dimensions.get("window");
@@ -339,5 +339,6 @@ export default connect(mapStateToProps, {
   updateTags,
   showMessage,
   addLoading,
+  removeLoading,
   randomPrompt,
 })(Create);
