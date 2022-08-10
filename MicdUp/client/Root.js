@@ -202,7 +202,7 @@ export class Root extends Component {
           <Navbar />
           {loading && (
             <View style={styles.loadingContainer}>
-              <CircleSnail size={60} color={["black", "#6FF6FF"]} />
+              <CircleSnail size={60} color={["white", "#6FF6FF"]} />
             </View>
           )}
           {showingSoundModal && <SoundModal />}
@@ -223,7 +223,7 @@ export class Root extends Component {
         <Fragment>
           {loading && (
             <View style={styles.loadingContainer}>
-              <CircleSnail size={60} color={["black", "#6FF6FF"]} />
+              <CircleSnail size={60} color={["white", "#6FF6FF"]} />
             </View>
           )}
           <Dashboard></Dashboard>

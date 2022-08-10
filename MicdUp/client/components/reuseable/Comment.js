@@ -430,7 +430,7 @@ export class Comment extends Component {
             justifyContent: "center",
           }}
         >
-          {loading && <CircleSnail color={["black", "#6FF6FF"]} />}
+          {loading && <CircleSnail color={["white", "#6FF6FF"]} />}
         </View>
       );
     }
@@ -483,7 +483,7 @@ export class Comment extends Component {
                 justifyContent: "center",
               }}
             >
-              {loading && <CircleSnail color={["black", "#6FF6FF"]} />}
+              {loading && <CircleSnail color={["white", "#6FF6FF"]} />}
             </View>
           )}
         </View>
