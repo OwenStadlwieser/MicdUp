@@ -11,7 +11,7 @@ import { Entypo } from "@expo/vector-icons";
 // styles
 import { listStyles, styles, postHeight, small } from "../../../styles/Styles";
 // components
-import { Appbar, Title } from "react-native-paper";
+import { Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
 import { Button } from "react-native-paper";
@@ -78,23 +78,26 @@ export class Feed extends Component {
       ),
     });
   };
+
   getData = async (skipMult) => {
     const { loggedIn, tag, navigation } = this.props;
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
     this.props.addLoading("Feed");
-    this.mounted && this.setState({ loading: true });
-    if (fromSearch && tag) {
-      this.mounted && this.setState({ tag: { ...tag } });
-      this.updateNavigationOptions(tag);
-      await this.props.getRecordingsFromTag(tag._id, skipMult);
-    } else if (!fromSearch && loggedIn) {
-      await this.props.getFollowingFeed(skipMult);
-    } else if (!loggedIn) {
-      await this.props.getNotLoggedInFeed(skipMult);
-    }
-    this.mounted && this.setState({ loading: false });
+    try {
+      this.mounted && this.setState({ loading: true });
+      if (fromSearch && tag) {
+        this.mounted && this.setState({ tag: { ...tag } });
+        this.updateNavigationOptions(tag);
+        await this.props.getRecordingsFromTag(tag._id, skipMult);
+      } else if (!fromSearch && loggedIn) {
+        await this.props.getFollowingFeed(skipMult);
+      } else if (!loggedIn) {
+        await this.props.getNotLoggedInFeed(skipMult);
+      }
+      this.mounted && this.setState({ loading: false });
+    } catch (err) {}
     this.props.removeLoading("Feed");
   };
 
@@ -108,6 +111,7 @@ export class Feed extends Component {
   componentWillUnmount = () => {
     this.props.removeLoading("Feed");
   };
+
   componentDidUpdate = async (prevProps) => {
     const { loggedIn, tag } = this.props;
     const tag2 = this.state.tag;
@@ -146,7 +150,7 @@ export class Feed extends Component {
         await this.getData(Math.round(postsToView.length / 20));
       }
     } catch (err) {
-      rollbar.log(err);
+      rollbar.error(err);
     }
   }
 
@@ -206,9 +210,13 @@ export class Feed extends Component {
                   cachedPosts["FOLLOWINGFEED"].length == 0
                 ) {
                   this.props.addLoading("Feed");
-                  this.mounted && this.setState({ loading: true });
-                  await this.props.getFollowingFeed(0);
-                  this.mounted && this.setState({ loading: false });
+                  try {
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getFollowingFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                  } catch (err) {
+                    rollbar.error(err);
+                  }
                   this.props.removeLoading("Feed");
                 }
                 this.mounted && this.setState({ following: true });
@@ -245,9 +253,13 @@ export class Feed extends Component {
                   cachedPosts["TOPICSFEED"].length == 0
                 ) {
                   this.props.addLoading("Feed");
-                  this.mounted && this.setState({ loading: true });
-                  await this.props.getTopicsFeed(0);
-                  this.mounted && this.setState({ loading: false });
+                  try {
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getTopicsFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                  } catch (err) {
+                    rollbar.error(err);
+                  }
                   this.props.removeLoading("Feed");
                 }
                 this.mounted && this.setState({ following: false });
