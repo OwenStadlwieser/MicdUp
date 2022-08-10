@@ -172,9 +172,9 @@ export class Profile extends Component {
   };
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("Profile");
     await this.stopRecordingBio();
     this.mounted = false;
-    this.props.removeLoading("Profile");
   };
 
   getPosts = async (fromRefresh = false) => {
