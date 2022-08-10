@@ -62,14 +62,12 @@ export class Bio extends Component {
 
   render() {
     const {
-      isUserProfile,
       startRecording,
+      isUserProfile,
       stopRecordingBio,
       currentSound,
-      profile,
       newBioRecording,
       bio,
-      id,
     } = this.props;
     const { isRecording } = this.state;
     return (
@@ -94,12 +92,16 @@ export class Bio extends Component {
             <TouchableOpacity
               onPress={async () => {
                 if (!isRecording || Platform.OS !== "web") {
-                  await startRecording();
-                  this.mounted && this.setState({ startTime: Date.now() });
                   try {
-                    Platform.OS !== "web" && Voice.start();
-                  } catch (err) {}
-                  this.mounted && this.setState({ isRecording: true });
+                    await startRecording();
+                    this.mounted && this.setState({ startTime: Date.now() });
+                    this.mounted && this.setState({ isRecording: true });
+                  } catch (err) {
+                    this.props.showMessage({
+                      success: false,
+                      message: "Unable to start recording",
+                    });
+                  }
                 } else {
                   try {
                     Platform.OS !== "web" && Voice.stop();

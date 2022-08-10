@@ -42,7 +42,7 @@ import {
   updateComments,
   deleteComment,
 } from "../../redux/actions/comment";
-import { showHeader } from "../../redux/actions/display";
+import { showHeader, showMessage } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 // helpers
 import { rollbar } from "../../reuseableFunctions/constants";
@@ -145,9 +145,17 @@ export class Comment extends Component {
 
   startRecordingComment = async () => {
     this.props.addLoading("COMMENT");
-    const recording = await startRecording(Voice, () => {});
+    try {
+      const recording = await startRecording(Voice, () => {});
+      this.mounted && this.setState({ recording, startTime: Date.now() });
+    } catch (err) {
+      this.props.showMessage({
+        success: false,
+        message: "Unable to start recording",
+      });
+    }
+
     this.props.removeLoading("COMMENT");
-    this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecordingComment = async () => {
@@ -514,4 +522,5 @@ export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   showHeader,
+  showMessage,
 })(Comment);

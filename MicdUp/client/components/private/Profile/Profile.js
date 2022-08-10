@@ -50,6 +50,7 @@ import {
   setCurrentKey,
   navigate,
   setList,
+  showMessage,
 } from "../../../redux/actions/display";
 // audio
 import {
@@ -136,6 +137,10 @@ export class Profile extends Component {
       this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
+      this.props.showMessage({
+        success: false,
+        message: "Unable to start recording",
+      });
       console.error("Failed to start recording", err);
     }
   };
@@ -552,5 +557,6 @@ export default connect(mapStateToProps, {
   removeLoading,
   setCurrentKey,
   navigate,
+  showMessage,
   setList,
 })(Profile);
