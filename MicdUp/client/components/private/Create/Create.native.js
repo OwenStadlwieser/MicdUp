@@ -72,10 +72,14 @@ export class Create extends Component {
     this.colors = ["white", "red"];
   }
   componentWillUnmount = async () => {
+    try {
+      this.stopRecording();
+      Voice.stop();
+      this.mounted = false;
+    } catch (err) {
+      rollbar.error(err);
+    }
     this.props.removeLoading("Create");
-    this.stopRecording();
-    Voice.stop();
-    this.mounted = false;
   };
 
   componentDidMount = async () => {
