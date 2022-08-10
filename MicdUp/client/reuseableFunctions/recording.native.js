@@ -9,6 +9,13 @@ const startRecording = async (Voice, onRecordingStatusUpdate) => {
     allowsRecordingIOS: true,
     playsInSilentModeIOS: true,
   });
+  rollbar.log("Starting recording..");
+  const { recording } = await Audio.Recording.createAsync(
+    Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
+    onRecordingStatusUpdate
+  );
+  rollbar.log("Finished starting recording..");
+
   rollbar.log("Requesting Voice..");
   try {
     Voice &&
@@ -18,12 +25,6 @@ const startRecording = async (Voice, onRecordingStatusUpdate) => {
   } catch (err) {
     rollbar.log(err);
   }
-  rollbar.log("Starting recording..");
-  const { recording } = await Audio.Recording.createAsync(
-    Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-    onRecordingStatusUpdate
-  );
-  rollbar.log("Finished starting recording..");
 
   return recording;
 };
