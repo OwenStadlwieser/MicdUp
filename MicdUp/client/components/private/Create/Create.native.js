@@ -92,9 +92,7 @@ export class Create extends Component {
   };
 
   startRecording = async () => {
-    this.props.addLoading("Create");
     const recording = await startRecording(Voice, () => {});
-    this.props.removeLoading("Create");
     this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
@@ -102,46 +100,50 @@ export class Create extends Component {
     const { recording, results } = this.state;
     const { clips } = this.props;
     console.log("Stopping recording..");
-    this.props.addLoading("Create");
 
     if (!recording || !recording.stopAndUnloadAsync) {
       return;
     }
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
+    this.props.addLoading("Create");
     try {
-      console.log("stopping");
-      Voice && Platform.OS !== "web" && Voice.stop();
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      try {
+        console.log("stopping");
+        Voice && Platform.OS !== "web" && Voice.stop();
+      } catch (err) {
+        rollbar.log(err);
+      }
+      const finalDuration = recording._finalDurationMillis;
+      this.mounted &&
+        this.setState({
+          recording: false,
+          audioBlobs: clips
+            ? [
+                ...clips,
+                {
+                  uri,
+                  finalDuration,
+                  type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+                  results,
+                  id: Date.now(),
+                },
+              ]
+            : [
+                {
+                  uri,
+                  finalDuration,
+                  type: Platform.OS === "web" ? "audio/webm" : ".m4a",
+                  results,
+                  id: Date.now(),
+                },
+              ],
+          v: 0,
+        });
+      this.props.updateClips(this.state.audioBlobs);
     } catch (err) {
-      rollbar.log(err);
+      console.log(err);
     }
-    const finalDuration = recording._finalDurationMillis;
-    this.mounted &&
-      this.setState({
-        recording: false,
-        audioBlobs: clips
-          ? [
-              ...clips,
-              {
-                uri,
-                finalDuration,
-                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-                results,
-                id: Date.now(),
-              },
-            ]
-          : [
-              {
-                uri,
-                finalDuration,
-                type: Platform.OS === "web" ? "audio/webm" : ".m4a",
-                results,
-                id: Date.now(),
-              },
-            ],
-        v: 0,
-      });
-    this.props.updateClips(this.state.audioBlobs);
     this.props.removeLoading("Create");
     console.log("Recording stopped and stored at", uri);
   };

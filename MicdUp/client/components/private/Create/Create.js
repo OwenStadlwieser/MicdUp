@@ -234,6 +234,7 @@ export class Create extends Component {
             {!recording ? (
               <TouchableOpacity
                 onPress={async () => {
+                  this.props.addLoading("Create");
                   try {
                     await this.startRecording();
                   } catch (err) {
@@ -242,6 +243,7 @@ export class Create extends Component {
                       message: "Unable to start recording",
                     });
                   }
+                  this.props.removeLoading("Create");
                 }}
               >
                 <MaterialCommunityIcons
