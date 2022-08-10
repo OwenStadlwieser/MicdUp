@@ -20,7 +20,7 @@ export class Like extends Component {
   }
 
   componentWillUnmount = () => {
-    this.props.removeLoading("COMMENT");
+    this.props.removeLoading("LIKE");
     this.mounted = false;
   };
 

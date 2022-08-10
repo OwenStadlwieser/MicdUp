@@ -50,6 +50,7 @@ export class RecordingControls extends Component {
   }
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("CONTROLS");
     await this.stopRecording();
     this.mounted = false;
   };
