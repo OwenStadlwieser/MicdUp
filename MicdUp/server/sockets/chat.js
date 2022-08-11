@@ -128,18 +128,19 @@ exports = module.exports = function (io) {
           returnMessage.owner.user._id = user._id;
           returnMessage.owner.user.userName = user.userName;
           let blocked_member = false;
-          for (member in chat.members) {
-            if (profileDoc.blockedMap.get(`${member}`)) {
+          for (let i = 0; i < chat.members.length; i++) {
+            let curr_blocked = false;
+            if (profileDoc.blockedMap.get(`${chat.members[i]}`)) {
               blocked_member = true;
+              curr_blocked = true;
             }
-
-            if (member != profileDoc.user) {
+            if (chat.members[i] != profileDoc.user && !curr_blocked) {
               console.log("making notification");
               await makeNotification(
                 user,
                 NotificationTypesBackend.SendMessage,
                 {},
-                member,
+                chat.members[i],
                 MESSAGE_MESSAGE,
                 message._id,
                 chat._id
