@@ -7,12 +7,13 @@ const { Message, File } = require("../database/models/File");
 const { getCurrentTime } = require("../reusableFunctions/helpers");
 const fs = require("fs");
 var path = require("path");
-
+const { makeNotification } = require("../utils/sendNotification");
 const {
-  uploadFileFromBase64,
-  getSignedUrl,
-  getFile,
-} = require("../utils/awsS3");
+  NotificationTypesBackend,
+  MESSAGE_MESSAGE,
+} = require("../utils/constants");
+
+const { getSignedUrl, getFile } = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
   ffmpegGetDuration,
@@ -131,6 +132,16 @@ exports = module.exports = function (io) {
             if (profileDoc.blockedMap.get(`${member}`)) {
               blocked_member = true;
             }
+            console.log("making notification");
+            await makeNotification(
+              user,
+              NotificationTypesBackend.SendMessage,
+              {},
+              member,
+              MESSAGE_MESSAGE,
+              message._id,
+              chat._id
+            );
           }
           !blocked_member &&
             io.to(chatId).emit("new message", returnMessage, chat._id);
