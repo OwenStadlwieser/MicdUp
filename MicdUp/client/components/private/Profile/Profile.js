@@ -419,10 +419,12 @@ export class Profile extends Component {
                   <TouchableOpacity style={styles.smallNextButton}>
                     <Text
                       onPress={async () => {
+                        this.props.addLoading("Profile");
                         await this.props.createOrOpenChat(
                           [id, profile.id],
                           profile.id
                         );
+                        this.props.removeLoading("Profile");
                       }}
                       style={styles.nextButtonText}
                     >
