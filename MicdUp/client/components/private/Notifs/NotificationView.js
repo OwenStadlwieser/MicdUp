@@ -6,7 +6,7 @@ import Notification from "./Notification";
 import { styles } from "../../../styles/Styles";
 import { hideNotif } from "../../../redux/actions/display";
 import { SwipeListView } from "react-native-swipe-list-view";
-import { markNotifsAsSeen, getUserNotifs } from "../../../redux/actions/notifs";
+import { getUserNotifs, markNotifsAsSeen } from "../../../redux/actions/notifs";
 export class NotificationView extends Component {
   constructor() {
     super();
@@ -22,7 +22,7 @@ export class NotificationView extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     this.props.markNotifsAsSeen();
   };
 
@@ -50,7 +50,7 @@ export class NotificationView extends Component {
               refreshing={refreshing}
               onRefresh={async () => {
                 this.mounted && this.setState({ refreshing: true });
-                await this.getUserNotifs(0);
+                await this.props.getUserNotifs(0);
                 this.mounted && this.setState({ refreshing: false });
               }}
             />
@@ -80,7 +80,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-  hideNotif,
   markNotifsAsSeen,
+  hideNotif,
   getUserNotifs,
 })(NotificationView);

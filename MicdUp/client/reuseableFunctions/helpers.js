@@ -1,5 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { rollbar } from "../reuseableFunctions/constants";
+import { io } from "socket.io-client";
+import { baseUrl } from "./constantsshared";
 
 const storeData = async (key, value) => {
   try {
@@ -29,6 +31,20 @@ const removeItemValue = async (key) => {
   } catch (exception) {
     return false;
   }
+};
+
+/**
+ * establishes a socket connection and returns socket instance
+ */
+const configureSocket = async (token, messageFunction, disconnectFunction) => {
+  if (!token) {
+    return;
+  }
+  const socket = io.connect(baseUrl);
+  socket.emit("new user", token);
+  socket.on("new message", messageFunction);
+  socket.on("disconnected", disconnectFunction);
+  return socket;
 };
 
 const clearAsyncStorage = async () => {
@@ -267,4 +283,5 @@ export {
   onSpeechResultsClips,
   getCurrentTime,
   forHumans,
+  configureSocket,
 };

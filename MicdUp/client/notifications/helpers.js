@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 
 import { addToken } from "../redux/actions/notifs";
 import { receiveNotif } from "../redux/actions/display";
+import { rollbar } from "../reuseableFunctions/constants";
 
 const MAX_NOTIFICATION_QUEUE_SIZE = 10;
 
@@ -106,6 +107,7 @@ const receiveNotificationListener = async (notification) => {
 };
 
 const notificationResponseReceivedListener = (response) => {
+  rollbar.log("Notification Response Receiverd", response);
   console.log(response);
 };
 
@@ -113,9 +115,10 @@ const setUpListeners = () => {
   Notifications.addNotificationResponseReceivedListener(
     notificationResponseReceivedListener
   );
-  Notifications.addNotificationReceivedListener((notification) =>
-    receiveNotificationListener(notification)
-  );
+  Notifications.addNotificationReceivedListener((notification) => {
+    rollbar.log("Notification Recieved", notification);
+    receiveNotificationListener(notification);
+  });
 };
 
 connect({}, { receiveNotif })(receiveNotificationListener);
