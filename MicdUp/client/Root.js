@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View, StatusBar } from "react-native";
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 // styles
@@ -26,8 +26,8 @@ import { getData } from "./reuseableFunctions/helpers";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
-import Header from "./components/reuseable/Header";
 import SoundModal from "./components/reuseable/SoundModal";
+import { STATUS_BAR_STYLE } from "./reuseableFunctions/constantsshared";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -54,6 +54,7 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
+    StatusBar.setBarStyle(STATUS_BAR_STYLE);
     publicIP()
       .then((ip) => {
         console.log(ip);
