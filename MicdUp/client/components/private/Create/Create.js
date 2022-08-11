@@ -26,7 +26,11 @@ import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
 // redux
-import { showMessage } from "../../../redux/actions/display";
+import {
+  showMessage,
+  addLoading,
+  removeLoading,
+} from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
@@ -332,4 +336,6 @@ export default connect(mapStateToProps, {
   updateTags,
   showMessage,
   randomPrompt,
+  addLoading,
+  removeLoading,
 })(Create);

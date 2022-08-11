@@ -62,6 +62,7 @@ export class Comment extends Component {
       replyingTo: "",
       replyingToName: "",
       parents: null,
+      controlsKey: 0,
     };
     try {
       Voice.onSpeechResults = onSpeechResults.bind(this);
@@ -85,9 +86,9 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
-    const { text, parents, replyingTo } = this.state;
+    const { text, parents, replyingTo, controlsKey } = this.state;
     this.props.addLoading("COMMENT");
-    await this.props.commentPost(
+    const res = await this.props.commentPost(
       post,
       replyingTo,
       base64Url,
@@ -96,6 +97,7 @@ export class Comment extends Component {
       [JSON.stringify(results)],
       parents
     );
+    this.mounted && res && this.setState({ controlsKey: controlsKey + 1 });
     this.props.removeLoading("COMMENT");
   };
 
@@ -415,7 +417,7 @@ export class Comment extends Component {
   }
 
   render() {
-    const { replyingToName, loading, refreshing } = this.state;
+    const { replyingToName, loading, refreshing, controlsKey } = this.state;
     const { postIndex, cachedPosts, currentKey } = this.props;
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
@@ -488,6 +490,7 @@ export class Comment extends Component {
           )}
         </View>
         <RecordingControls
+          key={controlsKey}
           backButtonAction={this.backButtonAction.bind(this)}
           onSend={this.onSend.bind(this)}
           replyingToName={replyingToName}

@@ -27,13 +27,11 @@ import {
   ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
   GET_SPECIFIC_POST_QUERY,
 } from "../../apollo/private/recording";
-import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 import { publicClient, privateClient } from "../../apollo/client";
-import { showMessage } from "./display";
-import { setCurrentKey } from "./display";
 import store from "../index";
 import { SHOW_MORE_REPLIES } from "../../apollo/private/comment";
 import { rollbar } from "../../reuseableFunctions/constants";
+import { navigate, showMessage } from "./display";
 
 export function checkIfLoggedIn() {
   let { loggedIn } = store.getState().auth;
@@ -150,10 +148,10 @@ export const uploadRecording =
       dispatch({
         type: CLEAR_RECORDING,
       });
-      dispatch({
-        type: NAVIGATE,
-        payload: "Feed",
-      });
+      dispatch(navigate("Feed"));
+      dispatch(
+        showMessage({ success: true, message: "Your post has been uploaded" })
+      );
     } catch (err) {
       rollbar.log(err);
     }
