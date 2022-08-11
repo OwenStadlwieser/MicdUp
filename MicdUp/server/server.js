@@ -23,6 +23,7 @@ app.use(cors());
 
 const verifiedUrls = ["http://localhost:19006", "http://192.168.0.193:19006"];
 function useHttps(req, res, next) {
+  console.log(process.env.NODE_ENV);
   if (!req.secure && process.env.NODE_ENV !== "DEVELOPMENT")
     return res.redirect("https://" + req.get("host") + req.url);
   next();
