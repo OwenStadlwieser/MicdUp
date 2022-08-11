@@ -17,6 +17,7 @@ import { NotificationTypesFrontend } from "../../../notifications/NotificationTy
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { SINGLE_POST_KEY } from "../../../reuseableFunctions/constants";
 import { createOrOpenChat } from "../../../redux/actions/chat";
+import { CircleSnail } from "react-native-progress";
 export class Notification extends Component {
   constructor() {
     super();
@@ -39,11 +40,12 @@ export class Notification extends Component {
   render() {
     const { data, profile } = this.props;
     const { sender, text, itemId, parentId } = data;
+    const { loading } = this.state;
     return (
       <TouchableOpacity
         style={styles.notif}
         onPress={async () => {
-          this.props.addLoading(this.LOADING_STRING);
+          this.mounted && this.setState({ loading: true });
 
           switch (data.type) {
             case NotificationTypesFrontend.LikePost:
@@ -79,7 +81,7 @@ export class Notification extends Component {
               this.props.showComments(0, SINGLE_POST_KEY);
               break;
           }
-          this.props.removeLoading(this.LOADING_STRING);
+          this.mounted && this.setState({ loading: false });
         }}
       >
         <Image
@@ -92,6 +94,7 @@ export class Notification extends Component {
           }
           style={styles.commentImg}
         />
+        {loading && <CircleSnail color={["black", "#6FF6FF"]} />}
         <Text style={{ fontSize: medium, fontWeight: "500", color: "#000000" }}>
           {text}
         </Text>
