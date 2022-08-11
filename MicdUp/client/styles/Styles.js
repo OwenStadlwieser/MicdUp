@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   recordingMicIconComments: {
-    fontSize: large,
+    fontSize: normalize(32),
   },
   currentRecordingIconComments: {
     fontSize: large,
