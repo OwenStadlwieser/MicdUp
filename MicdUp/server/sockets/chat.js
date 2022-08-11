@@ -132,16 +132,19 @@ exports = module.exports = function (io) {
             if (profileDoc.blockedMap.get(`${member}`)) {
               blocked_member = true;
             }
-            console.log("making notification");
-            await makeNotification(
-              user,
-              NotificationTypesBackend.SendMessage,
-              {},
-              member,
-              MESSAGE_MESSAGE,
-              message._id,
-              chat._id
-            );
+
+            if (member != profileDoc.user) {
+              console.log("making notification");
+              await makeNotification(
+                user,
+                NotificationTypesBackend.SendMessage,
+                {},
+                member,
+                MESSAGE_MESSAGE,
+                message._id,
+                chat._id
+              );
+            }
           }
           !blocked_member &&
             io.to(chatId).emit("new message", returnMessage, chat._id);
