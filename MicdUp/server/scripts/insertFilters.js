@@ -1,5 +1,11 @@
 //FIXME: import filter and connect to mongoose
-
+const { Filter } = require("../database/models/Filter");
+const mongoose = require("mongoose");
+const { getCurrentTime } = require("../reusableFunctions/helpers");
+const dotenv = require("dotenv");
+dotenv.config({ path: `${__dirname}/../config.env` });
+let db = process.env.DATABASE.replace("<DB_PASSWORD>", process.env.DB_PASSWORD);
+db = db.replace("<DB_USERNAME>", process.env.DB_USERNAME);
 let filters = [
   { title: "Parametric", type: "EQUALIZER", equalizerPreset: 0 },
   { title: "Low Pass", type: "EQUALIZER", equalizerPreset: 1 },
@@ -160,11 +166,23 @@ let filters = [
   { title: "Deep", type: "PITCH", pitchNum: 200 },
   { title: "Funny", type: "PITCH", pitchNum: 1256 },
 ];
-try {
-  await Filter.collection.drop();
-} catch (err) {}
-try {
-  await Filter.insertMany(filters);
-} catch (err) {
-  console.log(err);
-}
+
+mongoose
+  .connect(db, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(async (connected) => {
+    try {
+      await Filter.collection.drop();
+    } catch (err) {}
+    try {
+      console.log("here");
+      await Filter.insertMany(filters);
+    } catch (err) {
+      console.log(err);
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  });

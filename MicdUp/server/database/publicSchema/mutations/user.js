@@ -79,7 +79,7 @@ const setEmailVerified = {
       };
     }
     user.emailVerified = true;
-    user.verifyEmailToken = null;
+    delete user.verifyEmailToken;
     await user.save();
     return returnObject;
   },

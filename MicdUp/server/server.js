@@ -74,12 +74,16 @@ app.use(async (req, res, next) => {
     const user = await User.findOne({
       _id: userId.user,
     });
-    const profile = await Profile.findOne({
-      _id: user.profile,
-    });
-    req.profile = profile;
-    req.user = user;
-    req.isAuthenticated = true;
+    if (user) {
+      let profile = await Profile.findOne({
+        _id: user.profile,
+      });
+      if (profile) {
+        req.profile = profile;
+        req.user = user;
+        req.isAuthenticated = true;
+      }
+    }
   }
   req.host = req.get("host");
   next();
