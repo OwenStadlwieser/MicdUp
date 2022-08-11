@@ -13,6 +13,7 @@ import {
 import { showMessage } from "./display";
 import { navigate } from "./display";
 import { privateClient } from "../../apollo/client/index";
+import { rollbar } from "../../reuseableFunctions/constants";
 
 export const hideChats = () => async (dispatch) => {
   try {
@@ -20,7 +21,7 @@ export const hideChats = () => async (dispatch) => {
       type: HIDE_CHATS,
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -53,7 +54,7 @@ export const createOrOpenChat = (members, creator) => async (dispatch) => {
     dispatch(navigate("Chat"));
     return res.data.fetchChat;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -75,7 +76,7 @@ export const viewChats = (skipMult) => async (dispatch) => {
     });
     return res.data.fetchChats;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -104,6 +105,6 @@ export const viewMoreChats = (chat, skipMult) => async (dispatch) => {
 
     return res.data.fetchChatMessages;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };

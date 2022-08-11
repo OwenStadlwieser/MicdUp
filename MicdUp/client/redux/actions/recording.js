@@ -27,12 +27,12 @@ import {
   ADD_LISTENER_NOT_LOGGED_IN_MUTATION,
   GET_SPECIFIC_POST_QUERY,
 } from "../../apollo/private/recording";
-import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 import { publicClient, privateClient } from "../../apollo/client";
-import { showMessage } from "./display";
-import { setCurrentKey } from "./display";
 import store from "../index";
 import { SHOW_MORE_REPLIES } from "../../apollo/private/comment";
+import { rollbar } from "../../reuseableFunctions/constants";
+import { navigate, showMessage } from "./display";
+
 export function checkIfLoggedIn() {
   let { loggedIn } = store.getState().auth;
   if (loggedIn) {
@@ -148,12 +148,12 @@ export const uploadRecording =
       dispatch({
         type: CLEAR_RECORDING,
       });
-      dispatch({
-        type: NAVIGATE,
-        payload: "Feed",
-      });
+      dispatch(navigate("Feed"));
+      dispatch(
+        showMessage({ success: true, message: "Your post has been uploaded" })
+      );
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -183,7 +183,7 @@ export const openSpecificPost = (postId, commentId) => async (dispatch) => {
       payload: post,
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 export const uploadBio =
@@ -222,7 +222,7 @@ export const uploadBio =
       });
       return true;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 export const getUserPosts = (userId, skipMult) => async (dispatch) => {
@@ -259,7 +259,7 @@ export const getUserPosts = (userId, skipMult) => async (dispatch) => {
     });
     return res.data.getUserPosts;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -297,7 +297,7 @@ export const likePost = (postId, currentKey) => async (dispatch) => {
     });
     return res.data.likePost;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -337,7 +337,7 @@ export const deletePost = (postId, currentKey) => async (dispatch) => {
     }
     return res.data.deletePost;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -373,7 +373,7 @@ export const getComments =
       });
       return res.data.getComments;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 export const commentPost =
@@ -422,7 +422,7 @@ export const commentPost =
       });
       return res.data.commentToPost;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -465,6 +465,6 @@ export const getRecordingsFromTag =
       });
       return res.data.getRecordingsFromTag;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };

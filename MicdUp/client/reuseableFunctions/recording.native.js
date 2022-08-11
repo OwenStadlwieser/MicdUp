@@ -1,31 +1,32 @@
 import { Audio } from "expo-av";
+import { rollbar } from "../reuseableFunctions/constants";
 
 import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
+  rollbar.log("Requesting permission..");
+  await Audio.requestPermissionsAsync();
+  await Audio.setAudioModeAsync({
+    allowsRecordingIOS: true,
+    playsInSilentModeIOS: true,
+  });
+  rollbar.log("Starting recording..");
+  const { recording } = await Audio.Recording.createAsync(
+    Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
+    onRecordingStatusUpdate
+  );
+  rollbar.log("Finished starting recording..");
+
+  rollbar.log("Requesting Voice..");
   try {
-    await Audio.requestPermissionsAsync();
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: true,
-      playsInSilentModeIOS: true,
-    });
-    console.log("Starting recording..");
-    try {
-      Voice &&
-        Platform.OS !== "web" &&
-        (await Voice.isAvailable()) &&
-        Voice.start("en-US");
-    } catch (err) {
-      console.log(err);
-    }
-    const { recording } = await Audio.Recording.createAsync(
-      Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-      onRecordingStatusUpdate
-    );
-    return recording;
-    console.log("Recording started");
+    Voice &&
+      Platform.OS !== "web" &&
+      (await Voice.isAvailable()) &&
+      Voice.start("en-US");
   } catch (err) {
-    console.error("Failed to start recording", err);
+    rollbar.log(err);
   }
+
+  return recording;
 };
 
 const stopRecording = async (recording, Voice) => {
@@ -37,7 +38,7 @@ const stopRecording = async (recording, Voice) => {
   try {
     Voice && Platform.OS !== "web" && Voice.stop();
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
   return uri;
 };

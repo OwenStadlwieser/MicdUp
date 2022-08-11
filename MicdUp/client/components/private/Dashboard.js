@@ -24,15 +24,13 @@ import ListOfAccounts from "../reuseable/ListOfAccounts";
 import Chat from "./Dms/Chat";
 import SinglePostContainer from "../reuseable/SinglePostContainer";
 // helpers
-import { getData } from "../../reuseableFunctions/helpers";
-import { io } from "socket.io-client";
+import { getData, configureSocket } from "../../reuseableFunctions/helpers";
 //styles
 import { styles } from "../../styles/Styles";
 import NotificationView from "./Notifs/NotificationView";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import Header from "../reuseable/Header";
-
 const { width, height } = Dimensions.get("window");
 
 const MyTheme = {
@@ -61,23 +59,48 @@ export class Dashboard extends Component {
 
   componentDidMount = async () => {
     this.props.addLoading("Dashboard");
-    const { chatRecieved } = this.props;
     await this.props.getUserQuery();
     await this.props.getUserNotifs(0);
     const { user } = this.props;
     if (!user || Object.keys(user).length === 0) {
       this.props.logout();
     } else {
-      const token = await getData("token");
-      const socket = io.connect("http://localhost:6002/");
-      socket.emit("new user", token);
-      socket.on("new message", async function (message, chatId) {
-        console.log("recieved", message);
-        chatRecieved(message, chatId);
-      });
-      this.props.setSocket(socket);
+      await this.startSocket();
     }
     this.props.removeLoading("Dashboard");
+  };
+
+  messageSent = async (message, chatId) => {
+    this.props.removeLoading("MessageSending");
+  };
+
+  disconnectFunction = async () => {
+    const token = await getData("token");
+    if (token) {
+      setTimeout(async function () {
+        await this.startSocket();
+      }, 1000);
+    }
+  };
+
+  messageFunction = async (message, chatId) => {
+    const { profile } = this.props;
+    if (message.owner.id == profile.id) {
+      this.props.removeLoading("MessageSending");
+    }
+    this.props.chatRecieved(message, chatId);
+  };
+
+  startSocket = async () => {
+    const { setSocket } = this.props;
+    const token = await getData("token");
+    const socket = await configureSocket(
+      token,
+      this.messageFunction,
+      this.disconnectFunction,
+      this.messageSent
+    );
+    setSocket(socket);
   };
 
   render() {
@@ -93,6 +116,7 @@ export class Dashboard extends Component {
       userName,
       activeChatMembers,
       currentProfile,
+      socket,
     } = this.props;
     return (
       <Fragment>

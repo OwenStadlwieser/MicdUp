@@ -42,7 +42,7 @@ export class RecommendedTags extends Component {
               left: width * 0.5,
             }}
           >
-            <CircleSnail color={["black", "#6FF6FF"]} />
+            <CircleSnail color={["white", "#6FF6FF"]} />
           </View>
         )}
         {tags &&
@@ -66,7 +66,6 @@ export class RecommendedTags extends Component {
                 }}
                 underlayColor="#6FF6FF"
                 onPress={() => {
-                  console.log(tag);
                   this.props.setSelectedTag(tag);
                 }}
               >

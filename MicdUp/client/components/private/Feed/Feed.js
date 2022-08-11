@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 // styles
-import { listStyles, styles, postHeight } from "../../../styles/Styles";
+import { listStyles, styles, postHeight, small } from "../../../styles/Styles";
 // components
-import { Appbar, Title } from "react-native-paper";
+import { Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
 import { Button } from "react-native-paper";
@@ -29,6 +29,8 @@ import {
   getNotLoggedInFeed,
   getTopicsFeed,
 } from "../../../redux/actions/feed";
+// helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 const { height, width } = Dimensions.get("window");
 export class Feed extends Component {
@@ -76,23 +78,26 @@ export class Feed extends Component {
       ),
     });
   };
+
   getData = async (skipMult) => {
     const { loggedIn, tag, navigation } = this.props;
     const { fromSearch } = this.props.route.params
       ? this.props.route.params
       : {};
     this.props.addLoading("Feed");
-    this.mounted && this.setState({ loading: true });
-    if (fromSearch && tag) {
-      this.mounted && this.setState({ tag: { ...tag } });
-      this.updateNavigationOptions(tag);
-      await this.props.getRecordingsFromTag(tag._id, skipMult);
-    } else if (!fromSearch && loggedIn) {
-      await this.props.getFollowingFeed(skipMult);
-    } else if (!loggedIn) {
-      await this.props.getNotLoggedInFeed(skipMult);
-    }
-    this.mounted && this.setState({ loading: false });
+    try {
+      this.mounted && this.setState({ loading: true });
+      if (fromSearch && tag) {
+        this.mounted && this.setState({ tag: { ...tag } });
+        this.updateNavigationOptions(tag);
+        await this.props.getRecordingsFromTag(tag._id, skipMult);
+      } else if (!fromSearch && loggedIn) {
+        await this.props.getFollowingFeed(skipMult);
+      } else if (!loggedIn) {
+        await this.props.getNotLoggedInFeed(skipMult);
+      }
+      this.mounted && this.setState({ loading: false });
+    } catch (err) {}
     this.props.removeLoading("Feed");
   };
 
@@ -101,6 +106,10 @@ export class Feed extends Component {
   };
   componentDidMount = async () => {
     await this.getData(0);
+  };
+
+  componentWillUnmount = () => {
+    this.props.removeLoading("Feed");
   };
 
   componentDidUpdate = async (prevProps) => {
@@ -141,7 +150,7 @@ export class Feed extends Component {
         await this.getData(Math.round(postsToView.length / 20));
       }
     } catch (err) {
-      console.log(err);
+      rollbar.error(err);
     }
   }
 
@@ -201,15 +210,31 @@ export class Feed extends Component {
                   cachedPosts["FOLLOWINGFEED"].length == 0
                 ) {
                   this.props.addLoading("Feed");
-                  this.mounted && this.setState({ loading: true });
-                  await this.props.getFollowingFeed(0);
-                  this.mounted && this.setState({ loading: false });
+                  try {
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getFollowingFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                  } catch (err) {
+                    rollbar.error(err);
+                  }
                   this.props.removeLoading("Feed");
                 }
                 this.mounted && this.setState({ following: true });
               }}
             >
-              <Text style={styles.nextButtonText}>FOLLOWING</Text>
+              <Text
+                style={
+                  (styles.nextButtonText,
+                  {
+                    color: following ? "white" : "black",
+                    fontStyle: "italic",
+                    fontSize: small,
+                    fontWeight: "600",
+                  })
+                }
+              >
+                FOLLOWING
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
@@ -228,15 +253,31 @@ export class Feed extends Component {
                   cachedPosts["TOPICSFEED"].length == 0
                 ) {
                   this.props.addLoading("Feed");
-                  this.mounted && this.setState({ loading: true });
-                  await this.props.getTopicsFeed(0);
-                  this.mounted && this.setState({ loading: false });
+                  try {
+                    this.mounted && this.setState({ loading: true });
+                    await this.props.getTopicsFeed(0);
+                    this.mounted && this.setState({ loading: false });
+                  } catch (err) {
+                    rollbar.error(err);
+                  }
                   this.props.removeLoading("Feed");
                 }
                 this.mounted && this.setState({ following: false });
               }}
             >
-              <Text style={styles.nextButtonText}>TOPICS</Text>
+              <Text
+                style={
+                  (styles.nextButtonText,
+                  {
+                    color: !following ? "white" : "black",
+                    fontStyle: "italic",
+                    fontSize: small,
+                    fontWeight: "600",
+                  })
+                }
+              >
+                TOPICS
+              </Text>
             </TouchableOpacity>
           </View>
         )}

@@ -9,6 +9,8 @@ import {
 import { LOG_IN, LOG_OUT, DISPLAY_MESSAGE, SET_SOCKET, SET_IP } from "../types";
 import { storeData, clearAsyncStorage } from "../../reuseableFunctions/helpers";
 import { showMessage, navigate } from "./display";
+// constants
+import { rollbar } from "../../reuseableFunctions/constants";
 
 export const setSocket = (socket) => async (dispatch) => {
   try {
@@ -17,7 +19,7 @@ export const setSocket = (socket) => async (dispatch) => {
       payload: socket,
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -28,7 +30,7 @@ export const setIp = (ip) => async (dispatch) => {
       payload: ip,
     });
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -49,7 +51,7 @@ export const login = (authenticator, password) => async (dispatch) => {
     }
     return res.data.login;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -70,7 +72,7 @@ export const forgotPass = (email) => async (dispatch) => {
     }
     return res;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -84,7 +86,7 @@ export const forgotPassVerify = (secureCode, email) => async (dispatch) => {
     if (res && res.data) dispatch(showMessage(res.data.forgotPassVerify));
     return res;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -99,7 +101,7 @@ export const forgotPassChange =
       if (res && res.data) dispatch(showMessage(res.data.forgotPassChange));
       return res;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -113,6 +115,6 @@ export const register =
       });
       return res;
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };

@@ -36,8 +36,8 @@ exports = module.exports = function (io) {
         }
         const profile = await Profile.findOne({ user: userId.user });
         if (!profile) {
-          console.log(userId.user, "is not associated with a profile");
-          throw new Error("Profile not found");
+          console.log("unable to find profile");
+          return;
         }
         socket.profileId = profile._id;
         for (let i = 0; i < profile.chats.length; i++) {

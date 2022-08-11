@@ -42,9 +42,10 @@ import {
   updateComments,
   deleteComment,
 } from "../../redux/actions/comment";
-import { showHeader } from "../../redux/actions/display";
+import { showHeader, showMessage } from "../../redux/actions/display";
 import { addLoading, removeLoading } from "../../redux/actions/display";
 // helpers
+import { rollbar } from "../../reuseableFunctions/constants";
 import { forHumans, getCurrentTime } from "../../reuseableFunctions/helpers";
 import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
 const { height } = Dimensions.get("window");
@@ -61,12 +62,13 @@ export class Comment extends Component {
       replyingTo: "",
       replyingToName: "",
       parents: null,
+      controlsKey: 0,
     };
     try {
       Voice.onSpeechResults = onSpeechResults.bind(this);
       Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.colors = ["white", "red"];
     this.mounted = true;
@@ -84,9 +86,9 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
-    const { text, parents, replyingTo } = this.state;
+    const { text, parents, replyingTo, controlsKey } = this.state;
     this.props.addLoading("COMMENT");
-    await this.props.commentPost(
+    const res = await this.props.commentPost(
       post,
       replyingTo,
       base64Url,
@@ -95,6 +97,7 @@ export class Comment extends Component {
       [JSON.stringify(results)],
       parents
     );
+    this.mounted && res && this.setState({ controlsKey: controlsKey + 1 });
     this.props.removeLoading("COMMENT");
   };
 
@@ -144,9 +147,17 @@ export class Comment extends Component {
 
   startRecordingComment = async () => {
     this.props.addLoading("COMMENT");
-    const recording = await startRecording(Voice, () => {});
+    try {
+      const recording = await startRecording(Voice, () => {});
+      this.mounted && this.setState({ recording, startTime: Date.now() });
+    } catch (err) {
+      this.props.showMessage({
+        success: false,
+        message: "Unable to start recording",
+      });
+    }
+
     this.props.removeLoading("COMMENT");
-    this.mounted && this.setState({ recording, startTime: Date.now() });
   };
 
   stopRecordingComment = async () => {
@@ -406,7 +417,7 @@ export class Comment extends Component {
   }
 
   render() {
-    const { replyingToName, loading, refreshing } = this.state;
+    const { replyingToName, loading, refreshing, controlsKey } = this.state;
     const { postIndex, cachedPosts, currentKey } = this.props;
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
@@ -421,7 +432,7 @@ export class Comment extends Component {
             justifyContent: "center",
           }}
         >
-          {loading && <CircleSnail color={["black", "#6FF6FF"]} />}
+          {loading && <CircleSnail color={["white", "#6FF6FF"]} />}
         </View>
       );
     }
@@ -474,11 +485,12 @@ export class Comment extends Component {
                 justifyContent: "center",
               }}
             >
-              {loading && <CircleSnail color={["black", "#6FF6FF"]} />}
+              {loading && <CircleSnail color={["white", "#6FF6FF"]} />}
             </View>
           )}
         </View>
         <RecordingControls
+          key={controlsKey}
           backButtonAction={this.backButtonAction.bind(this)}
           onSend={this.onSend.bind(this)}
           replyingToName={replyingToName}
@@ -513,4 +525,5 @@ export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   showHeader,
+  showMessage,
 })(Comment);

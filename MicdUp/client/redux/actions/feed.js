@@ -7,6 +7,8 @@ import { privateClient, publicClient } from "../../apollo/client/index";
 import { showMessage } from "./display";
 import { SET_POSTS, CLEAR_POSTS } from "../types";
 import { setCurrentKey } from "./display";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export const getFollowingFeed = (skipMult) => async (dispatch) => {
   try {
     const res = await privateClient.query({
@@ -36,7 +38,7 @@ export const getFollowingFeed = (skipMult) => async (dispatch) => {
     });
     return res.data.getFollowingFeed;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -69,7 +71,7 @@ export const getTopicsFeed = (skipMult) => async (dispatch) => {
     });
     return res.data.getFollowingTopicsFeed;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -103,6 +105,6 @@ export const getNotLoggedInFeed = (skipMult) => async (dispatch) => {
     });
     return res.data.getNotLoggedInFeed;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };

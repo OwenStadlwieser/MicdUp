@@ -12,6 +12,8 @@ import {
 import { showMessage } from "./display";
 import { publicClient, privateClient } from "../../apollo/client";
 import { checkIfLoggedIn } from "./recording";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export const getReplies = (commentId) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
@@ -33,7 +35,7 @@ export const getReplies = (commentId) => async (dispatch) => {
     }
     return res.data.getReplies;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -45,7 +47,7 @@ export const updateCommentDisplay =
         payload: { comment, parents, postId: post.id, owner: post.owner.id },
       });
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   };
 
@@ -79,7 +81,7 @@ export const likeComment = (commentId) => async (dispatch) => {
     }
     return res.data.likeComment;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -113,7 +115,7 @@ export const deleteComment = (commentId) => async (dispatch) => {
     }
     return res.data.deleteComment;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 

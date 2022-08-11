@@ -7,6 +7,8 @@ import {
 } from "../../apollo/private/notifs";
 import { SET_NOTIFS, APPEND_NOTIFS, UPDATE_NOTIFS_UNSEEN } from "../types";
 import { showMessage } from "./display";
+import { rollbar } from "../../reuseableFunctions/constants";
+
 export const addToken = (token) => async (dispatch) => {
   try {
     let fetchPolicy = "no-cache";
@@ -28,7 +30,7 @@ export const addToken = (token) => async (dispatch) => {
     }
     return res.data.success;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -67,35 +69,30 @@ export const getUserNotifs = (skipMult) => async (dispatch) => {
       type: UPDATE_NOTIFS_UNSEEN,
       payload: res.data.getUserNotifs.numberOfUnseenNotifs,
     });
+    dispatch(updateNotifsAsSeen());
     return res.data.getUserNotifs;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
+};
+
+const updateNotifsAsSeen = () => async (dispatch) => {
+  let fetchPolicy = "no-cache";
+
+  await privateClient.mutate({
+    mutation: MARK_NOTIFS_AS_SEEN_MUTATION,
+    variables: {},
+    fetchPolicy,
+  });
 };
 
 export const markNotifsAsSeen = () => async (dispatch) => {
   try {
-    let fetchPolicy = "no-cache";
-    const res = await privateClient.mutate({
-      mutation: MARK_NOTIFS_AS_SEEN_MUTATION,
-      variables: {},
-      fetchPolicy,
-    });
-    if (!res.data) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
-    }
     dispatch({
       type: UPDATE_NOTIFS_UNSEEN,
       payload: 0,
     });
-    return res.data.success;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };

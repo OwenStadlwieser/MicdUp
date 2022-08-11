@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    width,
   },
   postsContainer: {
     marginTop: height * 0.015,
@@ -522,6 +523,7 @@ const styles = StyleSheet.create({
     flex: 3,
     width: width,
     flexDirection: "row",
+    zIndex: 6,
   },
   iconSmallContainer: {
     width: width * 0.15,
@@ -532,6 +534,7 @@ const styles = StyleSheet.create({
     width: width * 0.7,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 6,
   },
   recordingMicIcon: {
     paddingLeft: 10,
@@ -835,12 +838,18 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     fontStyle: "italic",
     fontSize: large,
-    color: "#FFFFFF",
-    marginRight: 8,
+    color: "black",
+    paddingRight: 18,
   },
   promptTopic: {
     flexDirection: "row",
     alignItems: "center",
+    position: "absolute",
+    width: width * 0.9,
+    backgroundColor: "white",
+    left: width * 0.05,
+    borderRadius: 24,
+    zIndex: 6,
   },
   deletePromptButton: {
     marginHorizontal: 8,

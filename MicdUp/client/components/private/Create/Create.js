@@ -26,10 +26,16 @@ import { startRecording } from "../../../reuseableFunctions/recording";
 // clips
 import Clips from "./Clips";
 // redux
-import { showMessage } from "../../../redux/actions/display";
+import {
+  showMessage,
+  addLoading,
+  removeLoading,
+} from "../../../redux/actions/display";
 import { updateClips, updateTags } from "../../../redux/actions/recording";
 import { randomPrompt } from "../../../redux/actions/tag";
 import { Button } from "react-native-paper";
+//helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 export class Create extends Component {
   constructor() {
@@ -52,7 +58,7 @@ export class Create extends Component {
       Voice.onSpeechResults = this.onSpeechResults.bind(this);
       Voice.onSpeechStart = this.onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.mounted = true;
     this.colors = ["white", "red"];
@@ -110,7 +116,7 @@ export class Create extends Component {
     try {
       Voice && Platform.OS !== "web" && Voice.stop();
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     const finalDuration = recording._finalDurationMillis;
     this.mounted &&
@@ -166,6 +172,31 @@ export class Create extends Component {
       />
     ) : (
       <View style={styles.pane}>
+        {promptShown && (
+          <View style={styles.promptTopic}>
+            <TouchableOpacity
+              style={styles.deletePromptButton}
+              onPress={() => {
+                const { functionID } = this.state;
+                if (functionID) {
+                  clearTimeout(functionID);
+                }
+                this.mounted &&
+                  this.setState({
+                    promptShown: false,
+                    prompt: {},
+                    functionID: 0,
+                  });
+              }}
+              accessibilityLabel="Remove Prompt"
+            >
+              <AntDesign size={32} name="closecircleo" color="red" />
+            </TouchableOpacity>
+            <Text style={styles.promptText}>
+              {prompt.prompt ? prompt.prompt : ""}
+            </Text>
+          </View>
+        )}
         <View style={styles.recordingPeopleContainer}>
           <TouchableHighlight
             style={[
@@ -190,31 +221,6 @@ export class Create extends Component {
           >
             @{user ? user.userName : ""}
           </Text>
-          {promptShown && (
-            <View style={styles.promptTopic}>
-              <TouchableOpacity
-                style={styles.deletePromptButton}
-                onPress={() => {
-                  const { functionID } = this.state;
-                  if (functionID) {
-                    clearTimeout(functionID);
-                  }
-                  this.mounted &&
-                    this.setState({
-                      promptShown: false,
-                      prompt: {},
-                      functionID: 0,
-                    });
-                }}
-                accessibilityLabel="Remove Prompt"
-              >
-                <AntDesign size={32} name="closecircleo" color="white" />
-              </TouchableOpacity>
-              <Text style={styles.promptText}>
-                {prompt.prompt ? prompt.prompt : ""}
-              </Text>
-            </View>
-          )}
         </View>
         <View style={styles.recordingClipsContainer}>
           <Clips />
@@ -230,21 +236,40 @@ export class Create extends Component {
           </View>
           <View style={styles.iconContainer}>
             {!recording ? (
-              <MaterialCommunityIcons
-                onPress={this.startRecording}
-                name="microphone-plus"
-                size={75}
-                color="red"
-                style={styles.recordingMicIcon}
-              />
+              <TouchableOpacity
+                onPress={async () => {
+                  this.props.addLoading("Create");
+                  try {
+                    await this.startRecording();
+                  } catch (err) {
+                    this.props.showMessage({
+                      success: false,
+                      message: "Unable to start recording",
+                    });
+                  }
+                  this.props.removeLoading("Create");
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="microphone-plus"
+                  size={75}
+                  color="red"
+                  style={styles.recordingMicIcon}
+                />
+              </TouchableOpacity>
             ) : (
-              <FontAwesome5
-                onPress={this.stopRecording}
-                style={styles.currentRecordingIcon}
-                name="record-vinyl"
-                size={24}
-                color={this.colors[v]}
-              />
+              <TouchableOpacity
+                onPress={async () => {
+                  await this.stopRecording();
+                }}
+              >
+                <FontAwesome5
+                  style={styles.currentRecordingIcon}
+                  name="record-vinyl"
+                  size={24}
+                  color={this.colors[v]}
+                />
+              </TouchableOpacity>
             )}
             <TouchableOpacity
               onPress={async () => {
@@ -270,27 +295,29 @@ export class Create extends Component {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.iconSmallContainer}>
+          <TouchableOpacity
+            onPress={async () => {
+              const { functionID } = this.state;
+              this.mounted && this.setState({ promptShown: true });
+              if (functionID) {
+                clearTimeout(functionID);
+              }
+              const newPrompt = await this.props.randomPrompt();
+              this.mounted && this.setState({ prompt: newPrompt });
+              const newFunctionID = setTimeout(() => {
+                this.props.updateTags(newPrompt.tag.title);
+              }, 10000);
+              this.mounted && this.setState({ functionID: newFunctionID });
+            }}
+            style={styles.iconSmallContainer}
+          >
             <Fontisto
-              onPress={async () => {
-                const { functionID } = this.state;
-                this.mounted && this.setState({ promptShown: true });
-                if (functionID) {
-                  clearTimeout(functionID);
-                }
-                const newPrompt = await this.props.randomPrompt();
-                this.mounted && this.setState({ prompt: newPrompt });
-                const newFunctionID = setTimeout(() => {
-                  this.props.updateTags(newPrompt.tag.title);
-                }, 10000);
-                this.mounted && this.setState({ functionID: newFunctionID });
-              }}
               style={styles.recordingHashtagIcon}
               name="hashtag"
               size={24}
               color="white"
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -309,4 +336,6 @@ export default connect(mapStateToProps, {
   updateTags,
   showMessage,
   randomPrompt,
+  addLoading,
+  removeLoading,
 })(Create);

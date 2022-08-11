@@ -1,8 +1,14 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { View, Platform, TouchableOpacity, Text, Dimensions } from "react-native";
-// children 
-import AudioRecordingVisualization from './AudioRecordingVisualization'
+import {
+  View,
+  Platform,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+} from "react-native";
+// children
+import AudioRecordingVisualization from "./AudioRecordingVisualization";
 // icons
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -17,7 +23,11 @@ import {
 // styles
 import { styles, largeIconFontSize } from "../../styles/Styles";
 // redux
-import { addLoading, removeLoading } from "../../redux/actions/display";
+import {
+  addLoading,
+  removeLoading,
+  showMessage,
+} from "../../redux/actions/display";
 import { changeSound, pauseSound } from "../../redux/actions/sound";
 // audio
 import Voice from "@react-native-voice/voice";
@@ -40,6 +50,7 @@ export class RecordingControls extends Component {
   }
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("CONTROLS");
     await this.stopRecording();
     this.mounted = false;
   };
@@ -56,12 +67,14 @@ export class RecordingControls extends Component {
   startRecordingChat = async () => {
     this.props.addLoading("CONTROLS");
     this.props.onRecordingStart();
-    if (Platform.OS !== "web") {
+    try {
       const recording = await startRecording(Voice, () => {});
       this.mounted && this.setState({ recording, startTime: Date.now() });
-    } else {
-      const recording = await startRecording(Voice, () => {});
-      this.mounted && this.setState({ recording, startTime: Date.now() });
+    } catch (err) {
+      this.props.showMessage({
+        success: false,
+        message: "Unable to start recording",
+      });
     }
     this.props.removeLoading("CONTROLS");
   };
@@ -98,99 +111,99 @@ export class RecordingControls extends Component {
     const { playingUri, isPause, replyingToName } = this.props;
     return (
       <Fragment>
-      <View style={styles.recordingContainerComments}>
-        {replyingToName ? (
-          <Text style={{ position: "absolute", left: 0, top: 0 }}>
-            {`Reply to ${replyingToName}`}
-          </Text>
-        ) : (
-          <Fragment />
-        )}
-        <View style={styles.iconContainerComments}>
-          {audioBlobs || replyingToName ? (
-            <Feather
-              style={styles.recordingMicIconComments}
-              name="delete"
-              size={24}
-              color="black"
-              onPress={() => {
-                this.props.backButtonAction();
-                this.mounted &&
-                  this.setState({
-                    audioBlobs: false,
-                  });
-              }}
-            />
+        <View style={styles.recordingContainerComments}>
+          {replyingToName ? (
+            <Text style={{ position: "absolute", left: 0, top: 0 }}>
+              {`Reply to ${replyingToName}`}
+            </Text>
           ) : (
             <Fragment />
           )}
-          {audioBlobs ? (
-            playingUri === audioBlobs.uri && !isPause ? (
-              <MaterialCommunityIcons
-                onPress={async () => {
-                  this.props.addLoading("CONTROLS");
-                  await this.props.pauseSound();
-                  this.props.removeLoading("CONTROLS");
+          <View style={styles.iconContainerComments}>
+            {audioBlobs || replyingToName ? (
+              <Feather
+                style={styles.recordingMicIconComments}
+                name="delete"
+                size={24}
+                color="black"
+                onPress={() => {
+                  this.props.backButtonAction();
+                  this.mounted &&
+                    this.setState({
+                      audioBlobs: false,
+                    });
                 }}
-                name="pause-circle"
+              />
+            ) : (
+              <Fragment />
+            )}
+            {audioBlobs ? (
+              playingUri === audioBlobs.uri && !isPause ? (
+                <MaterialCommunityIcons
+                  onPress={async () => {
+                    this.props.addLoading("CONTROLS");
+                    await this.props.pauseSound();
+                    this.props.removeLoading("CONTROLS");
+                  }}
+                  name="pause-circle"
+                  size={75}
+                  color="#6FF6FF"
+                  style={styles.recordingMicIconComments}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  onPress={async () => {
+                    this.props.addLoading("CONTROLS");
+                    await this.props.changeSound(audioBlobs, audioBlobs.uri);
+                    this.props.removeLoading("CONTROLS");
+                  }}
+                  name="play-circle"
+                  size={75}
+                  color="#6FF6FF"
+                  style={styles.recordingMicIconComments}
+                />
+              )
+            ) : !recording ? (
+              <MaterialCommunityIcons
+                onPress={this.startRecordingChat}
+                name="microphone-plus"
                 size={75}
-                color="#6FF6FF"
+                color="red"
                 style={styles.recordingMicIconComments}
               />
             ) : (
-              <MaterialCommunityIcons
+              recording &&
+              Platform.OS === "web" && (
+                <FontAwesome5
+                  onPress={this.stopRecording}
+                  style={styles.currentRecordingIconComments}
+                  name="record-vinyl"
+                  size={24}
+                  color={this.colors[v]}
+                />
+              )
+            )}
+            {audioBlobs && (
+              <TouchableOpacity
                 onPress={async () => {
-                  this.props.addLoading("CONTROLS");
-                  await this.props.changeSound(audioBlobs, audioBlobs.uri);
-                  this.props.removeLoading("CONTROLS");
+                  let fileType;
+                  const { results } = this.state;
+                  const base64Url = await soundBlobToBase64(audioBlobs.uri);
+                  if (base64Url != null) {
+                    fileType = audioBlobs.type;
+                    this.props.onSend(base64Url, fileType, results);
+                  } else {
+                    console.log("error with blob");
+                  }
+                  //  send message
                 }}
-                name="play-circle"
-                size={75}
-                color="#6FF6FF"
-                style={styles.recordingMicIconComments}
-              />
-            )
-          ) : !recording ? (
-            <MaterialCommunityIcons
-              onPress={this.startRecordingChat}
-              name="microphone-plus"
-              size={75}
-              color="red"
-              style={styles.recordingMicIconComments}
-            />
-          ) : (
-            recording &&
-            Platform.OS === "web" && (
-              <FontAwesome5
-                onPress={this.stopRecording}
-                style={styles.currentRecordingIconComments}
-                name="record-vinyl"
-                size={24}
-                color={this.colors[v]}
-              />
-            )
-          )}
-          {audioBlobs && (
-            <TouchableOpacity
-              onPress={async () => {
-                let fileType;
-                const { results } = this.state;
-                const base64Url = await soundBlobToBase64(audioBlobs.uri);
-                if (base64Url != null) {
-                  fileType = audioBlobs.type;
-                  this.props.onSend(base64Url, fileType, results);
-                } else {
-                  console.log("error with blob");
-                }
-                //  send message
-              }}
-            >
-              <FontAwesome name="send" size={24} color="black" />
-            </TouchableOpacity>
-          )}
+              >
+                <FontAwesome name="send" size={24} color="black" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-              {recording && Platform.OS !== "web" && (
+        {recording && Platform.OS !== "web" && (
           <View
             style={{
               alignItems: "center",
@@ -240,4 +253,5 @@ export default connect(mapStateToProps, {
   pauseSound,
   addLoading,
   removeLoading,
+  showMessage,
 })(RecordingControls);

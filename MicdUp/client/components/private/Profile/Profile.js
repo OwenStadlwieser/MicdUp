@@ -50,12 +50,15 @@ import {
   setCurrentKey,
   navigate,
   setList,
+  showMessage,
 } from "../../../redux/actions/display";
 // audio
 import {
   startRecording,
   stopRecording,
 } from "../../../reuseableFunctions/recording";
+// helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 var { height, width } = Dimensions.get("window");
 const barWidth = 5;
@@ -105,7 +108,7 @@ export class Profile extends Component {
         this.mounted && this.setState({ loading: false });
       }
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
   }
 
@@ -134,6 +137,10 @@ export class Profile extends Component {
       this.mounted && this.setState({ recording, bio: true });
       console.log("Recording started");
     } catch (err) {
+      this.props.showMessage({
+        success: false,
+        message: "Unable to start recording",
+      });
       console.error("Failed to start recording", err);
     }
   };
@@ -165,9 +172,9 @@ export class Profile extends Component {
   };
 
   componentWillUnmount = async () => {
+    this.props.removeLoading("Profile");
     await this.stopRecordingBio();
     this.mounted = false;
-    this.props.removeLoading("Profile");
   };
 
   getPosts = async (fromRefresh = false) => {
@@ -412,10 +419,12 @@ export class Profile extends Component {
                   <TouchableOpacity style={styles.smallNextButton}>
                     <Text
                       onPress={async () => {
+                        this.props.addLoading("Profile");
                         await this.props.createOrOpenChat(
                           [id, profile.id],
                           profile.id
                         );
+                        this.props.removeLoading("Profile");
                       }}
                       style={styles.nextButtonText}
                     >
@@ -550,5 +559,6 @@ export default connect(mapStateToProps, {
   removeLoading,
   setCurrentKey,
   navigate,
+  showMessage,
   setList,
 })(Profile);

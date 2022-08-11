@@ -11,8 +11,6 @@ import {
   RefreshControl,
 } from "react-native";
 import { Button } from "react-native-paper";
-// helpers
-import { io } from "socket.io-client";
 // redux
 import {
   addLoading,

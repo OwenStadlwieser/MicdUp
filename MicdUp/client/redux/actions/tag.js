@@ -7,6 +7,7 @@ import {
   FOLLOW_TAG_MUTATION,
 } from "../../apollo/private/tag";
 import { SET_USER, LOG_IN } from "../types";
+import { rollbar } from "../../reuseableFunctions/constants";
 
 export const getPopularTags = () => async (dispatch) => {
   try {
@@ -17,7 +18,7 @@ export const getPopularTags = () => async (dispatch) => {
     });
     return res.data.getPopularTags;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 export const searchTags = (searchTerm) => async (dispatch) => {
@@ -29,7 +30,7 @@ export const searchTags = (searchTerm) => async (dispatch) => {
     });
     return res.data.searchTags;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -41,7 +42,7 @@ export const randomPrompt = () => async (dispatch) => {
     });
     return res.data.randomPrompt;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -53,7 +54,7 @@ export const getRecommendedTags = () => async (dispatch) => {
     });
     return res.data.getRecommendedTags;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };
 
@@ -77,6 +78,6 @@ export const followTag = (tagId) => async (dispatch) => {
     }
     return res.data.followTopic;
   } catch (err) {
-    console.log(err);
+    rollbar.log(err);
   }
 };

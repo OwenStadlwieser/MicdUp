@@ -3,6 +3,7 @@ import { playSound } from "../../reuseableFunctions/helpers";
 import store from "../index";
 import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
+import { rollbar } from "../../reuseableFunctions/constants";
 
 const soundExpo = new Audio.Sound();
 
@@ -72,7 +73,7 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
         );
       }
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
       clearInterval(intervalId);
     }
   }, 100);

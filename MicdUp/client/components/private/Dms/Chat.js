@@ -27,18 +27,26 @@ import {
   addLoading,
   removeLoading,
   showHeader,
+  showMessage,
 } from "../../../redux/actions/display";
 import { changeSound, pauseSound } from "../../../redux/actions/sound";
-import { hideChats, viewMoreChats } from "../../../redux/actions/chat";
+import {
+  hideChats,
+  viewMoreChats,
+  chatRecieved,
+} from "../../../redux/actions/chat";
+import RecordingControls from "../../reuseable/RecordingControls";
+import { setSocket } from "../../../redux/actions/auth";
+// helpers
 import {
   getCurrentTime,
   onSpeechResults,
   onSpeechStart,
   forHumans,
+  configureSocket,
+  getData,
 } from "../../../reuseableFunctions/helpers";
-import RecordingControls from "../../reuseable/RecordingControls";
-
-const { width, height } = Dimensions.get("window");
+import { rollbar } from "../../../reuseableFunctions/constants";
 
 export class Chat extends Component {
   constructor() {
@@ -46,17 +54,17 @@ export class Chat extends Component {
     this.state = {
       loading: false,
       recording: false,
-      audioBlobs: false,
       fetching: false,
       lastFetched: 0,
       soundLevels: [],
       results: [],
+      controlsKey: 1,
     };
     try {
       Voice.onSpeechResults = onSpeechResults.bind(this);
       Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.scrollView = null;
     this.mounted = true;
@@ -72,18 +80,84 @@ export class Chat extends Component {
       });
   };
 
-  onSend = (base64Url, fileType, results) => {
-    const { activeChatId, socket } = this.props;
-    socket.emit("new message", {
-      messageData: base64Url,
-      chatId: activeChatId,
-      fileType,
-      speechToText: results,
-    });
+  disconnectFunction = async () => {
+    const token = await getData("token");
+    if (token) {
+      setTimeout(async function () {
+        await this.startSocket();
+      }, 1000);
+    }
+  };
+
+  messageFunction = async (message, chatId) => {
+    const { profile } = this.props;
+    if (message.owner.id == profile.id) {
+      this.props.removeLoading("MessageSending");
+    }
+    this.props.chatRecieved(message, chatId);
+  };
+
+  startSocket = async () => {
+    const { setSocket } = this.props;
+    const socket = await configureSocket(
+      token,
+      this.messageFunction,
+      this.disconnectFunction
+    );
+    setSocket(socket);
+    return socket;
+  };
+
+  onSend = async (base64Url, fileType, results) => {
+    const { activeChatId, socket, showMessage, addLoading, loadingMap } =
+      this.props;
+    if (loadingMap && loadingMap["MessageSending"]) {
+      showMessage({
+        success: false,
+        message: "Failed to send, currently sending previous message",
+      });
+      return;
+    }
+    if (socket.connected) {
+      addLoading("MessageSending");
+      socket.emit("new message", {
+        messageData: base64Url,
+        chatId: activeChatId,
+        fileType,
+        speechToText: results,
+      });
+    } else {
+      addLoading("MessageSending");
+      showMessage({
+        success: false,
+        message: "Establishing connection to server",
+      });
+      let newSocket = await this.startSocket();
+      const intervalId = setTimeout(function () {
+        newSocket = this.props.socket;
+        if (newSocket.connected) {
+          showMessage({
+            success: true,
+            message: "Established connection to server",
+          });
+          clearInterval(intervalId);
+          newSocket.emit("new message", {
+            messageData: base64Url,
+            chatId: activeChatId,
+            fileType,
+            speechToText: results,
+          });
+        }
+      }, 200);
+      this.mounted && this.setState({ intervalId });
+    }
   };
   componentWillUnmount = async () => {
+    const { intervalId } = this.state;
+    clearInterval(intervalId);
     this.props.showHeader(true);
     this.props.removeLoading("CHAT");
+    this.props.removeLoading("MessageSending");
     Voice.stop();
     this.mounted = false;
   };
@@ -94,8 +168,8 @@ export class Chat extends Component {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    const { activeChats } = this.props;
-    const { fetching } = this.state;
+    const { activeChats, loadingMap } = this.props;
+    const { fetching, controlsKey } = this.state;
     if (
       activeChats &&
       prevProps.activeChats &&
@@ -104,6 +178,13 @@ export class Chat extends Component {
     ) {
       this.scrollView.scrollToEnd({ animated: true });
     }
+    if (
+      prevProps.loadingMap &&
+      prevProps.loadingMap["MessageSending"] &&
+      (!loadingMap || !loadingMap["MessageSending"])
+    ) {
+      this.mounted && this.setState({ controlsKey: controlsKey + 1 });
+    }
   };
   goBack = () => console.log("Went back");
 
@@ -111,7 +192,7 @@ export class Chat extends Component {
 
   render() {
     const { activeChats, profile, playingId, isPause } = this.props;
-    const { recording, refreshing } = this.state;
+    const { recording, refreshing, controlsKey } = this.state;
     return (
       <View style={styles.pane}>
         <View style={styles.chatPane}>
@@ -299,6 +380,7 @@ export class Chat extends Component {
             </ScrollView>
           </View>
           <RecordingControls
+            key={controlsKey}
             onRecordingStart={(() => {
               this.mounted && this.setState({ recording: true });
             }).bind(this)}
@@ -321,6 +403,7 @@ const mapStateToProps = (state) => ({
   playingId:
     state.sound.currentPlayingSound && state.sound.currentPlayingSound.id,
   isPause: state.sound.isPause,
+  loadingMap: state.display.loadingMap,
 });
 
 export default connect(mapStateToProps, {
@@ -331,4 +414,7 @@ export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   showHeader,
+  showMessage,
+  chatRecieved,
+  setSocket,
 })(Chat);

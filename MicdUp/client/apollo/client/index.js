@@ -1,12 +1,16 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { getData } from "../../reuseableFunctions/helpers";
+import {
+  privateUrl,
+  publicUrl,
+} from "../../reuseableFunctions/constantsshared";
 const httpLinkPublic = createHttpLink({
-  uri: "http://localhost:6002/public",
+  uri: publicUrl,
 });
 
 const httpLinkPrivate = createHttpLink({
-  uri: "http://localhost:6002/private",
+  uri: privateUrl,
 });
 
 const authLink = setContext(async (_, { headers }) => {

@@ -9,6 +9,7 @@ import { styles } from "../../../styles/Styles";
 import { uploadBio } from "../../../redux/actions/recording";
 import { showMessage } from "../../../redux/actions/display";
 // helpers
+import { rollbar } from "../../../reuseableFunctions/constants";
 import { soundBlobToBase64 } from "../../../reuseableFunctions/helpers";
 // audio
 import Voice from "@react-native-voice/voice";
@@ -29,7 +30,7 @@ export class Bio extends Component {
       Voice.onSpeechResults = onSpeechResults.bind(this);
       Voice.onSpeechStart = onSpeechStart.bind(this);
     } catch (err) {
-      console.log(err);
+      rollbar.log(err);
     }
     this.mounted = true;
   }
@@ -61,14 +62,12 @@ export class Bio extends Component {
 
   render() {
     const {
-      isUserProfile,
       startRecording,
+      isUserProfile,
       stopRecordingBio,
       currentSound,
-      profile,
       newBioRecording,
       bio,
-      id,
     } = this.props;
     const { isRecording } = this.state;
     return (
@@ -93,12 +92,16 @@ export class Bio extends Component {
             <TouchableOpacity
               onPress={async () => {
                 if (!isRecording || Platform.OS !== "web") {
-                  await startRecording();
-                  this.mounted && this.setState({ startTime: Date.now() });
                   try {
-                    Platform.OS !== "web" && Voice.start();
-                  } catch (err) {}
-                  this.mounted && this.setState({ isRecording: true });
+                    await startRecording();
+                    this.mounted && this.setState({ startTime: Date.now() });
+                    this.mounted && this.setState({ isRecording: true });
+                  } catch (err) {
+                    this.props.showMessage({
+                      success: false,
+                      message: "Unable to start recording",
+                    });
+                  }
                 } else {
                   try {
                     Platform.OS !== "web" && Voice.stop();
