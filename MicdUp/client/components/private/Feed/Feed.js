@@ -226,7 +226,7 @@ export class Feed extends Component {
                 style={
                   (styles.nextButtonText,
                   {
-                    color: following ? "white" : "black",
+                    color: "black",
                     fontStyle: "italic",
                     fontSize: small,
                     fontWeight: "600",
@@ -269,7 +269,7 @@ export class Feed extends Component {
                 style={
                   (styles.nextButtonText,
                   {
-                    color: !following ? "white" : "black",
+                    color: "black",
                     fontStyle: "italic",
                     fontSize: small,
                     fontWeight: "600",
