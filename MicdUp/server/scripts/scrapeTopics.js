@@ -8,7 +8,7 @@ dotenv.config({ path: `${__dirname}/../config.env` });
 const { Tag } = require("../database/models/Tag");
 const { Prompt } = require("../database/models/Prompt");
 const mongoose = require("mongoose");
-const { getCurrentTime } = require("../server/reusableFunctions/helpers");
+const { getCurrentTime } = require("../reusableFunctions/helpers");
 let db = process.env.DATABASE.replace("<DB_PASSWORD>", process.env.DB_PASSWORD);
 db = db.replace("<DB_USERNAME>", process.env.DB_USERNAME);
 mongoose

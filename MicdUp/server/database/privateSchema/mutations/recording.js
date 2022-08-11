@@ -92,7 +92,6 @@ const createRecording = {
           "..",
           "..",
           "..",
-          "temp",
           `${post._id}${i}.${fileType}`
         );
         const base64 = files[i].substr(files[i].indexOf(",") + 1);
@@ -106,15 +105,8 @@ const createRecording = {
     } catch (err) {
       console.log(err);
     }
-    var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
-    const fileName = path.join(
-      __dirname,
-      "..",
-      "..",
-      "..",
-      "temp",
-      `${post._id}.mp4`
-    );
+    var jsonPath = path.join(__dirname, "..", "..", "..");
+    const fileName = path.join(__dirname, "..", "..", "..", `${post._id}.mp4`);
     // combine files
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -187,7 +179,6 @@ const uploadBio = {
         "..",
         "..",
         "..",
-        "temp",
         `${bio._id}.${fileType}`
       );
       const base64 = files.substr(files.indexOf(",") + 1);
@@ -212,15 +203,8 @@ const uploadBio = {
       profile.bio = null;
     }
     profile.bio = bio._id;
-    var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
-    const fileName = path.join(
-      __dirname,
-      "..",
-      "..",
-      "..",
-      "temp",
-      `${bio._id}.mp4`
-    );
+    var jsonPath = path.join(__dirname, "..", "..", "..");
+    const fileName = path.join(__dirname, "..", "..", "..", `${bio._id}.mp4`);
     // convert file to mp4 (might as well keep them all the same)
     try {
       await ffmpegMergeAndUpload(fileName, bio._id, fileNames, command);
@@ -456,7 +440,6 @@ const commentToPost = {
           "..",
           "..",
           "..",
-          "temp",
           `${comment._id}.${fileType}`
         );
         const base64 = files.substr(files.indexOf(",") + 1);
@@ -469,13 +452,12 @@ const commentToPost = {
       } catch (err) {
         console.log(err);
       }
-      var jsonPath = path.join(__dirname, "..", "..", "..", "temp");
+      var jsonPath = path.join(__dirname, "..", "..", "..");
       const fileName = path.join(
         __dirname,
         "..",
         "..",
         "..",
-        "temp",
         `${comment._id}.mp4`
       );
       await ffmpegMergeAndUpload(fileName, comment._id, fileNames, command);

@@ -7,12 +7,13 @@ const { Message, File } = require("../database/models/File");
 const { getCurrentTime } = require("../reusableFunctions/helpers");
 const fs = require("fs");
 var path = require("path");
-
+const { makeNotification } = require("../utils/sendNotification");
 const {
-  uploadFileFromBase64,
-  getSignedUrl,
-  getFile,
-} = require("../utils/awsS3");
+  NotificationTypesBackend,
+  MESSAGE_MESSAGE,
+} = require("../utils/constants");
+
+const { getSignedUrl, getFile } = require("../utils/awsS3");
 const {
   ffmpegMergeAndUpload,
   ffmpegGetDuration,
@@ -34,6 +35,10 @@ exports = module.exports = function (io) {
           throw new Error("Invalid token");
         }
         const profile = await Profile.findOne({ user: userId.user });
+        if (!profile) {
+          console.log(userId.user, "is not associated with a profile");
+          throw new Error("Profile not found");
+        }
         socket.profileId = profile._id;
         for (let i = 0; i < profile.chats.length; i++) {
           socket.join(profile.chats[i].toString());
@@ -70,7 +75,6 @@ exports = module.exports = function (io) {
         var jsonPath = path.join(
           __dirname,
           "..",
-          "temp",
           `${message._id}.${fileTypeFixed}`
         );
         const base64 = messageData.substr(messageData.indexOf(",") + 1);
@@ -82,12 +86,7 @@ exports = module.exports = function (io) {
 
         var command = ffmpeg();
         command.input(jsonPath).inputFormat(fileTypeFixed);
-        const fileName = path.join(
-          __dirname,
-          "..",
-          "temp",
-          `${message._id}.mp4`
-        );
+        const fileName = path.join(__dirname, "..", `${message._id}.mp4`);
         const session = await mongoose.startSession();
         session.startTransaction();
         const fileNames = [];
@@ -132,6 +131,19 @@ exports = module.exports = function (io) {
           for (member in chat.members) {
             if (profileDoc.blockedMap.get(`${member}`)) {
               blocked_member = true;
+            }
+
+            if (member != profileDoc.user) {
+              console.log("making notification");
+              await makeNotification(
+                user,
+                NotificationTypesBackend.SendMessage,
+                {},
+                member,
+                MESSAGE_MESSAGE,
+                message._id,
+                chat._id
+              );
             }
           }
           !blocked_member &&
