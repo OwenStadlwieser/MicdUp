@@ -31,32 +31,34 @@ export const chatRecieved = (message, chatId) => (dispatch) => {
     payload: { message, chatId },
   });
 };
-export const createOrOpenChat = (members, creator) => async (dispatch) => {
-  try {
-    const res = await privateClient.mutate({
-      mutation: FETCH_CHAT_MUTATION,
-      variables: { members, creator },
-      fetchPolicy: "no-cache",
-    });
-    if (!res || !res.data || !res.data.fetchChat) {
-      dispatch(
-        showMessage({ success: false, message: "Fetching chat failed" })
-      );
+export const createOrOpenChat =
+  (members, creator, chatId = null) =>
+  async (dispatch) => {
+    try {
+      const res = await privateClient.mutate({
+        mutation: FETCH_CHAT_MUTATION,
+        variables: { members, creator, chatId },
+        fetchPolicy: "no-cache",
+      });
+      if (!res || !res.data || !res.data.fetchChat) {
+        dispatch(
+          showMessage({ success: false, message: "Fetching chat failed" })
+        );
+      }
+      dispatch({
+        type: SET_ACTIVE_CHATS,
+        payload: {
+          activeChats: res.data.fetchChat.chatMessages,
+          activeChatId: res.data.fetchChat.id,
+          activeChatMembers: res.data.fetchChat.members,
+        },
+      });
+      dispatch(navigate("Chat"));
+      return res.data.fetchChat;
+    } catch (err) {
+      rollbar.log(err);
     }
-    dispatch({
-      type: SET_ACTIVE_CHATS,
-      payload: {
-        activeChats: res.data.fetchChat.chatMessages,
-        activeChatId: res.data.fetchChat.id,
-        activeChatMembers: res.data.fetchChat.members,
-      },
-    });
-    dispatch(navigate("Chat"));
-    return res.data.fetchChat;
-  } catch (err) {
-    rollbar.log(err);
-  }
-};
+  };
 
 export const viewChats = (skipMult) => async (dispatch) => {
   try {

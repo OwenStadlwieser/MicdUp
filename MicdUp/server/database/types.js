@@ -6,6 +6,7 @@ const { Post } = require("./models/Post");
 const { File } = require("./models/File");
 const { Chat } = require("./models/Chat");
 const { Comment } = require("./models/Comment");
+const { Message } = require("./models/File");
 const {
   GraphQLObjectType,
   GraphQLID,
@@ -684,10 +685,11 @@ const ChatType = new GraphQLObjectType({
       async resolve(parent, args, context, info) {
         const size = 20;
         const skipMult = 0;
-        return await Chat.find({ _id: { $in: parent.messages } })
+        const res = await Message.find({ _id: { $in: parent.messages } })
           .sort({ dateCreated: -1 })
           .skip(size * skipMult)
           .limit(size);
+        return res;
       },
     },
   }),

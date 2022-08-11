@@ -8,6 +8,7 @@ const NotificationTypesFrontend = {
   CommentPost: "CommentPost",
   // done
   ReplyComment: "ReplyComment",
+  SendMessage: "SendMessage",
 };
 
 module.exports = { NotificationTypesFrontend };

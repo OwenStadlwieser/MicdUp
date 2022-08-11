@@ -7,11 +7,16 @@ import {
   showComments,
 } from "../../../redux/actions/display";
 import { openSpecificPost } from "../../../redux/actions/recording";
-import { viewProfile } from "../../../redux/actions/display";
+import {
+  viewProfile,
+  addLoading,
+  removeLoading,
+} from "../../../redux/actions/display";
 import { styles, medium } from "../../../styles/Styles";
 import { NotificationTypesFrontend } from "../../../notifications/NotificationTypes";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { SINGLE_POST_KEY } from "../../../reuseableFunctions/constants";
+import { createOrOpenChat } from "../../../redux/actions/chat";
 export class Notification extends Component {
   constructor() {
     super();
@@ -22,7 +27,12 @@ export class Notification extends Component {
     this.mounted = true;
   }
 
-  componentWillUnmount = () => (this.mounted = false);
+  LOADING_STRING = "NOTIFICATIONLOADING";
+
+  componentWillUnmount = () => {
+    this.props.removeLoading(this.LOADING_STRING);
+    this.mounted = false;
+  };
 
   componentDidMount = async () => {};
 
@@ -33,6 +43,8 @@ export class Notification extends Component {
       <TouchableOpacity
         style={styles.notif}
         onPress={async () => {
+          this.props.addLoading(this.LOADING_STRING);
+
           switch (data.type) {
             case NotificationTypesFrontend.LikePost:
               await this.props.openSpecificPost(itemId, null);
@@ -47,11 +59,14 @@ export class Notification extends Component {
               if (profile && profile.id === sender.id) {
                 this.props.navigate("Profile");
                 this.mounted && this.setState({ showing: false });
-                return;
+                break;
               }
               this.props.viewProfile({ ...sender });
               this.props.searchViewProfile(true);
               this.props.navigate("SearchProfile");
+              break;
+            case NotificationTypesFrontend.SendMessage:
+              this.props.createOrOpenChat([], "", parentId);
               break;
             case NotificationTypesFrontend.ReplyComment:
               await this.props.openSpecificPost(parentId, itemId);
@@ -64,6 +79,7 @@ export class Notification extends Component {
               this.props.showComments(0, SINGLE_POST_KEY);
               break;
           }
+          this.props.removeLoading(this.LOADING_STRING);
         }}
       >
         <Image
@@ -95,4 +111,7 @@ export default connect(mapStateToProps, {
   viewProfile,
   openSpecificPost,
   showComments,
+  createOrOpenChat,
+  addLoading,
+  removeLoading,
 })(Notification);

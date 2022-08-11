@@ -10,18 +10,27 @@ const fetchChat = {
   args: {
     members: { type: new GraphQLList(GraphQLID) },
     creator: { type: GraphQLID },
+    chatId: { type: GraphQLID },
   },
-  async resolve(parent, { members, creator }, context) {
+  async resolve(parent, { members, creator, chatId }, context) {
     // FIXME: implement transaction
     const session = await mongoose.startSession();
     session.startTransaction();
     members.sort();
 
     try {
+      let blocked = [...context.profile.blockedMap.keys()];
+
+      if (chatId) {
+        let chat = await Chat.findOne({
+          $and: [{ _id: chatId }, { $not: { members: { $all: blocked } } }],
+        });
+        if (chat) return chat;
+        else return null;
+      }
       if (members.length > 20) {
         throw new Error("Too many members");
       }
-      let blocked = [...context.profile.blockedMap.keys()];
 
       const index = members.findIndex(
         (member) => member.toString() === creator.toString()

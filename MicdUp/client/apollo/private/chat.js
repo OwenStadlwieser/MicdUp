@@ -38,8 +38,8 @@ const FETCH_CHATS_QUERY = gql`
 `;
 
 const FETCH_CHAT_MUTATION = gql`
-  mutation fetchChat($members: [ID!], $creator: ID!) {
-    fetchChat(members: $members, creator: $creator) {
+  mutation fetchChat($members: [ID!], $creator: ID!, $chatId: ID) {
+    fetchChat(members: $members, creator: $creator, chatId: $chatId) {
       id
       creator {
         id

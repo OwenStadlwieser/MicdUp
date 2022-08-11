@@ -134,7 +134,7 @@ exports = module.exports = function (io) {
               blocked_member = true;
               curr_blocked = true;
             }
-            if (chat.members[i] != profileDoc.user && !curr_blocked) {
+            if (!chat.members[i].equals(profileDoc._id) && !curr_blocked) {
               console.log("making notification");
               await makeNotification(
                 user,
