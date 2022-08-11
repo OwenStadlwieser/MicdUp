@@ -68,7 +68,7 @@ export class Notification extends Component {
               this.props.navigate("SearchProfile");
               break;
             case NotificationTypesFrontend.SendMessage:
-              this.props.createOrOpenChat([], "", parentId);
+              await this.props.createOrOpenChat([], "", parentId);
               break;
             case NotificationTypesFrontend.ReplyComment:
               await this.props.openSpecificPost(parentId, itemId);
