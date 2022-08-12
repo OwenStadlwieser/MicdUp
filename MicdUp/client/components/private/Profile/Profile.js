@@ -208,9 +208,23 @@ export class Profile extends Component {
     this.mounted && this.setState({ newBioRecording: newR });
   };
 
-  setImage = (uri, base64) => {
+  setImage = async (uri, base64) => {
     let mimeType2 = uri.match(/[^:/]\w+(?=;|,)/)[0];
-    this.props.updateProfilePic(uri, base64, "." + mimeType2);
+    this.props.addLoading("Profile");
+    const res = await this.props.updateProfilePic(uri, base64, "." + mimeType2);
+    if (res) {
+      this.props.showMessage({
+        success: true,
+        message: "Successfully uploaded image",
+      });
+      this.mounted && this.setState({ selectImage: false });
+    } else {
+      this.props.showMessage({
+        success: false,
+        message: "Failed to upload image",
+      });
+    }
+    this.props.removeLoading("Profile");
   };
 
   setHidden = () => {
@@ -446,6 +460,7 @@ export class Profile extends Component {
             scrollEnabled={outerScrollEnabled}
             refreshControl={
               <RefreshControl
+                tintColor="white"
                 refreshing={refreshing}
                 onRefresh={() => {
                   this.getPosts(true);

@@ -15,6 +15,7 @@ import { Title } from "react-native-paper";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Post from "../Profile/Post";
 import { Button } from "react-native-paper";
+import Header from "../../reuseable/Header";
 // redux
 import { getRecordingsFromTag } from "../../../redux/actions/recording";
 import {
@@ -29,6 +30,8 @@ import {
   getNotLoggedInFeed,
   getTopicsFeed,
 } from "../../../redux/actions/feed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { updateTags } from "../../../redux/actions/recording";
 // helpers
 import { rollbar } from "../../../reuseableFunctions/constants";
 
@@ -61,20 +64,35 @@ export class Feed extends Component {
     navigation.setOptions({
       headerTitle: tag.title,
       headerRight: () => (
-        <Button
-          color="red"
-          icon={!tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"}
-          onPress={async () => {
-            const { tag } = this.state;
-            this.props.addLoading("Feed");
-            const newTag = await this.props.followTag(tag._id);
-            this.mounted && this.setState({ tag: newTag });
-            if (newTag) {
-              this.updateNavigationOptions(newTag);
-            }
-            this.props.removeLoading("Feed");
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            paddingHorizontal: 20,
           }}
-        />
+        >
+          <Header></Header>
+          <TouchableOpacity>
+            <MaterialCommunityIcons
+              color="red"
+              size={24}
+              name={
+                !tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"
+              }
+              onPress={async () => {
+                const { tag } = this.state;
+                this.props.addLoading("Feed");
+                const newTag = await this.props.followTag(tag._id);
+                this.mounted && this.setState({ tag: newTag });
+                if (newTag) {
+                  this.updateNavigationOptions(newTag);
+                }
+                this.props.removeLoading("Feed");
+              }}
+            />
+          </TouchableOpacity>
+        </View>
       ),
     });
   };
@@ -89,6 +107,7 @@ export class Feed extends Component {
       this.mounted && this.setState({ loading: true });
       if (fromSearch && tag) {
         this.mounted && this.setState({ tag: { ...tag } });
+        console.log(skipMult, "Skip Mult");
         this.updateNavigationOptions(tag);
         await this.props.getRecordingsFromTag(tag._id, skipMult);
       } else if (!fromSearch && loggedIn) {
@@ -144,7 +163,8 @@ export class Feed extends Component {
         event.nativeEvent.contentOffset.y >
           postsToView.length * postHeight - height &&
         !loading &&
-        prevLength !== postsToView.length
+        prevLength !== postsToView.length &&
+        Math.round(postsToView.length / 20) > 0
       ) {
         this.mounted && this.setState({ prevLength: postsToView.length });
         await this.getData(Math.round(postsToView.length / 20));
@@ -171,6 +191,7 @@ export class Feed extends Component {
       ? "FOLLOWINGFEED"
       : "TOPICSFEED";
     const postsToView = key ? cachedPosts[key] : [];
+    console.log(postsToView);
     return (
       <View
         style={{
@@ -226,7 +247,7 @@ export class Feed extends Component {
                 style={
                   (styles.nextButtonText,
                   {
-                    color: following ? "white" : "black",
+                    color: "black",
                     fontStyle: "italic",
                     fontSize: small,
                     fontWeight: "600",
@@ -269,7 +290,7 @@ export class Feed extends Component {
                 style={
                   (styles.nextButtonText,
                   {
-                    color: !following ? "white" : "black",
+                    color: "black",
                     fontStyle: "italic",
                     fontSize: small,
                     fontWeight: "600",
@@ -315,6 +336,7 @@ export class Feed extends Component {
             }}
             refreshControl={
               <RefreshControl
+                tintColor="white"
                 refreshing={refreshing}
                 onRefresh={async () => {
                   this.mounted && this.setState({ refreshing: true });
@@ -359,6 +381,22 @@ export class Feed extends Component {
             rightOpenValue={-75}
           />
         </View>
+        {fromSearch && (
+          <TouchableOpacity
+            style={{ display: "flex", alignItems: "center" }}
+            onPress={async () => {
+              this.props.updateTags(tag.title);
+              this.props.navigate("Create");
+            }}
+          >
+            <MaterialCommunityIcons
+              name="microphone-plus"
+              size={75}
+              color="red"
+              style={styles.recordingMicIcon}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -382,4 +420,5 @@ export default connect(mapStateToProps, {
   getNotLoggedInFeed,
   getTopicsFeed,
   showHeader,
+  updateTags,
 })(Feed);

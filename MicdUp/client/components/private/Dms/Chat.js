@@ -232,6 +232,7 @@ export class Chat extends Component {
                   }}
                 />
               }
+              tintColor="white"
               contentContainerStyle={styles.messagesContainer}
               scrollEventThrottle={16}
             >

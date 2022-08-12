@@ -179,7 +179,7 @@ export class SubmitRecording extends Component {
             <View style={styles.recordingSettingsOption}>
               <Text style={styles.recordingSettingsText}>Private Post</Text>
               <RadioButton
-                style={styles.recordingSettingsButton}
+                style={{ color: "black" }}
                 status={privatePost ? "checked" : "unchecked"}
                 onPress={() =>
                   this.mounted && this.setState({ privatePost: !privatePost })

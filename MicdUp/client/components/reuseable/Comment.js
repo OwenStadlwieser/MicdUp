@@ -448,6 +448,7 @@ export class Comment extends Component {
               scrollEnabled={true}
               refreshControl={
                 <RefreshControl
+                  tintColor="white"
                   refreshing={refreshing}
                   onRefresh={async () => {
                     this.mounted && this.setState({ refreshing: true });

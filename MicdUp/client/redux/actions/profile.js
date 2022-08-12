@@ -17,7 +17,9 @@ import {
   GET_FOLLOWING_QUERY,
   BLOCK_PROFILE_MUTATION,
 } from "../../apollo/private/profile";
+import { viewProfile, navigate } from "./display";
 import { rollbar } from "../../reuseableFunctions/constants";
+import store from "../index";
 
 export const blockProfile = (profileId, blocking) => async (dispatch) => {
   const res = await privateClient.mutate({
@@ -131,9 +133,20 @@ export const updateProfilePic =
         type: UPDATE_PROFILE_PIC,
         payload: { ...res.data.updateProfilePic },
       });
+
+      let { user } = store.getState().auth;
+      dispatch(
+        viewProfile({
+          ...user.profile,
+          user: { user },
+        })
+      );
+      //dispatch(navigate("Profile"));
+      dispatch(navigate("Profile"));
       return true;
     } catch (err) {
-      rollbar.log(err);
+      console.log(err);
+      return false;
     }
   };
 
