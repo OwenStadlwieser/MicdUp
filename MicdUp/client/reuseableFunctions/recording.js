@@ -4,10 +4,7 @@ import { rollbar } from "../reuseableFunctions/constants";
 
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
   await Audio.requestPermissionsAsync();
-  await Audio.setAudioModeAsync({
-    allowsRecordingIOS: true,
-    playsInSilentModeIOS: true,
-  });
+
   console.log("Starting recording..");
   try {
     Voice &&

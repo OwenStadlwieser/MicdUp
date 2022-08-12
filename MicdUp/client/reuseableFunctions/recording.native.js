@@ -5,10 +5,7 @@ import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
   rollbar.log("Requesting permission..");
   await Audio.requestPermissionsAsync();
-  await Audio.setAudioModeAsync({
-    allowsRecordingIOS: true,
-    playsInSilentModeIOS: true,
-  });
+
   rollbar.log("Starting recording..");
   const { recording } = await Audio.Recording.createAsync(
     Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,

@@ -248,7 +248,12 @@ function onSpeechResultsClips(e) {
     const words = e.value[e.value.length - 1];
     const wordsSplit = words.split(" ");
     const mostRecentWord = wordsSplit[wordsSplit.length - 1];
+    const lastWord =
+      currentResults.length > 0
+        ? currentResults[currentResults.length - 1].word
+        : "";
     this.mounted &&
+      lastWord != mostRecentWord &&
       this.setState({
         results: [
           ...currentResults,

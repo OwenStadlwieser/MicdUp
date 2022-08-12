@@ -54,6 +54,16 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      allowsRecordingIOS: true,
+      staysActiveInBackground: true,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+      playThroughEarpieceAndroid: false,
+    });
     StatusBar.setBarStyle(STATUS_BAR_STYLE);
     publicIP()
       .then((ip) => {
@@ -68,11 +78,8 @@ export class Root extends Component {
       });
     const token = await getData("token");
     this.mounted && this.setState({ token });
-    await Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      allowsRecordingIOS: false,
-    });
   };
+
   componentDidUpdate = async (prevProps, prevState) => {
     const { token } = this.state;
     const { loggedIn } = this.props;
