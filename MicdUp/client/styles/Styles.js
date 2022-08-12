@@ -17,6 +17,7 @@ const small = normalize(15);
 const medium = normalize(17);
 const large = normalize(20);
 const xl = normalize(24);
+const xxl = normalize(32);
 const postHeight = width > 1000 ? height * 0.35 : height * 0.23;
 const postPadding = height * 0.02;
 const chatWidth = width * 0.8;
@@ -467,9 +468,9 @@ const styles = StyleSheet.create({
     marginBottom: postPadding,
     backgroundColor: "white",
     justifyContent: "flex-start",
-    alignItems: "center",
+    alignItems: "baseline",
     paddingHorizontal: 15,
-    flexDirection: "row",
+    flexDirection: "column",
     position: "relative",
     paddingVertical: 10,
     overflow: "scroll",
@@ -488,7 +489,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   recordingMicIconComments: {
-    fontSize: large,
+    fontSize: xxl,
   },
   currentRecordingIconComments: {
     fontSize: large,
@@ -778,12 +779,13 @@ const styles = StyleSheet.create({
     height: height * 0.8,
   },
   tagResultsContainer: {
+    flex: 6,
+  },
+  userResultsContainer: {
     flex: 1,
     marginTop: height * 0.05,
     marginBottom: 20,
-  },
-  userResultsContainer: {
-    flex: 6,
+    maxHeight: height * 0.2,
   },
   foreignProfileButtons: {
     marginTop: height * 0.02,

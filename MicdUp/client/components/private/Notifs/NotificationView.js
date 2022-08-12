@@ -48,6 +48,7 @@ export class NotificationView extends Component {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
+              tintColor="white"
               onRefresh={async () => {
                 this.mounted && this.setState({ refreshing: true });
                 await this.props.getUserNotifs(0);

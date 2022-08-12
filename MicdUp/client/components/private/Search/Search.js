@@ -118,25 +118,9 @@ export class Search extends Component {
         )}
         {term.length > 0 && (
           <View style={styles.searchResultsContainer}>
-            <ScrollView style={styles.tagResultsContainer}>
-              {tags &&
-                tags.length > 0 &&
-                tags.map((res, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={async () => {
-                      this.props.searchViewTag;
-                    }}
-                    style={styles.listItemContainerUser}
-                  >
-                    <Text style={styles.listItemTextUser}>{res.title}</Text>
-                  </TouchableOpacity>
-                ))}
-            </ScrollView>
-            <ScrollView style={styles.userResultsContainer}>
-              {users &&
-                users.length > 0 &&
-                users.map((res, index) => (
+            {users && users.length > 0 && (
+              <ScrollView style={styles.userResultsContainer}>
+                {users.map((res, index) => (
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
@@ -161,7 +145,23 @@ export class Search extends Component {
                     <Text style={styles.listItemTextUser}>{res.userName}</Text>
                   </TouchableOpacity>
                 ))}
-            </ScrollView>
+              </ScrollView>
+            )}
+            {tags && tags.length > 0 && (
+              <ScrollView style={styles.tagResultsContainer}>
+                {tags.map((res, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={async () => {
+                      this.props.searchViewTag(res);
+                    }}
+                    style={styles.listItemContainerUser}
+                  >
+                    <Text style={styles.listItemTextUser}>{res.title}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
         )}
       </View>

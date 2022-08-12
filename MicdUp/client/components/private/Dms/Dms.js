@@ -178,6 +178,7 @@ export class Dms extends Component {
         <ScrollView
           refreshControl={
             <RefreshControl
+              tintColor="white"
               refreshing={refreshing}
               onRefresh={async () => {
                 this.mounted && this.setState({ refreshing: true });
