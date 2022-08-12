@@ -66,7 +66,7 @@ const fetchChats = {
         _id: { $in: context.profile.chats },
         $not: { members: { $all: blocked } },
       })
-        .sort({ dateCreated: 1 })
+        .sort({ updatedAt: -1 })
         .skip(size * skipMult)
         .limit(size);
       return chats;

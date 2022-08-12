@@ -115,6 +115,7 @@ exports = module.exports = function (io) {
           message.signedUrl = await getSignedUrl(`${message._id}.mp4`);
           await message.save({ session });
           chat.messages.push(message._id);
+          chat.updatedAt = getCurrentTime();
           await chat.save({ session });
           await session.commitTransaction();
           let returnMessage = {};

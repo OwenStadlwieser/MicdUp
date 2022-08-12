@@ -20,6 +20,14 @@ const chatSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Chat = mongoose.model("chat", chatSchema);

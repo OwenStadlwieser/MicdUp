@@ -9,7 +9,7 @@ import { SET_NOTIFS, APPEND_NOTIFS, UPDATE_NOTIFS_UNSEEN } from "../types";
 import { showMessage } from "./display";
 import { rollbar } from "../../reuseableFunctions/constants";
 
-export const addToken = (token) => async (dispatch) => {
+export const addToken = async (token) => {
   try {
     let fetchPolicy = "no-cache";
     const res = await privateClient.mutate({
@@ -19,15 +19,7 @@ export const addToken = (token) => async (dispatch) => {
       },
       fetchPolicy,
     });
-    if (!res.data) {
-      dispatch(
-        showMessage({
-          success: false,
-          message: "Something went wrong. Please contact support.",
-        })
-      );
-      return false;
-    }
+
     return res.data.success;
   } catch (err) {
     rollbar.log(err);

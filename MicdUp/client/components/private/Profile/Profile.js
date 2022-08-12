@@ -493,10 +493,12 @@ export class Profile extends Component {
                       listStyles.backRightBtnRight,
                     ]}
                     onPress={async () => {
+                      this.props.addLoading("Profile");
                       await this.props.deletePost(
                         data.item.id,
                         currentProfile.id
                       );
+                      this.props.removeLoading("Profile");
                     }}
                   >
                     <Entypo name="trash" size={24} color="red" />
