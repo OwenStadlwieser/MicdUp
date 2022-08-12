@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
-import MusicControl from "react-native-music-control";
+import MusicControl, { Command } from "react-native-music-control";
 export class MusicControlCustom extends Component {
   constructor() {
     super();
