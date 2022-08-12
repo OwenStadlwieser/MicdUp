@@ -191,7 +191,7 @@ export class Feed extends Component {
       ? "FOLLOWINGFEED"
       : "TOPICSFEED";
     const postsToView = key ? cachedPosts[key] : [];
-    console.log(postsToView);
+
     return (
       <View
         style={{

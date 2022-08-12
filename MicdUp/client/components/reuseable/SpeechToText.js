@@ -151,7 +151,7 @@ export class SpeechToText extends Component {
           const { currentPlayingSound } = this.props;
           this.mounted &&
             currentPlayingSound &&
-            currentPlayingSound.uri === post.signedUrl &&
+            currentPlayingSound.signedUrl === post.signedUrl &&
             playing &&
             this.setState({
               MainPosition: [
@@ -202,7 +202,7 @@ export class SpeechToText extends Component {
     if (
       currentPlayingSound &&
       post &&
-      currentPlayingSound.uri === post.signedUrl &&
+      currentPlayingSound.signedUrl === post.signedUrl &&
       post.speechToText[index] &&
       post.speechToText[index].time < time
     ) {
@@ -214,8 +214,9 @@ export class SpeechToText extends Component {
     } else if (
       prevProps.currentPlayingSound &&
       prevProps.post &&
-      prevProps.currentPlayingSound.uri === prevProps.post.signedUrl &&
-      (!currentPlayingSound || !(currentPlayingSound.uri === post.signedUrl))
+      prevProps.currentPlayingSound.signedUrl === prevProps.post.signedUrl &&
+      (!currentPlayingSound ||
+        !(currentPlayingSound.signedUrl === post.signedUrl))
     ) {
       if (playing) {
         this.mounted &&

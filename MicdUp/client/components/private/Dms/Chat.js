@@ -261,7 +261,10 @@ export class Chat extends Component {
                           if (playingId === chat.id && !isPause) {
                             await this.props.pauseSound();
                           } else if (chat.signedUrl) {
-                            await this.props.changeSound(chat, chat.signedUrl);
+                            await this.props.changeSound(
+                              0,
+                              activeChats.slice(index)
+                            );
                           }
                           this.props.removeLoading("CHAT");
                         }}

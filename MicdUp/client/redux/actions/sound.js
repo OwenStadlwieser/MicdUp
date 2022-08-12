@@ -4,14 +4,24 @@ import store from "../index";
 import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
 import { rollbar } from "../../reuseableFunctions/constants";
+import { showMessage } from "./display";
 
 const soundExpo = new Audio.Sound();
 
-export const changeSound = (sound, url, queue) => async (dispatch) => {
+export const changeSound = (currIndex, queue) => async (dispatch) => {
   let { currentPlayingSound, currentIntervalId, time } = store.getState().sound;
   let { user, ipAddr } = store.getState().auth;
-  sound.uri = url;
-  if (currentPlayingSound && currentPlayingSound.uri !== url) {
+  console.log(currIndex, queue.length);
+  if (!queue[currIndex]) {
+    dispatch(showMessage({ success: false, message: "No sound to play" }));
+    clearInterval(currentIntervalId);
+    return;
+  }
+
+  if (
+    currentPlayingSound &&
+    currentPlayingSound.signedUrl !== queue[currIndex].signedUrl
+  ) {
     if (user && currentPlayingSound.id && user._id) {
       dispatch(addListenerAuthenticated(currentPlayingSound.id, time));
     } else if (ipAddr && currentPlayingSound.id) {
@@ -32,7 +42,7 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
       }
     }
   }
-  const playbackObject = await playSound(sound.uri, soundExpo);
+  const playbackObject = await playSound(queue[currIndex].signedUrl, soundExpo);
   const intervalId = setInterval(async () => {
     try {
       const status = await playbackObject.getStatusAsync();
@@ -40,7 +50,7 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
         status.didJustFinish ||
         status.durationMillis === status.positionMillis
       ) {
-        let { queue, currentPlayingSound } = store.getState().sound;
+        let { queue, currentPlayingSound, currIndex } = store.getState().sound;
         let { user, ipAddr } = store.getState().auth;
         if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
           dispatch(
@@ -55,8 +65,8 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
           );
         }
         if (queue && queue.length > 0) {
-          let newSound = queue.shift();
-          await dispatch(changeSound(newSound, newSound.signedUrl, queue));
+          clearInterval(intervalId);
+          await dispatch(changeSound(currIndex + 1, queue));
           return;
         }
         await soundExpo.unloadAsync();
@@ -80,10 +90,11 @@ export const changeSound = (sound, url, queue) => async (dispatch) => {
   dispatch({
     type: CHANGE_SOUND,
     payload: {
-      currentPlayingSound: sound,
+      currentPlayingSound: queue[currIndex],
       intervalId,
       currentPlaybackObject: playbackObject,
       queue,
+      currIndex,
     },
   });
 };
