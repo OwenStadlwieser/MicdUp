@@ -6,6 +6,9 @@ import * as Notifications from "expo-notifications";
 
 import App from "./App";
 
+import TrackPlayer from "react-native-track-player";
+import { clearAsyncStorage } from "./reuseableFunctions/helpers";
+import Service from "./service";
 import {
   registerForPushNotificationsAsync,
   setUpListeners,
@@ -20,6 +23,11 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+TrackPlayer.registerPlaybackService(Service);
+(async () => {
+  await TrackPlayer.setupPlayer();
+})();
 
 //async() => clearAsyncStorage();
 registerForPushNotificationsAsync();

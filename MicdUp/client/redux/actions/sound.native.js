@@ -4,12 +4,32 @@ import store from "../index";
 import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
 import { rollbar } from "../../reuseableFunctions/constants";
+import { showMessage } from "./display";
 import {
   updateMusicControlPause,
   updateMusicControlNewSoundPlaying,
 } from "../../reuseableFunctions/constants";
+import TrackPlayer, { State } from "react-native-track-player";
 
 const soundExpo = new Audio.Sound();
+
+export const setTime = (time) => async (dispatch) => {
+  dispatch({
+    type: SET_TIME,
+    payload: time,
+  });
+};
+
+export const pauseSound = () => async (dispatch) => {
+  const state = await TrackPlayer.getState();
+  if (state === State.Playing) {
+    TrackPlayer.pause();
+    dispatch({
+      type: SOUND_PAUSE,
+      payload: true,
+    });
+  }
+};
 
 export const changeSound = (currIndex, queue) => async (dispatch) => {
   let { currentPlayingSound, currentIntervalId, time } = store.getState().sound;
@@ -29,29 +49,27 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
     } else if (ipAddr && currentPlayingSound.id) {
       dispatch(addListener(currentPlayingSound.id, ipAddr, time));
     }
-    await soundExpo.unloadAsync();
+    TrackPlayer.stop();
     clearInterval(currentIntervalId);
   } else if (currentPlayingSound) {
-    const result = await soundExpo.getStatusAsync();
-    if (result.isLoaded) {
-      if (result.isPlaying === false) {
-        soundExpo.playAsync();
-        dispatch({
-          type: SOUND_PAUSE,
-          payload: false,
-        });
-        return;
-      }
+    const state = await TrackPlayer.getState();
+    if (state === State.Paused) {
+      TrackPlayer.play();
+      dispatch({
+        type: SOUND_PAUSE,
+        payload: false,
+      });
     }
   }
-  const playbackObject = await playSound(queue[currIndex].signedUrl, soundExpo);
+  TrackPlayer.add(queue);
+  await TrackPlayer.skip(currIndex);
+  TrackPlayer.play();
+  const state = await TrackPlayer.getState();
+
   const intervalId = setInterval(async () => {
     try {
-      const status = await playbackObject.getStatusAsync();
-      if (
-        status.didJustFinish ||
-        status.durationMillis === status.positionMillis
-      ) {
+      const status = await state.getStatusAsync();
+      if (TrackPlayer.getPosition() === TrackPlayer.getDuration()) {
         let { queue, currentPlayingSound, currIndex } = store.getState().sound;
         let { user, ipAddr } = store.getState().auth;
         if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
@@ -68,10 +86,10 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
         }
         if (queue && queue.length > 0) {
           clearInterval(intervalId);
-          await dispatch(changeSound(currIndex + 1, queue));
+          await dispatch(changeSoundTrackPlayer(currIndex + 1, queue));
           return;
         }
-        await soundExpo.unloadAsync();
+        TrackPlayer.stop();
         clearInterval(intervalId);
         dispatch({
           type: SOUND_ENDED,
@@ -79,8 +97,8 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
       } else {
         await dispatch(
           setTime({
-            time: status.positionMillis,
-            duration: status.durationMillis,
+            time: TrackPlayer.getPosition(),
+            duration: TrackPlayer.getDuration(),
           })
         );
       }
@@ -89,7 +107,6 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
       clearInterval(intervalId);
     }
   }, 100);
-  updateMusicControlNewSoundPlaying(queue[currIndex]);
   dispatch({
     type: CHANGE_SOUND,
     payload: {
@@ -100,25 +117,4 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
       currIndex,
     },
   });
-};
-
-export const setTime = (time) => async (dispatch) => {
-  dispatch({
-    type: SET_TIME,
-    payload: time,
-  });
-};
-
-export const pauseSound = () => async (dispatch) => {
-  const result = await soundExpo.getStatusAsync();
-  if (result.isLoaded) {
-    if (result.isPlaying === true) {
-      updateMusicControlPause();
-      soundExpo.pauseAsync();
-      dispatch({
-        type: SOUND_PAUSE,
-        payload: true,
-      });
-    }
-  }
 };
