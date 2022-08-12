@@ -14,9 +14,8 @@ const soundExpo = new Audio.Sound();
 export const changeSound = (currIndex, queue) => async (dispatch) => {
   let { currentPlayingSound, currentIntervalId, time } = store.getState().sound;
   let { user, ipAddr } = store.getState().auth;
-  console.log(currIndex, queue.length);
+
   if (!queue[currIndex]) {
-    dispatch(showMessage({ success: false, message: "No sound to play" }));
     clearInterval(currentIntervalId);
     return;
   }
