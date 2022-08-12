@@ -5,6 +5,7 @@ import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
 import { rollbar } from "../../reuseableFunctions/constants";
 import { showMessage } from "./display";
+import { PitchAlgorithm } from "react-native-track-player";
 import {
   updateMusicControlPause,
   updateMusicControlNewSoundPlaying,
@@ -61,7 +62,18 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
       });
     }
   }
-  TrackPlayer.add(queue);
+  TrackPlayer.add(
+    queue.map((el) => {
+      el.url = el.signedUrl;
+      el.artist = el.owner ? el.owner.user.userName : "Unknown Artist";
+      el.artwork = el.owner
+        ? el.owner.image
+          ? el.owner.image.signedUrl
+          : null
+        : null;
+      el.pitchAlgorith = PitchAlgorithm.Voice;
+    })
+  );
   await TrackPlayer.skip(currIndex);
   TrackPlayer.play();
   const state = await TrackPlayer.getState();
