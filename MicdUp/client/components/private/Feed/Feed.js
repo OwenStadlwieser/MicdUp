@@ -336,6 +336,7 @@ export class Feed extends Component {
             }}
             refreshControl={
               <RefreshControl
+                tintColor="white"
                 refreshing={refreshing}
                 onRefresh={async () => {
                   this.mounted && this.setState({ refreshing: true });

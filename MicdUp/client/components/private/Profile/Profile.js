@@ -460,6 +460,7 @@ export class Profile extends Component {
             scrollEnabled={outerScrollEnabled}
             refreshControl={
               <RefreshControl
+                tintColor="white"
                 refreshing={refreshing}
                 onRefresh={() => {
                   this.getPosts(true);
