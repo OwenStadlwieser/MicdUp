@@ -124,7 +124,6 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
-    console.log(currentKey, 1232);
 
     this.props.showHeader(false);
     setInterval(() => {
@@ -138,7 +137,6 @@ export class Comment extends Component {
       post.comments &&
       post.comments.length > 0
     ) {
-      console.log("right here");
       return;
     }
     this.mounted && this.setState({ loading: true });
@@ -203,6 +201,9 @@ export class Comment extends Component {
     } else if (parent && !parent.parents) {
       comment.parents = [parentId];
     }
+
+    const queue =
+      comment.replies && comment.replies.length > 0 ? comment.replies : [];
     return (
       <Fragment key={comment.id}>
         <View
@@ -226,7 +227,7 @@ export class Comment extends Component {
               if (playingId === comment.id && !isPause) {
                 await this.props.pauseSound();
               } else if (comment.signedUrl) {
-                await this.props.changeSound(comment, comment.signedUrl);
+                await this.props.changeSound(0, [comment, ...queue]);
               }
             }}
             style={{
@@ -442,7 +443,7 @@ export class Comment extends Component {
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
-    console.log(currentKey, postIndex, post);
+
     if (!post) {
       return (
         <View

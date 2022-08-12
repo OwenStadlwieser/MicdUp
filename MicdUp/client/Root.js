@@ -6,6 +6,7 @@ import { styles } from "./styles/Styles";
 // redux
 import { setIp } from "./redux/actions/auth";
 import { navigationRef, navigateStateChanged } from "./redux/actions/display";
+import { changeSound, pauseSound } from "./redux/actions/sound";
 // children
 import LoginManager from "./components/reuseable/LoginManager";
 import Comment from "./components/reuseable/Comment";
@@ -28,6 +29,7 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import SoundModal from "./components/reuseable/SoundModal";
 import { STATUS_BAR_STYLE } from "./reuseableFunctions/constantsshared";
+import MusicControl from "./components/reuseable/MusicControl";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -113,6 +115,7 @@ export class Root extends Component {
     if (!loggedIn && !token)
       app = (
         <Fragment>
+          <MusicControl />
           <NavigationContainer
             theme={MyTheme}
             ref={navigationRef}
@@ -229,6 +232,8 @@ export class Root extends Component {
     else
       app = (
         <Fragment>
+          <MusicControl />
+
           {loading && (
             <View style={styles.loadingContainer}>
               <CircleSnail size={60} color={["white", "#6FF6FF"]} />
@@ -264,8 +269,13 @@ const mapStateToProps = (state) => ({
   userName: state.auth.user.userName,
   currentProfile: state.display.viewingProfile,
   showingSoundModal: state.display.showingSoundModal,
+  currentPlayingSound: state.sound.currentPlayingSound,
+  currentIntervalId: state.sound.currentIntervalId,
+  time: state.sound.time,
 });
 export default connect(mapStateToProps, {
   setIp,
   navigateStateChanged,
+  changeSound,
+  pauseSound,
 })(Root);

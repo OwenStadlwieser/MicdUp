@@ -8,6 +8,7 @@ const initialState = {
   isPause: false,
   time: 0,
   duration: 0,
+  currIndex: 0,
 };
 
 export default function (state = { ...initialState }, action) {
@@ -23,6 +24,7 @@ export default function (state = { ...initialState }, action) {
         isPause: false,
         time: 0,
         duration: 0,
+        currIndex: payload.currIndex,
       };
     case SOUND_ENDED:
       let queue = { state };

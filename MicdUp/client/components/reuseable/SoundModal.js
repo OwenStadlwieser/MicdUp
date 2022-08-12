@@ -37,7 +37,7 @@ export class SoundModal extends Component {
 
   componentDidUpdate = (prevProps) => {};
   render() {
-    const { playingId, sound, isPause, profile } = this.props;
+    const { playingId, sound, isPause, profile, queue } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
@@ -98,7 +98,14 @@ export class SoundModal extends Component {
                 {isPause ? (
                   <AntDesign
                     onPress={async () => {
-                      await this.props.changeSound(sound, sound.signedUrl);
+                      let index = queue.findIndex(
+                        (el) => el.signedUrl == sound.signedUrl
+                      );
+                      if (index > 0) {
+                        this.props.changeSound(index, queue);
+                      } else {
+                        await this.props.changeSound(0, [sound]);
+                      }
                     }}
                     name="playcircleo"
                     size={24}
@@ -138,6 +145,7 @@ const mapStateToProps = (state) => ({
   sound: state.sound.currentPlayingSound,
   isPause: state.sound.isPause,
   profile: state.auth.user ? state.auth.user.profile : null,
+  queue: state.sound.queue,
 });
 
 export default connect(mapStateToProps, {

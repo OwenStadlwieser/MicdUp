@@ -121,8 +121,11 @@ export class Clips extends Component {
               <AntDesign
                 onPress={async () => {
                   await this.props.changeSound(
-                    this.props.clips[index],
-                    this.props.clips[index].uri
+                    index,
+                    this.props.clips.map((el) => {
+                      el.signedUrl = el.uri;
+                      return el;
+                    })
                   );
                 }}
                 style={styles.playButton}

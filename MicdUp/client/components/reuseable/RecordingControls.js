@@ -160,7 +160,9 @@ export class RecordingControls extends Component {
                 <TouchableOpacity
                   onPress={async () => {
                     this.props.addLoading("CONTROLS");
-                    await this.props.changeSound(audioBlobs, audioBlobs.uri);
+                    await this.props.changeSound(0, [
+                      { ...audioBlobs, signedUrl: audioBlobs.uri },
+                    ]);
                     this.props.removeLoading("CONTROLS");
                   }}
                 >
@@ -258,7 +260,8 @@ export class RecordingControls extends Component {
 
 const mapStateToProps = (state) => ({
   playingUri:
-    state.sound.currentPlayingSound && state.sound.currentPlayingSound.uri,
+    state.sound.currentPlayingSound &&
+    state.sound.currentPlayingSound.signedUrl,
   isPause: state.sound.isPause,
 });
 

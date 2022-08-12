@@ -51,15 +51,22 @@ export class Post extends Component {
   componentDidMount = () => {};
 
   render() {
-    const { post, index, playingId, isPause, canViewPrivate, profile } =
-      this.props;
+    const {
+      post,
+      index,
+      playingId,
+      isPause,
+      canViewPrivate,
+      profile,
+      postArray,
+    } = this.props;
     return (
       <TouchableHighlight
         onPress={async () => {
           if (playingId === post.id && !isPause) {
             await this.props.pauseSound();
           } else if (post.signedUrl) {
-            await this.props.changeSound(post, post.signedUrl);
+            await this.props.changeSound(index, postArray);
           }
         }}
         style={[

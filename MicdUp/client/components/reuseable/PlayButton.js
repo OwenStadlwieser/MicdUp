@@ -49,7 +49,7 @@ export class PlayButton extends Component {
         {playingId !== post.id || isPause ? (
           <AntDesign
             onPress={async () => {
-              await this.props.changeSound(post, post.signedUrl, queue);
+              await this.props.changeSound(0, [post]);
             }}
             style={playButtonSty ? playButtonSty : styles.playButton}
             name="play"
