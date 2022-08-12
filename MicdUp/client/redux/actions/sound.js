@@ -5,7 +5,10 @@ import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
 import { rollbar } from "../../reuseableFunctions/constants";
 import { showMessage } from "./display";
-
+import {
+  updateMusicControlPause,
+  updateMusicControlNewSoundPlaying,
+} from "../../reuseableFunctions/constants";
 const soundExpo = new Audio.Sound();
 
 export const changeSound = (currIndex, queue) => async (dispatch) => {
@@ -87,6 +90,7 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
       clearInterval(intervalId);
     }
   }, 100);
+  updateMusicControlNewSoundPlaying(queue[currIndex]);
   dispatch({
     type: CHANGE_SOUND,
     payload: {
@@ -110,6 +114,7 @@ export const pauseSound = () => async (dispatch) => {
   const result = await soundExpo.getStatusAsync();
   if (result.isLoaded) {
     if (result.isPlaying === true) {
+      updateMusicControlPause();
       soundExpo.pauseAsync();
       dispatch({
         type: SOUND_PAUSE,
