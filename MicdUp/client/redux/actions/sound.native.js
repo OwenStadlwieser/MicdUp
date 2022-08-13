@@ -73,9 +73,6 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
   TrackPlayer.add(tracks);
   await TrackPlayer.skip(currIndex);
   TrackPlayer.play();
-  console.log(queue[currIndex]);
-
-  console.log("sound changed");
   dispatch({
     type: CHANGE_SOUND,
     payload: {

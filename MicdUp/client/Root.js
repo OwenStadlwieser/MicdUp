@@ -36,6 +36,7 @@ import { Audio } from "expo-av";
 import SoundModal from "./components/reuseable/SoundModal";
 import { STATUS_BAR_STYLE } from "./reuseableFunctions/constantsshared";
 import MusicControl from "./components/reuseable/MusicControl";
+import { Capability } from "react-native-track-player";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -66,9 +67,23 @@ export class Root extends Component {
 
   componentDidMount = async () => {
     await TrackPlayer.setupPlayer();
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+      ],
+      notificationCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+      ],
+    });
     TrackPlayer.addEventListener("playback-track-changed", async (object) => {
       const queue = await TrackPlayer.getQueue();
-      console.log(object.track, object.nextTrack != object.track);
       if (object.track != null && object.nextTrack != object.track) {
         await this.props.trackEnded(
           queue[object.track],
@@ -77,6 +92,38 @@ export class Root extends Component {
           object.track
         );
       }
+    });
+    TrackPlayer.addEventListener(
+      "remote-play",
+      async () => await TrackPlayer.play()
+    );
+    TrackPlayer.addEventListener(
+      "remote-pause",
+      async () => await TrackPlayer.pause()
+    );
+    TrackPlayer.addEventListener(
+      "remote-stop",
+      async () => await TrackPlayer.stop()
+    );
+    TrackPlayer.addEventListener("remote-next", async () => {
+      const queue = await TrackPlayer.getQueue();
+      const nextIndex = await TrackPlayer.getCurrentTrack();
+      await this.props.trackEnded(
+        queue[nextIndex],
+        queue,
+        nextIndex + 1,
+        nextIndex
+      );
+    });
+    TrackPlayer.addEventListener("remote-previous", async () => {
+      const queue = await TrackPlayer.getQueue();
+      const nextIndex = await TrackPlayer.getCurrentTrack();
+      await this.props.trackEnded(
+        queue[nextIndex],
+        queue,
+        nextIndex - 1,
+        nextIndex
+      );
     });
     const intervalId = setInterval(async () => {
       try {

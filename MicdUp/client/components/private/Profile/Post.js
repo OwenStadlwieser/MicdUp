@@ -60,7 +60,6 @@ export class Post extends Component {
       profile,
       postArray,
     } = this.props;
-    console.log(playingId, "playing id");
     return (
       <TouchableHighlight
         onPress={async () => {
