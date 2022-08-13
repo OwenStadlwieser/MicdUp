@@ -7,6 +7,11 @@ import { styles } from "./styles/Styles";
 import { setIp } from "./redux/actions/auth";
 import { navigationRef, navigateStateChanged } from "./redux/actions/display";
 import { changeSound, pauseSound } from "./redux/actions/sound";
+import { setTime, trackEnded } from "./redux/actions/sound";
+import {
+  addListener,
+  addListenerAuthenticated,
+} from "./redux/actions/recording";
 // children
 import LoginManager from "./components/reuseable/LoginManager";
 import Comment from "./components/reuseable/Comment";
@@ -21,6 +26,7 @@ import Search from "./components/private/Search/Search";
 import Profile from "./components/private/Profile/Profile";
 import ListOfAccounts from "./components/reuseable/ListOfAccounts";
 import VerifyEmail from "./components/private/Profile/VerifyEmail";
+import TrackPlayer from "react-native-track-player";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -46,16 +52,48 @@ export class Root extends Component {
     this.state = {
       token: "",
       loggedIn: false,
+      intervalId: "",
     };
 
     this.mounted = true;
   }
 
   componentWillUnmount = () => {
+    const { intervalId } = this.state;
+    clearInterval(intervalId);
     this.mounted = false;
   };
 
   componentDidMount = async () => {
+    await TrackPlayer.setupPlayer();
+    TrackPlayer.addEventListener("playback-track-changed", async (object) => {
+      const queue = await TrackPlayer.getQueue();
+      console.log(object.track, object.nextTrack != object.track);
+      if (object.track != null && object.nextTrack != object.track) {
+        await this.props.trackEnded(
+          queue[object.track],
+          queue,
+          object.nextTrack,
+          object.track
+        );
+      }
+    });
+    const intervalId = setInterval(async () => {
+      try {
+        const position = await TrackPlayer.getPosition();
+        const duration = await TrackPlayer.getDuration();
+        if (position && duration) {
+          await this.props.setTime({
+            time: position,
+            duration: duration,
+          });
+        }
+      } catch (err) {
+        console.log(err, 123);
+        rollbar.log(err, 123);
+        clearInterval(intervalId);
+      }
+    }, 100);
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
       allowsRecordingIOS: true,
@@ -79,7 +117,7 @@ export class Root extends Component {
         // 'Unable to get IP address.'
       });
     const token = await getData("token");
-    this.mounted && this.setState({ token });
+    this.mounted && this.setState({ token, intervalId });
   };
 
   componentDidUpdate = async (prevProps, prevState) => {
@@ -278,4 +316,6 @@ export default connect(mapStateToProps, {
   navigateStateChanged,
   changeSound,
   pauseSound,
+  setTime,
+  trackEnded,
 })(Root);

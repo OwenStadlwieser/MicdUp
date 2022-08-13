@@ -289,7 +289,6 @@ export class SpeechToText extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  recording: state.sound.currentPlaybackObject,
   currentPlayingSound: state.sound.currentPlayingSound,
   time: state.sound.time,
 });

@@ -37,10 +37,8 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
   let { user, ipAddr } = store.getState().auth;
 
   if (!queue[currIndex]) {
-    clearInterval(currentIntervalId);
     return;
   }
-
   if (
     currentPlayingSound &&
     currentPlayingSound.signedUrl !== queue[currIndex].signedUrl
@@ -50,8 +48,6 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
     } else if (ipAddr && currentPlayingSound.id) {
       dispatch(addListener(currentPlayingSound.id, ipAddr, time));
     }
-    TrackPlayer.stop();
-    clearInterval(currentIntervalId);
   } else if (currentPlayingSound) {
     const state = await TrackPlayer.getState();
     if (state === State.Paused) {
@@ -61,72 +57,54 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
         payload: false,
       });
     }
+    return;
   }
-  TrackPlayer.add(
-    queue.map((el) => {
-      el.url = el.signedUrl;
-      el.artist = el.owner ? el.owner.user.userName : "Unknown Artist";
-      el.artwork = el.owner
-        ? el.owner.image
-          ? el.owner.image.signedUrl
-          : null
-        : null;
-      el.pitchAlgorith = PitchAlgorithm.Voice;
-    })
-  );
+  const tracks = queue.map((el) => {
+    el.url = el.signedUrl;
+    el.artist = el.owner ? el.owner.user.userName : "Unknown Artist";
+    el.artwork = el.owner
+      ? el.owner.image
+        ? el.owner.image.signedUrl
+        : null
+      : null;
+    el.pitchAlgorith = PitchAlgorithm.Voice;
+    return el;
+  });
+  TrackPlayer.add(tracks);
   await TrackPlayer.skip(currIndex);
   TrackPlayer.play();
-  const state = await TrackPlayer.getState();
+  console.log(queue[currIndex]);
 
-  const intervalId = setInterval(async () => {
-    try {
-      const status = await state.getStatusAsync();
-      if (TrackPlayer.getPosition() === TrackPlayer.getDuration()) {
-        let { queue, currentPlayingSound, currIndex } = store.getState().sound;
-        let { user, ipAddr } = store.getState().auth;
-        if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
-          dispatch(
-            addListenerAuthenticated(
-              currentPlayingSound.id,
-              status.durationMillis
-            )
-          );
-        } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
-          dispatch(
-            addListener(currentPlayingSound.id, ipAddr, status.durationMillis)
-          );
-        }
-        if (queue && queue.length > 0) {
-          clearInterval(intervalId);
-          await dispatch(changeSoundTrackPlayer(currIndex + 1, queue));
-          return;
-        }
-        TrackPlayer.stop();
-        clearInterval(intervalId);
-        dispatch({
-          type: SOUND_ENDED,
-        });
-      } else {
-        await dispatch(
-          setTime({
-            time: TrackPlayer.getPosition(),
-            duration: TrackPlayer.getDuration(),
-          })
-        );
-      }
-    } catch (err) {
-      rollbar.log(err);
-      clearInterval(intervalId);
-    }
-  }, 100);
+  console.log("sound changed");
   dispatch({
     type: CHANGE_SOUND,
     payload: {
       currentPlayingSound: queue[currIndex],
-      intervalId,
-      currentPlaybackObject: playbackObject,
+      intervalId: "",
       queue,
       currIndex,
     },
   });
 };
+
+export const trackEnded =
+  (currentPlayingSound, queue, currIndex, duration) => async (dispatch) => {
+    let { user, ipAddr } = store.getState().auth;
+    if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
+      dispatch(addListenerAuthenticated(currentPlayingSound.id, duration));
+    } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
+      dispatch(addListener(currentPlayingSound.id, ipAddr, duration));
+    }
+    console.log(currIndex);
+    if (queue && queue.length > 0 && currIndex && currIndex < queue.length) {
+      dispatch({
+        type: CHANGE_SOUND,
+        payload: {
+          currentPlayingSound: queue[currIndex],
+          intervalId: "",
+          queue,
+          currIndex,
+        },
+      });
+    }
+  };

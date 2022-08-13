@@ -25,10 +25,6 @@ Notifications.setNotificationHandler({
 });
 
 TrackPlayer.registerPlaybackService(Service);
-(async () => {
-  await TrackPlayer.setupPlayer();
-})();
-
 //async() => clearAsyncStorage();
 registerForPushNotificationsAsync();
 
