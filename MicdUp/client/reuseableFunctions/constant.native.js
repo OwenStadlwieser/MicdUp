@@ -1,6 +1,6 @@
 import { Client } from "rollbar-react-native";
 import MusicControl from "../../components/reuseable/MusicControl";
-
+import TrackPlayer from "react-native-track-player";
 const SINGLE_POST_KEY = "SinglePost";
 
 const rollbar = new Client("9acdab57458540fda4d4df662189d166");
@@ -21,9 +21,29 @@ const updateMusicControlNewSoundPlaying = (sound) => {
     isLiveStream: false,
   });
 };
+
+const nextTrackIos = async () => {
+  const queue = await TrackPlayer.getQueue();
+  const nextIndex = await TrackPlayer.getCurrentTrack();
+  if (nextIndex < queue.length - 1) {
+    await TrackPlayer.skipToNext();
+  }
+  return { queue, nextIndex };
+};
+
+const prevTrackIos = async () => {
+  const queue = await TrackPlayer.getQueue();
+  const nextIndex = await TrackPlayer.getCurrentTrack();
+  if (nextIndex > 0) {
+    await TrackPlayer.skipToPrevious();
+  }
+  return { queue, nextIndex };
+};
 export {
   SINGLE_POST_KEY,
   rollbar,
   updateMusicControlPause,
   updateMusicControlNewSoundPlaying,
+  nextTrackIos,
+  prevTrackIos,
 };

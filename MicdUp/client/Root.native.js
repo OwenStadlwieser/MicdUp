@@ -37,6 +37,10 @@ import {
   registerForPushNotificationsAsync,
   setUpListeners,
 } from "./notifications/helpers";
+import {
+  nextTrackIos,
+  prevTrackIos,
+} from "./reuseableFunctions/constant.native";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -115,11 +119,7 @@ export class Root extends Component {
       async (position) => await TrackPlayer.seekTo(position.position)
     );
     TrackPlayer.addEventListener("remote-next", async () => {
-      const queue = await TrackPlayer.getQueue();
-      const nextIndex = await TrackPlayer.getCurrentTrack();
-      if (nextIndex < queue.length - 1) {
-        await TrackPlayer.skipToNext();
-      }
+      const { queue, nextIndex } = await nextTrackIos();
       await this.props.trackEnded(
         queue[nextIndex],
         queue,
@@ -128,11 +128,7 @@ export class Root extends Component {
       );
     });
     TrackPlayer.addEventListener("remote-previous", async () => {
-      const queue = await TrackPlayer.getQueue();
-      const nextIndex = await TrackPlayer.getCurrentTrack();
-      if (nextIndex > 0) {
-        await TrackPlayer.skipToPrevious();
-      }
+      const { queue, nextIndex } = await prevTrackIos();
       await this.props.trackEnded(
         queue[nextIndex],
         queue,
