@@ -92,7 +92,6 @@ export const trackEnded =
     } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
       dispatch(addListener(currentPlayingSound.id, ipAddr, duration));
     }
-    console.log(currIndex);
     if (queue && queue.length > 0 && currIndex && currIndex < queue.length) {
       dispatch({
         type: CHANGE_SOUND,

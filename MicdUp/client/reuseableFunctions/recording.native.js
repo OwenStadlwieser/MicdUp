@@ -1,11 +1,11 @@
 import { Audio } from "expo-av";
 import { rollbar } from "../reuseableFunctions/constants";
-
+import TrackPlayer from "react-native-track-player";
 import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
   rollbar.log("Requesting permission..");
   await Audio.requestPermissionsAsync();
-
+  TrackPlayer.pause();
   rollbar.log("Starting recording..");
   const { recording } = await Audio.Recording.createAsync(
     Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
