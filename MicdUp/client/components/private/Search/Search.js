@@ -82,7 +82,7 @@ export class Search extends Component {
           placeHolderColor={"white"}
           scrollable={true}
           displayResults={false}
-          initValue={users ? users.toString() : ""}
+          initValue={""}
         />
         {term.length == 0 && (
           <View style={styles.searchTags}>

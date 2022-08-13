@@ -252,7 +252,7 @@ export class Profile extends Component {
       ? this.props.currentProfile.user
       : {};
     const { id } = this.props.currentProfile;
-    const isUserProfile = profile && currentProfile ? profile.id === id : true;
+    const isUserProfile = profile && currentProfile ? profile.id === id : false;
     const posts = cachedPosts[id];
     if (!profile && !currentProfile) {
       return (
@@ -405,6 +405,13 @@ export class Profile extends Component {
                 <View style={styles.foreignProfileButtons}>
                   <TouchableOpacity
                     onPress={async () => {
+                      if (!id) {
+                        this.props.followProfile({
+                          success: false,
+                          message: "Log in to follow profile",
+                        });
+                        return;
+                      }
                       await this.props.followProfile(id);
                     }}
                     style={styles.smallNextButton}
@@ -417,6 +424,13 @@ export class Profile extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={async () => {
+                      if (!id) {
+                        this.props.showMessage({
+                          success: false,
+                          message: "Log in to add to privates",
+                        });
+                        return;
+                      }
                       await this.props.addToPrivates(
                         id,
                         currentProfile.isPrivateByUser
@@ -433,6 +447,13 @@ export class Profile extends Component {
                   <TouchableOpacity style={styles.smallNextButton}>
                     <Text
                       onPress={async () => {
+                        if (!profile) {
+                          this.props.showMessage({
+                            success: false,
+                            message: "Log in to send messages",
+                          });
+                          return;
+                        }
                         this.props.addLoading("Profile");
                         await this.props.createOrOpenChat(
                           [id, profile.id],

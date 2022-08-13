@@ -98,7 +98,7 @@ export class Dms extends Component {
               this.mounted && this.setState({ showDropDown: true })
             }
             displayResults={false}
-            initValue={users ? users.toString() : ""}
+            initValue={""}
           />
           {showDropDown && (
             <DropDown
