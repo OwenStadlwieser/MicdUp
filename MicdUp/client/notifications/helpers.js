@@ -116,6 +116,7 @@ const receiveNotificationListener = async (notification) => {
 
 const notificationAppResponse = async (data) => {
   const { sender, text, itemId, parentId, dateCreated } = data;
+  rollbar.log(sender, itemId, parentId);
   let { user, ipAddr } = store.getState().auth;
   let profile = user.profile;
   switch (data.type) {
@@ -154,16 +155,11 @@ const notificationAppResponse = async (data) => {
   }
 };
 const notificationResponseReceivedListener = async (response) => {
-  rollbar.log(1, response);
-  rollbar.log(3, response.notification);
-  rollbar.log(4, response.notification.data);
-  rollbar.log(5, response.notification.request);
-  rollbar.log(6, response.notification.request.content);
   rollbar.log(7, response.notification.request.content.data);
 
   rollbar.log("Notification Response Receiverd", response);
   try {
-    const data = response.notification.request.content.data.data;
+    const data = response.notification.request.content.data;
     await notificationAppResponse(data);
     rollbar.log(data);
   } catch (err) {

@@ -1,4 +1,5 @@
 const { User } = require("../database/models/User");
+const { Profile } = require("../database/models/Profile");
 const { Notif } = require("../database/models/Notif");
 const { Expo } = require("expo-server-sdk");
 const {
@@ -16,9 +17,16 @@ const expo = new Expo();
 //data is the json data contained in the push notification.
 //tokens is an array of the push tokens to send the notification to.
 //sound is optional. leave blank for default sound.
-const sendNotification = (title, body, data, tokens, sound = "default") => {
+const sendNotification = async (
+  title,
+  body,
+  data,
+  tokens,
+  sound = "default"
+) => {
   let notifications = [];
-
+  // security ???
+  data.sender = await Profile.findOne({ user: data.sender });
   for (let token of tokens) {
     notifications.push({
       to: token,
@@ -103,7 +111,7 @@ const makeNotification = async (
     parentId,
   });
   await notif.save();
-  sendNotification(title, body, notif, tokens);
+  await sendNotification(title, body, notif, tokens);
 };
 
 // deletes notification from db
