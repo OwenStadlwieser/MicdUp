@@ -43,9 +43,7 @@ export class Search extends Component {
 
   componentWillUnmount = () => (this.mounted = false);
 
-  componentDidMount = () => {
-    console.log("mount");
-  };
+  componentDidMount = () => {};
   componentDidUpdate = (prevProps) => {
     const { keyForSearch } = this.props;
     if (prevProps.keyForSearch != keyForSearch) {
