@@ -7,7 +7,14 @@ import { connect } from "react-redux";
 import { addToken } from "../redux/actions/notifs";
 import { receiveNotif } from "../redux/actions/display";
 import { rollbar } from "../reuseableFunctions/constants";
-
+import { NotificationTypesFrontend } from "./NotificationTypes";
+import { openSpecificPost } from "../redux/actions/recording";
+import { navigate } from "../redux/actions/display";
+import { searchViewProfile } from "../redux/actions/display";
+import { viewProfile } from "../redux/actions/display";
+import { createOrOpenChat } from "../redux/actions/chat";
+import { showComments } from "../redux/actions/display";
+import { SINGLE_POST_KEY } from "../reuseableFunctions/constants";
 const MAX_NOTIFICATION_QUEUE_SIZE = 10;
 
 const registerForPushNotificationsAsync = async () => {
@@ -107,8 +114,55 @@ const receiveNotificationListener = async (notification) => {
   console.log(notification);
 };
 
-const notificationResponseReceivedListener = (response) => {
+const notificationAppResponse = async (data) => {
+  const { sender, text, itemId, parentId, dateCreated } = data;
+  let { user, ipAddr } = store.getState().auth;
+  let profile = user.profile;
+  switch (data.type) {
+    case NotificationTypesFrontend.LikePost:
+      await store.dispatch(openSpecificPost(itemId, null));
+      store.dispatch(navigate("SinglePostContainer"));
+      break;
+    case NotificationTypesFrontend.CommentPost:
+      await store.dispatch(openSpecificPost(parentId, itemId));
+      store.dispatch(navigate("SinglePostContainer"));
+      store.dispatch(showComments(0, SINGLE_POST_KEY));
+      break;
+    case NotificationTypesFrontend.Follow:
+      if (profile && profile.id === sender.id) {
+        store.dispatch(navigate("Profile"));
+        this.mounted && this.setState({ showing: false });
+        break;
+      }
+      store.dispatch(viewProfile({ ...sender }));
+      store.dispatch(searchViewProfile(true));
+      store.dispatch(navigate("SearchProfile"));
+      break;
+    case NotificationTypesFrontend.SendMessage:
+      await store.dispatch(createOrOpenChat([], "", parentId));
+      break;
+    case NotificationTypesFrontend.ReplyComment:
+      await store.dispatch(openSpecificPost(parentId, itemId));
+      store.dispatch(navigate("SinglePostContainer"));
+      store.dispatch(showComments(0, SINGLE_POST_KEY));
+      break;
+    case NotificationTypesFrontend.LikeComment:
+      await store.dispatch(openSpecificPost(parentId, itemId));
+      store.dispatch(navigate("SinglePostContainer"));
+      store.dispatch(showComments(0, SINGLE_POST_KEY));
+      break;
+  }
+};
+const notificationResponseReceivedListener = async (response) => {
+  rollbar.log(response);
   rollbar.log("Notification Response Receiverd", response);
+  try {
+    const data = response.notification.request.content.data;
+    await notificationAppResponse(data);
+    rollbar.log(data);
+  } catch (err) {
+    rollbar.error(err);
+  }
   console.log(response);
 };
 
@@ -117,6 +171,7 @@ const setUpListeners = () => {
     notificationResponseReceivedListener
   );
   Notifications.addNotificationReceivedListener((notification) => {
+    rollbar.log(notification);
     rollbar.log("Notification Recieved", notification);
     receiveNotificationListener(notification);
   });
@@ -124,4 +179,8 @@ const setUpListeners = () => {
 
 connect({}, { receiveNotif })(receiveNotificationListener);
 
-export { registerForPushNotificationsAsync, setUpListeners };
+export {
+  registerForPushNotificationsAsync,
+  setUpListeners,
+  notificationAppResponse,
+};

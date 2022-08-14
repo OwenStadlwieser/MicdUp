@@ -20,7 +20,7 @@
             "infoPlist": {
                 "UIBackgroundModes": ["audio"]
             },
-            "bundleIdentifier": "com.test.test"
+            "bundleIdentifier": "com.micdup.development"
         },
         "android": {
             "adaptiveIcon": {
