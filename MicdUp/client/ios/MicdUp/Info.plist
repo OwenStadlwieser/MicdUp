@@ -62,6 +62,14 @@
 	<string>Allow $(PRODUCT_NAME) to securely recognize user speech</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>audio</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

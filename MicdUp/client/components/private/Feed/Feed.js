@@ -80,6 +80,7 @@ export class Feed extends Component {
               name={
                 !tag.isFollowedByUser ? "heart-plus-outline" : "heart-remove"
               }
+              style={{ paddingHorizontal: 20 }}
               onPress={async () => {
                 const { tag } = this.state;
                 this.props.addLoading("Feed");
@@ -363,19 +364,24 @@ export class Feed extends Component {
             )}
             renderHiddenItem={(data, rowMap) => {
               return (
-                <View style={listStyles.rowBack}>
-                  <TouchableOpacity
-                    style={[
-                      listStyles.backRightBtn,
-                      listStyles.backRightBtnRight,
-                    ]}
-                    onPress={async () => {
-                      await this.props.deletePost(data.item.id, key);
-                    }}
-                  >
-                    <Entypo name="trash" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
+                profile &&
+                data.item.owner.id == profile.id && (
+                  <View style={listStyles.rowBack}>
+                    <TouchableOpacity
+                      style={[
+                        listStyles.backRightBtn,
+                        listStyles.backRightBtnRight,
+                      ]}
+                      onPress={async () => {
+                        this.props.addLoading("Feed");
+                        await this.props.deletePost(data.item.id, key);
+                        this.props.removeLoading("Feed");
+                      }}
+                    >
+                      <Entypo name="trash" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                )
               );
             }}
             rightOpenValue={-75}

@@ -334,9 +334,16 @@ export const deletePost = (postId, currentKey) => async (dispatch) => {
         type: DELETE_POST,
         payload: { id: postId, currentKey },
       });
+      dispatch(
+        showMessage({
+          success: true,
+          message: "Post deleted",
+        })
+      );
     }
     return res.data.deletePost;
   } catch (err) {
+    console.log(err);
     rollbar.log(err);
   }
 };

@@ -52,6 +52,7 @@
         "react-native-swipe-list-view": "^3.2.9",
         "react-native-swipeout": "^2.3.6",
         "react-native-text-size": "^4.0.0-rc.1",
+        "react-native-track-player": "^3.0.0",
         "react-native-web": "0.17.1",
         "react-navigation": "^4.4.4",
         "react-redux": "^7.2.6",

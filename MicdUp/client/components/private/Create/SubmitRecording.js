@@ -112,7 +112,7 @@ export class SubmitRecording extends Component {
               setResOnChangeFunc={this.setTagsArrayState.bind(this)}
               inputStyle={styles.textInputRecEdit}
               placeHolderColor={"white"}
-              initValue={tags ? tags.toString() : ""}
+              initValue={""}
               displayResults={false}
               onFocus={() =>
                 this.mounted && this.setState({ showResults: true })

@@ -7,11 +7,7 @@ import { styles } from "./styles/Styles";
 import { setIp } from "./redux/actions/auth";
 import { navigationRef, navigateStateChanged } from "./redux/actions/display";
 import { changeSound, pauseSound } from "./redux/actions/sound";
-import { setTime } from "./redux/actions/sound";
-import {
-  addListener,
-  addListenerAuthenticated,
-} from "./redux/actions/recording";
+import { setTime, trackEnded } from "./redux/actions/sound";
 // children
 import LoginManager from "./components/reuseable/LoginManager";
 import Comment from "./components/reuseable/Comment";
@@ -26,6 +22,7 @@ import Search from "./components/private/Search/Search";
 import Profile from "./components/private/Profile/Profile";
 import ListOfAccounts from "./components/reuseable/ListOfAccounts";
 import VerifyEmail from "./components/private/Profile/VerifyEmail";
+import TrackPlayer from "react-native-track-player";
 // helpers
 import publicIP from "react-native-public-ip";
 import { getData } from "./reuseableFunctions/helpers";
@@ -35,6 +32,16 @@ import { Audio } from "expo-av";
 import SoundModal from "./components/reuseable/SoundModal";
 import { STATUS_BAR_STYLE } from "./reuseableFunctions/constantsshared";
 import MusicControl from "./components/reuseable/MusicControl";
+import { Capability } from "react-native-track-player";
+import {
+  registerForPushNotificationsAsync,
+  setUpListeners,
+} from "./notifications/helpers";
+import {
+  nextTrackIos,
+  prevTrackIos,
+} from "./reuseableFunctions/constant.native";
+import { rollbar } from "./reuseableFunctions/constants";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -58,10 +65,102 @@ export class Root extends Component {
   }
 
   componentWillUnmount = () => {
+    const { intervalId } = this.state;
+    clearInterval(intervalId);
     this.mounted = false;
   };
 
   componentDidMount = async () => {
+    try {
+      await registerForPushNotificationsAsync();
+      setUpListeners();
+    } catch (err) {
+      rollbar.log(err, "notif error");
+      console.log(err, "notif error");
+    }
+
+    await TrackPlayer.setupPlayer();
+
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.SeekTo,
+      ],
+      notificationCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.SeekTo,
+      ],
+    });
+    TrackPlayer.addEventListener("playback-track-changed", async (object) => {
+      const queue = await TrackPlayer.getQueue();
+      if (object.track != null && object.nextTrack != object.track) {
+        await this.props.trackEnded(
+          queue[object.track],
+          queue,
+          object.nextTrack,
+          object.track
+        );
+      }
+    });
+    TrackPlayer.addEventListener(
+      "remote-play",
+      async () => await TrackPlayer.play()
+    );
+    TrackPlayer.addEventListener(
+      "remote-pause",
+      async () => await TrackPlayer.pause()
+    );
+    TrackPlayer.addEventListener(
+      "remote-stop",
+      async () => await TrackPlayer.stop()
+    );
+    TrackPlayer.addEventListener(
+      "remote-seek",
+      async (position) => await TrackPlayer.seekTo(position.position)
+    );
+    TrackPlayer.addEventListener("remote-next", async () => {
+      const { queue, nextIndex } = await nextTrackIos();
+      await this.props.trackEnded(
+        queue[nextIndex],
+        queue,
+        nextIndex + 1,
+        nextIndex
+      );
+    });
+    TrackPlayer.addEventListener("remote-previous", async () => {
+      const { queue, nextIndex } = await prevTrackIos();
+      await this.props.trackEnded(
+        queue[nextIndex],
+        queue,
+        nextIndex + 1,
+        nextIndex
+      );
+    });
+    console.log("setup");
+
+    const intervalId = setInterval(async () => {
+      try {
+        const position = await TrackPlayer.getPosition();
+        const duration = await TrackPlayer.getDuration();
+        if (position && duration) {
+          await this.props.setTime({
+            time: position,
+            duration: duration,
+          });
+        }
+      } catch (err) {
+        console.log(err, 123);
+        rollbar.log(err, 123);
+        clearInterval(intervalId);
+      }
+    }, 100);
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
       allowsRecordingIOS: true,
@@ -85,7 +184,7 @@ export class Root extends Component {
         // 'Unable to get IP address.'
       });
     const token = await getData("token");
-    this.mounted && this.setState({ token });
+    this.mounted && this.setState({ token, intervalId });
   };
 
   componentDidUpdate = async (prevProps, prevState) => {
@@ -285,4 +384,5 @@ export default connect(mapStateToProps, {
   changeSound,
   pauseSound,
   setTime,
+  trackEnded,
 })(Root);

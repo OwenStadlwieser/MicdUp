@@ -60,9 +60,12 @@ export class Dms extends Component {
   };
 
   componentDidMount = async () => {
-    this.props.addLoading("DMS");
-    await this.props.viewChats(0);
-    this.props.removeLoading("DMS");
+    const { chats } = this.props;
+    if (!chats || chats.length == 0) {
+      this.props.addLoading("DMS");
+      await this.props.viewChats(0);
+      this.props.removeLoading("DMS");
+    }
   };
 
   render() {
@@ -95,7 +98,7 @@ export class Dms extends Component {
               this.mounted && this.setState({ showDropDown: true })
             }
             displayResults={false}
-            initValue={users ? users.toString() : ""}
+            initValue={""}
           />
           {showDropDown && (
             <DropDown

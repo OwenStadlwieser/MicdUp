@@ -12,6 +12,7 @@ import { Button } from "react-native-paper";
 // redux
 import { addLoading, removeLoading } from "../../redux/actions/display";
 import { blockProfile } from "../../redux/actions/profile";
+import { showMessage } from "../../redux/actions/display";
 // icons
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -41,6 +42,7 @@ export class OtherUserSetttings extends Component {
   };
 
   render() {
+    const { profile } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
@@ -53,6 +55,13 @@ export class OtherUserSetttings extends Component {
             color="red"
             style={[styles.button, { width: "auto", marginTop: 0 }]}
             onPress={async () => {
+              if (!this.props.profile) {
+                this.props.showMessage({
+                  success: false,
+                  message: "Log in to block users",
+                });
+                return;
+              }
               this.props.addLoading("OTHERSETTING");
               await this.props.blockProfile(
                 this.props.currentProfile.id,
@@ -70,10 +79,13 @@ export class OtherUserSetttings extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  profile: state.auth.user.profile,
+});
 
 export default connect(mapStateToProps, {
   addLoading,
   removeLoading,
   blockProfile,
+  showMessage,
 })(OtherUserSetttings);

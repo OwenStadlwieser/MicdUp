@@ -17,6 +17,7 @@ import Like from "./Like";
 import SpeechToText from "./SpeechToText";
 import CircleSnail from "react-native-progress/CircleSnail";
 import RecordingControls from "./RecordingControls";
+import ProgressBar from "./ProgressBar";
 // styles
 import { styles } from "../../styles/Styles";
 // helpers
@@ -48,7 +49,7 @@ import { addLoading, removeLoading } from "../../redux/actions/display";
 import { rollbar } from "../../reuseableFunctions/constants";
 import { forHumans, getCurrentTime } from "../../reuseableFunctions/helpers";
 import { SINGLE_POST_KEY } from "../../reuseableFunctions/constants";
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 export class Comment extends Component {
   constructor() {
     super();
@@ -188,7 +189,7 @@ export class Comment extends Component {
 
   handleMap(comment, i, index, parentId, parent) {
     const { profile, playingId, isPause } = this.props;
-    const { postIndex, cachedPosts, currentKey } = this.props;
+    const { postIndex, cachedPosts, currentKey, time, duration } = this.props;
     const post = cachedPosts[currentKey]
       ? cachedPosts[currentKey][postIndex]
       : null;
@@ -218,6 +219,7 @@ export class Comment extends Component {
             flexDirection: "row",
             alignItems: "center",
             paddingVertical: 5,
+            height: height * 0.1,
           }}
         >
           <TouchableOpacity
@@ -246,6 +248,24 @@ export class Comment extends Component {
                   : "transparent",
             }}
           >
+            {playingId === comment.id && (
+              <View
+                style={{
+                  width: width * (time / duration),
+                  height: 3,
+                  bottom: 15,
+                  right:
+                    index >= 12
+                      ? 10 + (width - width * (time / duration))
+                      : width - width * (time / duration),
+                  left: index > 0 && index < 12 ? index * 10 : 0,
+                  position: "absolute",
+                  zIndex: -1,
+                  backgroundColor: "#6FF6FF",
+                  borderRadius: 8,
+                }}
+              ></View>
+            )}
             <View style={{ flexDirection: "column" }}>
               <View style={{ flex: 2 }}>
                 <Text style={styles.blackText}>
@@ -513,6 +533,8 @@ const mapStateToProps = (state) => ({
   postIndex: state.display.postIndex,
   cachedPosts: state.auth.posts,
   currentKey: state.auth.currentKey,
+  time: state.sound.time,
+  duration: state.sound.duration,
 });
 
 export default connect(mapStateToProps, {

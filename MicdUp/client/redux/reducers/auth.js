@@ -132,7 +132,6 @@ export default function (state = { ...initialState }, action) {
         },
       };
     case SET_POSTS:
-      console.log(payload.userId, 1232, payload.posts);
       let oldPosts = state.posts[payload.userId];
       let newPosts =
         oldPosts && payload.skipMult != 0
@@ -150,7 +149,7 @@ export default function (state = { ...initialState }, action) {
     case DELETE_POST:
       let postsToDelete = [...state.posts[payload.currentKey]];
       const postDelIndex = postsToDelete.findIndex(
-        (post) => post.id === payload.post.id
+        (post) => post.id === payload.id
       );
       postsToDelete.splice(postDelIndex, 1);
       return {
