@@ -154,10 +154,16 @@ const notificationAppResponse = async (data) => {
   }
 };
 const notificationResponseReceivedListener = async (response) => {
-  rollbar.log(response);
+  rollbar.log(1, response);
+  rollbar.log(3, response.notification);
+  rollbar.log(4, response.notification.data);
+  rollbar.log(5, response.notification.request);
+  rollbar.log(6, response.notification.request.content);
+  rollbar.log(7, response.notification.request.content.data);
+
   rollbar.log("Notification Response Receiverd", response);
   try {
-    const data = response.notification.request.content.data;
+    const data = response.notification.request.content.data.data;
     await notificationAppResponse(data);
     rollbar.log(data);
   } catch (err) {
