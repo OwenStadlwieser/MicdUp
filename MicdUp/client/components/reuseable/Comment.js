@@ -134,6 +134,7 @@ export class Comment extends Component {
     }, 1000);
     if (
       currentKey == SINGLE_POST_KEY &&
+      post &&
       post.comments &&
       post.comments.length > 0
     ) {
@@ -463,7 +464,7 @@ export class Comment extends Component {
         style={styles.commentOpenContainer}
       >
         <View style={styles.commentsContainer}>
-          {post.comments && post.comments.length > 0 ? (
+          {post && post.comments && post.comments.length > 0 ? (
             <ScrollView
               ref={(scrollView) => (this.scrollView = scrollView)}
               scrollEnabled={true}
@@ -485,7 +486,7 @@ export class Comment extends Component {
                   return this.handleMap(comment, index, 0, null, null);
                 })}
             </ScrollView>
-          ) : !loading ? (
+          ) : post && !loading ? (
             <View
               style={{
                 flex: 1,
@@ -497,6 +498,20 @@ export class Comment extends Component {
                 style={{ color: "#000000", fontStyle: "italic", fontSize: 24 }}
               >
                 Be the first to comment!
+              </Text>
+            </View>
+          ) : !post ? (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{ color: "#000000", fontStyle: "italic", fontSize: 24 }}
+              >
+                Could not find post
               </Text>
             </View>
           ) : (

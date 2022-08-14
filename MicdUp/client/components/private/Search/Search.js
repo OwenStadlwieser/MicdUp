@@ -44,7 +44,12 @@ export class Search extends Component {
   componentWillUnmount = () => (this.mounted = false);
 
   componentDidMount = () => {};
-
+  componentDidUpdate = (prevProps) => {
+    const { keyForSearch } = this.props;
+    if (prevProps.keyForSearch != keyForSearch) {
+      this.mounted && this.setState({ term: "" });
+    }
+  };
   setUsersState = (users) => {
     this.mounted && this.setState({ users });
   };
@@ -171,6 +176,7 @@ export class Search extends Component {
 
 const mapStateToProps = (state) => ({
   currentProfile: state.display.viewingProfile,
+  keyForSearch: state.display.keyForSearch,
 });
 
 export default connect(mapStateToProps, {

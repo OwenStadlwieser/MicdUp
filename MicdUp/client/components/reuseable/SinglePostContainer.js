@@ -47,7 +47,9 @@ export class SinglePostContainer extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  post: state.auth.posts[SINGLE_POST_KEY][0],
+  post: state.auth.posts[SINGLE_POST_KEY]
+    ? state.auth.posts[SINGLE_POST_KEY][0]
+    : {},
 });
 
 export default connect(mapStateToProps, {})(SinglePostContainer);

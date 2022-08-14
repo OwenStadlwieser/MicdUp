@@ -19,6 +19,7 @@ import { SINGLE_POST_KEY } from "../../../reuseableFunctions/constants";
 import { createOrOpenChat } from "../../../redux/actions/chat";
 import { CircleSnail } from "react-native-progress";
 import { forHumans, getCurrentTime } from "../../../reuseableFunctions/helpers";
+import { notificationAppResponse } from "../../../notifications/helpers";
 export class Notification extends Component {
   constructor() {
     super();
@@ -48,40 +49,7 @@ export class Notification extends Component {
         onPress={async () => {
           this.mounted && this.setState({ loading: true });
 
-          switch (data.type) {
-            case NotificationTypesFrontend.LikePost:
-              await this.props.openSpecificPost(itemId, null);
-              this.props.navigate("SinglePostContainer");
-              break;
-            case NotificationTypesFrontend.CommentPost:
-              await this.props.openSpecificPost(parentId, itemId);
-              this.props.navigate("SinglePostContainer");
-              this.props.showComments(0, SINGLE_POST_KEY);
-              break;
-            case NotificationTypesFrontend.Follow:
-              if (profile && profile.id === sender.id) {
-                this.props.navigate("Profile");
-                this.mounted && this.setState({ showing: false });
-                break;
-              }
-              this.props.viewProfile({ ...sender });
-              this.props.searchViewProfile(true);
-              this.props.navigate("SearchProfile");
-              break;
-            case NotificationTypesFrontend.SendMessage:
-              await this.props.createOrOpenChat([], "", parentId);
-              break;
-            case NotificationTypesFrontend.ReplyComment:
-              await this.props.openSpecificPost(parentId, itemId);
-              this.props.navigate("SinglePostContainer");
-              this.props.showComments(0, SINGLE_POST_KEY);
-              break;
-            case NotificationTypesFrontend.LikeComment:
-              await this.props.openSpecificPost(parentId, itemId);
-              this.props.navigate("SinglePostContainer");
-              this.props.showComments(0, SINGLE_POST_KEY);
-              break;
-          }
+          await notificationAppResponse(data);
           this.mounted && this.setState({ loading: false });
         }}
       >
