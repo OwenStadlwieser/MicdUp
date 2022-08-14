@@ -4,7 +4,18 @@ import TrackPlayer from "react-native-track-player";
 import { Platform } from "react-native";
 const startRecording = async (Voice, onRecordingStatusUpdate) => {
   rollbar.log("Requesting permission..");
+  await Audio.setAudioModeAsync({
+    playsInSilentModeIOS: true,
+    allowsRecordingIOS: true,
+    staysActiveInBackground: true,
+    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
+    playsInSilentModeIOS: true,
+    shouldDuckAndroid: true,
+    interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+    playThroughEarpieceAndroid: false,
+  });
   await Audio.requestPermissionsAsync();
+
   TrackPlayer.pause();
   rollbar.log("Starting recording..");
   const { recording } = await Audio.Recording.createAsync(

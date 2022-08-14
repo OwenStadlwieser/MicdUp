@@ -4,12 +4,7 @@ import store from "../index";
 import { Audio } from "expo-av";
 import { addListenerAuthenticated, addListener } from "./recording";
 import { rollbar } from "../../reuseableFunctions/constants";
-import { showMessage } from "./display";
 import { PitchAlgorithm } from "react-native-track-player";
-import {
-  updateMusicControlPause,
-  updateMusicControlNewSoundPlaying,
-} from "../../reuseableFunctions/constants";
 import TrackPlayer, { State } from "react-native-track-player";
 
 const soundExpo = new Audio.Sound();
@@ -43,10 +38,15 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
     currentPlayingSound &&
     currentPlayingSound.signedUrl !== queue[currIndex].signedUrl
   ) {
-    if (user && currentPlayingSound.id && user._id) {
-      dispatch(addListenerAuthenticated(currentPlayingSound.id, time));
-    } else if (ipAddr && currentPlayingSound.id) {
-      dispatch(addListener(currentPlayingSound.id, ipAddr, time));
+    try {
+      if (user && currentPlayingSound.id && user._id) {
+        dispatch(addListenerAuthenticated(currentPlayingSound.id, time));
+      } else if (ipAddr && currentPlayingSound.id) {
+        dispatch(addListener(currentPlayingSound.id, ipAddr, time));
+      }
+    } catch (err) {
+      console.log(err, "add listen err");
+      rollbar.log(err, "add listen err");
     }
   } else if (currentPlayingSound) {
     const state = await TrackPlayer.getState();
@@ -70,9 +70,10 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
     el.pitchAlgorith = PitchAlgorithm.Voice;
     return el;
   });
-  TrackPlayer.add(tracks);
+  await TrackPlayer.reset();
+  await TrackPlayer.add(tracks);
   await TrackPlayer.skip(currIndex);
-  TrackPlayer.play();
+  await TrackPlayer.play();
   dispatch({
     type: CHANGE_SOUND,
     payload: {
@@ -83,16 +84,41 @@ export const changeSound = (currIndex, queue) => async (dispatch) => {
     },
   });
 };
-
+const calls = {};
 export const trackEnded =
-  (currentPlayingSound, queue, currIndex, duration) => async (dispatch) => {
+  (currentPlayingSoundFromQueue, queue, currIndex, prevIndex) =>
+  async (dispatch) => {
     let { user, ipAddr } = store.getState().auth;
-    if (user && currentPlayingSound && currentPlayingSound.id && user._id) {
-      dispatch(addListenerAuthenticated(currentPlayingSound.id, duration));
-    } else if (currentPlayingSound && currentPlayingSound.id && ipAddr) {
-      dispatch(addListener(currentPlayingSound.id, ipAddr, duration));
+    let { currentPlayingSound, currentIntervalId, time } =
+      store.getState().sound;
+
+    try {
+      const duration = await TrackPlayer.getDuration();
+      if (
+        user &&
+        currentPlayingSoundFromQueue &&
+        currentPlayingSoundFromQueue.id &&
+        user._id
+      ) {
+        dispatch(
+          addListenerAuthenticated(currentPlayingSoundFromQueue.id, duration)
+        );
+      } else if (
+        currentPlayingSoundFromQueue &&
+        currentPlayingSoundFromQueue.id &&
+        ipAddr
+      ) {
+        dispatch(
+          addListener(currentPlayingSoundFromQueue.id, ipAddr, duration)
+        );
+      }
+    } catch (err) {
+      console.log(err, "add listen err");
+      rollbar.log(err, "add listen err");
     }
+
     if (queue && queue.length > 0 && currIndex && currIndex < queue.length) {
+      calls[queue[currIndex].signedUrl] = 1;
       dispatch({
         type: CHANGE_SOUND,
         payload: {
@@ -102,5 +128,22 @@ export const trackEnded =
           currIndex,
         },
       });
+    } else if (
+      !currIndex &&
+      queue[prevIndex].signedUrl == currentPlayingSound.signedUrl &&
+      calls[currentPlayingSound.signedUrl]
+    ) {
+      delete calls[currentPlayingSound.signedUrl];
+      dispatch({
+        type: CHANGE_SOUND,
+        payload: {
+          currentPlayingSound: "",
+          intervalId: "",
+          queue: [],
+          currIndex: 0,
+        },
+      });
+    } else {
+      calls[currentPlayingSound.signedUrl] = 1;
     }
   };

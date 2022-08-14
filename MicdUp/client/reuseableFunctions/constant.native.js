@@ -1,6 +1,6 @@
 import { Client } from "rollbar-react-native";
-import MusicControl from "../../components/reuseable/MusicControl";
 import TrackPlayer from "react-native-track-player";
+import MusicControl from "../components/reuseable/MusicControl";
 const SINGLE_POST_KEY = "SinglePost";
 
 const rollbar = new Client("9acdab57458540fda4d4df662189d166");

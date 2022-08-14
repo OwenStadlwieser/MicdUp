@@ -164,7 +164,7 @@ export class SoundModal extends Component {
                       <AntDesign
                         name="pausecircleo"
                         size={24}
-                        color="1A3561"
+                        color="#1A3561"
                         style={{ paddingBottom: 30 }}
                       />
                     </TouchableOpacity>
@@ -213,4 +213,5 @@ export default connect(mapStateToProps, {
   searchViewProfile,
   navigate,
   showSoundModal,
+  trackEnded,
 })(SoundModal);

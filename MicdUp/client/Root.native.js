@@ -41,6 +41,7 @@ import {
   nextTrackIos,
   prevTrackIos,
 } from "./reuseableFunctions/constant.native";
+import { rollbar } from "./reuseableFunctions/constants";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -70,10 +71,16 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
-    await registerForPushNotificationsAsync();
+    try {
+      await registerForPushNotificationsAsync();
+      setUpListeners();
+    } catch (err) {
+      rollbar.log(err, "notif error");
+      console.log(err, "notif error");
+    }
 
-    setUpListeners();
     await TrackPlayer.setupPlayer();
+
     await TrackPlayer.updateOptions({
       stopWithApp: false,
       capabilities: [
@@ -136,6 +143,8 @@ export class Root extends Component {
         nextIndex
       );
     });
+    console.log("setup");
+
     const intervalId = setInterval(async () => {
       try {
         const position = await TrackPlayer.getPosition();
