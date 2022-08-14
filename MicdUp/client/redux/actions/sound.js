@@ -11,6 +11,7 @@ import {
 
 const soundExpo = new Audio.Sound();
 
+export const trackEnded = () => () => {};
 export const changeSound = (currIndex, queue) => async (dispatch) => {
   let { currentPlayingSound, currentIntervalId, time } = store.getState().sound;
   let { user, ipAddr } = store.getState().auth;

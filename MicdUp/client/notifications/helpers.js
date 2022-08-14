@@ -11,6 +11,7 @@ import { rollbar } from "../reuseableFunctions/constants";
 const MAX_NOTIFICATION_QUEUE_SIZE = 10;
 
 const registerForPushNotificationsAsync = async () => {
+  rollbar.log("Registering");
   if (await getData("expoToken")) {
     let token = await getData("expoPushToken");
     console.log("FOUND TOKEN!");

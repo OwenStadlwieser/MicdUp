@@ -242,6 +242,8 @@ export class Create extends Component {
                   try {
                     await this.startRecording();
                   } catch (err) {
+                    rollbar.log(err);
+                    console.log(err);
                     this.props.showMessage({
                       success: false,
                       message: "Unable to start recording",

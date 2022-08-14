@@ -18,9 +18,9 @@ import {
   navigate,
   showSoundModal,
 } from "../../redux/actions/display";
-import { pauseSound, changeSound } from "../../redux/actions/sound";
-
-const { width, height } = Dimensions.get("screen");
+import { pauseSound, changeSound, trackEnded } from "../../redux/actions/sound";
+import { nextTrackIos, prevTrackIos } from "../../reuseableFunctions/constant";
+const { width } = Dimensions.get("screen");
 export class SoundModal extends Component {
   constructor() {
     super();
@@ -36,8 +36,28 @@ export class SoundModal extends Component {
   componentDidMount = () => {};
 
   componentDidUpdate = (prevProps) => {};
+
+  nextTrackIos = async () => {
+    const { queue, nextIndex } = await nextTrackIos();
+    await this.props.trackEnded(
+      queue[nextIndex],
+      queue,
+      nextIndex + 1,
+      nextIndex
+    );
+  };
+  prevTrackIos = async () => {
+    const { queue, nextIndex } = await prevTrackIos();
+    await this.props.trackEnded(
+      queue[nextIndex],
+      queue,
+      nextIndex - 1,
+      nextIndex
+    );
+  };
+
   render() {
-    const { playingId, sound, isPause, profile, queue } = this.props;
+    const { playingId, sound, isPause, profile, queue, currIndex } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
@@ -95,34 +115,71 @@ export class SoundModal extends Component {
                 <View>
                   <Title>{sound.title}</Title>
                 </View>
-                {isPause ? (
-                  <AntDesign
-                    onPress={async () => {
-                      let index = queue.findIndex(
-                        (el) => el.signedUrl == sound.signedUrl
-                      );
-                      if (index > 0) {
-                        this.props.changeSound(index, queue);
-                      } else {
-                        await this.props.changeSound(0, [sound]);
-                      }
-                    }}
-                    name="playcircleo"
-                    size={24}
-                    color="#000000"
-                    style={{ paddingBottom: 30 }}
-                  />
-                ) : (
-                  <AntDesign
-                    onPress={async () => {
-                      await this.props.pauseSound();
-                    }}
-                    name="pausecircleo"
-                    size={24}
-                    color="1A3561"
-                    style={{ paddingBottom: 30 }}
-                  />
-                )}
+                <View
+                  style={{
+                    width: width * 0.5,
+                    paddingHorizontal: 40,
+                    justifyContent: "space-evenly",
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  {currIndex > 0 && (
+                    <TouchableOpacity>
+                      <AntDesign
+                        onPress={this.prevTrackIos}
+                        name="stepbackward"
+                        size={24}
+                        color="black"
+                      />
+                    </TouchableOpacity>
+                  )}
+
+                  {isPause ? (
+                    <TouchableOpacity
+                      onPress={async () => {
+                        let index = queue.findIndex(
+                          (el) => el.signedUrl == sound.signedUrl
+                        );
+                        if (index > 0) {
+                          this.props.changeSound(index, queue);
+                        } else {
+                          await this.props.changeSound(0, [sound]);
+                        }
+                      }}
+                    >
+                      <AntDesign
+                        name="playcircleo"
+                        size={24}
+                        color="#000000"
+                        style={{ paddingBottom: 30 }}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={async () => {
+                        await this.props.pauseSound();
+                      }}
+                    >
+                      <AntDesign
+                        name="pausecircleo"
+                        size={24}
+                        color="#1A3561"
+                        style={{ paddingBottom: 30 }}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  {currIndex < queue.length - 1 && (
+                    <TouchableOpacity>
+                      <AntDesign
+                        onPress={this.nextTrackIos}
+                        name="stepforward"
+                        size={24}
+                        color="black"
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
                 <ProgressBar
                   parentId={playingId}
                   height={10}
@@ -146,6 +203,7 @@ const mapStateToProps = (state) => ({
   isPause: state.sound.isPause,
   profile: state.auth.user ? state.auth.user.profile : null,
   queue: state.sound.queue,
+  currIndex: state.sound.currIndex,
 });
 
 export default connect(mapStateToProps, {
@@ -155,4 +213,5 @@ export default connect(mapStateToProps, {
   searchViewProfile,
   navigate,
   showSoundModal,
+  trackEnded,
 })(SoundModal);

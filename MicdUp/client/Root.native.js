@@ -8,10 +8,6 @@ import { setIp } from "./redux/actions/auth";
 import { navigationRef, navigateStateChanged } from "./redux/actions/display";
 import { changeSound, pauseSound } from "./redux/actions/sound";
 import { setTime, trackEnded } from "./redux/actions/sound";
-import {
-  addListener,
-  addListenerAuthenticated,
-} from "./redux/actions/recording";
 // children
 import LoginManager from "./components/reuseable/LoginManager";
 import Comment from "./components/reuseable/Comment";
@@ -37,6 +33,15 @@ import SoundModal from "./components/reuseable/SoundModal";
 import { STATUS_BAR_STYLE } from "./reuseableFunctions/constantsshared";
 import MusicControl from "./components/reuseable/MusicControl";
 import { Capability } from "react-native-track-player";
+import {
+  registerForPushNotificationsAsync,
+  setUpListeners,
+} from "./notifications/helpers";
+import {
+  nextTrackIos,
+  prevTrackIos,
+} from "./reuseableFunctions/constant.native";
+import { rollbar } from "./reuseableFunctions/constants";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -66,7 +71,16 @@ export class Root extends Component {
   };
 
   componentDidMount = async () => {
+    try {
+      await registerForPushNotificationsAsync();
+      setUpListeners();
+    } catch (err) {
+      rollbar.log(err, "notif error");
+      console.log(err, "notif error");
+    }
+
     await TrackPlayer.setupPlayer();
+
     await TrackPlayer.updateOptions({
       stopWithApp: false,
       capabilities: [
@@ -74,12 +88,14 @@ export class Root extends Component {
         Capability.Pause,
         Capability.SkipToNext,
         Capability.SkipToPrevious,
+        Capability.SeekTo,
       ],
       notificationCapabilities: [
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
         Capability.SkipToPrevious,
+        Capability.SeekTo,
       ],
     });
     TrackPlayer.addEventListener("playback-track-changed", async (object) => {
@@ -105,9 +121,12 @@ export class Root extends Component {
       "remote-stop",
       async () => await TrackPlayer.stop()
     );
+    TrackPlayer.addEventListener(
+      "remote-seek",
+      async (position) => await TrackPlayer.seekTo(position.position)
+    );
     TrackPlayer.addEventListener("remote-next", async () => {
-      const queue = await TrackPlayer.getQueue();
-      const nextIndex = await TrackPlayer.getCurrentTrack();
+      const { queue, nextIndex } = await nextTrackIos();
       await this.props.trackEnded(
         queue[nextIndex],
         queue,
@@ -116,15 +135,16 @@ export class Root extends Component {
       );
     });
     TrackPlayer.addEventListener("remote-previous", async () => {
-      const queue = await TrackPlayer.getQueue();
-      const nextIndex = await TrackPlayer.getCurrentTrack();
+      const { queue, nextIndex } = await prevTrackIos();
       await this.props.trackEnded(
         queue[nextIndex],
         queue,
-        nextIndex - 1,
+        nextIndex + 1,
         nextIndex
       );
     });
+    console.log("setup");
+
     const intervalId = setInterval(async () => {
       try {
         const position = await TrackPlayer.getPosition();
