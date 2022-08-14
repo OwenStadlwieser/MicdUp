@@ -1,5 +1,4 @@
-const baseUrl =
-  "http://micdupdevbackend-env.eba-gwujqkuj.us-east-2.elasticbeanstalk.com/";
+const baseUrl = "http://localhost:6002/";
 const publicUrl = baseUrl + "public";
 const privateUrl = baseUrl + "private";
 const STATUS_BAR_STYLE = "light-content";
